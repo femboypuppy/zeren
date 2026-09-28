@@ -352,9 +352,16 @@ pub fn static_models() -> Vec<Model> {
             vec![toggle("fastMode", "Fast Mode")],
         ),
         model(
+            "claude-sonnet-5-5",
+            "Sonnet 5.5",
+            "Balanced speed and intelligence",
+            XHIGH_LADDER,
+            vec![context_window()],
+        ),
+        model(
             "claude-sonnet-5",
             "Sonnet 5",
-            "Balanced speed and intelligence",
+            "Previous generation Sonnet",
             XHIGH_LADDER,
             vec![context_window()],
         ),
@@ -405,6 +412,8 @@ mod tests {
         assert!(supports_xhigh("claude-opus-5-5"));
         assert!(supports_xhigh("claude-opus-5-5[1m]"));
         assert!(supports_xhigh("claude-opus-4-7-20260101"));
+        assert!(supports_xhigh("claude-sonnet-5-5"));
+        assert!(supports_xhigh("claude-sonnet-5-5[1m]"));
         assert!(!supports_xhigh("claude-opus-4-5"));
         assert!(!supports_xhigh("claude-sonnet-4-5"));
     }
