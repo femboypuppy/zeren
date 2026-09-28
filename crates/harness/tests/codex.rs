@@ -1517,7 +1517,9 @@ async fn ordinary_followup_cannot_overtake_a_queued_native_command() {
             "working",
             "done",
             "steered",
-            "Queued review result",
+            // Native results end in a paragraph break so the next reply
+            // starts on its own line.
+            "Queued review result\n\n",
             "done",
             "steered",
             "followup",
