@@ -292,7 +292,16 @@ fn validate_release_override(value: &str) -> anyhow::Result<String> {
 /// The project's GitHub releases page — the advisory update strip opens this
 /// for unmanaged installs (source builds, hand-copied binaries), where no
 /// updater flow exists to drive.
-pub const RELEASES_PAGE: &str = "https://github.com/zeronsh/zeron/releases";
+/// A build can bake in its own (`ZERON_RELEASES_PAGE`), e.g. a fork's.
+pub const RELEASES_PAGE: &str = match option_env!("ZERON_RELEASES_PAGE") {
+    Some(page) if !page.is_empty() => page,
+    _ => "https://github.com/zeronsh/zeron/releases",
+};
+
+/// The update feed baked in at build time (`ZERON_RELEASE_FEED`), for builds
+/// published somewhere other than the edge's `/releases` — a fork's GitHub
+/// releases, say — so they never update onto another project's build.
+const BUILT_RELEASE_FEED: Option<&str> = option_env!("ZERON_RELEASE_FEED");
 
 fn release_base(edge_url: &str) -> anyhow::Result<String> {
     if let Ok(url) = std::env::var("ZERON_RELEASES_URL")
@@ -303,6 +312,9 @@ fn release_base(edge_url: &str) -> anyhow::Result<String> {
     #[cfg(windows)]
     if let Some(url) = windows::release_url()? {
         return Ok(url.trim_end_matches('/').to_owned());
+    }
+    if let Some(url) = BUILT_RELEASE_FEED.filter(|url| !url.trim().is_empty()) {
+        return validate_release_override(url);
     }
     Ok(format!("{}/releases", edge_url.trim_end_matches('/')))
 }

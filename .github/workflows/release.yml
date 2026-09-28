@@ -20,6 +20,12 @@ on:
 permissions:
   contents: write
 
+# Forks publish to their own GitHub releases, so their builds check for
+# updates there instead of zeron.sh (crates/update reads both at build time).
+env:
+  ZERON_RELEASE_FEED: ${{ github.repository != 'zeronsh/zeron' && format('https://github.com/{0}/releases/latest/download', github.repository) || '' }}
+  ZERON_RELEASES_PAGE: ${{ github.repository != 'zeronsh/zeron' && format('https://github.com/{0}/releases', github.repository) || '' }}
+
 jobs:
   cursor-compatibility:
     uses: ./.github/workflows/cursor-compatibility.yml
