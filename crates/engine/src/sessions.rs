@@ -3441,7 +3441,12 @@ mod tests {
         request.prompt.clear();
         core.sessions
             .inner
-            .remember_harness_session("idle", "old-native-thread", &request.cwd);
+            .remember_harness_session(
+                "idle",
+                "old-native-thread",
+                &request.cwd,
+                Some(HarnessId::Codex),
+            );
         core.sessions.start_idle("idle", request).await.unwrap();
         tokio::time::timeout(std::time::Duration::from_secs(5), async {
             loop {
@@ -3450,7 +3455,11 @@ mod tests {
                         .session_status("idle")
                         .is_some_and(|s| s.status == SessionStatus::Errored)
                 } else {
-                    core.sessions.inner.resume_for("idle", "/tmp").as_deref()
+                    core.sessions
+                        .inner
+                        .resume_for("idle", "/tmp", HarnessId::Codex)
+                        .resume
+                        .as_deref()
                         == Some("new-native-thread")
                 };
                 if completed {

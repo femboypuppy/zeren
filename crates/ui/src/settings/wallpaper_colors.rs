@@ -203,6 +203,7 @@ mod tests {
                 settings.theme_selection.clone(),
                 settings.accent,
                 settings.surface,
+                settings.frost_strength,
                 cx,
             );
             let manual = crate::theme::Theme::of(cx).clone();
