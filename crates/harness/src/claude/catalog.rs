@@ -419,6 +419,17 @@ mod tests {
     }
 
     #[test]
+    fn catalog_contains_sonnet_5_5() {
+        let models = static_models();
+        let sonnet = models
+            .iter()
+            .find(|model| model.id == "claude-sonnet-5-5")
+            .expect("Sonnet 5.5 in catalog");
+        assert_eq!(sonnet.label, "Sonnet 5.5");
+        assert!(sonnet.reasoning_levels.contains(&ReasoningLevel::XHigh));
+    }
+
+    #[test]
     fn ultrathink_preserves_leading_commands_and_arguments() {
         for command in ["/compact", "/review focus on tests"] {
             for prefix in ["", " ", "   ", "\n", "\r\n  "] {
