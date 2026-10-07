@@ -1274,13 +1274,40 @@ struct RenameChatDialog {
     _events: Subscription,
 }
 
-/// In-app update lifecycle (macOS bundle installs; see `render_update_strip`).
+/// In-app update lifecycle for managed desktop packages; see
+/// `render_update_strip` and `drive_auto_update`.
 enum UpdateFlow {
     Idle,
     Downloading,
     /// Staged bundle ready to swap in — one click restarts into it.
     Ready(PathBuf),
     Failed(SharedString),
+}
+
+fn should_auto_stage_update(
+    install: &zeron_update::InstallKind,
+    flow: &UpdateFlow,
+    status: Option<&zeron_update::UpdateStatus>,
+) -> bool {
+    install.supports_desktop_update()
+        && matches!(flow, UpdateFlow::Idle)
+        && status.is_some_and(|status| {
+            status.update_available
+                && status
+                    .latest_version
+                    .as_deref()
+                    .is_some_and(|version| !version.is_empty())
+        })
+}
+
+fn take_ready_update(flow: &mut UpdateFlow) -> Option<PathBuf> {
+    if !matches!(flow, UpdateFlow::Ready(_)) {
+        return None;
+    }
+    match std::mem::replace(flow, UpdateFlow::Idle) {
+        UpdateFlow::Ready(staged) => Some(staged),
+        _ => unreachable!(),
+    }
 }
 
 /// Account lifecycle owned by this process. Sign-in on a local workspace
@@ -1664,7 +1691,7 @@ enum PendingExit {
     CloseWindow,
     Quit,
     RuntimeChange,
-    InstallUpdate(PathBuf),
+    InstallUpdate { staged: PathBuf, relaunch: bool },
 }
 
 pub struct Shell {
@@ -2135,7 +2162,7 @@ impl Shell {
             shell: shell.downgrade(),
             _observation: cx.observe(&shell, |_, _, cx| cx.notify()),
         });
-        Self {
+        let mut this = Self {
             state,
             sidebar_pane,
             transcript,
@@ -2304,7 +2331,10 @@ impl Shell {
             _composer_events: composer_events,
             _transcript_events: transcript_events,
             _transcript_invalidation: transcript_invalidation,
-        }
+        };
+        let state = this.state.clone();
+        this.drive_auto_update(&state, cx);
+        this
     }
 
     /// Route a completed viewer-side capture only after its source window is
@@ -2367,6 +2397,7 @@ impl Shell {
         if let Some(notice) = state.update(cx, |state, _| state.take_deep_link_notice()) {
             self.sidebar_notice = Some(notice.into());
         }
+        self.drive_auto_update(state, cx);
         let next_sync_flow = {
             let state = state.read(cx);
             sync_flow_after_auth(self.sync_flow, state.workspace_scope, state.auth.as_ref())
@@ -3761,7 +3792,9 @@ impl Shell {
 
     fn cancel_file_close(&mut self, surface: RightSurface, cx: &mut Context<Self>) {
         self.pending_file_closes.remove(&surface);
-        self.pending_exit = None;
+        if let Some(PendingExit::InstallUpdate { staged, .. }) = self.pending_exit.take() {
+            self.update_flow = UpdateFlow::Ready(staged);
+        }
         cx.notify();
     }
 
@@ -3800,6 +3833,10 @@ impl Shell {
     }
 
     pub fn prepare_quit(&mut self, cx: &mut Context<Self>) -> bool {
+        if let Some(staged) = take_ready_update(&mut self.update_flow) {
+            self.apply_staged_update(staged, false, cx);
+            return false;
+        }
         self.prepare_exit(PendingExit::Quit, cx)
     }
 
@@ -7682,8 +7719,8 @@ impl Shell {
 
     /// Update strip: shown above the user menu whenever the engine's
     /// UpdateStatus stream reports a newer release. On desktop-update installs
-    /// (macOS bundles, Windows portable packages) it drives the whole flow —
-    /// click to download, then click to restart into the staged replacement.
+    /// (macOS bundles, Windows portable packages) the release downloads and
+    /// verifies automatically; the strip can restart into the staged replacement.
     /// Managed installs are advisory (`zeron update`); unmanaged installs link
     /// to the GitHub releases page. Clicking an advisory dismisses it for that
     /// version.
@@ -7734,8 +7771,8 @@ impl Shell {
     }
 
     /// The update strip's label and click affordance per install kind. Desktop
-    /// update installs (macOS bundles, Windows portable packages) drive their
-    /// flow from the strip; managed installs get the `zeron update` hint;
+    /// update installs (macOS bundles, Windows portable packages) show their
+    /// background-download state and restart action; managed installs get the `zeron update` hint;
     /// unmanaged installs (source builds, hand-copied binaries) are pointed at
     /// the GitHub releases page.
     fn update_strip_label(
@@ -7783,7 +7820,21 @@ impl Shell {
         match std::mem::replace(&mut self.update_flow, UpdateFlow::Idle) {
             UpdateFlow::Idle | UpdateFlow::Failed(_) => self.begin_update_download(cx),
             UpdateFlow::Downloading => self.update_flow = UpdateFlow::Downloading,
-            UpdateFlow::Ready(staged) => self.apply_staged_update(staged, cx),
+            UpdateFlow::Ready(staged) => self.apply_staged_update(staged, true, cx),
+        }
+    }
+
+    /// Desktop packages download and verify new releases as soon as the
+    /// background checker reports them. Applying remains non-disruptive: the
+    /// strip can restart immediately, or a normal quit installs without
+    /// reopening the app.
+    fn drive_auto_update(&mut self, state: &Entity<AppState>, cx: &mut Context<Self>) {
+        let should_stage = {
+            let state = state.read(cx);
+            should_auto_stage_update(&self.install, &self.update_flow, state.update.as_ref())
+        };
+        if should_stage {
+            self.begin_update_download(cx);
         }
     }
 
@@ -7819,14 +7870,24 @@ impl Shell {
         cx.notify();
     }
 
-    /// Swap the staged bundle over the installed one, arm the detached
-    /// relauncher, and quit — the relauncher `open`s the new bundle once this
-    /// process (and its engine lock / IPC port) is gone.
-    fn apply_staged_update(&mut self, staged: PathBuf, cx: &mut Context<Self>) {
-        if !self.prepare_exit(PendingExit::InstallUpdate(staged.clone()), cx) {
+    /// Swap the staged bundle over the installed one and quit. Explicit apply
+    /// relaunches after exit; automatic apply on normal quit stays closed.
+    fn apply_staged_update(
+        &mut self,
+        staged: PathBuf,
+        relaunch: bool,
+        cx: &mut Context<Self>,
+    ) {
+        if !self.prepare_exit(
+            PendingExit::InstallUpdate {
+                staged: staged.clone(),
+                relaunch,
+            },
+            cx,
+        ) {
             return;
         }
-        match self.install.apply_desktop(&staged) {
+        match self.install.apply_desktop(&staged, relaunch) {
             Ok(()) => {
                 crate::app_menus::quit_after_save(cx);
             }
@@ -11305,8 +11366,8 @@ impl Render for Shell {
                                 }
                             }
                             PendingExit::RuntimeChange => shell.quit_for_runtime_change(cx),
-                            PendingExit::InstallUpdate(staged) => {
-                                shell.apply_staged_update(staged, cx)
+                            PendingExit::InstallUpdate { staged, relaunch } => {
+                                shell.apply_staged_update(staged, relaunch, cx)
                             }
                             PendingExit::Quit => unreachable!(),
                         })
@@ -12156,6 +12217,40 @@ mod tests {
             Shell::update_strip_label(&mac_app, &UpdateFlow::Idle, "0.2.86").0,
             SharedString::from("Update available — v0.2.86")
         );
+    }
+
+    #[test]
+    fn desktop_updates_auto_stage_once_and_remain_ready_for_quit() {
+        let install = zeron_update::InstallKind::MacApp {
+            bundle: PathBuf::from("/Applications/Zeron.app"),
+        };
+        let status = zeron_update::UpdateStatus {
+            current_version: "0.2.100".into(),
+            latest_version: Some("0.2.101".into()),
+            update_available: true,
+            checked_at: Some(1),
+            error: None,
+        };
+        assert!(should_auto_stage_update(
+            &install,
+            &UpdateFlow::Idle,
+            Some(&status)
+        ));
+        assert!(!should_auto_stage_update(
+            &install,
+            &UpdateFlow::Downloading,
+            Some(&status)
+        ));
+        assert!(!should_auto_stage_update(
+            &zeron_update::InstallKind::Unmanaged,
+            &UpdateFlow::Idle,
+            Some(&status)
+        ));
+
+        let staged = PathBuf::from("/tmp/zeron-update/Zeron.app");
+        let mut flow = UpdateFlow::Ready(staged.clone());
+        assert_eq!(take_ready_update(&mut flow), Some(staged));
+        assert!(matches!(flow, UpdateFlow::Idle));
     }
 
     #[cfg(windows)]
@@ -14387,7 +14482,11 @@ mod exit_regressions {
             cx.run_until_parked();
             window
                 .update(cx, |shell, _, cx| {
-                    assert!(matches!(shell.pending_exit, Some(PendingExit::Quit)));
+                    assert!(
+                        matches!(shell.pending_exit, Some(PendingExit::Quit)),
+                        "pending exit: {:?}",
+                        shell.pending_exit
+                    );
                     assert!(!shell.all_file_edits_flushed(cx));
                     shell.cancel_file_close(RightSurface::File(0), cx);
                     assert!(shell.pending_exit.is_none());
@@ -14404,14 +14503,16 @@ mod exit_regressions {
                         Some(PendingExit::RuntimeChange)
                     ));
                     assert!(shell.runtime_change_task.is_none());
-                    shell.apply_staged_update(PathBuf::from("must-not-install"), cx);
+                    shell.apply_staged_update(PathBuf::from("must-not-install"), true, cx);
                     assert!(matches!(
                         shell.pending_exit,
-                        Some(PendingExit::InstallUpdate(_))
+                        Some(PendingExit::InstallUpdate { relaunch: true, .. })
                     ));
                     assert!(matches!(shell.update_flow, UpdateFlow::Idle));
                     shell.cancel_file_close(RightSurface::File(0), cx);
                     assert!(shell.pending_exit.is_none());
+                    assert!(matches!(shell.update_flow, UpdateFlow::Ready(_)));
+                    shell.update_flow = UpdateFlow::Idle;
                 })
                 .unwrap();
         }

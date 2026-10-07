@@ -364,16 +364,20 @@ impl InstallKind {
         }
     }
 
-    /// Install and arrange a relaunch. The UI must quit after this succeeds.
-    pub fn apply_desktop(&self, staged: &Path) -> anyhow::Result<()> {
+    /// Install the staged desktop update. When `relaunch` is true, arrange for
+    /// the replacement to open after this process exits; otherwise the user's
+    /// next normal launch starts the new version.
+    pub fn apply_desktop(&self, staged: &Path, relaunch: bool) -> anyhow::Result<()> {
         match self {
             Self::MacApp { bundle } => {
                 apply_mac_app(staged, bundle)?;
-                relaunch_app_after_exit(bundle);
+                if relaunch {
+                    relaunch_app_after_exit(bundle);
+                }
                 Ok(())
             }
             #[cfg(windows)]
-            Self::WindowsPortable { directory } => windows::apply(staged, directory, true),
+            Self::WindowsPortable { directory } => windows::apply(staged, directory, relaunch),
             _ => bail!("this installation does not support desktop updates"),
         }
     }
