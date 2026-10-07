@@ -17,6 +17,8 @@ async fn main() {
     std::fs::create_dir_all(&cwd).unwrap();
     let (_steer_tx, steering) = mpsc::channel(8);
     let controls = RunControls {
+        realtime: None,
+        execution_lease: None,
         request_input: Box::new(move |questions| {
             let (tx, rx) = oneshot::channel();
             let answers: Vec<UserInputAnswer> = questions
@@ -33,6 +35,7 @@ async fn main() {
         interrupt: CancellationToken::new(),
     };
     let request = RunRequest {
+        mcp: None,
         prompt: "Use spawn_subagent to launch ONE subagent of type general with description \
                  'Viz probe' and prompt: 'Run the terminal command: echo viz-probe-ok && sleep 3. \
                  Then reply with the word finished.'. Wait for it with \

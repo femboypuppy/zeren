@@ -1,7 +1,13 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/voice",
+    "crates/voice-media",
+    "crates/voice-session",
+    "crates/orb",
+    "crates/veil",
     "crates/theme",
+    "crates/audio",
     "crates/proto",
     "crates/preview",
     "crates/doc",
@@ -12,17 +18,26 @@ members = [
     "crates/update",
     "crates/ui",
     "crates/syntax",
+    "crates/markdown",
+    "crates/mobile",
+    "crates/client",
     "crates/mcp",
+    "crates/text",
     "apps/zeron",
 ]
 
 [workspace.package]
-version = "0.2.106"
+version = "0.2.107"
 edition = "2024"
 license = "MIT"
 publish = false
 
 [workspace.dependencies]
+zeron-voice-session = { path = "crates/voice-session" }
+zeron-orb = { path = "crates/orb" }
+zeron-veil = { path = "crates/veil" }
+zeron-voice-media = { path = "crates/voice-media" }
+zeron-audio = { path = "crates/audio" }
 zeron-proto = { path = "crates/proto" }
 zeron-preview = { path = "crates/preview" }
 zeron-doc = { path = "crates/doc" }
@@ -33,8 +48,12 @@ zeron-rpc = { path = "crates/rpc" }
 zeron-update = { path = "crates/update" }
 zeron-ui = { path = "crates/ui" }
 zeron-syntax = { path = "crates/syntax" }
+zeron-markdown = { path = "crates/markdown" }
+zeron-mobile = { path = "crates/mobile" }
+zeron-client = { path = "crates/client" }
 zeron-theme = { path = "crates/theme" }
 zeron-mcp = { path = "crates/mcp" }
+zeron-text = { path = "crates/text" }
 
 # CRDT
 loro = "1.13"
@@ -68,15 +87,15 @@ loro-protocol = "0.3"
 # Linux — the Metal path's snapshot/blur/composite, ported).
 # Paint-time rounded image masks (#9), bounded Windows backdrop blur and
 # translucent compositing, plus blur-aware scene batching (#10).
-gpui = { git = "https://github.com/zeronsh/zui", rev = "18a89af04cfe079d55275b111ac349d5640d9cda" }
-gpui_platform = { git = "https://github.com/zeronsh/zui", rev = "18a89af04cfe079d55275b111ac349d5640d9cda", features = [
+gpui = { git = "https://github.com/zeronsh/zui", rev = "0966d065b23e0b7c9b53c2e186705b8bce16fe2d" }
+gpui_platform = { git = "https://github.com/zeronsh/zui", rev = "0966d065b23e0b7c9b53c2e186705b8bce16fe2d", features = [
     "wayland",
     "x11",
     "font-kit",
     "runtime_shaders",
 ] }
-gpui_tokio = { git = "https://github.com/zeronsh/zui", rev = "18a89af04cfe079d55275b111ac349d5640d9cda" }
-gpui-base = { git = "https://github.com/zeronsh/gpui-component", rev = "103f13da91ff2c7c52941bdc2b1910f29716dc19" }
+gpui_tokio = { git = "https://github.com/zeronsh/zui", rev = "0966d065b23e0b7c9b53c2e186705b8bce16fe2d" }
+gpui-base = { git = "https://github.com/zeronsh/gpui-component", rev = "4764fd002ab5894ec9413511d01d37481b2129ab" }
 
 # diffs
 similar = "2"
@@ -147,3 +166,20 @@ opt-level = 0
 
 [profile.dev.package."*"]
 opt-level = 2
+
+# Mobile core (scripts/ios/build-core.sh). Always optimized — layout and sync
+# run on the phone's hot paths, so even Debug app builds link an -O core.
+[profile.mobile]
+inherits = "release"
+lto = false
+strip = false
+debug = "line-tables-only"
+incremental = true
+codegen-units = 16
+
+# TestFlight/App Store archives.
+[profile.mobile-dist]
+inherits = "release"
+lto = "thin"
+codegen-units = 1
+strip = "debuginfo"

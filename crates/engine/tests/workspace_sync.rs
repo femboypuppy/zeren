@@ -145,6 +145,7 @@ where
 
 fn run_request(prompt: &str) -> RunRequest {
     RunRequest {
+        mcp: None,
         prompt: prompt.into(),
         harness: None,
         model: None,
@@ -692,6 +693,7 @@ async fn legacy_workspace_doc_migrates_instantly_on_first_boot() {
                 git_detected: true,
                 git_checked_at: Some(now),
                 checkout_id: Some("co-1".into()),
+                repository_id: None,
                 created_at: now,
             })
             .unwrap();
@@ -711,9 +713,9 @@ async fn legacy_workspace_doc_migrates_instantly_on_first_boot() {
                 created_at: now,
                 harness_session_id: Some("hs-9".into()),
                 room_gen: None,
+                parent_chat_id: None,
                 harness_session_cwd: Some("/tmp/legacy".into()),
                 harness_session_harness: None,
-                parent_chat_id: None,
                 space_id: Some("space-legacy".into()),
                 last_seen_at: Some(now),
             })

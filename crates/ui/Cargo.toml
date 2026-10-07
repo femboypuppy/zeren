@@ -6,7 +6,9 @@ license.workspace = true
 publish.workspace = true
 
 [features]
+voice-experimental = [] # Compatibility flag; native subscription voice uses Codex's packaged helper.
 project-palette-fixture = []
+compact-picker-fixture = ["gpui_platform/test-support"]
 
 browser-fixture = []
 windows-render-fixture = []
@@ -41,7 +43,16 @@ required-features = ["project-palette-fixture"]
 name = "sidebar-fixture"
 required-features = ["project-palette-fixture"]
 
+[[example]]
+name = "compact-picker-fixture"
+required-features = ["compact-picker-fixture"]
+
 [dependencies]
+zeron-voice-media.workspace = true
+zeron-voice-session.workspace = true
+zeron-orb.workspace = true
+zeron-veil.workspace = true
+zeron-voice = { path = "../voice" }
 url = "2"
 zeron-proto.workspace = true
 similar.workspace = true
@@ -55,6 +66,7 @@ zeron-theme.workspace = true
 gpui.workspace = true
 gpui_platform.workspace = true
 gpui_tokio.workspace = true
+tokio-util.workspace = true
 gpui-base.workspace = true
 tokio.workspace = true
 futures.workspace = true
@@ -62,6 +74,7 @@ async-trait.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 pulldown-cmark.workspace = true
+zeron-markdown.workspace = true
 alacritty_terminal.workspace = true
 base64 = "0.22"
 image = { version = "0.25.10", default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp", "tiff", "ico"] }
@@ -88,7 +101,7 @@ wry = { version = "0.56", default-features = false, features = ["os-webview"] }
 raw-window-handle = "0.6"
 objc2 = "0.6"
 block2 = "0.6"
-objc2-app-kit = { version = "0.3.2", features = ["NSApplication", "NSBitmapImageRep", "NSImage", "NSEvent", "NSResponder", "NSView", "NSWindow"] }
+objc2-app-kit = { version = "0.3.2", features = ["NSApplication", "NSHapticFeedback", "NSBitmapImageRep", "NSImage", "NSEvent", "NSResponder", "NSView", "NSWindow"] }
 objc2-foundation = "0.3.2"
 objc2-web-kit = { version = "0.3.2", features = ["WKWebView", "WKNavigationDelegate", "WKNavigationAction", "WKSnapshotConfiguration"] }
 reqwest.workspace = true
@@ -98,7 +111,7 @@ foreign-types = "0.5"
 block = "0.1"
 
 [target.'cfg(target_os = "linux")'.dependencies]
-ashpd = { version = "0.13.13", default-features = false, features = ["async-io", "global_shortcuts", "screenshot"] }
+ashpd = { version = "0.13.13", default-features = false, features = ["async-io", "global_shortcuts", "screenshot", "settings"] }
 atspi = { version = "0.30.0", features = ["zbus"] }
 async-io = "2"
 url = "2"
@@ -111,5 +124,5 @@ mimalloc.workspace = true
 tracing-subscriber.workspace = true
 
 [target.'cfg(windows)'.dependencies]
-windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Graphics_Dwm", "Win32_Security", "Win32_System_LibraryLoader", "Win32_System_Threading", "Win32_UI_Controls"] }
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Graphics_Dwm", "Win32_Security", "Win32_System_LibraryLoader", "Win32_System_Threading", "Win32_UI_Controls", "Win32_UI_WindowsAndMessaging"] }
 raw-window-handle = "0.6"

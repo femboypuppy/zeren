@@ -61,7 +61,8 @@ use tokio::sync::mpsc;
 
 use zeron_proto::{
     AgentEvent, DoneStatus, HarnessId, Model, ModelOption, ModelOptionChoice, ReasoningLevel,
-    RunRequest, SlashCommand, SteeringMode, TodoItem, ToolCall, UserInputAnswer, UserInputQuestion,
+    RunRequest, SlashCommand, SteeringMode, TodoItem, TodoStatus, ToolCall, UserInputAnswer,
+    UserInputQuestion,
 };
 
 use crate::process::{Child, Command, Stdio};
@@ -278,19 +279,23 @@ impl OpencodeHarness {
 
     /// Boot (or attach to) a server for a run/probe. Probes have no chat cwd:
     /// they boot in the user's home, where global provider config lives.
-    async fn server(&self, cwd: Option<&str>) -> Result<Server, HarnessError> {
+    async fn server(
+        &self,
+        cwd: Option<&str>,
+        mcp: Option<&zeron_proto::McpServer>,
+    ) -> Result<Server, HarnessError> {
         if let Some(base) = &self.base_url {
             return Ok(Server::attached(base.clone()));
         }
         let exe = self.resolve_executable()?;
-        Server::spawn(&exe, cwd, self.startup_timeout).await
+        Server::spawn(&exe, cwd, self.startup_timeout, mcp).await
     }
 
     /// One short-lived server answers both discovery calls. Also primes the
     /// commands cache so concurrent picker/composer fetches share one boot.
     async fn probe_models(&self) -> Result<Vec<Model>, HarnessError> {
         let _guard = self.probe_lock.lock().await;
-        let mut server = self.server(None).await?;
+        let mut server = self.server(None, None).await?;
         let result = async {
             let providers = server.provider_catalog(None).await?;
             let mut models = models_from_providers(&providers);
@@ -322,7 +327,7 @@ impl OpencodeHarness {
         if let Some(commands) = self.commands_cache.get() {
             return Ok(commands.clone());
         }
-        let mut server = self.server(None).await?;
+        let mut server = self.server(None, None).await?;
         let result = server
             .commands_wire(None)
             .await
@@ -347,7 +352,9 @@ impl Harness for OpencodeHarness {
     /// Steers queue and deliver as the next prompt when the live turn goes
     /// idle — opencode has no mid-turn injection on this wire.
     fn steering_mode(&self) -> SteeringMode {
-        SteeringMode::TurnBoundary
+        // Steers preempt the generation (never a running tool) and continue
+        // the turn immediately; see `maybe_preempt!`.
+        SteeringMode::StepBoundary
     }
     fn reasoning_levels(&self) -> &[ReasoningLevel] {
         REASONING_LEVELS
@@ -356,6 +363,9 @@ impl Harness for OpencodeHarness {
         self.executable.is_some()
             || self.base_url.is_some()
             || resolve_opencode_executable().is_some()
+    }
+    fn executable_path(&self) -> Option<PathBuf> {
+        self.resolve_executable().ok()
     }
     /// `session.status{idle}` is a real terminal frame per turn: the engine
     /// can retire its quiesce watchdogs.
@@ -398,7 +408,7 @@ impl Harness for OpencodeHarness {
         let directory = cwd
             .to_str()
             .ok_or_else(|| HarnessError::Protocol("Project path is not UTF-8".into()))?;
-        let mut server = self.server(Some(directory)).await?;
+        let mut server = self.server(Some(directory), None).await?;
         let result = server.commands_wire(Some(directory)).await;
         server.shutdown(self.kill_grace).await;
         let commands = result?;
@@ -418,7 +428,7 @@ impl Harness for OpencodeHarness {
         let directory = cwd
             .to_str()
             .ok_or_else(|| HarnessError::Protocol("Project path is not UTF-8".into()))?;
-        let mut server = self.server(Some(directory)).await?;
+        let mut server = self.server(Some(directory), None).await?;
         let result = server
             .commands_wire(Some(directory))
             .await
@@ -438,7 +448,7 @@ impl Harness for OpencodeHarness {
         let initial_native_command_selected = selected_native_command(&request.prompt, self.id());
         request.prompt = zeron_proto::invocation::harness_prompt(&request.prompt, self.id());
         let cwd = (!request.cwd.is_empty()).then(|| request.cwd.clone());
-        let server = self.server(cwd.as_deref()).await?;
+        let server = self.server(cwd.as_deref(), request.mcp.as_ref()).await?;
         let (event_tx, event_rx) = mpsc::channel::<Result<AgentEvent, HarnessError>>(256);
         tokio::spawn(run_session(Session {
             server,
@@ -584,6 +594,7 @@ impl Server {
         exe: &std::path::Path,
         cwd: Option<&str>,
         startup: Duration,
+        mcp: Option<&zeron_proto::McpServer>,
     ) -> Result<Self, HarnessError> {
         let port = free_localhost_port().ok_or_else(|| {
             HarnessError::Protocol("no free localhost port for opencode serve".into())
@@ -595,8 +606,36 @@ impl Server {
             .arg(port.to_string())
             .arg("--hostname")
             .arg("127.0.0.1")
+            // 2.x prefers OPENCODE_PASSWORD over the legacy name; a user's
+            // own value would otherwise lock us out of our server (401).
+            .env("OPENCODE_PASSWORD", &password)
             .env("OPENCODE_SERVER_PASSWORD", &password)
             .env("OPENCODE_CLIENT", "zeron");
+        if let Some(mcp) = mcp {
+            // The config shape differs by generation. If even the cold probe
+            // can't tell, run without the Zeron MCP server rather than fail.
+            match opencode_version(exe).await {
+                Some(version) => {
+                    let protocol = if version.major >= 2 {
+                        Protocol::V2
+                    } else {
+                        Protocol::V1
+                    };
+                    cmd.env(
+                        "OPENCODE_CONFIG_CONTENT",
+                        mcp_config(
+                            std::env::var("OPENCODE_CONFIG_CONTENT").ok().as_deref(),
+                            mcp,
+                            protocol,
+                        )?,
+                    );
+                }
+                None => tracing::warn!(
+                    binary_path = %exe.display(),
+                    "opencode version unknown; starting without the Zeron MCP server"
+                ),
+            }
+        }
         crate::compose_child_path(&mut cmd, exe);
         if let Some(cwd) = cwd {
             cmd.current_dir(cwd);
@@ -1365,6 +1404,11 @@ struct TurnState {
     aborted_for_retry: bool,
     /// Deadline for the first session-scoped event after the prompt.
     stall_deadline: Option<tokio::time::Instant>,
+    /// Main-session tool calls started and not yet finished.
+    open_tools: std::collections::HashSet<String>,
+    /// Aborted to deliver a steer immediately: its idle/interrupted frame is
+    /// a steer boundary, not the end of the run.
+    preempted: bool,
 }
 
 /// A detached native-command HTTP request failed. `generation` binds the
@@ -1416,6 +1460,8 @@ impl TurnState {
             retry_reported: false,
             aborted_for_retry: false,
             stall_deadline: stall.map(|d| tokio::time::Instant::now() + d),
+            open_tools: Default::default(),
+            preempted: false,
         }
     }
 
@@ -1437,6 +1483,8 @@ async fn run_session(session: Session) {
         initial_native_command_selected,
     } = session;
     let RunControls {
+        realtime: _,
+        execution_lease: _execution_lease,
         request_input,
         mut steering,
         interrupt,
@@ -1719,15 +1767,32 @@ async fn run_session(session: Session) {
                 done_sent = true;
                 break $label;
             }
-            if let Some((steer, native_command_selected)) = queued_steers.pop_front() {
+            if let Some((first, native_command_selected)) = queued_steers.pop_front() {
                 turn_generation = turn_generation.wrapping_add(1);
-                let (prev, next) = rotate(&mut assistant_message_id);
-                if !send(&event_tx, AgentEvent::Steered {
-                    assistant_message_id: Some(prev),
-                    next_assistant_message_id: Some(next),
-                }).await {
+                // Plain-text steers waiting together go out as one prompt,
+                // each confirmed by its own Steered boundary; a native
+                // command always travels alone.
+                let mut texts = vec![first];
+                while !native_command_selected
+                    && queued_steers.front().is_some_and(|(_, native)| !native)
+                {
+                    texts.push(queued_steers.pop_front().expect("front checked").0);
+                }
+                let mut consumer_gone = false;
+                for _ in &texts {
+                    let (prev, next) = rotate(&mut assistant_message_id);
+                    if !send(&event_tx, AgentEvent::Steered {
+                        assistant_message_id: Some(prev),
+                        next_assistant_message_id: Some(next),
+                    }).await {
+                        consumer_gone = true;
+                        break;
+                    }
+                }
+                if consumer_gone {
                     break $label;
                 }
+                let steer = texts.join("\n\n");
                 match post_prompt(
                     &server,
                     &bus_tx,
@@ -1779,7 +1844,42 @@ async fn run_session(session: Session) {
                 session_id: Some(session_id.clone()),
             }).await;
             done_sent = true;
-            break $label;
+            if errored || !steering_open {
+                break $label;
+            }
+            // Keep the mailbox and server alive between successful turns.
+            // Closing here races the engine's next queued dispatch: it may
+            // accept a prompt into a dying mailbox and replay it out of order.
+            continue $label;
+        }};
+    }
+
+    // Immediate steering: a queued steer aborts the current generation as
+    // soon as no tool is running (a running tool is never killed), and the
+    // abort's idle promotes the steer — the way Codex `turn/steer` behaves.
+    macro_rules! maybe_preempt {
+        () => {{
+            if turn.active
+                && !turn.preempted
+                && !interrupt_requested
+                && !queued_steers.is_empty()
+                && turn.open_tools.is_empty()
+            {
+                turn.preempted = true;
+                turn.idle_ready = true;
+                let abort = tokio::time::timeout(
+                    Duration::from_secs(5),
+                    server.abort_session(&session_id, dir),
+                )
+                .await;
+                if !matches!(abort, Ok(Ok(_))) {
+                    // Deliver at the natural turn end instead.
+                    tracing::warn!(
+                        target: "zeron_harness::opencode",
+                        "steer preempt abort failed; delivering at turn end"
+                    );
+                }
+            }
         }};
     }
 
@@ -1802,6 +1902,8 @@ async fn run_session(session: Session) {
 
         tokio::select! {
             biased;
+
+            _ = event_tx.closed() => break 'main,
 
             _ = interrupt.cancelled(), if !interrupt_requested => {
                 interrupt_requested = true;
@@ -1884,6 +1986,7 @@ async fn run_session(session: Session) {
                         );
                         if turn.active {
                             queued_steers.push_back((prompt, native_command_selected));
+                            maybe_preempt!();
                         } else {
                             turn_generation = turn_generation.wrapping_add(1);
                             // Between turns (shouldn't happen — the engine
@@ -1937,7 +2040,10 @@ async fn run_session(session: Session) {
                             }
                         }
                     }
-                    None => steering_open = false,
+                    None => {
+                        steering_open = false;
+                        if !turn.active { break 'main; }
+                    },
                 }
             }
 
@@ -2063,9 +2169,15 @@ async fn run_session(session: Session) {
                             context_windows: &context_windows,
                         }).await;
                         match outcome {
-                            BusOutcome::Continue => {}
+                            BusOutcome::Continue => maybe_preempt!(),
                             BusOutcome::ConsumerGone => break 'main,
                             BusOutcome::TurnIdle => settle_idle!('main),
+                            // Our own steer preempt: a steer boundary.
+                            BusOutcome::TurnInterrupted
+                                if turn.preempted && !interrupt_requested =>
+                            {
+                                settle_idle!('main)
+                            }
                             BusOutcome::TurnInterrupted => {
                                 interrupt_requested = true;
                                 settle_idle!('main);
@@ -3020,6 +3132,17 @@ async fn forward(
 }
 
 fn mark_content(turn: &mut TurnState, events: &[AgentEvent]) {
+    for ev in events {
+        match ev {
+            AgentEvent::ToolCall { id, .. } => {
+                turn.open_tools.insert(id.clone());
+            }
+            AgentEvent::ToolResult { id, .. } => {
+                turn.open_tools.remove(id);
+            }
+            _ => {}
+        }
+    }
     if turn.active
         && events.iter().any(|ev| {
             matches!(
@@ -3241,7 +3364,12 @@ fn part_snapshot_events(
                 });
             let mut events = Vec::new();
             let has_input = input.as_object().is_some_and(|o| !o.is_empty());
-            if !entry.tool_started && (has_input || matches!(status, "completed" | "error")) {
+            // `running` means the input is final — including a tool that takes
+            // no arguments, which must count as open so a steer never aborts
+            // it (preemption waits for open tools).
+            if !entry.tool_started
+                && (has_input || matches!(status, "running" | "completed" | "error"))
+            {
                 entry.tool_started = true;
                 events.push(AgentEvent::ToolCall {
                     id: call_id.clone(),
@@ -3418,6 +3546,8 @@ fn map_questions(props: &Value) -> Vec<UserInputQuestion> {
                                     .collect()
                             })
                             .unwrap_or_default(),
+                        prefill: None,
+                        multiline: false,
                         multi_select: q.get("multiple").and_then(Value::as_bool).unwrap_or(false),
                     })
                 })
@@ -3495,13 +3625,13 @@ fn oc_tool_call(name: &str, input: &Value) -> ToolCall {
                 .map(|a| a.as_slice())
                 .unwrap_or_default()
                 .iter()
-                .map(|t| TodoItem {
-                    text: t
-                        .get("content")
-                        .and_then(Value::as_str)
-                        .unwrap_or_default()
-                        .to_owned(),
-                    done: t.get("status").and_then(Value::as_str) == Some("completed"),
+                .map(|t| {
+                    TodoItem::new(
+                        t.get("content").and_then(Value::as_str).unwrap_or_default(),
+                        TodoStatus::parse(
+                            t.get("status").and_then(Value::as_str).unwrap_or_default(),
+                        ),
+                    )
                 })
                 .collect(),
         },
@@ -3539,13 +3669,41 @@ fn oc_tool_call(name: &str, input: &Value) -> ToolCall {
 /// - tools: `session.tool.input.started` (carries the NAME),
 ///   `.input.ended` (args as text), `.called` (args as object),
 ///   `.success` (content array) / `.error`.
-/// - usage: `session.usage.updated` with the cumulative token totals.
+/// - usage: `session.step.ended` carries the step's own tokens; the
+///   cumulative `session.usage.updated` totals are ignored.
 ///
 /// `tool_names` tracks pending calls by session, message, and provider call id.
+/// `session_models` remembers the latest model for step.ended, which omits it.
 type V2ToolKey = (String, String, String);
 const MAX_PENDING_V2_TOOLS: usize = 4096;
+/// Cache cap; overflow clears the cache instead of failing the run.
+const MAX_V2_SESSION_MODELS: usize = 4096;
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct V2ModelIdentity {
+    provider_id: String,
+    model_id: String,
+}
+
+fn v2_model_identity(model: &Value) -> Option<V2ModelIdentity> {
+    let provider_id = model.get("providerID")?.as_str()?;
+    let model_id = model.get("id")?.as_str()?;
+    (!provider_id.is_empty() && !model_id.is_empty()).then(|| V2ModelIdentity {
+        provider_id: provider_id.to_owned(),
+        model_id: model_id.to_owned(),
+    })
+}
+
+#[cfg(test)]
 fn normalize_v2_frame(event: Value, tool_names: &mut HashMap<V2ToolKey, String>) -> Vec<Value> {
+    normalize_v2_frame_with_session_models(event, tool_names, &mut HashMap::new())
+}
+
+fn normalize_v2_frame_with_session_models(
+    event: Value,
+    tool_names: &mut HashMap<V2ToolKey, String>,
+    session_models: &mut HashMap<String, V2ModelIdentity>,
+) -> Vec<Value> {
     let kind = event.get("type").and_then(Value::as_str).unwrap_or("");
     let data = event.get("data").cloned().unwrap_or(Value::Null);
     if data
@@ -3643,12 +3801,20 @@ fn normalize_v2_frame(event: Value, tool_names: &mut HashMap<V2ToolKey, String>)
             warning["type"] = json!("session.warning");
             vec![warning]
         }
-        "session.step.started" => vec![json!({
-            "type": "message.updated",
-            "properties": {
-                "info": { "sessionID": session(), "id": message(), "role": "assistant" }
+        "session.step.started" => {
+            if let (Some(session_id), Some(model)) = (
+                data.get("sessionID").and_then(Value::as_str),
+                data.get("model").and_then(v2_model_identity),
+            ) {
+                session_models.insert(session_id.to_owned(), model);
             }
-        })],
+            vec![json!({
+                "type": "message.updated",
+                "properties": {
+                    "info": { "sessionID": session(), "id": message(), "role": "assistant" }
+                }
+            })]
+        }
         "session.text.started" | "session.text.ended" => {
             vec![v2_stream_part(
                 &data,
@@ -3732,27 +3898,37 @@ fn normalize_v2_frame(event: Value, tool_names: &mut HashMap<V2ToolKey, String>)
                 &json!({ "status": "error", "error": message }),
             )]
         }
-        "session.usage.updated" => {
+        "session.step.ended" => {
             let tokens = data.get("tokens").cloned().unwrap_or(Value::Null);
-            if tokens.is_null() {
+            if !tokens.is_object() {
                 return Vec::new();
             }
-            // Cumulative totals keyed to a synthetic message: registers
-            // Usage + ContextUsage exactly like the 1.x assistant
-            // message.updated did. (No providerID/modelID on this frame —
-            // the context window is dropped.)
+            // One step's tokens are the prompt it sent plus its reply, which
+            // is what the 1.x assistant message carried. The frame omits the
+            // model, so the session's latest step supplies it and the
+            // advertised context limit resolves.
+            let mut info = json!({
+                "sessionID": session(),
+                "id": "usage",
+                "role": "assistant",
+                "tokens": tokens,
+            });
+            if let Some(model) = data
+                .get("sessionID")
+                .and_then(Value::as_str)
+                .and_then(|id| session_models.get(id))
+            {
+                info["providerID"] = json!(model.provider_id);
+                info["modelID"] = json!(model.model_id);
+            }
             vec![json!({
                 "type": "message.updated",
-                "properties": {
-                    "info": {
-                        "sessionID": session(),
-                        "id": "usage",
-                        "role": "assistant",
-                        "tokens": tokens,
-                    }
-                }
+                "properties": { "info": info }
             })]
         }
+        // Cumulative session totals (every step, title, and compaction
+        // summed), so they measure spend, not context occupancy.
+        "session.usage.updated" => Vec::new(),
         "session.created" => {
             let Some(id) = data.get("sessionID").and_then(Value::as_str) else {
                 return Vec::new();
@@ -3882,6 +4058,8 @@ async fn bus_task(
         Protocol::V2 => format!("{base}/api/event"),
     };
     let mut failures: u32 = 0;
+    let mut v2_tool_names: HashMap<V2ToolKey, String> = HashMap::new();
+    let mut v2_session_models: HashMap<String, V2ModelIdentity> = HashMap::new();
     loop {
         if tx.is_closed() {
             return;
@@ -3895,7 +4073,14 @@ async fn bus_task(
         match req.send().await {
             Ok(resp) if resp.status().is_success() => {
                 failures = 0;
-                stream_bus(&tx, resp, protocol).await;
+                stream_bus(
+                    &tx,
+                    resp,
+                    protocol,
+                    &mut v2_tool_names,
+                    &mut v2_session_models,
+                )
+                .await;
                 if tx.is_closed() {
                     return;
                 }
@@ -3913,13 +4098,16 @@ async fn bus_task(
     }
 }
 
-async fn stream_bus(tx: &mpsc::Sender<BusMsg>, resp: reqwest::Response, protocol: Protocol) {
+async fn stream_bus(
+    tx: &mpsc::Sender<BusMsg>,
+    resp: reqwest::Response,
+    protocol: Protocol,
+    v2_tool_names: &mut HashMap<V2ToolKey, String>,
+    v2_session_models: &mut HashMap<String, V2ModelIdentity>,
+) {
     let mut stream = resp.bytes_stream();
     let mut buf: Vec<u8> = Vec::new();
     let mut announced = false;
-    // 2.x names a tool only when its input starts streaming; the later
-    // called/success frames carry the call id alone.
-    let mut v2_tool_names: HashMap<V2ToolKey, String> = HashMap::new();
     while let Some(chunk) = stream.next().await {
         let Ok(bytes) = chunk else {
             return;
@@ -3948,10 +4136,22 @@ async fn stream_bus(tx: &mpsc::Sender<BusMsg>, resp: reqwest::Response, protocol
                     continue;
                 };
                 if protocol == Protocol::V2 {
-                    let payloads = normalize_v2_frame(event, &mut v2_tool_names);
+                    let payloads = normalize_v2_frame_with_session_models(
+                        event,
+                        v2_tool_names,
+                        v2_session_models,
+                    );
                     if v2_tool_names.len() > MAX_PENDING_V2_TOOLS {
                         let _ = tx.send(BusMsg::Disconnected).await;
                         return;
+                    }
+                    // Model identity only feeds usage frames. Dropping the
+                    // cache degrades to "window preserved" and refills on the
+                    // next step.started, so — unlike leaked pending tools — it
+                    // must not fail the run, especially now that the cache
+                    // survives reconnects.
+                    if v2_session_models.len() > MAX_V2_SESSION_MODELS {
+                        v2_session_models.clear();
                     }
                     for payload in payloads {
                         if tx.send(BusMsg::Event(payload)).await.is_err() {
@@ -3999,5 +4199,356 @@ mod context_tests {
                 window: None
             })
         );
+    }
+
+    #[test]
+    fn malformed_usage_is_ignored_without_panicking() {
+        let windows = HashMap::from([("provider/model".to_owned(), 200_000)]);
+        for info in [
+            json!({}),
+            json!({"tokens": null}),
+            json!({"tokens": "12"}),
+            json!({"tokens": [1, 2]}),
+            json!({"tokens": {"input": -1, "output": 1.5, "cache": "x"}}),
+            json!({"providerID": 1, "modelID": null, "tokens": {"input": "3"}}),
+        ] {
+            assert_eq!(context_usage_event(&info, &windows), None, "{info}");
+        }
+        // Unexpected model fields drop only the window, never the count.
+        assert_eq!(
+            context_usage_event(
+                &json!({"providerID": ["provider"], "modelID": "model",
+                        "tokens": {"input": 7, "cache": {"read": "x", "write": 3}}}),
+                &windows
+            ),
+            Some(AgentEvent::ContextUsage {
+                tokens: Some(10),
+                window: None
+            })
+        );
+    }
+
+    #[test]
+    fn unknown_model_preserves_the_previous_window() {
+        // A catalog that failed to load (or lags the 2.x model sync)
+        // advertises nothing; an absent model must not read as "no limit".
+        let info = json!({"providerID":"provider","modelID":"unknown",
+                          "tokens":{"input":10,"output":2}});
+        assert_eq!(
+            context_usage_event(&info, &HashMap::new()),
+            Some(AgentEvent::ContextUsage {
+                tokens: Some(12),
+                window: None
+            })
+        );
+    }
+}
+
+/// Budget for a `--version` the shared probe gave up on: a freshly installed
+/// binary's first exec waits on the OS malware scan (1.1s on an M-series Mac
+/// for 2.0.20, longer on slower machines and under Windows Defender).
+const COLD_VERSION_TIMEOUT: Duration = Duration::from_secs(30);
+
+/// The shared probe caps `--version` at 2s and caches a timeout for the
+/// binary's lifetime, so one cold first exec after an upgrade failed every
+/// later run instantly until restart. Retry past that cache with a longer
+/// budget, and on success clear the cached failure for other callers.
+async fn opencode_version(exe: &std::path::Path) -> Option<semver::Version> {
+    let cached_exe = exe.to_path_buf();
+    let cached =
+        tokio::task::spawn_blocking(move || crate::executable::binary_version(&cached_exe))
+            .await
+            .ok()
+            .flatten();
+    if cached.is_some() {
+        return cached;
+    }
+    let mut cmd = Command::new(exe);
+    cmd.arg("--version")
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .kill_on_drop(true);
+    let output = tokio::time::timeout(COLD_VERSION_TIMEOUT, cmd.output())
+        .await
+        .ok()?
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let version = crate::executable::parse_version(&output.stdout)
+        .or_else(|| crate::executable::parse_version(&output.stderr))?;
+    if let Some(stem) = exe.file_stem().and_then(|s| s.to_str()) {
+        crate::executable::invalidate_versions(&[stem]);
+    }
+    Some(version)
+}
+
+/// Inline config is the final user config layer. Preserve inherited overrides
+/// and other MCP servers; never write chat identity into a shared config file.
+fn mcp_config(
+    inherited: Option<&str>,
+    mcp: &zeron_proto::McpServer,
+    protocol: Protocol,
+) -> Result<String, HarnessError> {
+    let mut config: Value = match inherited.filter(|s| !s.trim().is_empty()) {
+        Some(raw) => deser_hjson::from_str(raw).map_err(|_| {
+            HarnessError::Protocol("OPENCODE_CONFIG_CONTENT must be a valid config object".into())
+        })?,
+        None => json!({}),
+    };
+    let object = config.as_object_mut().ok_or_else(|| {
+        HarnessError::Protocol("OPENCODE_CONFIG_CONTENT must be an object".into())
+    })?;
+    let servers = object.entry("mcp").or_insert_with(|| json!({}));
+    let servers = if protocol == Protocol::V2 {
+        servers
+            .as_object_mut()
+            .ok_or_else(|| {
+                HarnessError::Protocol("OPENCODE_CONFIG_CONTENT.mcp must be an object".into())
+            })?
+            .entry("servers")
+            .or_insert_with(|| json!({}))
+    } else {
+        servers
+    };
+    let servers = servers.as_object_mut().ok_or_else(|| {
+        HarnessError::Protocol("OPENCODE_CONFIG_CONTENT.mcp must be an object".into())
+    })?;
+    let command: Vec<&str> = std::iter::once(mcp.command.as_str())
+        .chain(mcp.args.iter().map(String::as_str))
+        .collect();
+    let mut server = json!({"type": "local", "command": command, "environment": mcp.env});
+    match protocol {
+        Protocol::V1 => server["enabled"] = json!(true),
+        Protocol::V2 => server["disabled"] = json!(false),
+    }
+    servers.insert(mcp.name.clone(), server);
+    Ok(config.to_string())
+}
+
+#[cfg(test)]
+mod mcp_injection_tests {
+    use super::*;
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn mcp_injection_reaches_isolated_server_processes() {
+        use std::os::unix::fs::PermissionsExt;
+        let fixture = tempfile::tempdir().unwrap();
+        for major in [1, 2] {
+            let exe = fixture.path().join(format!("opencode-{major}"));
+            let script = format!(
+                r#"#!/usr/bin/env node
+const http = require('node:http');
+const version = '{major}.0.0';
+if (process.argv.includes('--version')) {{ console.log(version); process.exit(0); }}
+const config = JSON.parse(process.env.OPENCODE_CONFIG_CONTENT);
+const server = {major} === 1 ? config.mcp.zeron : config.mcp.servers.zeron;
+if (!server || server.command[1] !== 'mcp') throw new Error('missing MCP config');
+const port = Number(process.argv[process.argv.indexOf('--port') + 1]);
+http.createServer((req, res) => {{
+  res.setHeader('content-type', 'application/json');
+  if (req.url === '/config-probe') {{ res.end(JSON.stringify(server)); return; }}
+  if (req.url === ({major} === 1 ? '/global/health' : '/api/info')) {{
+    res.end(JSON.stringify({{version}})); return;
+  }}
+  res.statusCode = 404; res.end('{{}}');
+}}).listen(port, '127.0.0.1');
+"#
+            );
+            std::fs::write(&exe, script).unwrap();
+            std::fs::set_permissions(&exe, std::fs::Permissions::from_mode(0o700)).unwrap();
+            let first = zeron_proto::McpServer {
+                name: "zeron".into(),
+                command: "/path with spaces/zeron".into(),
+                args: vec!["mcp".into()],
+                env: [("ZERON_CHAT_ID".into(), "first".into())].into(),
+            };
+            let mut second = first.clone();
+            second.env.insert("ZERON_CHAT_ID".into(), "second".into());
+            let mut a = Server::spawn(
+                &exe,
+                fixture.path().to_str(),
+                Duration::from_secs(5),
+                Some(&first),
+            )
+            .await
+            .unwrap();
+            let mut b = Server::spawn(
+                &exe,
+                fixture.path().to_str(),
+                Duration::from_secs(5),
+                Some(&second),
+            )
+            .await
+            .unwrap();
+            let a_config = a.get_json("/config-probe", None).await.unwrap();
+            let b_config = b.get_json("/config-probe", None).await.unwrap();
+            a.shutdown(Duration::from_millis(100)).await;
+            b.shutdown(Duration::from_millis(100)).await;
+            assert_eq!(a_config["environment"]["ZERON_CHAT_ID"], "first");
+            assert_eq!(b_config["environment"]["ZERON_CHAT_ID"], "second");
+            assert_eq!(
+                a_config["command"],
+                json!(["/path with spaces/zeron", "mcp"])
+            );
+        }
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn unknown_version_starts_without_mcp_instead_of_failing() {
+        use std::os::unix::fs::PermissionsExt;
+        let fixture = tempfile::tempdir().unwrap();
+        let exe = fixture.path().join("opencode");
+        // `--version` fails (a probe that timed out or printed no version).
+        let script = r#"#!/usr/bin/env node
+const http = require('node:http');
+if (process.argv.includes('--version')) process.exit(1);
+const config = process.env.OPENCODE_CONFIG_CONTENT ?? null;
+const port = Number(process.argv[process.argv.indexOf('--port') + 1]);
+http.createServer((req, res) => {
+  res.setHeader('content-type', 'application/json');
+  if (req.url === '/config-probe') { res.end(JSON.stringify({config})); return; }
+  if (req.url === '/api/info') { res.end(JSON.stringify({version: '2.0.20'})); return; }
+  res.statusCode = 404; res.end('{}');
+}).listen(port, '127.0.0.1');
+"#;
+        std::fs::write(&exe, script).unwrap();
+        std::fs::set_permissions(&exe, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let mcp = zeron_proto::McpServer {
+            name: "zeron".into(),
+            command: "zeron".into(),
+            args: vec!["mcp".into()],
+            env: Default::default(),
+        };
+        let mut server = Server::spawn(
+            &exe,
+            fixture.path().to_str(),
+            Duration::from_secs(5),
+            Some(&mcp),
+        )
+        .await
+        .expect("an unknown version must not fail the run");
+        let probe = server.get_json("/config-probe", None).await.unwrap();
+        server.shutdown(Duration::from_millis(100)).await;
+        assert_eq!(probe["config"], Value::Null);
+    }
+
+    /// A freshly installed binary's first `--version` outlasts the shared
+    /// 2s probe (OS malware scan). That cached failure used to fail every
+    /// run; the cold retry must still find 2.x and inject the MCP config.
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn cold_first_version_probe_still_injects_mcp() {
+        use std::os::unix::fs::PermissionsExt;
+        let fixture = tempfile::tempdir().unwrap();
+        let exe = fixture.path().join("opencode");
+        let warmed = fixture.path().join("warmed");
+        let script = format!(
+            r#"#!/usr/bin/env node
+const fs = require('node:fs');
+const http = require('node:http');
+if (process.argv.includes('--version')) {{
+  const cold = !fs.existsSync({warmed:?});
+  fs.writeFileSync({warmed:?}, '');
+  setTimeout(() => {{ console.log('opencode v2.0.20'); process.exit(0); }}, cold ? 3000 : 0);
+}} else {{
+  const config = JSON.parse(process.env.OPENCODE_CONFIG_CONTENT);
+  const auth = {{
+    password: process.env.OPENCODE_PASSWORD,
+    legacy: process.env.OPENCODE_SERVER_PASSWORD,
+  }};
+  const port = Number(process.argv[process.argv.indexOf('--port') + 1]);
+  http.createServer((req, res) => {{
+    res.setHeader('content-type', 'application/json');
+    if (req.url === '/config-probe') {{
+      res.end(JSON.stringify({{server: config.mcp.servers.zeron, auth}})); return;
+    }}
+    if (req.url === '/api/info') {{ res.end(JSON.stringify({{version: '2.0.20'}})); return; }}
+    res.statusCode = 404; res.end('{{}}');
+  }}).listen(port, '127.0.0.1');
+}}
+"#
+        );
+        std::fs::write(&exe, script).unwrap();
+        std::fs::set_permissions(&exe, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let mcp = zeron_proto::McpServer {
+            name: "zeron".into(),
+            command: "zeron".into(),
+            args: vec!["mcp".into()],
+            env: Default::default(),
+        };
+        for _ in 0..2 {
+            let mut server = Server::spawn(
+                &exe,
+                fixture.path().to_str(),
+                Duration::from_secs(10),
+                Some(&mcp),
+            )
+            .await
+            .expect("a slow first --version must not fail the run");
+            let probe = server.get_json("/config-probe", None).await.unwrap();
+            server.shutdown(Duration::from_millis(100)).await;
+            assert_eq!(probe["server"]["command"], json!(["zeron", "mcp"]));
+            // 2.x reads OPENCODE_PASSWORD first: both must carry ours.
+            assert!(probe["auth"]["password"].is_string());
+            assert_eq!(probe["auth"]["password"], probe["auth"]["legacy"]);
+        }
+    }
+
+    #[test]
+    fn mcp_injection_preserves_config_and_scopes_identity_for_both_protocols() {
+        let mut mcp = zeron_proto::McpServer {
+            name: "zeron".into(),
+            command: "/path with spaces/zeron".into(),
+            args: vec!["mcp".into()],
+            env: [("ZERON_CHAT_ID".into(), "first".into())].into(),
+        };
+        for protocol in [Protocol::V1, Protocol::V2] {
+            let inherited = match protocol {
+                Protocol::V1 => {
+                    r#"{"model":"keep", "mcp":{"user":{"type":"remote","url":"https://example.test"}}}"#
+                }
+                Protocol::V2 => {
+                    r#"{"model":"keep", "mcp":{"servers":{"user":{"type":"remote","url":"https://example.test"}}}}"#
+                }
+            };
+            let first: Value =
+                serde_json::from_str(&mcp_config(Some(inherited), &mcp, protocol).unwrap())
+                    .unwrap();
+            mcp.env.insert("ZERON_CHAT_ID".into(), "second".into());
+            let second: Value =
+                serde_json::from_str(&mcp_config(Some(inherited), &mcp, protocol).unwrap())
+                    .unwrap();
+            assert_eq!(first["model"], "keep");
+            let pointer = if protocol == Protocol::V1 {
+                "/mcp"
+            } else {
+                "/mcp/servers"
+            };
+            let servers = first.pointer(pointer).unwrap();
+            assert_eq!(servers["user"]["url"], "https://example.test");
+            assert_eq!(
+                servers["zeron"]["command"],
+                json!(["/path with spaces/zeron", "mcp"])
+            );
+            assert_eq!(servers["zeron"]["environment"]["ZERON_CHAT_ID"], "first");
+            assert_eq!(
+                second.pointer(pointer).unwrap()["zeron"]["environment"]["ZERON_CHAT_ID"],
+                "second"
+            );
+            if protocol == Protocol::V1 {
+                assert_eq!(servers["zeron"]["enabled"], true);
+            } else {
+                assert_eq!(servers["zeron"]["disabled"], false);
+                assert!(servers["zeron"].get("enabled").is_none());
+            }
+            for invalid in ["[]", "{", r#"{"mcp":false}"#] {
+                assert!(mcp_config(Some(invalid), &mcp, protocol).is_err());
+            }
+            mcp.env.insert("ZERON_CHAT_ID".into(), "first".into());
+        }
     }
 }

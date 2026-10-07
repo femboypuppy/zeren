@@ -4,7 +4,7 @@
 //! The rows live on the session doc ([`zeron_doc::QueuedMessage`]), so the phone
 //! shows the same queue and either device can reorder it.
 //!
-//! Each row exposes a `Send now` control that interrupts the active response.
+//! Text rows steer the live agent; attachment rows offer an explicit interrupt.
 //! Editing moves the message into the composer while its leased row reserves
 //! its position.
 
@@ -79,8 +79,9 @@ const ROW_GAP: f32 = 0.0;
 const ROW_SLOT: f32 = ROW_HEIGHT + ROW_GAP;
 const ROW_PAD_X: f32 = 8.0;
 const ROW_RADIUS: f32 = 8.0;
-const PANEL_RADIUS: f32 = 16.0;
-const PANEL_PAD_TOP: f32 = 0.0;
+pub(crate) const PANEL_RADIUS: f32 = 16.0;
+const PANEL_PAD_X: f32 = 4.0;
+const PANEL_PAD_TOP: f32 = 4.0;
 /// The custom 24px queue glyphs have quieter geometry than the legacy set, so
 /// render them slightly larger to preserve the previous optical weight.
 const QUEUE_ICON_SIZE: f32 = 13.0;
@@ -88,24 +89,36 @@ const QUEUE_ICON_SIZE: f32 = 13.0;
 /// The single trailing action a queue row advertises and executes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum QueuePrimaryAction {
+    Steer,
+    SendNext,
     SendNow,
 }
 
 impl QueuePrimaryAction {
     fn tooltip(self) -> &'static str {
         match self {
+            Self::Steer => "Steer (keep current work running)",
+            Self::SendNext => "Send at the next turn (this agent cannot steer mid-turn)",
             Self::SendNow => "Send now (interrupt)",
         }
     }
 }
 
-/// All providers use Send now. Only host support and edit/review gates
-/// determine whether the action is available.
+/// Text uses the live mailbox, including providers that consume at turn boundaries.
+/// Attachments still require a new request and advertise the interruption.
 fn available_queue_primary_action(
     delivery_blocked: bool,
     host_supports_actions: bool,
+    has_attachments: bool,
+    steers_mid_turn: bool,
 ) -> Option<QueuePrimaryAction> {
-    (!delivery_blocked && host_supports_actions).then_some(QueuePrimaryAction::SendNow)
+    (!delivery_blocked && host_supports_actions).then_some(if has_attachments {
+        QueuePrimaryAction::SendNow
+    } else if steers_mid_turn {
+        QueuePrimaryAction::Steer
+    } else {
+        QueuePrimaryAction::SendNext
+    })
 }
 
 fn queue_latest_shortcut_visible(
@@ -183,7 +196,7 @@ fn one_line(text: &str) -> SharedString {
 fn queue_visible_text(text: &str, attachments: &[String]) -> String {
     let text = crate::appshots::strip_context_for_display(text);
     if text.trim().is_empty() && !attachments.is_empty() {
-        return crate::attachments::ATTACHMENT_ONLY_TEXT.to_string();
+        return crate::attachments::attachment_only_text(attachments).to_string();
     }
     if attachments.is_empty() {
         return text.to_string();
@@ -199,13 +212,30 @@ fn queue_visible_text(text: &str, attachments: &[String]) -> String {
         return text.to_string();
     }
     if parsed.text.trim().is_empty() {
-        crate::attachments::ATTACHMENT_ONLY_TEXT.to_string()
+        crate::attachments::attachment_only_text(attachments).to_string()
     } else {
         parsed.text
     }
 }
 
+/// The row's one-line label and the chips to paint over it. Commands, skills,
+/// files and attachments show the same chips as the transcript; editing and
+/// delivery still read the stored text, which keeps their canonical links.
+fn queue_row_text(
+    text: &str,
+    attachments: &[String],
+) -> (SharedString, Vec<crate::composer::SentMentionSpan>) {
+    let visible = queue_visible_text(text, attachments);
+    match crate::composer::sent_mention_display(&visible) {
+        // Line breaks become spaces of the same size, so the chips' spans
+        // still line up with the text.
+        Some((display, spans)) => (display.replace(['\r', '\n'], " ").into(), spans),
+        None => (one_line(&visible), Vec::new()),
+    }
+}
+
 /// Presentation-only metadata. Never expose the observed accessibility payload.
+/// Rows show thumbnails only; these names surface as tooltips and labels.
 fn queue_attachment_labels(text: &str, paths: &[String]) -> Vec<String> {
     let presentations = crate::appshots::presentations(text);
     paths
@@ -221,7 +251,13 @@ fn queue_attachment_labels(text: &str, paths: &[String]) -> Vec<String> {
         .collect()
 }
 
-fn queue_panel_surface(theme: &Theme) -> gpui::Div {
+/// Names the attachments folded into the "+N" chip, so they stay discoverable.
+fn queue_hidden_attachments_label(labels: &[String], shown: usize) -> Option<String> {
+    let hidden = labels.get(shown..).filter(|hidden| !hidden.is_empty())?;
+    Some(format!("{} more: {}", hidden.len(), hidden.join(" · ")))
+}
+
+pub(crate) fn queue_panel_surface(theme: &Theme) -> gpui::Div {
     div()
         .occlude()
         .rounded_t(px(PANEL_RADIUS))
@@ -235,8 +271,10 @@ fn queue_panel_surface(theme: &Theme) -> gpui::Div {
         .border_1()
         .border_color(theme.border)
         .when(!theme.is_frost(), |el| el.shadow_lg())
-        // Keep visible rows flush with the tray; only the portion tucked behind
-        // the composer needs padding.
+        // GPUI clips children to rectangles, so inset the rows to keep their
+        // hover and editing backgrounds inside the tray's rounded corners.
+        .px(px(PANEL_PAD_X))
+        .pt(px(PANEL_PAD_TOP))
         .pb(px(QUEUE_COMPOSER_OVERLAP))
         .flex()
         .flex_col()
@@ -404,14 +442,17 @@ impl Composer {
         let being_removed = self.queue_removing.contains(&item.id);
         let delivery_blocked = item.delivery_gate.is_some();
         let interaction_blocked = delivery_blocked || being_removed;
-        let text = match &item.delivery_gate {
+        let (text, chips) = match &item.delivery_gate {
             Some(QueueDeliveryGate::Editing {
                 owner_device_id, ..
-            }) if !being_edited => SharedString::from(format!("Editing on {owner_device_id}")),
+            }) if !being_edited => (
+                SharedString::from(format!("Editing on {owner_device_id}")),
+                Vec::new(),
+            ),
             Some(QueueDeliveryGate::ReviewRequired { .. }) if !being_edited => {
-                SharedString::from("Needs review")
+                (SharedString::from("Needs review"), Vec::new())
             }
-            _ => one_line(&queue_visible_text(&item.text, &item.attachments)),
+            _ => queue_row_text(&item.text, &item.attachments),
         };
 
         let edit_id = item.id.clone();
@@ -442,8 +483,12 @@ impl Composer {
                 this.remove_queued(drop_id.clone(), cx);
             }),
         );
-        let resolved_primary =
-            available_queue_primary_action(interaction_blocked, host_supports_actions);
+        let resolved_primary = available_queue_primary_action(
+            interaction_blocked,
+            host_supports_actions,
+            !item.attachments.is_empty(),
+            self.pickers().read(cx).steers_mid_turn(cx),
+        );
         let primary_action = resolved_primary.unwrap_or(QueuePrimaryAction::SendNow);
         let primary_id = item.id.clone();
         let primary = self.queue_primary_action_button(
@@ -508,7 +553,7 @@ impl Composer {
             .id(SharedString::from(format!("{key}-row")))
             .h(px(ROW_HEIGHT))
             .flex_none()
-            .px(px(ROW_PAD_X))
+            .px(px(ROW_PAD_X - PANEL_PAD_X))
             .flex()
             .flex_row()
             .items_center()
@@ -544,51 +589,33 @@ impl Composer {
             // from the editing state.
             .when(being_edited, |el| el.child(div().w(px(14.0)).flex_none()))
             .when(!being_edited, |el| {
-                let labels = queue_attachment_labels(&item.text, &item.attachments);
-                let summary = if labels.len() > 1 {
-                    format!("{} attachments · {}", labels.len(), labels.join(" · "))
-                } else {
-                    labels.join(" · ")
-                };
-                let only_images = text.as_ref() == crate::attachments::ATTACHMENT_ONLY_TEXT;
-                let title = if only_images {
-                    summary.clone().into()
-                } else {
-                    text
-                };
-                let mut content = div()
+                // A line with chips is taller, so their pills have room.
+                let line_height = if chips.is_empty() { 16.0 } else { 20.0 };
+                let content = div()
                     .flex_1()
                     .min_w_0()
-                    .flex()
-                    .flex_col()
-                    .gap(px(1.0))
-                    .child(
-                        div()
-                            .truncate()
-                            .text_size(px(QUEUE_TEXT_SIZE))
-                            .line_height(px(16.0))
-                            .text_color(theme.text.opacity(0.9))
-                            .child(title),
-                    );
-                if !labels.is_empty() && !only_images {
-                    content = content.child(
-                        div()
-                            .truncate()
-                            .text_size(px(11.0))
-                            .line_height(px(13.0))
-                            .text_color(theme.text_muted)
-                            .child(summary),
-                    );
-                }
-                el.children(
-                    item.attachments
-                        .iter()
-                        .take(self.queue_preview_limit())
-                        .enumerate()
-                        .map(|(index, path)| self.queue_thumbnail(&key, index, path, cx)),
-                )
-                .when(item.attachments.len() > self.queue_preview_limit(), |el| {
-                    let remaining = item.attachments.len() - self.queue_preview_limit();
+                    .truncate()
+                    .text_size(px(QUEUE_TEXT_SIZE))
+                    .line_height(px(line_height))
+                    .text_color(theme.text.opacity(0.9))
+                    .child(crate::composer::chip_text(text, chips, theme));
+                // Attachments the row's chips already show get no tile.
+                let tiled: Vec<String> =
+                    crate::attachments::unchipped_attachments(&item.text, &item.attachments)
+                        .into_iter()
+                        .cloned()
+                        .collect();
+                let labels = queue_attachment_labels(&item.text, &tiled);
+                let limit = self.queue_preview_limit();
+                let hidden = queue_hidden_attachments_label(&labels, limit);
+                el.children(tiled.iter().zip(&labels).take(limit).enumerate().map(
+                    |(index, (path, label))| {
+                        self.queue_thumbnail(&key, index, path, label.into(), cx)
+                    },
+                ))
+                .when_some(hidden, |el, hidden| {
+                    let remaining = tiled.len() - limit;
+                    let hidden: SharedString = hidden.into();
                     el.child(
                         div()
                             .id(SharedString::from(format!("{key}-more-attachments")))
@@ -602,9 +629,14 @@ impl Composer {
                             .bg(crate::theme::ink(0.06))
                             .text_size(px(11.0))
                             .text_color(theme.text_muted)
-                            .aria_label(format!(
-                                "{remaining} more attachments; edit message to view all"
-                            ))
+                            .aria_label(format!("{hidden}; edit message to view all"))
+                            .tooltip(move |_, cx| {
+                                cx.new(|_| QueueActionTooltip {
+                                    label: hidden.clone(),
+                                })
+                                .into()
+                            })
+                            .tooltip_show_delay(std::time::Duration::from_millis(350))
                             .child(format!("+{remaining}")),
                     )
                 })
@@ -701,7 +733,12 @@ impl Composer {
         );
         let keys: std::collections::HashSet<_> = items[visible]
             .iter()
-            .flat_map(|item| item.attachments.iter().take(self.queue_preview_limit()))
+            .flat_map(|item| {
+                attachments::unchipped_attachments(&item.text, &item.attachments)
+                    .into_iter()
+                    .take(self.queue_preview_limit())
+            })
+            .filter(|path| attachments::is_image_path(path))
             .map(|path| (device.clone(), path.clone()))
             .take(64)
             .collect();
@@ -829,6 +866,7 @@ impl Composer {
         key: &SharedString,
         index: usize,
         path: &str,
+        label: SharedString,
         cx: &mut Context<Self>,
     ) -> AnyElement {
         use crate::attachments;
@@ -856,10 +894,36 @@ impl Composer {
             .border_1()
             .border_color(crate::theme::hairline(0.1))
             .bg(crate::theme::ink(0.035))
-            .overflow_hidden();
+            .overflow_hidden()
+            .tooltip({
+                let label = label.clone();
+                move |_, cx| {
+                    cx.new(|_| QueueActionTooltip {
+                        label: label.clone(),
+                    })
+                    .into()
+                }
+            })
+            .tooltip_show_delay(std::time::Duration::from_millis(350));
+        // A file that is not an image has no thumbnail to load: its icon stands in.
+        if !attachments::is_image_path(path) {
+            return frame
+                .flex()
+                .items_center()
+                .justify_center()
+                .child(
+                    crate::file_icons::icon(
+                        crate::file_icons::FileIconIdentity::file(
+                            attachments::attachment_display_name(&label),
+                        ),
+                        Theme::of(cx).appearance,
+                    )
+                    .size(px(16.0)),
+                )
+                .into_any_element();
+        }
         match snapshot {
             Some(image) => {
-                let label = image.name.clone();
                 let path = path.to_owned();
                 let accent = Theme::of(cx).accent;
                 frame
@@ -888,7 +952,7 @@ impl Composer {
                     let accent = Theme::of(cx).accent;
                     frame
                         .role(gpui::Role::Button)
-                        .aria_label("Open attachment preview")
+                        .aria_label(format!("Preview {label}"))
                         .tab_index(0)
                         .focus_visible(move |style| style.border_color(accent))
                         .cursor_pointer()
@@ -968,7 +1032,7 @@ impl Composer {
             .into_any_element()
     }
 
-    /// Send now interrupts the current response before delivering the row.
+    /// Advertise the exact delivery action taken by the row.
     fn queue_primary_action_button(
         &self,
         key: &SharedString,
@@ -1037,7 +1101,13 @@ impl Composer {
                     .text_color(theme.text_muted)
                     .into_any_element()
             } else {
-                div().child("Send now").into_any_element()
+                div()
+                    .child(match action {
+                        QueuePrimaryAction::Steer => "Steer",
+                        QueuePrimaryAction::SendNext => "Send next",
+                        QueuePrimaryAction::SendNow => "Send now",
+                    })
+                    .into_any_element()
             })
             .into_any_element()
     }
@@ -1218,18 +1288,24 @@ impl Composer {
         cx: &mut Context<Self>,
     ) {
         match action {
+            QueuePrimaryAction::Steer | QueuePrimaryAction::SendNext => self.queue_rpc(
+                methods::STEER_QUEUED_MESSAGE_NOW,
+                serde_json::json!({ "id": id }),
+                "Couldn't send that message",
+                cx,
+            ),
             QueuePrimaryAction::SendNow => self.send_queued_now(id, cx),
         }
     }
 
     /// Cmd/Ctrl+Enter on an empty composer activates the same action shown on
-    /// the most recently queued row: Send now, interrupting the current response.
+    /// the most recently queued row: steer text, or send attachments with an interrupt.
     /// An edit/review gate or an old chat host makes it a no-op.
     pub(crate) fn activate_latest_queued(&mut self, cx: &mut Context<Self>) {
         if self.editing_queued.is_some() {
             return;
         }
-        let (id, delivery_blocked, host_supports_actions) = {
+        let (id, delivery_blocked, host_supports_actions, has_attachments) = {
             let state = self.state.read(cx);
             let Some(chat_id) = state.selected_chat.as_deref() else {
                 return;
@@ -1244,10 +1320,15 @@ impl Composer {
                     chat_id,
                     zeron_proto::capabilities::MESSAGE_QUEUE_ACTIONS_V1,
                 ),
+                !item.attachments.is_empty(),
             )
         };
-        let Some(action) = available_queue_primary_action(delivery_blocked, host_supports_actions)
-        else {
+        let Some(action) = available_queue_primary_action(
+            delivery_blocked,
+            host_supports_actions,
+            has_attachments,
+            self.pickers().read(cx).steers_mid_turn(cx),
+        ) else {
             return;
         };
         self.activate_queued_primary(id, action, cx);
@@ -1313,14 +1394,23 @@ impl Composer {
                     .and_then(|v| serde_json::from_value::<Vec<String>>(v.clone()).ok());
                 let mut load_failed = paths.is_none();
                 for path in paths.unwrap_or_default() {
-                    let loaded = crate::attachments::read_attachment_image(
-                        &engine, cx.background_executor(), Some(&host_device_id), &path,
-                        None,
-                    ).await;
+                    let loaded = if crate::attachments::is_image_path(&path) {
+                        crate::attachments::read_attachment_image(
+                            &engine, cx.background_executor(), Some(&host_device_id), &path,
+                            None,
+                        ).await.map(|loaded| crate::attachments::StagedAttachment {
+                            id: uuid::Uuid::new_v4().to_string(),
+                            mention: None,
+                            name: loaded.name,
+                            content: crate::attachments::AttachmentContent::Image(loaded.image),
+                        })
+                    } else {
+                        crate::attachments::read_attachment_file(
+                            &engine, cx.background_executor(), Some(&host_device_id), &path,
+                        ).await
+                    };
                     match loaded {
-                        Some(loaded) => loaded_attachments.push(crate::attachments::StagedAttachment {
-                            id: uuid::Uuid::new_v4().to_string(), name: loaded.name, image: loaded.image,
-                        }),
+                        Some(staged) => loaded_attachments.push(staged),
                         None => { load_failed = true; break; }
                     }
                 }
@@ -1374,7 +1464,7 @@ impl Composer {
                             .to_string();
                         let attachments: Vec<String> = serde_json::from_value(reply["attachments"].clone()).unwrap_or_default();
                         let text = queue_visible_text(&raw_text, &attachments);
-                        let text = if !attachments.is_empty() && text == crate::attachments::ATTACHMENT_ONLY_TEXT {
+                        let text = if !attachments.is_empty() && crate::attachments::is_attachment_only_text(&text) {
                             String::new()
                         } else { text };
                         let selected_matches = composer.state.read(cx).selected_chat.as_deref()
@@ -1404,15 +1494,12 @@ impl Composer {
                         composer.queue_edit_base_text_hash = Some(base_text_hash.to_string());
                         composer.queue_edit_chat_id = Some(chat_id.clone());
                         composer.queue_edit_host_device_id = Some(host_device_id.clone());
-                        composer.queue_edit_draft = Some((
-                            composer.input.read(cx).text().to_string(),
-                            composer.attachments.remove(&composer.current_key).unwrap_or_default(),
-                            composer.appshots.remove(&composer.current_key).unwrap_or_default(),
-                        ));
-                        composer.attachments.insert(composer.current_key.clone(), loaded_attachments);
-                        composer.appshots.insert(composer.current_key.clone(), loaded_appshots);
-                        composer.focus_pending = true;
-                        composer.input.update(cx, |input, cx| input.set_text(text, cx));
+                        composer.swap_in_queued_draft(
+                            text,
+                            std::mem::take(&mut loaded_attachments),
+                            std::mem::take(&mut loaded_appshots),
+                            cx,
+                        );
                         composer.start_queue_edit_renewal(engine.clone(), cx);
                     }
                     Ok(reply)
@@ -1438,13 +1525,55 @@ impl Composer {
         self.queue_edit_task = Some(task);
     }
 
+    /// Set the draft aside and fill the composer with a queued message.
+    /// Restored attachments take the numbers of the chips that name them, so
+    /// those chips stay live; the draft's own numbering waits with the draft.
+    pub(crate) fn swap_in_queued_draft(
+        &mut self,
+        text: String,
+        mut attachments: Vec<crate::attachments::StagedAttachment>,
+        appshots: Vec<crate::appshots::CapturedAppshot>,
+        cx: &mut Context<Self>,
+    ) {
+        self.queue_edit_draft = Some((
+            self.input.read(cx).text().to_string(),
+            self.attachments
+                .remove(&self.current_key)
+                .unwrap_or_default(),
+            self.appshots.remove(&self.current_key).unwrap_or_default(),
+        ));
+        self.displace_attachment_draft();
+        crate::attachments::pair_with_chips(&text, &mut attachments);
+        self.attachments
+            .insert(self.current_key.clone(), attachments);
+        self.appshots.insert(self.current_key.clone(), appshots);
+        self.focus_pending = true;
+        self.input.update(cx, |input, cx| input.set_text(text, cx));
+    }
+
+    /// The text a queue edit saves: a chip whose attachment was removed is
+    /// saved as its plain label.
+    pub(crate) fn queue_edit_text(&self, cx: &gpui::App) -> String {
+        let attached: Vec<u32> = self.staged().iter().filter_map(|att| att.mention).collect();
+        zeron_proto::attachment_mentions::demote_unattached_mentions(
+            self.input.read(cx).text(),
+            &attached,
+        )
+    }
+
     /// Save the composer into the existing row, including its attachments.
     /// An entirely empty composer removes the row.
     pub(crate) fn commit_queue_edit(&mut self, cx: &mut Context<Self>) -> bool {
         if self.editing_queued.is_none() {
             return false;
         }
-        let text = self.input.read(cx).text().to_string();
+        if self
+            .input
+            .update(cx, |input, cx| input.finish_dictation(true, cx))
+        {
+            return true;
+        }
+        let text = self.queue_edit_text(cx);
         if !self.check_reference_delivery(&text, cx) {
             return true;
         }
@@ -1461,6 +1590,7 @@ impl Composer {
         if self.editing_queued.is_none() {
             return false;
         }
+        self.input.update(cx, |input, _| input.cancel_dictation());
         self.finish_queue_edit("cancel", None, cx);
         true
     }
@@ -1470,7 +1600,7 @@ impl Composer {
         self.clear_queue_edit_local(cx);
     }
 
-    fn clear_queue_edit_local(&mut self, cx: &mut Context<Self>) {
+    pub(crate) fn clear_queue_edit_local(&mut self, cx: &mut Context<Self>) {
         self.editing_queued = None;
         self.queue_edit_lease_id = None;
         self.queue_edit_base_text_hash = None;
@@ -1479,11 +1609,13 @@ impl Composer {
         self.queue_edit_pending_id = None;
         self.queue_edit_finishing = false;
         self.input.update(cx, |input, cx| {
+            input.cancel_dictation();
             input.read_only = false;
             cx.notify();
         });
         self.queue_edit_task = None;
         self.queue_edit_renew_task = None;
+        self.restore_attachment_draft();
         if let Some((text, attachments, appshots)) = self.queue_edit_draft.take() {
             self.appshots.insert(self.current_key.clone(), appshots);
             self.input.update(cx, |input, cx| input.set_text(text, cx));
@@ -1529,6 +1661,7 @@ impl Composer {
         });
         self.queue_edit_finishing = true;
         self.input.update(cx, |input, cx| {
+            input.cancel_dictation();
             input.read_only = true;
             cx.notify();
         });
@@ -1550,7 +1683,7 @@ impl Composer {
                         params["text"].as_str().unwrap_or_default(), &staged_appshots, &appshot_paths,
                     ).into();
                     if params["text"].as_str().is_some_and(|text| text.trim().is_empty()) && !paths.is_empty() {
-                        params["text"] = crate::attachments::ATTACHMENT_ONLY_TEXT.into();
+                        params["text"] = crate::attachments::attachment_only_text(&paths).into();
                     }
                     params["attachments"] = serde_json::json!(paths);
                 }
@@ -1796,10 +1929,10 @@ mod tests {
     use zeron_rpc::methods;
 
     use super::{
-        PANEL_PAD_TOP, QueuePrimaryAction, ROW_SLOT, available_queue_primary_action,
-        latest_queued_message, one_line, queue_action_needs_host, queue_drag_offsets,
-        queue_drop_index, queue_latest_shortcut_visible, queue_mutation_acknowledged,
-        queue_visible_text, visible_queue_rows,
+        PANEL_PAD_TOP, PANEL_PAD_X, PANEL_RADIUS, QueuePrimaryAction, ROW_RADIUS, ROW_SLOT,
+        available_queue_primary_action, latest_queued_message, one_line, queue_action_needs_host,
+        queue_drag_offsets, queue_drop_index, queue_latest_shortcut_visible,
+        queue_mutation_acknowledged, queue_visible_text, visible_queue_rows,
     };
 
     #[test]
@@ -1818,11 +1951,25 @@ mod tests {
     #[test]
     fn available_primary_action_obeys_row_and_host_gates() {
         assert_eq!(
-            available_queue_primary_action(false, true),
+            available_queue_primary_action(false, true, false, false),
+            Some(QueuePrimaryAction::SendNext)
+        );
+        assert_eq!(
+            available_queue_primary_action(false, true, true, true),
             Some(QueuePrimaryAction::SendNow)
         );
-        assert_eq!(available_queue_primary_action(true, true), None);
-        assert_eq!(available_queue_primary_action(false, false), None);
+        assert_eq!(
+            available_queue_primary_action(false, true, false, true),
+            Some(QueuePrimaryAction::Steer)
+        );
+        assert_eq!(
+            available_queue_primary_action(true, true, false, true),
+            None
+        );
+        assert_eq!(
+            available_queue_primary_action(false, false, false, true),
+            None
+        );
     }
 
     #[test]
@@ -1960,6 +2107,130 @@ mod tests {
         assert_eq!(
             super::queue_attachment_labels(&malformed, &paths),
             vec!["shot & detail.png", "reference.png"]
+        );
+    }
+
+    /// GPUI clips the rows rectangularly, so a row's own rounded hover wash
+    /// must fit inside the tray's rounded top corners (within its 1px border).
+    #[test]
+    fn row_hover_corners_stay_inside_the_panel_curve() {
+        let border = 1.0_f32;
+        let row_corner_center = (
+            border + PANEL_PAD_X + ROW_RADIUS,
+            border + PANEL_PAD_TOP + ROW_RADIUS,
+        );
+        let reach = (PANEL_RADIUS - row_corner_center.0).hypot(PANEL_RADIUS - row_corner_center.1)
+            + ROW_RADIUS;
+        assert!(reach <= PANEL_RADIUS - border, "row corner reaches {reach}");
+    }
+
+    /// Filenames are no longer printed in the row, so every attachment folded
+    /// into the "+N" chip must still be named by its tooltip.
+    #[test]
+    fn overflow_chip_names_every_hidden_attachment() {
+        let labels = ["a.png", "Notes Appshot", "c.png"].map(String::from);
+        assert_eq!(
+            super::queue_hidden_attachments_label(&labels, 1).as_deref(),
+            Some("2 more: Notes Appshot · c.png")
+        );
+        assert_eq!(super::queue_hidden_attachments_label(&labels, 3), None);
+        assert_eq!(super::queue_hidden_attachments_label(&labels, 5), None);
+        assert_eq!(super::queue_hidden_attachments_label(&[], 2), None);
+    }
+
+    /// A row's text without the room reserved for chip icons and padding.
+    fn plain(display: &gpui::SharedString) -> String {
+        display
+            .replace('\u{a0}', " ")
+            .split_whitespace()
+            .collect::<Vec<_>>()
+            .join(" ")
+    }
+
+    fn kinds(spans: &[crate::composer::SentMentionSpan]) -> Vec<crate::composer::ChipKind> {
+        spans.iter().map(|span| span.kind).collect()
+    }
+
+    /// Rows label references the way the transcript does, never as raw
+    /// `zeron-invoke:`/`zeron-file:` links, and still hide attachment trailers.
+    #[test]
+    fn queue_rows_label_commands_skills_and_files() {
+        use crate::composer::ChipKind;
+        use zeron_proto::invocation::Invocation;
+        let command = Invocation::Command {
+            name: "compact".into(),
+        }
+        .link();
+        let skill = Invocation::Skill {
+            name: "review-pr".into(),
+            path: "/skills/review-pr/SKILL.md".into(),
+            command: None,
+        }
+        .link();
+        let file = zeron_proto::file_mentions::local_file_link("src/queue.rs", false);
+        let text = format!("{command} then {skill}\non {file}");
+        let (display, spans) = super::queue_row_text(&text, &[]);
+        assert_eq!(plain(&display), "compact then review-pr on queue.rs");
+        assert_eq!(
+            kinds(&spans),
+            [ChipKind::Command, ChipKind::Skill, ChipKind::File]
+        );
+        // Every chip span lies inside the row's text, line breaks included.
+        assert!(spans.iter().all(|span| span.range.end <= display.len()));
+        assert!(!display.contains('\n'));
+
+        let paths = vec!["/tmp/image.png".to_string()];
+        let legacy = crate::attachments::with_attachments(&command, &paths);
+        assert_eq!(plain(&super::queue_row_text(&legacy, &paths).0), "compact");
+        let (display, spans) = super::queue_row_text("plain  text", &[]);
+        assert_eq!(display.as_ref(), "plain text");
+        assert!(spans.is_empty());
+    }
+
+    /// A queued message with attachment chips shows them as chips in its row,
+    /// and an attachments-only message names what it holds.
+    #[test]
+    fn queue_rows_label_attachment_chips_and_file_only_sends() {
+        use zeron_proto::attachment_mentions::attachment_mention_link;
+        let paths = vec![
+            "/uploads/ab12cd34-Image_1.png".to_string(),
+            "/uploads/ef56ab78-notes.md".to_string(),
+        ];
+        let text = format!(
+            "compare {} and {}",
+            attachment_mention_link(1, None),
+            attachment_mention_link(2, Some("notes.md"))
+        );
+        let (display, spans) = super::queue_row_text(&text, &paths);
+        assert_eq!(plain(&display), "compare Image 1 and notes.md");
+        assert_eq!(
+            kinds(&spans),
+            [
+                crate::composer::ChipKind::Image,
+                crate::composer::ChipKind::File
+            ]
+        );
+
+        let files = vec!["/uploads/ef56ab78-notes.md".to_string()];
+        assert_eq!(
+            queue_visible_text("", &files),
+            crate::attachments::FILE_ATTACHMENT_ONLY_TEXT
+        );
+        let mixed = vec!["/a/cat.png".to_string(), "/a/notes.md".to_string()];
+        assert_eq!(
+            queue_visible_text("", &mixed),
+            crate::attachments::FILE_ATTACHMENT_ONLY_TEXT
+        );
+        let images = vec!["/a/cat.png".to_string()];
+        assert_eq!(
+            queue_visible_text("", &images),
+            crate::attachments::ATTACHMENT_ONLY_TEXT
+        );
+        // A legacy trailer on a files-only row is hidden like an image one.
+        let legacy = crate::attachments::with_attachments("", &files);
+        assert_eq!(
+            queue_visible_text(&legacy, &files),
+            crate::attachments::FILE_ATTACHMENT_ONLY_TEXT
         );
     }
 

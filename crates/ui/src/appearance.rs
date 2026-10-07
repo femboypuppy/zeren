@@ -115,6 +115,7 @@ pub fn init(
         cx,
     );
     Theme::set_glass_alpha_override(frost.glass_alpha(), cx);
+    settings::wallpaper_colors::ensure_color(cx);
 }
 
 /// The mode currently in effect (defaults to `System` before [`init`]).
@@ -286,6 +287,7 @@ pub fn apply(cx: &mut App) {
             && theme.variant_id.as_ref() == variant_id
             && theme.accent_selection == accent
             && theme.surface_preference == surface
+            && theme.wallpaper_color == settings::wallpaper_colors::active(cx)
     });
     let frost_changed = cx
         .try_global::<Theme>()

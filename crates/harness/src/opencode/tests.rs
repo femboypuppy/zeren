@@ -15,6 +15,7 @@ struct TurnWire {
     requests: mpsc::UnboundedReceiver<String>,
     events: mpsc::Receiver<Result<AgentEvent, HarnessError>>,
     interrupt: tokio_util::sync::CancellationToken,
+    steering: Option<mpsc::Sender<crate::SteerMessage>>,
     polls: Arc<std::sync::atomic::AtomicUsize>,
     command_failure_release: Option<tokio::sync::oneshot::Sender<()>>,
     server: tokio::task::JoinHandle<()>,
@@ -199,7 +200,7 @@ impl TurnWire {
                             "/api/session" => ("200 OK", r#"{"data":{"id":"fixture"}}"#),
                             "/api/command" => ("200 OK", r#"{"data":[]}"#),
                             // Non-empty: the catalog-sync retry loop must not stall tests.
-                            "/api/model" => ("200 OK", r#"{"data":[{"providerID":"opencode","id":"muse","name":"Muse","limit":{"context":1000},"variants":[{"id":"low"}],"enabled":true}]}"#),
+                            "/api/model" => ("200 OK", r#"{"data":[{"providerID":"opencode","id":"muse","name":"Muse","limit":{"context":1000},"variants":[{"id":"low"}],"enabled":true},{"providerID":"opencode","id":"long-context","name":"Long Context","limit":{"context":2000},"enabled":true}]}"#),
                             _ => ("200 OK", "{}"),
                         }
                     } else {
@@ -240,7 +241,10 @@ impl TurnWire {
                 .await
                 .unwrap();
         }
-        drop(steer_tx);
+        let retained_steering = overrides["keepSteering"]
+            .as_bool()
+            .unwrap_or(false)
+            .then_some(steer_tx);
         let interrupt = tokio_util::sync::CancellationToken::new();
         let mut request = json!({"prompt": if native_command_reply.is_some() { "/project-review" } else { "first" }, "cwd":"", "sandbox":"workspace-write", "autoApprove": auto_approve, "model": if v2 { Some("opencode/muse") } else { None }, "reasoning": "low"});
         request
@@ -251,6 +255,8 @@ impl TurnWire {
             server: Server::attached(base),
             event_tx,
             controls: RunControls {
+                realtime: None,
+                execution_lease: None,
                 request_input: Box::new(move |questions| {
                     let answer = answer.expect("fixture must not ask for input");
                     let (tx, rx) = tokio::sync::oneshot::channel();
@@ -289,6 +295,7 @@ impl TurnWire {
             requests,
             events,
             interrupt,
+            steering: retained_steering,
             polls,
             command_failure_release: matches!(
                 native_command_reply,
@@ -297,6 +304,26 @@ impl TurnWire {
             .then_some(command_failure_release),
             server,
             run,
+        }
+    }
+
+    /// Requests whose relative order the fixture's concurrent HTTP handlers
+    /// do not preserve.
+    async fn requests_any_order(&mut self, suffixes: &[&str]) {
+        let mut seen = Vec::new();
+        for _ in suffixes {
+            seen.push(
+                tokio::time::timeout(Duration::from_secs(5), self.requests.recv())
+                    .await
+                    .unwrap()
+                    .unwrap(),
+            );
+        }
+        for suffix in suffixes {
+            assert!(
+                seen.iter().any(|path| path.ends_with(suffix)),
+                "missing {suffix}: {seen:?}"
+            );
         }
     }
 
@@ -362,10 +389,51 @@ impl TurnWire {
 }
 
 #[tokio::test]
+async fn completed_turn_keeps_mailbox_alive_for_the_next_queued_request() {
+    let mut wire = TurnWire::start_config(
+        false,
+        false,
+        true,
+        None,
+        "1.18.21",
+        json!({ "keepSteering": true }),
+        false,
+    )
+    .await;
+    wire.request("/prompt_async").await;
+    wire.status("busy");
+    wire.status("idle");
+    wire.idle();
+    assert_eq!(wire.done().await.0, DoneStatus::Completed);
+    assert!(!wire.run.is_finished());
+    wire.steering
+        .as_ref()
+        .unwrap()
+        .send(crate::SteerMessage {
+            prompt: "after completion".into(),
+            message_id: Some("second".into()),
+        })
+        .await
+        .unwrap();
+    wire.request("/prompt_async").await;
+    wire.status("busy");
+    wire.status("idle");
+    wire.idle();
+    assert_eq!(wire.done().await.0, DoneStatus::Completed);
+    assert!(!wire.run.is_finished());
+    drop(wire.steering.take());
+    tokio::time::timeout(Duration::from_secs(5), &mut wire.run)
+        .await
+        .unwrap()
+        .unwrap();
+}
+
+#[tokio::test]
 async fn queued_turn_ignores_previous_turn_duplicate_idle() {
     for status_first in [true, false] {
         let mut wire = TurnWire::start(true).await;
-        wire.request("/prompt_async").await;
+        // The queued steer preempts the generation at once.
+        wire.requests_any_order(&["/prompt_async", "/abort"]).await;
         wire.status("busy");
         // Both completion encodings belong to the first turn. The first frame
         // submits the queued prompt; the second must not finish that new turn.
@@ -435,7 +503,8 @@ async fn native_command_http_failures_settle_the_current_turn() {
 #[tokio::test]
 async fn late_native_command_failure_does_not_poison_the_queued_turn() {
     let mut wire = TurnWire::start_native_command(true, NativeCommandReply::DelayedHttp404).await;
-    wire.request("/command").await;
+    // The queued steer preempts the generation at once.
+    wire.requests_any_order(&["/command", "/abort"]).await;
     wire.status("busy");
     wire.status("idle");
     wire.request("/prompt_async").await;
@@ -492,6 +561,38 @@ async fn v2_wire_streams_text_and_settles_on_execution_success() {
             "text": "PONG"
         }),
     );
+    // Each step reports its own tokens; `session.usage.updated` follows with
+    // the cumulative session totals, which must not read as occupancy.
+    let step = |wire: &TurnWire, message: &str, model: &str, tokens: Value, cumulative: Value| {
+        wire.v2(
+            "session.step.started",
+            json!({
+                "sessionID": "fixture",
+                "assistantMessageID": message,
+                "model": {"id": model, "providerID": "opencode"},
+            }),
+        );
+        wire.v2(
+            "session.step.ended",
+            json!({
+                "sessionID": "fixture", "assistantMessageID": message,
+                "finish": "stop", "cost": 0, "tokens": tokens,
+            }),
+        );
+        wire.v2(
+            "session.usage.updated",
+            json!({"sessionID": "fixture", "cost": 0, "tokens": cumulative}),
+        );
+    };
+    wire.v2(
+        "session.step.ended",
+        json!({
+            "sessionID": "fixture", "assistantMessageID": "msg_a",
+            "finish": "stop", "cost": 0,
+            "tokens": {"input": 10, "output": 2, "reasoning": 0,
+                       "cache": {"read": 0, "write": 0}}
+        }),
+    );
     wire.v2(
         "session.usage.updated",
         json!({
@@ -500,33 +601,72 @@ async fn v2_wire_streams_text_and_settles_on_execution_success() {
                        "cache": {"read": 0, "write": 0}}
         }),
     );
+    // A model switch resolves the new model's advertised window.
+    step(
+        &wire,
+        "msg_b",
+        "long-context",
+        json!({"input": 20, "output": 3, "reasoning": 0, "cache": {"read": 5, "write": 0}}),
+        json!({"input": 30, "output": 5, "reasoning": 0, "cache": {"read": 5, "write": 0}}),
+    );
+    // A step without reported usage is not an empty context.
+    step(
+        &wire,
+        "msg_c",
+        "long-context",
+        json!({"input": 0, "output": 0, "reasoning": 0, "cache": {"read": 0, "write": 0}}),
+        json!({"input": 30, "output": 5, "reasoning": 0, "cache": {"read": 5, "write": 0}}),
+    );
+    // After compaction the next prompt is smaller; the totals keep climbing.
+    step(
+        &wire,
+        "msg_d",
+        "long-context",
+        json!({"input": 4, "output": 1, "reasoning": 0, "cache": {"read": 0, "write": 0}}),
+        json!({"input": 34, "output": 6, "reasoning": 0, "cache": {"read": 5, "write": 0}}),
+    );
     wire.v2(
         "session.execution.succeeded",
         json!({"sessionID": "fixture"}),
     );
 
-    let (status, text, usage) = tokio::time::timeout(Duration::from_secs(5), async {
-        let mut text = String::new();
-        let mut usage = None;
-        loop {
-            match wire.events.recv().await.unwrap().unwrap() {
-                AgentEvent::TextDelta { text: delta } => text.push_str(&delta),
-                AgentEvent::Usage {
-                    input_tokens,
-                    output_tokens,
-                } => {
-                    usage = Some((input_tokens, output_tokens));
+    let (status, text, usage, context_usage) =
+        tokio::time::timeout(Duration::from_secs(5), async {
+            let mut text = String::new();
+            let mut usage = None;
+            let mut context_usage = Vec::new();
+            loop {
+                match wire.events.recv().await.unwrap().unwrap() {
+                    AgentEvent::TextDelta { text: delta } => text.push_str(&delta),
+                    AgentEvent::Usage {
+                        input_tokens,
+                        output_tokens,
+                    } => {
+                        usage = Some((input_tokens, output_tokens));
+                    }
+                    AgentEvent::ContextUsage { tokens, window } => {
+                        context_usage.push((tokens, window));
+                    }
+                    AgentEvent::Done { status, .. } => {
+                        return (status, text, usage, context_usage);
+                    }
+                    _ => {}
                 }
-                AgentEvent::Done { status, .. } => return (status, text, usage),
-                _ => {}
             }
-        }
-    })
-    .await
-    .unwrap();
+        })
+        .await
+        .unwrap();
     assert_eq!(status, DoneStatus::Completed);
     assert_eq!(text, "PONG");
-    assert_eq!(usage, Some((10, 2)));
+    assert_eq!(usage, Some((4, 1)));
+    assert_eq!(
+        context_usage,
+        vec![
+            (Some(12), Some(1000)),
+            (Some(28), Some(2000)),
+            (Some(5), Some(2000)),
+        ]
+    );
 }
 
 #[tokio::test]
@@ -1039,6 +1179,29 @@ fn tool_parts_open_and_resolve_once() {
     ));
 }
 
+/// A running tool that takes no arguments is open too: steering preempts
+/// only when no tool is open, so an unseen one would be aborted.
+#[test]
+fn a_running_tool_without_arguments_opens_before_it_completes() {
+    let mut feed = feed_with_assistant("msg_a");
+    let pending = json!({
+        "id": "prt_w", "messageID": "msg_a", "sessionID": "ses_1",
+        "type": "tool", "tool": "slow_slow_wait", "callID": "call-w",
+        "state": {"status": "pending", "input": {}},
+    });
+    assert!(part_snapshot_events(&mut feed, &pending, true, None).is_empty());
+    let running = json!({
+        "id": "prt_w", "messageID": "msg_a", "sessionID": "ses_1",
+        "type": "tool", "tool": "slow_slow_wait", "callID": "call-w",
+        "state": {"status": "running", "input": {}},
+    });
+    let events = part_snapshot_events(&mut feed, &running, true, None);
+    assert!(
+        matches!(events.as_slice(), [AgentEvent::ToolCall { id, .. }] if id == "call-w"),
+        "{events:?}"
+    );
+}
+
 #[test]
 fn task_spawn_registers_child_by_metadata_and_completion_settles() {
     for name in ["task", "subagent"] {
@@ -1171,13 +1334,22 @@ fn tool_names_type_the_common_calls() {
         "todowrite",
         &json!({"todos": [
             {"content": "step one", "status": "completed"},
-            {"content": "step two", "status": "pending"},
+            {"content": "step two", "status": "in_progress"},
+            {"content": "step three", "status": "pending"},
+            {"content": "step four", "status": "cancelled"},
         ]}),
     );
-    assert!(matches!(
-        &call,
-        ToolCall::Todo { items } if items.len() == 2 && items[0].done && !items[1].done
-    ));
+    assert_eq!(
+        call,
+        ToolCall::Todo {
+            items: vec![
+                TodoItem::new("step one", TodoStatus::Completed),
+                TodoItem::new("step two", TodoStatus::InProgress),
+                TodoItem::new("step three", TodoStatus::Pending),
+                TodoItem::new("step four", TodoStatus::Pending),
+            ]
+        }
+    );
     let call = oc_tool_call("mystery", &json!({"x": 1}));
     assert!(matches!(&call, ToolCall::Unknown { name, input: Some(_) } if name == "mystery"));
     assert!(!call.is_subagent_spawn());
@@ -1339,10 +1511,10 @@ fn v2_frames_normalize_to_v1_payloads() {
             "type":"tool","tool":"read",
             "state":{"status":"running","input":{"path":"/tmp/x"}}}}})]
     );
-    // Usage totals reach the engine as an assistant message.updated.
+    // A step's own usage reaches the engine as an assistant message.updated.
     let out = normalize_v2_frame(
-        json!({"id":"evt_9","type":"session.usage.updated","data":{
-            "sessionID":"ses_1","cost":0,
+        json!({"id":"evt_9","type":"session.step.ended","data":{
+            "sessionID":"ses_1","assistantMessageID":"msg_a","finish":"stop","cost":0,
             "tokens":{"input":10,"output":2,"reasoning":0,"cache":{"read":0,"write":0}}}}),
         &mut tools,
     );
@@ -1352,6 +1524,60 @@ fn v2_frames_normalize_to_v1_payloads() {
             "info":{"sessionID":"ses_1","id":"usage","role":"assistant",
                     "tokens":{"input":10,"output":2,"reasoning":0,
                               "cache":{"read":0,"write":0}}}}})]
+    );
+    // Cumulative session totals are spend, not occupancy; malformed step
+    // usage is dropped.
+    for data in [
+        json!({"id":"evt_10","type":"session.usage.updated","data":{
+            "sessionID":"ses_1","cost":0,"tokens":{"input":10,"output":2}}}),
+        json!({"id":"evt_11","type":"session.step.ended","data":{
+            "sessionID":"ses_1","assistantMessageID":"msg_a","tokens":"12"}}),
+        json!({"id":"evt_11","type":"session.step.ended","data":{
+            "sessionID":"ses_1","assistantMessageID":"msg_a"}}),
+    ] {
+        assert_eq!(normalize_v2_frame(data, &mut tools), Vec::<Value>::new());
+    }
+    // step.ended omits model identity; the session's latest step supplies
+    // it so the context window resolves downstream.
+    let mut session_models = HashMap::new();
+    let step = normalize_v2_frame_with_session_models(
+        json!({"id":"evt_12","type":"session.step.started","data":{
+            "sessionID":"ses_2","assistantMessageID":"msg_b",
+            "model":{"id":"long-context","providerID":"opencode"}}}),
+        &mut tools,
+        &mut session_models,
+    );
+    assert_eq!(step.len(), 1);
+    let out = normalize_v2_frame_with_session_models(
+        json!({"id":"evt_13","type":"session.step.ended","data":{
+            "sessionID":"ses_2","assistantMessageID":"msg_b","finish":"stop","cost":0,
+            "tokens":{"input":1,"output":2}}}),
+        &mut tools,
+        &mut session_models,
+    );
+    assert_eq!(
+        out,
+        vec![json!({"type":"message.updated","properties":{
+            "info":{"sessionID":"ses_2","id":"usage","role":"assistant",
+                    "tokens":{"input":1,"output":2},
+                    "providerID":"opencode","modelID":"long-context"}}})]
+    );
+    // A malformed model leaves the cached one in place.
+    for model in [
+        json!(null),
+        json!("opencode/muse"),
+        json!({"id":"", "providerID":"opencode"}),
+    ] {
+        normalize_v2_frame_with_session_models(
+            json!({"id":"evt_14","type":"session.step.started","data":{
+                "sessionID":"ses_2","assistantMessageID":"msg_c","model":model}}),
+            &mut tools,
+            &mut session_models,
+        );
+    }
+    assert_eq!(
+        session_models.get("ses_2").map(|m| m.model_id.as_str()),
+        Some("long-context")
     );
     // The permission ask keeps its 1.x name on 2.x (observed live when a
     // tool reaches outside the workspace); the auto-approver replies.
@@ -1679,6 +1905,29 @@ async fn v2_pending_tool_overflow_fails_the_run_instead_of_growing_forever() {
         wire.v2("session.tool.input.started",json!({"sessionID":"other","assistantMessageID":"m","id":format!("c{i}"),"name":"read"}));
     }
     assert_eq!(wire.done().await.0, DoneStatus::Errored);
+}
+
+#[tokio::test]
+async fn v2_session_model_overflow_drops_the_cache_instead_of_failing_the_run() {
+    let mut wire = TurnWire::start_proto(false, true).await;
+    wire.request("/api/model").await;
+    wire.request("/prompt").await;
+    wire.v2("session.execution.started", json!({"sessionID": "fixture"}));
+    for i in 0..=MAX_V2_SESSION_MODELS {
+        wire.v2(
+            "session.step.started",
+            json!({
+                "sessionID": format!("other-{i}"),
+                "assistantMessageID": "m",
+                "model": {"id": "muse", "providerID": "opencode"},
+            }),
+        );
+    }
+    wire.v2(
+        "session.execution.succeeded",
+        json!({"sessionID": "fixture"}),
+    );
+    assert_eq!(wire.done().await.0, DoneStatus::Completed);
 }
 
 #[tokio::test]

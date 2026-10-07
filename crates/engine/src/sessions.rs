@@ -51,6 +51,8 @@ pub struct JournaledEvent {
 pub enum SteerOutcome {
     /// Delivered into the live run's steering mailbox.
     Accepted,
+    /// A live run owns the turn, but an update prevents accepting another prompt.
+    DeferredByUpdate,
     /// No live steerable run — the caller should dispatch the prompt as a new turn.
     NotSteerable,
 }
@@ -119,7 +121,37 @@ impl RuntimeConfig {
     }
 }
 
+/// A run's live voice calls. They hold its idle reaper off, and each hang-up
+/// wakes the reaper to restart its window from there.
+#[derive(Default)]
+pub(crate) struct VoiceActivity {
+    calls: std::sync::atomic::AtomicUsize,
+    ended: tokio::sync::Notify,
+}
+impl VoiceActivity {
+    pub(crate) fn live(&self) -> bool {
+        self.calls.load(std::sync::atomic::Ordering::Acquire) > 0
+    }
+    /// A live call until the returned guard drops.
+    pub(crate) fn call(self: &Arc<Self>) -> VoiceCall {
+        self.calls.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
+        VoiceCall(self.clone())
+    }
+}
+pub(crate) struct VoiceCall(Arc<VoiceActivity>);
+impl Drop for VoiceCall {
+    fn drop(&mut self) {
+        self.0
+            .calls
+            .fetch_sub(1, std::sync::atomic::Ordering::AcqRel);
+        // A stored permit: the reaper hears it even while busy elsewhere.
+        self.0.ended.notify_one();
+    }
+}
+
 struct RunHandle {
+    voice: Option<zeron_harness::codex::realtime::RealtimeHandle>,
+    voice_active: Arc<VoiceActivity>,
     run_id: String,
     steerable: bool,
     runtime_config: RuntimeConfig,
@@ -138,6 +170,9 @@ struct RunHandle {
     /// and re-dispatches each entry as a fresh turn, so an accepted message
     /// can never silently evaporate from a transcript that shows it as sent.
     routed_steers: Arc<Mutex<std::collections::VecDeque<RoutedSteer>>>,
+    /// This runtime's provider session holds the fork's copied history (a
+    /// side chat's bootstrap went out on its run or on one of its steers).
+    fork_history_sent: Arc<std::sync::atomic::AtomicBool>,
 }
 
 /// One accepted-but-unconfirmed steer: enough to re-dispatch it verbatim.
@@ -145,10 +180,18 @@ struct RunHandle {
 struct RoutedSteer {
     prompt: String,
     message_id: String,
+    /// The delivered text carried the fork's copied history: its delivery
+    /// is recorded only when the runtime confirms consuming it (`Steered`).
+    /// An orphan re-dispatches the bare prompt, still owing the history.
+    fork_history: bool,
 }
 
 struct Inner {
+    voice: crate::voice::VoiceManager,
     device_id: String,
+    /// Loopback IPC port this engine serves, once known (0 = not serving):
+    /// what the injected `zeron mcp` server dials back into.
+    ipc_port: std::sync::atomic::AtomicU16,
     journal: Arc<RunJournal>,
     registry: Arc<HarnessRegistry>,
     /// Set-once (first wins), cleared on runtime retirement: sessions and
@@ -199,7 +242,9 @@ impl SessionsEngine {
         let (sessions_tx, _) = watch::channel(Vec::new());
         Self {
             inner: Arc::new(Inner {
+                voice: crate::voice::VoiceManager::default(),
                 device_id,
+                ipc_port: std::sync::atomic::AtomicU16::new(0),
                 journal,
                 registry,
                 doc_host: Mutex::new(None),
@@ -214,6 +259,19 @@ impl SessionsEngine {
                 turn_listener: OnceLock::new(),
             }),
         }
+    }
+
+    pub(crate) fn voice_manager(&self) -> crate::voice::VoiceManager {
+        self.inner.voice.clone()
+    }
+
+    /// Record the loopback IPC port this engine serves. Runs started after
+    /// this carry Zeron's MCP server (see [`Inner::zeron_mcp`]); until then —
+    /// or with 0 — agents get no Zeron tools rather than a dead server.
+    pub fn set_ipc_port(&self, port: u16) {
+        self.inner
+            .ipc_port
+            .store(port, std::sync::atomic::Ordering::Relaxed);
     }
 
     /// Wire the doc host (called once at engine assembly; the two services are mutually
@@ -303,6 +361,48 @@ impl SessionsEngine {
     /// "don't restart from under a session" gate.
     pub fn any_active(&self) -> bool {
         lock(&self.inner.statuses).values().any(is_active)
+            || lock(&self.inner.runs)
+                .values()
+                .any(|r| r.voice_active.live())
+    }
+
+    /// A text prompt for `chat_id` would land in the mailbox of a live
+    /// turn-boundary agent mid-turn. The agent reads it only after the turn,
+    /// but a mailbox delivery writes the user message now — above the reply
+    /// still streaming for the message before it. Such prompts belong in the
+    /// visible queue. `request` = a Run that may differ from the live config
+    /// (a different config restarts the runtime instead, which is no hold).
+    pub fn defers_to_turn_end(
+        &self,
+        chat_id: &str,
+        request: Option<(HarnessId, &RunRequest)>,
+    ) -> bool {
+        if !self.turn_in_flight(chat_id) {
+            return false;
+        }
+        let live = lock(&self.inner.runs).get(chat_id).map(|h| {
+            (
+                h.runtime_config.harness_id,
+                h.steerable && request.is_none_or(|(id, r)| h.runtime_config.can_route(id, r)),
+            )
+        });
+        live.is_some_and(|(harness, routable)| routable && !self.steers_mid_turn(harness))
+    }
+
+    /// Whether an accepted agent update gates the chat's live run, so a new
+    /// prompt waits in the queue rather than joining that run's transcript.
+    pub fn live_run_update_pending(&self, chat_id: &str) -> bool {
+        let harness = lock(&self.inner.runs)
+            .get(chat_id)
+            .map(|h| h.runtime_config.harness_id);
+        harness.is_some_and(|harness| self.inner.registry.update_pending(harness))
+    }
+
+    /// The chat's live run accepts steering into its mailbox.
+    pub fn live_run_steerable(&self, chat_id: &str) -> bool {
+        lock(&self.inner.runs)
+            .get(chat_id)
+            .is_some_and(|h| h.steerable)
     }
 
     /// The last request dispatched for a chat (steer→new-turn fallback).
@@ -332,6 +432,62 @@ impl SessionsEngine {
             .map(|(seq, event)| JournaledEvent { seq, event })
             .collect();
         Ok((replay, rx))
+    }
+
+    /// Local experimental bootstrap. No Submit, empty user entry or title request.
+    pub async fn start_idle(
+        &self,
+        chat_id: &str,
+        request: RunRequest,
+    ) -> Result<String, EngineError> {
+        // A fresh explicit request may renew an identity-invalidated idle
+        // process. Never interrupt a native delegated turn to recover voice.
+        let deadline = tokio::time::Instant::now() + std::time::Duration::from_secs(8);
+        loop {
+            let stale = lock(&self.inner.runs).get(chat_id).map(|run| {
+                (
+                    run.voice.as_ref().is_some_and(|v| v.invalidated()),
+                    run.voice_active.live(),
+                )
+            });
+            match stale {
+                Some((true, false)) => {
+                    if self.turn_in_flight(chat_id) {
+                        return Err(EngineError::Other(
+                            "identity changed during delegated work".into(),
+                        ));
+                    }
+                    self.interrupt(chat_id).await?;
+                    break;
+                }
+                Some((true, _)) => {
+                    if tokio::time::Instant::now() >= deadline {
+                        return Err(EngineError::Other("voice cleanup in progress".into()));
+                    }
+                    tokio::time::sleep(std::time::Duration::from_millis(20)).await;
+                }
+                _ => break,
+            }
+        }
+        self.dispatch_inner(chat_id, HarnessId::Codex, request, None, false, true)
+            .await
+    }
+
+    pub(crate) fn take_voice_bridge(
+        &self,
+        chat_id: &str,
+    ) -> Option<(
+        zeron_harness::codex::realtime::RealtimeHandle,
+        tokio::sync::broadcast::Receiver<zeron_proto::voice::VoiceEvent>,
+        Arc<VoiceActivity>,
+    )> {
+        let mut runs = lock(&self.inner.runs);
+        let run = runs.get_mut(chat_id)?;
+        Some((
+            run.voice.clone()?,
+            run.voice.as_ref()?.events.subscribe(),
+            run.voice_active.clone(),
+        ))
     }
 
     /// Start (or route) a run for `chat_id`.
@@ -364,7 +520,14 @@ impl SessionsEngine {
         message_id: Option<String>,
         startup_retry: bool,
     ) -> futures::future::BoxFuture<'a, Result<String, EngineError>> {
-        Box::pin(self.dispatch_inner(chat_id, harness_id, request, message_id, startup_retry))
+        Box::pin(self.dispatch_inner(
+            chat_id,
+            harness_id,
+            request,
+            message_id,
+            startup_retry,
+            false,
+        ))
     }
 
     async fn dispatch_inner(
@@ -374,6 +537,7 @@ impl SessionsEngine {
         mut request: RunRequest,
         mut message_id: Option<String>,
         startup_retry: bool,
+        idle: bool,
     ) -> Result<String, EngineError> {
         // Project-less chats store cwd `~` (the creating device can't know the
         // host's home); expand it here, on the host, where the run spawns.
@@ -383,8 +547,6 @@ impl SessionsEngine {
         // cross-harness delivery before recording or routing the user turn.
         zeron_proto::invocation::validate_harness_invocations(&request.prompt, harness_id)
             .map_err(EngineError::Other)?;
-        // Every dispatched prompt is a turn — routed steer or fresh run alike.
-        self.note_turn_start(chat_id, &request.cwd);
         let routed = lock(&self.inner.runs).get(chat_id).map(|h| {
             (
                 h.run_id.clone(),
@@ -392,31 +554,52 @@ impl SessionsEngine {
                 h.runtime_config.can_route(harness_id, &request),
                 h.steer_tx.clone(),
                 h.routed_steers.clone(),
+                h.fork_history_sent.clone(),
             )
         });
-        if let Some((run_id, steerable, same_runtime, steer_tx, ledger)) = routed {
+        if let Some((run_id, steerable, same_runtime, steer_tx, ledger, history_sent)) = routed {
+            if idle {
+                return if same_runtime && harness_id == HarnessId::Codex {
+                    Ok(run_id)
+                } else {
+                    Err(EngineError::Other("incompatible live runtime".into()))
+                };
+            }
             let user_id = message_id.clone().unwrap_or_else(new_id);
+            let mut bootstrap = None;
             let accepted = if steerable && same_runtime {
+                bootstrap =
+                    self.warm_fork_history(chat_id, harness_id, &request.prompt, &history_sent);
+                let delivered = bootstrap.as_deref().unwrap_or(&request.prompt);
                 // Warm dispatch uses the same mailbox as explicit steering.
                 // Register acceptance before a fast boundary can retire it.
-                let mut pending = lock(&ledger);
                 let message = SteerMessage {
                     // OpenCode must see the canonical selection before it
                     // decodes the provider command: a project-scoped command
                     // can disappear between composer discovery and delivery.
                     prompt: if harness_id == HarnessId::Opencode {
-                        request.prompt.clone()
+                        delivered.to_owned()
                     } else {
-                        zeron_proto::invocation::harness_prompt(&request.prompt, harness_id)
+                        zeron_proto::invocation::harness_prompt(delivered, harness_id)
                     },
                     message_id: Some(user_id.clone()),
                 };
-                if steer_tx.try_send(message).is_ok() {
-                    pending.push_back(RoutedSteer {
-                        prompt: request.prompt.clone(),
-                        message_id: user_id.clone(),
-                    });
-                    true
+                if let Ok(permit) = steer_tx.reserve().await {
+                    // Commit the reserved slot atomically with the update
+                    // marker. An accepted update releases the slot instead, and
+                    // the prompt takes the fresh-run path behind the update.
+                    self.inner
+                        .registry
+                        .while_update_clear(harness_id, || {
+                            let mut pending = lock(&ledger);
+                            pending.push_back(RoutedSteer {
+                                prompt: request.prompt.clone(),
+                                message_id: user_id.clone(),
+                                fork_history: bootstrap.is_some(),
+                            });
+                            permit.send(message);
+                        })
+                        .is_some()
                 } else {
                     false
                 }
@@ -426,7 +609,11 @@ impl SessionsEngine {
             if accepted {
                 let handle = self.doc_handle(chat_id)?;
                 handle.write_user_message(&user_id, &request.prompt, now_ms())?;
+                self.note_turn_start(chat_id, &request.cwd);
                 if self.is_live(chat_id, &run_id) {
+                    if bootstrap.is_some() {
+                        history_sent.store(true, std::sync::atomic::Ordering::Release);
+                    }
                     // Working BEFORE the lastMessageAt bump: both ride the
                     // workspace doc from this one peer, so causal order makes it
                     // impossible for an observer to hold [new message, old status]
@@ -468,7 +655,9 @@ impl SessionsEngine {
         let harness = self.inner.registry.resolve(harness_id)?;
         let handle = self.doc_handle(chat_id)?;
         let user_id = message_id.unwrap_or_else(new_id);
-        handle.write_user_message(&user_id, &request.prompt, now_ms())?;
+        if !idle {
+            handle.write_user_message(&user_id, &request.prompt, now_ms())?;
+        }
 
         // Engine-owned resume (zeron sessions.ts:736 — every dispatch read the
         // chat's stored harness session): callers always send `resume: None`;
@@ -522,18 +711,36 @@ impl SessionsEngine {
             let pending = pending_inputs.clone();
             let engine_tx = engine_tx.clone();
             Box::new(move |questions: Vec<UserInputQuestion>| {
-                let (tx, rx) = oneshot::channel();
+                let (mut tx, rx) = oneshot::channel();
+                let (answer_tx, answer_rx) = oneshot::channel();
                 let request_id = new_id();
-                lock(&pending).insert(request_id.clone(), tx);
+                lock(&pending).insert(request_id.clone(), answer_tx);
                 let _ = engine_tx.send(AgentEvent::InputRequested {
-                    request_id,
+                    request_id: request_id.clone(),
                     questions,
+                });
+                let pending = pending.clone();
+                let engine_tx = engine_tx.clone();
+                tokio::spawn(async move {
+                    tokio::select! {
+                        // A dropped resolver stays an error for the harness, as before.
+                        answer = answer_rx => if let Ok(answer) = answer { let _ = tx.send(answer); },
+                        _ = tx.closed() => {
+                            lock(&pending).remove(&request_id);
+                            let _ = engine_tx.send(AgentEvent::InputResolved { request_id });
+                        }
+                    }
                 });
                 rx
             })
         };
         let interrupt_token = CancellationToken::new();
+        let fork_history_sent = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let (voice_handle, realtime, _voice_events) = zeron_harness::codex::realtime::channel();
+        let voice_active = Arc::new(VoiceActivity::default());
         let controls = RunControls {
+            realtime: (harness_id == HarnessId::Codex).then_some(realtime),
+            execution_lease: None,
             request_input,
             steering: steer_rx,
             interrupt: interrupt_token.clone(),
@@ -542,6 +749,8 @@ impl SessionsEngine {
         lock(&self.inner.runs).insert(
             chat_id.to_string(),
             RunHandle {
+                voice: (harness_id == HarnessId::Codex).then_some(voice_handle),
+                voice_active: voice_active.clone(),
                 run_id: run_id.clone(),
                 steerable: harness.supports_steering(),
                 runtime_config: RuntimeConfig::from_request(harness_id, &request),
@@ -551,19 +760,30 @@ impl SessionsEngine {
                 engine_tx,
                 pending_inputs,
                 routed_steers: Arc::new(Mutex::new(std::collections::VecDeque::new())),
+                fork_history_sent: fork_history_sent.clone(),
             },
         );
-        self.set_status(chat_id, SessionStatus::Working, true);
+        self.set_status(
+            chat_id,
+            if idle {
+                SessionStatus::Idle
+            } else {
+                SessionStatus::Working
+            },
+            true,
+        );
         // AFTER Working (same causal-order guarantee as the steer path): the
         // lastMessageAt bump must never be observable ahead of the live run.
-        self.inner.note_message(chat_id, &user_prompt);
+        if !idle {
+            self.inner.note_message(chat_id, &user_prompt);
+        }
 
         // Name the chat NOW, off the first prompt — not after the first
         // exchange completes ("called New session for a long time for no
         // reason"; the titler only needs the prompt and skips titled chats;
         // the Done-time call below stays as the retry for a failed
         // generation).
-        if let Some(titles) = self.inner.titles.get() {
+        if !idle && let Some(titles) = self.inner.titles.get() {
             titles.maybe_generate(chat_id, harness_id, &user_prompt, &request.cwd);
         }
 
@@ -578,12 +798,44 @@ impl SessionsEngine {
             engine_rx,
             cancel_rx,
             RunResumeState {
+                idle,
+                voice_active,
                 user_message_id: user_id,
                 resume_injected,
                 startup_retry,
+                fork_history_sent,
             },
         ));
         Ok(run_id)
+    }
+
+    /// A warm send's prompt with the fork's copied history in front, when the
+    /// live provider session never received it (the fork's first turns were
+    /// native commands) and no earlier send in this runtime carries it
+    /// (`sent`). `None` = send the prompt as is.
+    fn warm_fork_history(
+        &self,
+        chat_id: &str,
+        harness_id: HarnessId,
+        prompt: &str,
+        sent: &std::sync::atomic::AtomicBool,
+    ) -> Option<String> {
+        if sent.load(std::sync::atomic::Ordering::Acquire) {
+            return None;
+        }
+        let session = lock(&self.inner.harness_sessions)
+            .get(chat_id)
+            .map(|known| known.session_id.clone())
+            .filter(|id| !id.is_empty());
+        let handle = self.doc_handle(chat_id).ok()?;
+        self.inner.fork_history_prompt(
+            chat_id,
+            handle.doc(),
+            harness_id,
+            prompt,
+            None,
+            ProviderSession::Continued(session.as_deref()),
+        )
     }
 
     /// Push a steer prompt into the live run's mailbox. `NotSteerable` when no live
@@ -594,6 +846,16 @@ impl SessionsEngine {
         prompt: &str,
         message_id: Option<String>,
     ) -> Result<SteerOutcome, EngineError> {
+        self.steer_at(chat_id, prompt, message_id, now_ms()).await
+    }
+
+    pub(crate) async fn steer_at(
+        &self,
+        chat_id: &str,
+        prompt: &str,
+        message_id: Option<String>,
+        issued_at: i64,
+    ) -> Result<SteerOutcome, EngineError> {
         let target = lock(&self.inner.runs)
             .get(chat_id)
             .filter(|h| h.steerable)
@@ -603,42 +865,57 @@ impl SessionsEngine {
                     h.runtime_config.harness_id,
                     h.steer_tx.clone(),
                     h.routed_steers.clone(),
+                    h.fork_history_sent.clone(),
                 )
             });
-        let Some((run_id, harness_id, steer_tx, ledger)) = target else {
+        let Some((run_id, harness_id, steer_tx, ledger, history_sent)) = target else {
             return Ok(SteerOutcome::NotSteerable);
         };
         zeron_proto::invocation::validate_harness_invocations(prompt, harness_id)
             .map_err(EngineError::Other)?;
         let user_id = message_id.unwrap_or_else(new_id);
+        let bootstrap = self.warm_fork_history(chat_id, harness_id, prompt, &history_sent);
+        let delivered = bootstrap.as_deref().unwrap_or(prompt);
         let message = SteerMessage {
             prompt: if harness_id == HarnessId::Opencode {
-                prompt.to_owned()
+                delivered.to_owned()
             } else {
-                zeron_proto::invocation::harness_prompt(prompt, harness_id)
+                zeron_proto::invocation::harness_prompt(delivered, harness_id)
             },
             message_id: Some(user_id.clone()),
         };
-        {
+        // Saturation is backpressure, not a dead runtime. Waiting for room
+        // preserves the live process and every accepted message in a burst.
+        let Ok(permit) = steer_tx.reserve().await else {
+            return Ok(SteerOutcome::NotSteerable);
+        };
+        let accepted = self.inner.registry.while_update_clear(harness_id, || {
             // Serialize mailbox acceptance with confirmation and Done-time
             // inspection: a fast consumer must never outrun its ledger entry.
+            // The update marker is checked in the same critical section, so an
+            // accepted update releases the reserved slot instead.
             let mut pending = lock(&ledger);
-            if steer_tx.try_send(message).is_err() {
-                return Ok(SteerOutcome::NotSteerable);
-            }
             pending.push_back(RoutedSteer {
                 prompt: prompt.to_string(),
                 message_id: user_id.clone(),
+                fork_history: bootstrap.is_some(),
             });
+            permit.send(message);
+        });
+        if accepted.is_none() {
+            return Ok(SteerOutcome::DeferredByUpdate);
         }
         let handle = self.doc_handle(chat_id)?;
-        handle.write_user_message(&user_id, prompt, now_ms())?;
+        handle.write_user_message(&user_id, prompt, issued_at.min(now_ms()))?;
         // A routed steer is a turn too. Fired here (not only on the confirmed
         // path) — a reclaim falls back to dispatch, which just re-snapshots.
         if let Some(request) = self.last_request(chat_id) {
             self.note_turn_start(chat_id, &request.cwd);
         }
         if self.is_live(chat_id, &run_id) {
+            if bootstrap.is_some() {
+                history_sent.store(true, std::sync::atomic::Ordering::Release);
+            }
             self.set_status(chat_id, SessionStatus::Working, false);
             self.inner.note_message(chat_id, prompt);
             return Ok(SteerOutcome::Accepted);
@@ -811,6 +1088,7 @@ impl SessionsEngine {
                     .or_else(|| {
                         let (_, cwd) = sessions.inner.journal_harness_session(&chat_id)?;
                         Some(RunRequest {
+                            mcp: None,
                             prompt: String::new(),
                             harness: None,
                             model: None,
@@ -856,6 +1134,7 @@ impl SessionsEngine {
 
     /// Graceful shutdown: interrupt every live run so streaming entries settle.
     pub async fn shutdown(&self) {
+        self.inner.voice.retire();
         let chats: Vec<String> = lock(&self.inner.runs).keys().cloned().collect();
         for chat_id in chats {
             if let Err(err) = self.interrupt(&chat_id).await {
@@ -1084,6 +1363,30 @@ impl Inner {
         lock(&self.doc_host).clone()
     }
 
+    /// Zeron's own MCP server for a run of `chat_id`: this binary's `zeron
+    /// mcp` subcommand, dialing the engine's IPC port and stamped with the
+    /// originating chat + device so the agent's side chats link back here.
+    /// None when the engine serves no port or its executable is unknown.
+    fn zeron_mcp(&self, chat_id: &str) -> Option<zeron_proto::McpServer> {
+        let port = self.ipc_port.load(std::sync::atomic::Ordering::Relaxed);
+        if port == 0 {
+            return None;
+        }
+        let command = std::env::current_exe().ok()?.to_str()?.to_owned();
+        Some(zeron_proto::McpServer {
+            name: "zeron".into(),
+            command,
+            args: vec!["mcp".into()],
+            env: [
+                ("ZERON_IPC_PORT".to_owned(), port.to_string()),
+                ("ZERON_CHAT_ID".to_owned(), chat_id.to_owned()),
+                ("ZERON_DEVICE_ID".to_owned(), self.device_id.clone()),
+            ]
+            .into_iter()
+            .collect(),
+        })
+    }
+
     fn workspace(&self) -> Option<crate::workspace_host::WorkspaceHost> {
         self.doc_host().and_then(|host| host.workspace().cloned())
     }
@@ -1231,6 +1534,111 @@ impl Inner {
 
 // ── run task ────────────────────────────────────────────────────────────────
 
+/// Which provider session a side chat's prompt goes to.
+#[derive(Clone, Copy)]
+enum ProviderSession<'a> {
+    /// A new provider session: it holds none of the transcript.
+    Fresh,
+    /// An existing one (id when known): it holds the fork's own turns.
+    Continued(Option<&'a str>),
+}
+
+/// A run's provider session now holds the fork history its own prompt
+/// carried (steers record theirs when confirmed, not here).
+fn note_fork_history_session(doc: &SessionDoc, carried: bool, session_id: &str) {
+    if carried && !session_id.is_empty() {
+        let _ = doc.set_fork_history_session(session_id);
+    }
+}
+
+impl Inner {
+    /// `prompt` with the conversation a side chat's provider session lacks in
+    /// front of it, or `None` when it lacks nothing. A fresh session gets the
+    /// whole transcript (`current` excluded); a continued one only the fork's
+    /// copied history before the seam, until that went out to that session.
+    /// Native commands are never wrapped: providers route a leading `/name`.
+    fn fork_history_prompt(
+        &self,
+        chat_id: &str,
+        doc: &SessionDoc,
+        harness_id: HarnessId,
+        prompt: &str,
+        current: Option<&str>,
+        provider: ProviderSession<'_>,
+    ) -> Option<String> {
+        if native_command(prompt, harness_id)
+            || !self
+                .workspace()
+                .and_then(|ws| ws.chat(chat_id).ok().flatten())
+                .is_some_and(|chat| chat.parent_chat_id.is_some())
+        {
+            return None;
+        }
+        let entries: Vec<_> = doc
+            .read_entries()
+            .unwrap_or_default()
+            .into_iter()
+            .filter(|entry| Some(entry.id.as_str()) != current)
+            .collect();
+        let end = match provider {
+            ProviderSession::Fresh => entries.len(),
+            ProviderSession::Continued(session) => {
+                let delivered = doc.fork_history_session();
+                if session.is_some() && delivered.as_deref() == session {
+                    return None;
+                }
+                entries.iter().position(|entry| {
+                    entry
+                        .parts
+                        .iter()
+                        .any(|part| matches!(part, zeron_doc::MessagePart::Fork { .. }))
+                })?
+            }
+        };
+        let history: Vec<_> = entries[..end]
+            .iter()
+            .map(|entry| {
+                let text = entry
+                    .parts
+                    .iter()
+                    .filter_map(|part| match part {
+                        zeron_doc::MessagePart::Text { text, .. } => Some(text.clone()),
+                        zeron_doc::MessagePart::Tool { call, output, .. } => Some(format!(
+                            "Tool: {}\n{}",
+                            serde_json::to_string(call).unwrap_or_default(),
+                            output.clone().unwrap_or_default()
+                        )),
+                        _ => None,
+                    })
+                    .collect::<Vec<_>>()
+                    .join("\n");
+                (entry.role, text)
+            })
+            .filter(|(_, text)| !text.is_empty())
+            .map(|(role, text)| serde_json::json!({ "role": role, "text": text }))
+            .collect();
+        (!history.is_empty()).then(|| {
+            format!(
+                "Continue this side conversation using the following prior conversation as context.\n<conversation>\n{}\n</conversation>\n\n{}",
+                serde_json::to_string(&history).unwrap_or_default(),
+                prompt
+            )
+        })
+    }
+}
+
+/// Whether the provider routes this prompt as a native command: its delivered
+/// text leads with `/name` (Codex `command_request`, OpenCode commands, Claude
+/// slash commands). Anything put in front of it would make it model input.
+fn native_command(prompt: &str, harness: HarnessId) -> bool {
+    let delivered = if harness == HarnessId::Codex {
+        zeron_proto::invocation::invocation_prompt(prompt)
+    } else {
+        zeron_proto::invocation::harness_prompt(prompt, harness)
+    };
+    zeron_proto::invocation::leading_command(&delivered).is_some()
+}
+
 /// A turn is in flight: streaming, or parked on a question it is still owed an
 /// answer to. Notably NOT a persistent session that has parked between turns —
 /// that holds a warm child with nothing outstanding.
@@ -1265,6 +1673,17 @@ pub(crate) fn subagent_doc_id(chat_id: &str, tool_use_id: &str) -> String {
     format!("{chat_id}--sub--{hex}")
 }
 
+/// Test-only instrumentation: how often `drive_run`'s coalesced commit branch
+/// fires. The sink-dirty regression test proves the branch ticks once per
+/// commit window instead of spinning on a deadline left in the past.
+/// Thread-local so parallel tests' runs can't bleed into the count: the
+/// test's current-thread runtime runs its spawned `drive_run` on its own
+/// thread.
+#[cfg(test)]
+thread_local! {
+    static FLUSH_TICKS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
 /// A live subagent transcript sink: its own doc (opened by id — the room
 /// `chat2/{docId}/ws` dials automatically, so viewers sync it like a chat),
 /// one streaming assistant entry folded from the tagged events. The held
@@ -1282,7 +1701,14 @@ struct SubagentSink {
 
 impl SubagentSink {
     fn flush(&mut self, device_id: &str) {
-        if !self.dirty || self.folded.is_empty() {
+        if !self.dirty {
+            return;
+        }
+        // An empty fold still counts as flushed: leaving dirty set would hold
+        // the run loop's coalesced-commit guard open on a deadline already in
+        // the past, spinning it until the subagent emits real content.
+        self.dirty = false;
+        if self.folded.is_empty() {
             return;
         }
         let rendered = render_parts(&self.folded);
@@ -1313,7 +1739,6 @@ impl SubagentSink {
             // errors the chat.
             tracing::warn!(doc = %self.doc_id, error = %err, "subagent sink flush failed");
         }
-        self.dirty = false;
     }
 
     /// A parent→subagent steer ([`AgentEvent::UserMessage`], tagged): close
@@ -1498,9 +1923,12 @@ fn finish_segment<'a>(
 /// engine-injected resumes retry — a caller-specified resume fails loudly),
 /// and whether this run already IS the retry (one attempt only).
 struct RunResumeState {
+    idle: bool,
+    voice_active: Arc<VoiceActivity>,
     user_message_id: String,
     resume_injected: bool,
     startup_retry: bool,
+    fork_history_sent: Arc<std::sync::atomic::AtomicBool>,
 }
 
 fn cursor_unstarted_history(
@@ -1573,7 +2001,7 @@ async fn drive_run(
     harness: Arc<dyn Harness>,
     mut request: RunRequest,
     doc: crate::doc_host::DocWriter,
-    controls: RunControls,
+    mut controls: RunControls,
     mut engine_rx: mpsc::UnboundedReceiver<AgentEvent>,
     mut cancel_rx: watch::Receiver<bool>,
     resume_state: RunResumeState,
@@ -1588,6 +2016,11 @@ async fn drive_run(
     if request.resume.is_none() {
         let _ = doc.clear_context_usage();
     }
+    // The host stamps its own MCP server onto every run it drives, so the
+    // agent can spawn and talk to side chats through the engine it runs in.
+    if request.mcp.is_none() {
+        request.mcp = inner.zeron_mcp(&chat_id);
+    }
     // Kept whole for the startup-crash retry (same user entry; dispatch
     // re-injects the stored resume id). Option so the retry branch (inside
     // the event loop) can take ownership.
@@ -1595,6 +2028,29 @@ async fn drive_run(
         resume: None,
         ..request.clone()
     });
+    // A side chat owns a fresh provider session. Bootstrap it from the frozen
+    // conversation, never resume (and mutate) the parent's provider session.
+    let mut carried_history = false;
+    let provider = match request.resume.as_deref() {
+        None => ProviderSession::Fresh,
+        resumed => ProviderSession::Continued(resumed),
+    };
+    if !resume_state.idle
+        && let Some(prompt) = inner.fork_history_prompt(
+            &chat_id,
+            &doc,
+            harness_id,
+            &request.prompt,
+            Some(&resume_state.user_message_id),
+            provider,
+        )
+    {
+        request.prompt = prompt;
+        carried_history = true;
+        resume_state
+            .fork_history_sent
+            .store(true, std::sync::atomic::Ordering::Release);
+    }
     // Startup can stop before the SDK saves user text, with no new session
     // ID or receipt. Bridge that unacknowledged tail from our transcript;
     // a fresh session needs all prior user text, not just the latest tail.
@@ -1610,14 +2066,44 @@ async fn drive_run(
     } else {
         Ok(())
     };
+    // Waiting here keeps dispatch and the shared queue-flush watcher responsive.
+    // The pending-update marker still orders new subprocesses after installation.
+    // Share the lease with the adapter so child cleanup outlives this event loop.
+    let mut _execution_lease = None;
     let started = match prepared {
         Ok(()) => {
-            let mut wire_request = request;
-            if !matches!(harness_id, HarnessId::Cursor | HarnessId::Opencode) {
-                wire_request.prompt =
-                    zeron_proto::invocation::harness_prompt(&wire_request.prompt, harness_id);
+            let lease = tokio::select! {
+                biased;
+                _ = controls.interrupt.cancelled() => None,
+                lease = inner.registry.execution_lease(harness_id) => Some(Arc::new(lease)),
+            };
+            if let Some(lease) = lease {
+                _execution_lease = Some(lease.clone());
+                controls.execution_lease = Some(lease);
+                if let Some(listener) = inner.turn_listener.get() {
+                    listener(&chat_id, &request.cwd);
+                }
+                let mut wire_request = request;
+                if !matches!(harness_id, HarnessId::Cursor | HarnessId::Opencode) {
+                    wire_request.prompt =
+                        zeron_proto::invocation::harness_prompt(&wire_request.prompt, harness_id);
+                }
+                if resume_state.idle {
+                    harness.start_idle(wire_request, controls).await
+                } else {
+                    harness.run(wire_request, controls).await
+                }
+            } else {
+                Ok(futures::stream::once(async {
+                    Ok(AgentEvent::Done {
+                        status: DoneStatus::Interrupted,
+                        result: None,
+                        error: None,
+                        session_id: None,
+                    })
+                })
+                .boxed())
             }
-            harness.run(wire_request, controls).await
         }
         Err(error) => Err(error),
     };
@@ -1625,6 +2111,25 @@ async fn drive_run(
         Ok(stream) => stream,
         Err(err) => {
             let message = err.to_string();
+            tracing::warn!(chat = %chat_id, harness = ?harness_id, error = %message, "run failed to start");
+            // The journal alone is live-only: without an entry the transcript
+            // shows "Run failed" with no reason (an OpenCode server that never
+            // booted looked exactly like that).
+            let parts = [MessagePart::Error {
+                id: "e0".into(),
+                message: message.clone(),
+            }];
+            if let Err(err) = finish_segment(
+                &doc,
+                None,
+                &new_id(),
+                &device_id,
+                now_ms(),
+                &parts,
+                MessageStatus::Complete,
+            ) {
+                tracing::warn!(chat = %chat_id, error = %err, "start failure entry failed");
+            }
             inner.publish(
                 &chat_id,
                 &AgentEvent::Error {
@@ -1694,9 +2199,31 @@ async fn drive_run(
     // its steering mailbox stay warm, and the next user message (dispatch
     // routes into a live run) starts the next turn with zero respawn/resume
     // latency. `Some(when)` = idle since then; the 30-min reaper below ends
-    // a session nobody comes back to (zeron SESSION_IDLE_MS).
-    const SESSION_IDLE: std::time::Duration = std::time::Duration::from_secs(30 * 60);
-    let mut idle_since: Option<tokio::time::Instant> = None;
+    // a session nobody comes back to (zeron SESSION_IDLE_MS). A voice
+    // orchestrator holds Codex and its MCP servers (~200 MB) for calls only,
+    // so it goes after 5 minutes. A call holds the reaper off, and the window
+    // restarts at hang-up. `ZERON_SESSION_IDLE_MS` overrides both (tests).
+    let session_idle = std::env::var("ZERON_SESSION_IDLE_MS")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+        .map(std::time::Duration::from_millis)
+        .unwrap_or(std::time::Duration::from_secs(
+            if zeron_proto::voice::is_orchestrator_chat(&chat_id) {
+                5 * 60
+            } else {
+                30 * 60
+            },
+        ));
+    // A live subagent stretches the window, but never unbounded: every
+    // driver's subagent terminal is a best-effort vendor signal (claude's
+    // untagged task_notification, grok's subagent_finished, codex thread
+    // closure), and one lost signal would otherwise pin the child — and this
+    // loop's registry heartbeat — until the chat is archived. A subagent
+    // silent this long (4h by default) is presumed lost; the reap stamps its
+    // chip failed.
+    let subagent_silence = session_idle * 8;
+    let mut idle_since: Option<tokio::time::Instant> =
+        resume_state.idle.then(tokio::time::Instant::now);
     let steerable = harness.supports_steering();
     // TURN-QUIESCE WATCHDOG (2026-08-12 stuck-Working incident): a harness
     // that loses a turn's Done — the adapter never settles `session/prompt`
@@ -1760,6 +2287,10 @@ async fn drive_run(
     // Live subagent sinks, parent tool-use id → transcript doc state.
     let mut subagents: std::collections::HashMap<String, SubagentSink> =
         std::collections::HashMap::new();
+    // Last tagged subagent event. A background subagent outlives the turn that
+    // spawned it, and its traffic never un-parks the chat, so the idle reaper
+    // measures from here as well as from the park.
+    let mut last_subagent_activity: Option<tokio::time::Instant> = None;
 
     let mut final_completed_turn = None;
     let final_status = loop {
@@ -1788,13 +2319,52 @@ async fn drive_run(
                     inner.touch_session(&chat_id);
                     continue;
                 }
+                // A hang-up restarts the idle window, however long the call.
+                _ = resume_state.voice_active.ended.notified() => {
+                    if idle_since.is_some() {
+                        idle_since = Some(tokio::time::Instant::now());
+                    }
+                    continue;
+                }
+                // An accepted update must not wait behind a warm between-turn
+                // child for the full idle-reaper window. The completed turn is
+                // already durable, so retire the parked process cleanly and let
+                // the queued exclusive lease proceed.
+                _ = tokio::time::sleep_until(tokio::time::Instant::now()),
+                    if idle_since.is_some() && !resume_state.voice_active.live() && inner.registry.update_pending(harness_id) =>
+                {
+                    if let Some(token) = lock(&inner.runs)
+                        .get(&chat_id)
+                        .filter(|h| h.run_id == run_id)
+                        .map(|h| h.interrupt_token.clone())
+                    {
+                        token.cancel();
+                    }
+                    break SessionStatus::Idle;
+                }
                 // Idle reaper (zeron SESSION_IDLE_MS): a parked persistent session
-                // nobody returned to in 30 minutes releases its child. The turn
+                // nobody returned to within its window releases its child. The turn
                 // was finalized at Done, so this end is clean — no aborted stamp.
+                // A live background subagent is somebody still using the child:
+                // the window counts from its last activity, and stretches to
+                // `subagent_silence` while its sink is open.
                 _ = tokio::time::sleep_until(
-                    idle_since.map(|at| at + SESSION_IDLE).unwrap_or_else(tokio::time::Instant::now)
-                ), if idle_since.is_some() => {
-                    tracing::info!(chat = %chat_id, "reaping idle persistent session");
+                    idle_since
+                        .map(|at| {
+                            at.max(last_subagent_activity.unwrap_or(at))
+                                + if subagents.is_empty() { session_idle } else { subagent_silence }
+                        })
+                        .unwrap_or_else(tokio::time::Instant::now)
+                ), if idle_since.is_some() && !resume_state.voice_active.live() => {
+                    // A call that began after this wait was armed holds it off.
+                    if resume_state.voice_active.live() {
+                        continue;
+                    }
+                    tracing::info!(
+                        chat = %chat_id,
+                        live_subagents = subagents.len(),
+                        "reaping idle persistent session"
+                    );
                     if let Some(token) = lock(&inner.runs)
                         .get(&chat_id)
                         .filter(|h| h.run_id == run_id)
@@ -1839,6 +2409,8 @@ async fn drive_run(
                     },
                 },
                 _ = tokio::time::sleep_until(flush_at), if dirty || subagents.values().any(|s| s.dirty) => {
+                    #[cfg(test)]
+                    FLUSH_TICKS.with(|t| t.set(t.get() + 1));
                     // Coalesced STREAM_COMMIT_MS tick: one doc commit per window
                     // (parent + any dirty subagent docs).
                     if dirty {
@@ -1948,6 +2520,7 @@ async fn drive_run(
         } = &event
         {
             inner.publish(&chat_id, &event);
+            last_subagent_activity = Some(tokio::time::Instant::now());
             let is_steer = matches!(
                 sub_event.as_ref(),
                 AgentEvent::UserMessage { .. } | AgentEvent::Steered { .. }
@@ -2035,6 +2608,17 @@ async fn drive_run(
             let done = matches!(sub_event.as_ref(), AgentEvent::Done { .. });
             if done {
                 settled_subagents.insert(parent_tool_use_id.clone());
+                if !chip_streaming {
+                    // A resumed run can finish an older chip without ever
+                    // opening a sink. The chip's lifecycle is independent of
+                    // whether this run received transcript content.
+                    let _ = doc_ref.update_subagent_chip(
+                        parent_tool_use_id,
+                        None,
+                        subagent_chip_update(sub_event),
+                        None,
+                    );
+                }
             }
             if let Some(sink) = subagents.get_mut(parent_tool_use_id) {
                 if let AgentEvent::UserMessage { text } = sub_event.as_ref() {
@@ -2043,17 +2627,17 @@ async fn drive_run(
                     sink.push_user(&device_id, text);
                     continue;
                 }
+                let was_clean = !sink.dirty;
                 zeron_doc::fold_event_into_parts(&mut sink.folded, sub_event);
                 sink.dirty = true;
-                if !chip_streaming && done {
-                    // In-place chip refresh on lifecycle transitions only —
-                    // content never rewrites the parent doc.
-                    let _ = doc_ref.update_subagent_chip(
-                        parent_tool_use_id,
-                        None,
-                        subagent_chip_update(sub_event),
-                        None,
-                    );
+                // A sink waking on its own must arm the same commit window
+                // the parent's dirty flag does — `flush_at` is otherwise only
+                // rescheduled on the parent's flip, so a past deadline would
+                // fire the commit branch on every event instead of once per
+                // STREAM_COMMIT_MS window.
+                if was_clean && !dirty && flush_at <= tokio::time::Instant::now() {
+                    flush_at = tokio::time::Instant::now()
+                        + std::time::Duration::from_millis(STREAM_COMMIT_MS);
                 }
                 if done {
                     let status = match sub_event.as_ref() {
@@ -2177,6 +2761,8 @@ async fn drive_run(
                 inner.set_status(&chat_id, SessionStatus::Working, true);
             } else {
                 match &event {
+                    AgentEvent::SessionStarted { .. }
+                        if resume_state.idle && !saw_session_started => {}
                     AgentEvent::Steered { .. } => {
                         idle_since = None;
                         inner.set_status(&chat_id, SessionStatus::Working, true);
@@ -2258,6 +2844,7 @@ async fn drive_run(
         // helper that is down hard fails the retry too and surfaces its
         // crash text (the harness now appends exit status + stderr).
         if resume_state.resume_injected
+            && !resume_state.idle
             && !resume_state.startup_retry
             && !saw_session_started
             && folded.is_empty()
@@ -2331,11 +2918,19 @@ async fn drive_run(
             inner.set_status(&chat_id, SessionStatus::Working, true);
             // The boundary confirms delivery of the oldest accepted steer —
             // retire its at-least-once ledger entry.
-            if let Some(h) = lock(&inner.runs)
+            let confirmed = lock(&inner.runs)
                 .get(&chat_id)
                 .filter(|h| h.run_id == run_id)
+                .and_then(|h| lock(&h.routed_steers).pop_front());
+            // Consumed: a steer carrying the fork history delivered it to
+            // this runtime's provider session.
+            if confirmed.is_some_and(|steer| steer.fork_history)
+                && let Some(session) = lock(&inner.harness_sessions)
+                    .get(&chat_id)
+                    .map(|known| known.session_id.clone())
+                    .filter(|id| !id.is_empty())
             {
-                lock(&h.routed_steers).pop_front();
+                let _ = doc.set_fork_history_session(&session);
             }
             continue;
         }
@@ -2348,12 +2943,14 @@ async fn drive_run(
                 // The event's own cwd (where the harness actually created the
                 // session) scopes the stored id, not the request's.
                 inner.remember_harness_session(&chat_id, session_id, cwd, Some(run_harness));
+                note_fork_history_session(&doc, carried_history, session_id);
             }
             AgentEvent::Done {
                 session_id: Some(session_id),
                 ..
             } => {
                 inner.remember_harness_session(&chat_id, session_id, &run_cwd, Some(run_harness));
+                note_fork_history_session(&doc, carried_history, session_id);
             }
             AgentEvent::InputRequested { .. } => {
                 // Known-id guaranteed: the unknown-id twin was dropped above,
@@ -2452,7 +3049,11 @@ async fn drive_run(
             // PERSISTENT SESSION: a cleanly completed turn on a steerable
             // harness PARKS instead of ending — child + mailbox stay warm for
             // the next routed dispatch; per-turn state resets for it.
-            if *status == DoneStatus::Completed && steerable && !interrupted {
+            if *status == DoneStatus::Completed
+                && steerable
+                && !interrupted
+                && !inner.registry.update_pending(harness_id)
+            {
                 folded.clear();
                 dirty = false;
                 entry_id = new_id();
@@ -2461,9 +3062,15 @@ async fn drive_run(
                 saw_session_started = true;
                 idle_since = Some(tokio::time::Instant::now());
                 self_continued_turn = false;
+                // Accepted steers still own this runtime. Publishing Idle
+                // here lets the ordinary queue overtake that continuation.
                 inner.set_status_with_completion(
                     &chat_id,
-                    SessionStatus::Idle,
+                    if pending_steer {
+                        SessionStatus::Working
+                    } else {
+                        SessionStatus::Idle
+                    },
                     false,
                     completed_turn,
                 );
@@ -2560,6 +3167,8 @@ async fn drive_run(
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
     fn cursor_recovery_converts_rich_messages_before_json_encoding() {
         let doc = zeron_doc::SessionDoc::init("cursor-rich-recovery").unwrap();
@@ -2651,7 +3260,6 @@ mod tests {
         assert_eq!(doc.read_entries().unwrap().len(), 4);
     }
 
-    use super::{RuntimeConfig, subagent_doc_id};
     use zeron_proto::{HarnessId, RunRequest, SandboxLevel};
 
     #[tokio::test]
@@ -2718,6 +3326,7 @@ mod tests {
 
     fn request() -> RunRequest {
         RunRequest {
+            mcp: None,
             prompt: "first".into(),
             harness: None,
             model: Some("grok-4.6".into()),
@@ -2730,6 +3339,164 @@ mod tests {
             attachments: Vec::new(),
             worktree: None,
         }
+    }
+
+    struct IdleStartupFixture {
+        idle_calls: Arc<std::sync::atomic::AtomicUsize>,
+        inference_calls: Arc<std::sync::atomic::AtomicUsize>,
+        fail: bool,
+    }
+    #[async_trait::async_trait]
+    impl zeron_harness::Harness for IdleStartupFixture {
+        fn id(&self) -> HarnessId {
+            HarnessId::Codex
+        }
+        fn display_name(&self) -> &str {
+            "Offline idle fixture"
+        }
+        fn supports_steering(&self) -> bool {
+            false
+        }
+        fn steering_mode(&self) -> zeron_proto::SteeringMode {
+            zeron_proto::SteeringMode::TurnBoundary
+        }
+        fn reasoning_levels(&self) -> &[zeron_proto::ReasoningLevel] {
+            &[]
+        }
+        async fn models(&self) -> Result<Vec<zeron_proto::Model>, zeron_harness::HarnessError> {
+            Ok(vec![])
+        }
+        async fn start_idle(
+            &self,
+            request: RunRequest,
+            _controls: zeron_harness::RunControls,
+        ) -> Result<
+            futures::stream::BoxStream<'static, Result<AgentEvent, zeron_harness::HarnessError>>,
+            zeron_harness::HarnessError,
+        > {
+            use futures::StreamExt;
+            self.idle_calls
+                .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+            assert!(request.prompt.is_empty());
+            assert_eq!(request.resume.as_deref(), Some("old-native-thread"));
+            let event = if self.fail {
+                AgentEvent::Done {
+                    status: zeron_proto::DoneStatus::Errored,
+                    result: None,
+                    error: Some("offline startup failed".into()),
+                    session_id: None,
+                }
+            } else {
+                AgentEvent::SessionStarted {
+                    harness: HarnessId::Codex,
+                    model: "fixture".into(),
+                    tools: vec![],
+                    cwd: request.cwd,
+                    session_id: "new-native-thread".into(),
+                    assistant_message_id: "fixture-empty".into(),
+                }
+            };
+            Ok(futures::stream::iter([Ok(event)])
+                .chain(futures::stream::pending())
+                .boxed())
+        }
+        async fn run(
+            &self,
+            _request: RunRequest,
+            _controls: zeron_harness::RunControls,
+        ) -> Result<
+            futures::stream::BoxStream<'static, Result<AgentEvent, zeron_harness::HarnessError>>,
+            zeron_harness::HarnessError,
+        > {
+            self.inference_calls
+                .fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+            Err(zeron_harness::HarnessError::Protocol(
+                "fixture forbids inference".into(),
+            ))
+        }
+    }
+
+    async fn idle_startup_case(fail: bool) {
+        use super::*;
+        let temp = tempfile::tempdir().unwrap();
+        let idle_calls = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let inference_calls = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let registry = crate::HarnessRegistry::new();
+        registry.register(Arc::new(IdleStartupFixture {
+            idle_calls: idle_calls.clone(),
+            inference_calls: inference_calls.clone(),
+            fail,
+        }));
+        let core = crate::EngineCore::assemble_with_profile(
+            crate::EngineProfile::local(temp.path()).unwrap(),
+            Arc::new(registry),
+            HarnessId::Codex,
+            None,
+        )
+        .unwrap();
+        core.workspace
+            .create_chat("idle", None, Some(&core.device_id), None, None)
+            .unwrap();
+        let mut request = request();
+        request.prompt.clear();
+        core.sessions
+            .inner
+            .remember_harness_session("idle", "old-native-thread", &request.cwd);
+        core.sessions.start_idle("idle", request).await.unwrap();
+        tokio::time::timeout(std::time::Duration::from_secs(5), async {
+            loop {
+                let completed = if fail {
+                    core.sessions
+                        .session_status("idle")
+                        .is_some_and(|s| s.status == SessionStatus::Errored)
+                } else {
+                    core.sessions.inner.resume_for("idle", "/tmp").as_deref()
+                        == Some("new-native-thread")
+                };
+                if completed {
+                    break;
+                }
+                tokio::task::yield_now().await;
+            }
+        })
+        .await
+        .unwrap();
+        assert_eq!(idle_calls.load(std::sync::atomic::Ordering::SeqCst), 1);
+        assert_eq!(inference_calls.load(std::sync::atomic::Ordering::SeqCst), 0);
+        let entries = core
+            .doc_host
+            .open("idle")
+            .unwrap()
+            .doc()
+            .read_entries()
+            .unwrap();
+        assert!(
+            !entries
+                .iter()
+                .any(|entry| entry.role == zeron_doc::MessageRole::User)
+        );
+        if !fail {
+            assert!(entries.is_empty());
+            assert_eq!(
+                core.sessions.session_status("idle").unwrap().status,
+                SessionStatus::Idle
+            );
+            assert_eq!(
+                core.workspace.chat_harness_session("idle").unwrap().0,
+                "new-native-thread"
+            );
+            let events = core.sessions.inner.journal.replay("idle", 0).unwrap();
+            assert!(events.iter().any(|(_, event)| matches!(event, AgentEvent::SessionStarted { session_id, .. } if session_id == "new-native-thread")));
+        }
+        core.sessions.shutdown().await;
+    }
+    #[tokio::test]
+    async fn voice_idle_startup_failure_never_retries_as_inference() {
+        idle_startup_case(true).await;
+    }
+    #[tokio::test]
+    async fn voice_idle_startup_remembers_thread_without_creating_messages() {
+        idle_startup_case(false).await;
     }
 
     #[test]
@@ -2783,5 +3550,139 @@ mod tests {
             subagent_doc_id("chat", "a:b"),
             subagent_doc_id("chat", "a:c")
         );
+    }
+
+    #[tokio::test]
+    async fn subagent_sink_flush_clears_dirty_when_nothing_folded() {
+        use super::*;
+        let dir = tempfile::tempdir().unwrap();
+        let store = Arc::new(zeron_sync::DocsStore::open(dir.path()).unwrap());
+        let host = DocHost::new(
+            store,
+            crate::doc_host::DocHostConfig {
+                device_id: "dev-test".into(),
+                default_harness: HarnessId::Mock,
+                edge: None,
+            },
+        );
+        let handle = host.open("chat-sub-flush--sub--t1").unwrap();
+        let mut sink = SubagentSink {
+            doc_id: "chat-sub-flush--sub--t1".into(),
+            doc: handle.writer(),
+            entry_id: "entry-1".into(),
+            started_at: 0,
+            entry_index: None,
+            written: Vec::new(),
+            folded: Vec::new(),
+            dirty: true,
+        };
+        // Nothing to write is still a completed flush — left set, the flag
+        // holds the run loop's commit guard open on a past deadline.
+        sink.flush("dev-test");
+        assert!(!sink.dirty);
+    }
+
+    /// Feed-by-hand harness: the test pushes wire events through a channel
+    /// and decides when the stream ends.
+    struct FeedHarness {
+        feed: Mutex<Option<mpsc::UnboundedReceiver<AgentEvent>>>,
+    }
+
+    #[async_trait::async_trait]
+    impl Harness for FeedHarness {
+        fn id(&self) -> HarnessId {
+            HarnessId::Mock
+        }
+        fn display_name(&self) -> &str {
+            "Feed"
+        }
+        fn supports_steering(&self) -> bool {
+            true
+        }
+        fn steering_mode(&self) -> zeron_proto::SteeringMode {
+            zeron_proto::SteeringMode::StepBoundary
+        }
+        fn reasoning_levels(&self) -> &[zeron_proto::ReasoningLevel] {
+            &[zeron_proto::ReasoningLevel::Medium]
+        }
+        async fn models(&self) -> Result<Vec<zeron_proto::Model>, zeron_harness::HarnessError> {
+            Ok(vec![])
+        }
+        async fn run(
+            &self,
+            _request: RunRequest,
+            _controls: RunControls,
+        ) -> Result<
+            futures::stream::BoxStream<'static, Result<AgentEvent, zeron_harness::HarnessError>>,
+            zeron_harness::HarnessError,
+        > {
+            let mut feed = self
+                .feed
+                .lock()
+                .unwrap()
+                .take()
+                .expect("FeedHarness serves one run per test");
+            Ok(futures::stream::poll_fn(move |cx| feed.poll_recv(cx).map(|e| e.map(Ok))).boxed())
+        }
+    }
+
+    // A tagged subagent event that folds to NO parts used to leave its sink
+    // dirty forever: the commit branch's guard stayed true on a deadline in
+    // the past and the run loop burned a core until real content arrived.
+    #[tokio::test]
+    async fn empty_subagent_events_commit_once_per_window_not_per_tick() {
+        use super::*;
+        FLUSH_TICKS.with(|t| t.set(0));
+        let (feed, rx) = mpsc::unbounded_channel();
+        let registry = HarnessRegistry::new();
+        registry.register(Arc::new(FeedHarness {
+            feed: Mutex::new(Some(rx)),
+        }));
+        let dir = tempfile::tempdir().unwrap();
+        let core =
+            crate::EngineCore::assemble(dir.path(), Arc::new(registry), HarnessId::Mock, None)
+                .unwrap();
+        let chat = "chat-sink-spin";
+        core.sessions
+            .dispatch(chat, HarnessId::Mock, request(), None)
+            .await
+            .unwrap();
+        feed.send(AgentEvent::SessionStarted {
+            harness: HarnessId::Mock,
+            model: "mock-1".into(),
+            tools: vec![],
+            cwd: "/tmp".into(),
+            session_id: "hs-1".into(),
+            assistant_message_id: "a1".into(),
+        })
+        .unwrap();
+        feed.send(AgentEvent::Subagent {
+            parent_tool_use_id: "tool-1".into(),
+            event: Box::new(AgentEvent::ReasoningDelta {
+                text: String::new(),
+            }),
+        })
+        .unwrap();
+        // Well past several commit windows with the stream still open: the
+        // loop must idle between commits, not spin on a past deadline.
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+        let ticks = FLUSH_TICKS.with(|t| t.get());
+        assert!(
+            (1..=8).contains(&ticks),
+            "commit branch fired {ticks} times in 1s for one empty subagent event"
+        );
+        assert_eq!(
+            core.sessions.session_status(chat).map(|s| s.status),
+            Some(SessionStatus::Working),
+            "stream still open, turn still running"
+        );
+        feed.send(AgentEvent::Done {
+            status: DoneStatus::Completed,
+            result: None,
+            error: None,
+            session_id: None,
+        })
+        .unwrap();
+        core.sessions.shutdown().await;
     }
 }

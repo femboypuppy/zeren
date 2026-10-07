@@ -5,8 +5,7 @@
 //! `grok agent stdio`), Devin ([`AcpHarness::devin`], `devin acp`) and Hermes
 //! ([`AcpHarness::hermes`], `hermes acp`) and Antigravity
 //! ([`AcpHarness::antigravity`], Google's `agy_acp_server`, installed from its
-//! pinned release archive) — plus pi ([`AcpHarness::pi`]) via the community
-//! `pi-acp` adapter until a native driver exists. Claude, Codex and Cursor moved to native drivers
+//! pinned release archive). Pi, Claude, Codex and Cursor use native drivers
 //! ([`crate::ClaudeHarness`], [`crate::CodexHarness`], [`crate::CursorHarness`])
 //! after adapter-mediated ACP kept manufacturing done-status bugs the native
 //! wires don't have (turn-hold bookkeeping vs the CLI's own eager result).
@@ -39,6 +38,7 @@ use std::collections::VecDeque;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
+use crate::process::{ChildStdin, ChildStdout};
 use async_trait::async_trait;
 use futures::StreamExt;
 use futures::future::BoxFuture;
@@ -53,11 +53,13 @@ use zeron_proto::{
 };
 
 use crate::jsonrpc::{Incoming, RpcClient};
+pub(crate) use crate::process::owned as child;
 use crate::process::{Command, Stdio};
 use crate::scratch::ScratchDir;
+use crate::{
+    CancellationToken, Harness, HarnessError, RunControls, Signal, send_signal, shutdown_child,
+};
 use child::Child;
-pub(crate) mod child;
-use crate::{Harness, HarnessError, RunControls, Signal, send_signal, shutdown_child};
 use normalize::{map_update, parse_commands, preferred_allow_option};
 use subagent::SubagentTracker;
 use subagent_devin::DevinTracker;
@@ -90,7 +92,7 @@ struct AcpAgentSpec {
     extra_paths: fn() -> Vec<PathBuf>,
     /// The agent's own CLI binary (`claude`, `codex`, …) — what "installed"
     /// means to the user. Distinct from `executable` where the spawned adapter
-    /// wraps the CLI (`claude-agent-acp`, `codex-acp`, `pi-acp`), and the npx
+    /// wraps the CLI (third-party ACP adapters), and the npx
     /// fallback deliberately doesn't count: npx can fetch an adapter on
     /// demand, but an absent CLI still means no logins/config to drive.
     cli_executable: &'static str,
@@ -141,6 +143,9 @@ struct AcpAgentSpec {
     skill_dirs: fn() -> Vec<PathBuf>,
     /// advertised commands the picker leaves out.
     hidden_commands: &'static [&'static str],
+    /// A prompt cancelled before it produced anything vanishes from the
+    /// agent's history (Grok, verified live); preemption re-sends its text.
+    drops_unstarted_cancelled_prompt: bool,
 }
 
 fn identity_transform(_reasoning: Option<ReasoningLevel>, text: &str) -> String {
@@ -173,25 +178,16 @@ fn default_effort_values(
     }
 }
 
-/// npm-global bin dirs for an adapter binary (`npm i -g` installs).
-fn npm_global_paths(exe: &'static str) -> fn() -> Vec<PathBuf> {
-    // fn pointers can't capture; probe the fixed npm-global locations and
-    // append the exe at call time via a small per-exe shim table.
-    match exe {
-        "pi-acp" => || npm_global_bins("pi-acp"),
-        _ => || Vec::new(),
+/// Devin's `thought_level` also offers `none` ("No Thinking"), which the
+/// catalog maps to Zeron's lowest level.
+fn devin_effort_values(
+    reasoning: Option<ReasoningLevel>,
+    model: Option<&str>,
+) -> Vec<&'static str> {
+    match reasoning {
+        Some(ReasoningLevel::Minimal) => vec!["none", "minimal", "low"],
+        _ => default_effort_values(reasoning, model),
     }
-}
-
-fn npm_global_bins(exe: &str) -> Vec<PathBuf> {
-    let mut dirs = Vec::new();
-    if let Some(home) = crate::executable::home_dir() {
-        dirs.push(home.join(".local").join("bin").join(exe));
-        dirs.push(home.join(".npm-global").join("bin").join(exe));
-    }
-    dirs.push(PathBuf::from("/opt/homebrew/bin").join(exe));
-    dirs.push(PathBuf::from("/usr/local/bin").join(exe));
-    dirs
 }
 
 fn grok_install_paths() -> Vec<PathBuf> {
@@ -243,8 +239,9 @@ fn grok_spec() -> AcpAgentSpec {
                 options: Vec::new(),
             }]
         },
-        // No `_session/steering` extension: steers deliver at turn boundaries.
-        steering_mode: SteeringMode::TurnBoundary,
+        // No `_session/steering` extension: a steer preempts the generation
+        // (waiting out running tools) and continues the turn — immediate.
+        steering_mode: SteeringMode::StepBoundary,
         // Grok Build's advertised efforts (default high); applied through the
         // session's `thought_level` config option.
         reasoning_levels: &[
@@ -266,6 +263,7 @@ fn grok_spec() -> AcpAgentSpec {
         auth_method: None,
         skill_dirs: Vec::new,
         hidden_commands: &[],
+        drops_unstarted_cancelled_prompt: true,
     }
 }
 
@@ -299,10 +297,8 @@ fn devin_spec() -> AcpAgentSpec {
              `curl -fsSL https://cli.devin.ai/install.sh | bash` or \
              `brew install --cask devin-cli`, then `devin auth login`; set \
              DEVIN_EXECUTABLE to override)",
-        // Legacy metadata only: discovery uses `devin models list` because
-        // session/new starts with a stale catalog. Effort is baked into ids.
-        // These ids were live-verified with CLI 3000.6.14; `swe-1-7-medium`
-        // is the session default the server reports.
+        // Fallback metadata only: discovery uses `devin models list`, grouped
+        // into one model per family with effort levels (see `devin_models`).
         models: || {
             vec![
                 Model {
@@ -328,12 +324,14 @@ fn devin_spec() -> AcpAgentSpec {
                 },
             ]
         },
-        steering_mode: SteeringMode::TurnBoundary,
-        // Effort is encoded in Devin's advertised model ids, not a separate
-        // thought_level config option.
+        // No `_session/steering` extension: a steer preempts the generation
+        // (waiting out running tools) and continues the turn — immediate.
+        steering_mode: SteeringMode::StepBoundary,
+        // Effort levels are per model (catalog groups, see `devin_models`)
+        // and applied through the session's `thought_level` option.
         reasoning_levels: &[],
         prompt_transform: identity_transform,
-        effort_values: default_effort_values,
+        effort_values: devin_effort_values,
         ladder_extras: &[],
         prompt_complete_extension: false,
         prompt_stall: None,
@@ -342,6 +340,7 @@ fn devin_spec() -> AcpAgentSpec {
         auth_method: None,
         skill_dirs: Vec::new,
         hidden_commands: &[],
+        drops_unstarted_cancelled_prompt: false,
     }
 }
 
@@ -412,73 +411,62 @@ fn hermes_spec() -> AcpAgentSpec {
         auth_method: None,
         skill_dirs: Vec::new,
         hidden_commands: &[],
-    }
-}
-
-fn pi_spec() -> AcpAgentSpec {
-    AcpAgentSpec {
-        id: HarnessId::Pi,
-        display_name: "Pi",
-        executable: "pi-acp",
-        env_override: "PI_ACP_EXECUTABLE",
-        args: &[],
-        npm_package: Some("pi-acp@0.0.33"),
-        archive: None,
-        extra_paths: npm_global_paths("pi-acp"),
-        cli_executable: "pi",
-        cli_extra_paths: || npm_global_bins("pi"),
-        install_hint: "pi-acp (searched PATH, the login shell's PATH, npm global bins, \
-             and fnm/nvm/volta/pnpm/bun install dirs; zeron installs the pinned \
-             pi-acp automatically when npm is available — the pi CLI itself is \
-             still required, `npm install -g --ignore-scripts \
-             @earendil-works/pi-coding-agent`; set PI_ACP_EXECUTABLE to override)",
-        // pi routes models through its own provider config (~/.pi); the picker
-        // advertises the pass-through entry and pi keeps whatever the user set
-        // up. Unknown ids are skipped by the config-option set.
-        models: || {
-            vec![Model {
-                id: "default".into(),
-                label: "pi default".into(),
-                description: Some("Runs the model configured in pi (`pi` settings)".into()),
-                reasoning_levels: vec![
-                    ReasoningLevel::Minimal,
-                    ReasoningLevel::Low,
-                    ReasoningLevel::Medium,
-                    ReasoningLevel::High,
-                    ReasoningLevel::XHigh,
-                    ReasoningLevel::Max,
-                ],
-                options: Vec::new(),
-            }]
-        },
-        // The adapter has no `_session/steering` extension: turn boundaries.
-        steering_mode: SteeringMode::TurnBoundary,
-        // pi's thinking ladder (minimal→max; its extra "off" tier has no zeron
-        // equivalent and is left to the agent default).
-        reasoning_levels: &[
-            ReasoningLevel::Minimal,
-            ReasoningLevel::Low,
-            ReasoningLevel::Medium,
-            ReasoningLevel::High,
-            ReasoningLevel::XHigh,
-            ReasoningLevel::Max,
-        ],
-        prompt_transform: identity_transform,
-        effort_values: default_effort_values,
-        ladder_extras: &[],
-        prompt_complete_extension: false,
-        prompt_stall: None,
-        stall_hint: "The agent process is likely wedged.",
-        effort_in_model_id: false,
-        auth_method: None,
-        skill_dirs: Vec::new,
-        hidden_commands: &[],
+        drops_unstarted_cancelled_prompt: false,
     }
 }
 
 /// google's builds as the acp registry lists them (`antigravity-acp`); `None`
 /// on platforms without one, where only an explicit override can launch.
 fn antigravity_archive() -> Option<crate::archive_install::ArchivePin> {
+    let (url, entry, sha512) = if cfg!(all(target_os = "macos", target_arch = "aarch64")) {
+        (
+            "https://dl.google.com/agy-extensions/releases/macos/agy-acp-server-1.2.1-darwin-arm64.zip",
+            "agy_acp_server.par",
+            "c0049b1f423ffdf0e6a79a6caa104a27b6368522b1eb2c67d9eeed1424af2a07898a66b475b0824a734a0bdd01264473a7d67d1550357a8607fb136507b0afae",
+        )
+    } else if cfg!(all(target_os = "macos", target_arch = "x86_64")) {
+        (
+            "https://dl.google.com/agy-extensions/releases/macos/agy-acp-server-1.2.1-darwin-x86_64.zip",
+            "agy_acp_server.par",
+            "790541c7e7bbbac1cb15bb4a77b02c53f30c997090487fbf42df16846e2e5d8d4f1cec92038d88956fbec33331ebacefe8faf974aad0690aadc2332215712ff2",
+        )
+    } else if cfg!(all(target_os = "linux", target_arch = "x86_64")) {
+        (
+            "https://dl.google.com/agy-extensions/releases/linux/agy-acp-server-1.2.1-linux-x86_64.zip",
+            "agy_acp_server.par",
+            "dd9b778479dbfc753661d63ff66a3235e7249e8451af12adc11d26509172de1ff50452c3af57684009bb944314bd587b2be200bab17df743a2706ce4067d6731",
+        )
+    } else if cfg!(all(target_os = "linux", target_arch = "aarch64")) {
+        (
+            "https://dl.google.com/agy-extensions/releases/linux/agy-acp-server-1.2.1-linux-arm64.zip",
+            "agy_acp_server.par",
+            "d907f928609ff2232bfeeec9177fe925d3e02e1773295cfb30097e5c4e134758021bff916ba5ae2e2e2ff81d374564349f268f92a4577bc88370537011473e29",
+        )
+    } else if cfg!(all(target_os = "windows", target_arch = "x86_64")) {
+        (
+            "https://dl.google.com/agy-extensions/releases/windows/agy-acp-server-1.2.1-windows-x86_64.zip",
+            "agy_acp_server.exe",
+            "515c0af1d00164ca3a608f4ef04caa4ef8045ffa94a3ef2405c9b43c87c7a74c9f71a232c81917353dc3f2d49b69230f935d2ebfa28f7ee021b5aa088f3fa554",
+        )
+    } else if cfg!(all(target_os = "windows", target_arch = "aarch64")) {
+        (
+            "https://dl.google.com/agy-extensions/releases/windows/agy-acp-server-1.2.1-windows-arm64.zip",
+            "agy_acp_server.exe",
+            "ae3f4c2d2255c03d4d9548e10a760a107c41c99e4c6c710bd82758791e4fd497b75bdef0cd2cfd7fdff1a5bb2fee7afd81f5d043da92ab52dce5505dd2aa58b3",
+        )
+    } else {
+        return None;
+    };
+    Some(crate::archive_install::ArchivePin {
+        name: "antigravity-acp",
+        version: "1.2.1",
+        url,
+        entry,
+        sha512,
+    })
+}
+
+fn antigravity_legacy_archive() -> Option<crate::archive_install::ArchivePin> {
     let (url, entry, sha512) = if cfg!(all(target_os = "macos", target_arch = "aarch64")) {
         (
             "https://dl.google.com/agy-extensions/releases/macos/agy-acp-server-agy_acp_server_1.1.1-darwin-arm64.zip",
@@ -519,6 +507,349 @@ fn antigravity_archive() -> Option<crate::archive_install::ArchivePin> {
         entry,
         sha512,
     })
+}
+
+const ANTIGRAVITY_ARCHIVE_NAME: &str = "antigravity-acp";
+
+/// the acp registry's manifest for google's server, the source of releases
+/// newer than the pin compiled into this build.
+pub const ANTIGRAVITY_REGISTRY_URL: &str = "https://raw.githubusercontent.com/agentclientprotocol/registry/main/antigravity-acp/agent.json";
+
+/// install marker for a release proven by google's code signature, which has
+/// no digest in zeron's source to record instead.
+const ANTIGRAVITY_SIGNED_MARKER: &str = "google-code-signature";
+
+fn antigravity_entry() -> &'static str {
+    if cfg!(windows) {
+        "agy_acp_server.exe"
+    } else {
+        "agy_acp_server.par"
+    }
+}
+
+fn antigravity_registry_platform() -> Option<&'static str> {
+    Some(if cfg!(all(target_os = "macos", target_arch = "aarch64")) {
+        "darwin-aarch64"
+    } else if cfg!(all(target_os = "macos", target_arch = "x86_64")) {
+        "darwin-x86_64"
+    } else if cfg!(all(target_os = "linux", target_arch = "x86_64")) {
+        "linux-x86_64"
+    } else if cfg!(all(target_os = "linux", target_arch = "aarch64")) {
+        "linux-aarch64"
+    } else if cfg!(all(target_os = "windows", target_arch = "x86_64")) {
+        "windows-x86_64"
+    } else if cfg!(all(target_os = "windows", target_arch = "aarch64")) {
+        "windows-aarch64"
+    } else {
+        return None;
+    })
+}
+
+/// completed installs whose marker proves their origin: a digest pinned by
+/// this or an earlier build, or google's verified code signature.
+fn trusted_antigravity_installs() -> Vec<(semver::Version, PathBuf)> {
+    let pins: Vec<_> = [antigravity_archive(), antigravity_legacy_archive()]
+        .into_iter()
+        .flatten()
+        .collect();
+    crate::archive_install::installed_versions(ANTIGRAVITY_ARCHIVE_NAME)
+        .into_iter()
+        .filter_map(|(version, marker)| {
+            let parsed = semver::Version::parse(&version).ok()?;
+            let trusted = pins
+                .iter()
+                .any(|pin| pin.version == version && pin.sha512 == marker)
+                || (crate::code_signature::SUPPORTED && marker == ANTIGRAVITY_SIGNED_MARKER);
+            if !trusted {
+                return None;
+            }
+            crate::archive_install::installed_entry_with_marker(
+                ANTIGRAVITY_ARCHIVE_NAME,
+                &version,
+                antigravity_entry(),
+                &marker,
+            )
+            .map(|entry| (parsed, entry))
+        })
+        .collect()
+}
+
+fn newest_antigravity_install() -> Option<(semver::Version, PathBuf)> {
+    trusted_antigravity_installs()
+        .into_iter()
+        .max_by(|(left, _), (right, _)| left.cmp(right))
+}
+
+/// whether `executable` is the server zeron installed and may replace.
+pub fn is_managed_antigravity_server(executable: &Path) -> bool {
+    newest_antigravity_install().is_some_and(|(_, entry)| entry == executable)
+}
+
+/// the registry's current release for this platform.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AntigravityRelease {
+    pub version: String,
+    /// `None` when the manifest has no usable google-hosted archive here.
+    archive_url: Option<String>,
+}
+
+impl AntigravityRelease {
+    /// whether zeron can prove this release's origin before installing it.
+    pub fn installable(&self) -> bool {
+        antigravity_archive().is_some_and(|pin| pin.version == self.version)
+            || (crate::code_signature::SUPPORTED && self.archive_url.is_some())
+    }
+}
+
+pub fn antigravity_release(manifest: &Value) -> Option<AntigravityRelease> {
+    if manifest.get("id")?.as_str()? != ANTIGRAVITY_ARCHIVE_NAME {
+        return None;
+    }
+    let version = manifest.get("version")?.as_str()?;
+    semver::Version::parse(version).ok()?;
+    let archive_url = antigravity_registry_platform()
+        .and_then(|platform| manifest.get("distribution")?.get("binary")?.get(platform))
+        .filter(|binary| {
+            binary
+                .get("cmd")
+                .and_then(Value::as_str)
+                .is_some_and(|cmd| cmd.strip_prefix("./").unwrap_or(cmd) == antigravity_entry())
+        })
+        .and_then(|binary| binary.get("archive")?.as_str())
+        .filter(|url| is_google_release_url(url))
+        .map(str::to_owned);
+    Some(AntigravityRelease {
+        version: version.to_owned(),
+        archive_url,
+    })
+}
+
+fn is_google_release_url(url: &str) -> bool {
+    reqwest::Url::parse(url).is_ok_and(|url| {
+        url.scheme() == "https"
+            && url.host_str() == Some("dl.google.com")
+            && url.port().is_none()
+            && url.username().is_empty()
+            && url.password().is_none()
+            && url.path().starts_with("/agy-extensions/releases/")
+    })
+}
+
+/// install `release` beside earlier ones; launches switch to it once complete.
+pub async fn install_antigravity_release(
+    release: &AntigravityRelease,
+) -> Result<PathBuf, HarnessError> {
+    if let Some(pin) = antigravity_archive().filter(|pin| pin.version == release.version) {
+        return crate::archive_install::ensure_installed(pin, "Antigravity").await;
+    }
+    if !crate::code_signature::SUPPORTED {
+        return Err(HarnessError::Install(format!(
+            "Antigravity {} is not pinned by this build of Zeron; update Zeron to install it",
+            release.version
+        )));
+    }
+    let url = release.archive_url.as_deref().ok_or_else(|| {
+        HarnessError::Install(format!(
+            "the ACP registry lists no Google-hosted Antigravity {} archive for this platform",
+            release.version
+        ))
+    })?;
+    let verified = crate::archive_install::VerifiedRelease {
+        name: ANTIGRAVITY_ARCHIVE_NAME,
+        version: &release.version,
+        url,
+        entry: antigravity_entry(),
+        marker: ANTIGRAVITY_SIGNED_MARKER,
+    };
+    let expected = release.version.clone();
+    crate::archive_install::install_verified(&verified, "Antigravity", |dir| async move {
+        crate::code_signature::verify_google_signed(&dir).await?;
+        // a signature proves google built the server, not that it is the
+        // release the registry named; the install directory, and so launch
+        // order, is keyed by that name.
+        confirm_reported_version(&dir.join(antigravity_entry()), &expected).await
+    })
+    .await
+}
+
+const VERSION_PROBE_TIMEOUT: Duration = Duration::from_secs(60);
+
+async fn confirm_reported_version(server: &Path, expected: &str) -> Result<(), HarnessError> {
+    let mut command = Command::new(server);
+    command
+        .arg("--version")
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .kill_on_drop(true);
+    let output = tokio::time::timeout(VERSION_PROBE_TIMEOUT, command.output())
+        .await
+        .map_err(|_| {
+            HarnessError::Install(format!(
+                "the downloaded Antigravity server did not report its version within {}s",
+                VERSION_PROBE_TIMEOUT.as_secs()
+            ))
+        })??;
+    let text = format!(
+        "{}\n{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    match antigravity_build_version(&text) {
+        Some(reported) if reported == expected => Ok(()),
+        Some(reported) => Err(HarnessError::Install(format!(
+            "the ACP registry lists Antigravity {expected}, but its archive contains {reported}"
+        ))),
+        None => Err(HarnessError::Install(format!(
+            "the downloaded Antigravity {expected} server reported no build label"
+        ))),
+    }
+}
+
+/// the release in `--version` output's `Build label:` line. google's build
+/// metadata also names branch revisions, which are not releases.
+pub fn antigravity_build_version(output: &str) -> Option<String> {
+    output
+        .lines()
+        .find_map(|line| line.trim().strip_prefix("Build label: "))
+        // 1.1.1 prefixed its label with the target name; 1.2.1 dropped it.
+        .map(|label| label.trim_start_matches("agy_acp_server_"))
+        .filter(|version| semver::Version::parse(version).is_ok())
+        .map(str::to_owned)
+}
+
+/// remove trusted installs older than the one launches resolve to. a version
+/// still running (in any process, including another zeron) is kept, and on
+/// failure to inspect processes nothing is removed.
+pub fn prune_superseded_antigravity_installs() {
+    let Some((newest, _)) = newest_antigravity_install() else {
+        return;
+    };
+    let Some(adapters) = crate::adapter_install::adapters_root() else {
+        return;
+    };
+    let Some(running) = running_command_lines() else {
+        return;
+    };
+    for (version, entry) in trusted_antigravity_installs() {
+        let Some(dir) = entry.parent().filter(|_| version < newest) else {
+            continue;
+        };
+        let prefixes = install_path_prefixes(dir);
+        if running.iter().any(|line| {
+            let line = comparable_path(line);
+            prefixes.iter().any(|prefix| line.contains(prefix))
+        }) {
+            continue;
+        }
+        // windows also refuses to rename a directory holding a running
+        // image, which covers processes the scan could not open.
+        let trash = adapters.join(format!(
+            ".trash-{ANTIGRAVITY_ARCHIVE_NAME}-{version}-{}",
+            std::process::id()
+        ));
+        if std::fs::rename(dir, &trash).is_ok()
+            && let Err(error) = std::fs::remove_dir_all(&trash)
+        {
+            tracing::warn!(%error, %version, "could not remove a superseded Antigravity server");
+        }
+    }
+}
+
+#[cfg(unix)]
+fn running_command_lines() -> Option<Vec<String>> {
+    let output = std::process::Command::new("/bin/ps")
+        .args(["-axww", "-o", "command="])
+        .stdin(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .output()
+        .ok()
+        .filter(|output| output.status.success())?;
+    Some(
+        String::from_utf8_lossy(&output.stdout)
+            .lines()
+            .map(str::to_owned)
+            .collect(),
+    )
+}
+
+/// the image path of every process this user can inspect.
+#[cfg(windows)]
+fn running_command_lines() -> Option<Vec<String>> {
+    use windows_sys::Win32::Foundation::{CloseHandle, INVALID_HANDLE_VALUE};
+    use windows_sys::Win32::System::Diagnostics::ToolHelp::{
+        CreateToolhelp32Snapshot, PROCESSENTRY32W, Process32FirstW, Process32NextW,
+        TH32CS_SNAPPROCESS,
+    };
+    use windows_sys::Win32::System::Threading::{
+        OpenProcess, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION,
+        QueryFullProcessImageNameW,
+    };
+
+    // SAFETY: the snapshot and every process handle are closed below.
+    unsafe {
+        let snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+        if snapshot == INVALID_HANDLE_VALUE {
+            return None;
+        }
+        let mut entry = PROCESSENTRY32W {
+            dwSize: size_of::<PROCESSENTRY32W>() as u32,
+            ..Default::default()
+        };
+        let mut images = Vec::new();
+        let mut more = Process32FirstW(snapshot, &mut entry) != 0;
+        while more {
+            let process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, entry.th32ProcessID);
+            if !process.is_null() {
+                let mut path = [0u16; 32_768];
+                let mut length = path.len() as u32;
+                if QueryFullProcessImageNameW(
+                    process,
+                    PROCESS_NAME_WIN32,
+                    path.as_mut_ptr(),
+                    &mut length,
+                ) != 0
+                {
+                    images.push(String::from_utf16_lossy(&path[..length as usize]));
+                }
+                CloseHandle(process);
+            }
+            more = Process32NextW(snapshot, &mut entry) != 0;
+        }
+        CloseHandle(snapshot);
+        Some(images)
+    }
+}
+
+#[cfg(not(any(unix, windows)))]
+fn running_command_lines() -> Option<Vec<String>> {
+    None
+}
+
+/// how a process may name files under `dir`: as zeron spawned it, and in its
+/// canonical form, which windows reports for images even when the adapters
+/// directory was reached through an 8.3 short name such as `RUNNER~1`.
+fn install_path_prefixes(dir: &Path) -> Vec<String> {
+    let with_separator = |path: &Path| {
+        let path = path.display().to_string();
+        let path = path.strip_prefix(r"\\?\").unwrap_or(&path);
+        comparable_path(&format!("{path}{}", std::path::MAIN_SEPARATOR))
+    };
+    let mut prefixes = vec![with_separator(dir)];
+    if let Ok(canonical) = std::fs::canonicalize(dir) {
+        prefixes.push(with_separator(&canonical));
+    }
+    prefixes.dedup();
+    prefixes
+}
+
+/// windows paths compare case-insensitively.
+fn comparable_path(path: &str) -> String {
+    if cfg!(windows) {
+        path.to_lowercase()
+    } else {
+        path.to_owned()
+    }
 }
 
 /// Whether the listing device has a pinned, explicitly installable archive.
@@ -771,6 +1102,9 @@ fn antigravity_spec() -> AcpAgentSpec {
                 },
             ]
         },
+        // No preemption: agy_acp_server 1.1.1 never answers a prompt (or any
+        // later one) when a cancel lands as it starts replying after a tool
+        // (verified on the wire). Steers wait for the turn end instead.
         steering_mode: SteeringMode::TurnBoundary,
         reasoning_levels: &[],
         prompt_transform: identity_transform,
@@ -785,6 +1119,7 @@ fn antigravity_spec() -> AcpAgentSpec {
         auth_method: Some("oauth-personal"),
         skill_dirs: antigravity_skill_dirs,
         hidden_commands: &[],
+        drops_unstarted_cancelled_prompt: false,
     }
 }
 
@@ -843,7 +1178,7 @@ pub fn prewarm_managed_adapters() {
     let Ok(handle) = tokio::runtime::Handle::try_current() else {
         return;
     };
-    for spec in [grok_spec(), pi_spec()] {
+    for spec in [grok_spec()] {
         let Some(pkg) = spec.npm_package else {
             continue;
         };
@@ -882,7 +1217,7 @@ enum Launch {
         args: Vec<String>,
     },
     Archive {
-        pin: crate::archive_install::ArchivePin,
+        entry: PathBuf,
         args: Vec<String>,
     },
 }
@@ -949,12 +1284,6 @@ impl AcpHarness {
         Self::with_spec(hermes_spec())
     }
 
-    /// The pi coding agent over ACP — the community `pi-acp` adapter wrapping
-    /// pi's RPC mode.
-    pub fn pi() -> Self {
-        Self::with_spec(pi_spec()).with_model_discovery_timeout(Duration::from_secs(60))
-    }
-
     /// google antigravity over its acp server (`agy_acp_server`).
     pub fn antigravity() -> Self {
         Self::with_spec(antigravity_spec())
@@ -965,9 +1294,12 @@ impl AcpHarness {
     /// sign-in stored.
     pub async fn sign_out(&self) -> Result<(), HarnessError> {
         let home = std::env::var("HOME").ok();
-        let (_scratch, mut child, _stderr) = self.spawn_agent(home.as_deref(), false, &[]).await?;
+        let (_scratch, mut child, _stderr, sign_in_prompted) =
+            self.spawn_agent(home.as_deref(), false, &[], None).await?;
         let (client, mut incoming) = match (child.stdin.take(), child.stdout.take()) {
-            (Some(stdin), Some(stdout)) => RpcClient::new(stdin, stdout),
+            (Some(stdin), Some(stdout)) => {
+                client_with_sign_in_prompt(stdin, stdout, self.spec.id, &sign_in_prompted)
+            }
             _ => {
                 child.shutdown(self.kill_grace).await;
                 return Err(HarnessError::Protocol("agent child has no stdio".into()));
@@ -1185,8 +1517,7 @@ impl AcpHarness {
                         .ok_or_else(|| HarnessError::NotInstalled(self.spec.install_hint.into())),
                 }
             }
-            Launch::Archive { pin, .. } => crate::archive_install::entry_path(&pin)
-                .ok_or_else(|| HarnessError::NotInstalled(self.spec.install_hint.into())),
+            Launch::Archive { entry, .. } => Ok(entry),
         }
     }
 
@@ -1203,6 +1534,13 @@ impl AcpHarness {
                 None
             }
         })
+    }
+
+    fn installed_archive_entry(&self) -> Option<PathBuf> {
+        if self.spec.id == HarnessId::Antigravity {
+            return newest_antigravity_install().map(|(_, entry)| entry);
+        }
+        crate::archive_install::installed_entry(self.spec.archive.as_ref()?)
     }
 
     fn resolve_launch(&self) -> Result<Launch, HarnessError> {
@@ -1232,12 +1570,12 @@ impl AcpHarness {
                 });
             }
         }
-        if let Some(pin) = self.spec.archive {
-            if crate::archive_install::installed_entry(&pin).is_none() {
-                return Err(HarnessError::NotInstalled(self.spec.install_hint.into()));
-            }
+        if self.spec.archive.is_some() {
+            let entry = self
+                .installed_archive_entry()
+                .ok_or_else(|| HarnessError::NotInstalled(self.spec.install_hint.into()))?;
             return Ok(Launch::Archive {
-                pin,
+                entry,
                 args: spec_args,
             });
         }
@@ -1298,11 +1636,7 @@ impl AcpHarness {
                 node_args.extend(args);
                 Ok((program, node_args))
             }
-            Launch::Archive { pin, args } => {
-                let entry = crate::archive_install::installed_entry(&pin)
-                    .ok_or_else(|| HarnessError::NotInstalled(self.spec.install_hint.into()))?;
-                Ok((entry, args))
-            }
+            Launch::Archive { entry, args } => Ok((entry, args)),
         }
     }
 
@@ -1344,7 +1678,16 @@ impl AcpHarness {
         cwd: Option<&str>,
         block_on_install: bool,
         extra_args: &[String],
-    ) -> Result<(Option<ScratchDir>, Child, crate::StderrTail), HarnessError> {
+        _mcp: Option<&zeron_proto::McpServer>,
+    ) -> Result<
+        (
+            Option<ScratchDir>,
+            Child,
+            crate::StderrTail,
+            CancellationToken,
+        ),
+        HarnessError,
+    > {
         let (exe, args) = self.resolve_program(block_on_install).await?;
         let mut cmd = Command::new(&exe);
         cmd.args(args);
@@ -1357,9 +1700,16 @@ impl AcpHarness {
         }
         if self.spec.id == HarnessId::Antigravity {
             cmd.env("GEMINI_HOME", antigravity_paths::home()?);
-            // Python webbrowser accepts an executable template; never launch a browser here.
-            #[cfg(unix)]
-            cmd.env("BROWSER", "/usr/bin/true %s");
+            match noop_browser() {
+                Ok(browser) => {
+                    cmd.env("BROWSER", browser);
+                }
+                // an unsuppressed browser only matters if the server asks
+                // for sign-in, which the prompt watchers then stop.
+                Err(error) => {
+                    tracing::warn!(%error, "Antigravity browser suppression is unavailable")
+                }
+            }
         }
         let scratch = self.adapter_scratch()?;
         if let Some(dir) = &scratch {
@@ -1378,18 +1728,24 @@ impl AcpHarness {
         })?;
         let mut child = Child::new(child);
         let stderr_tail = crate::StderrTail::default();
+        let sign_in_prompted = CancellationToken::new();
         if let Some(stderr) = child.stderr.take() {
             let tail = stderr_tail.clone();
+            let prompted = sign_in_prompted.clone();
+            let harness = self.spec.id;
             tokio::spawn(async move {
                 let mut lines = tokio::io::BufReader::new(stderr).lines();
                 while let Ok(Some(line)) = lines.next_line().await {
                     tracing::debug!(target: "zeron_harness::acp", "stderr: {line}");
                     tail.push(&line);
+                    if is_sign_in_prompt(harness, &line) {
+                        prompted.cancel();
+                    }
                 }
                 tail.close();
             });
         }
-        Ok((scratch, child, stderr_tail))
+        Ok((scratch, child, stderr_tail, sign_in_prompted))
     }
 
     /// Short-lived discovery run for [`Harness::commands`]: initialize, scan
@@ -1401,11 +1757,13 @@ impl AcpHarness {
         &self,
         cwd: Option<&std::path::Path>,
     ) -> Result<Vec<SlashCommand>, HarnessError> {
-        let (_scratch, mut child, _stderr) = self
-            .spawn_agent(cwd.and_then(|p| p.to_str()), false, &[])
+        let (_scratch, mut child, _stderr, sign_in_prompted) = self
+            .spawn_agent(cwd.and_then(|p| p.to_str()), false, &[], None)
             .await?;
         let (client, mut incoming) = match (child.stdin.take(), child.stdout.take()) {
-            (Some(stdin), Some(stdout)) => RpcClient::new(stdin, stdout),
+            (Some(stdin), Some(stdout)) => {
+                client_with_sign_in_prompt(stdin, stdout, self.spec.id, &sign_in_prompted)
+            }
             _ => {
                 child.shutdown(self.kill_grace).await;
                 return Err(HarnessError::Protocol("agent child has no stdio".into()));
@@ -1455,6 +1813,8 @@ impl AcpHarness {
             }
             Ok::<Vec<SlashCommand>, HarnessError>(commands)
         };
+        let discovery =
+            unless_sign_in_prompted(discovery, &sign_in_prompted, self.spec.display_name);
         let result = tokio::time::timeout(self.model_discovery_timeout, discovery).await;
         child.shutdown(self.kill_grace).await;
         match result {
@@ -1469,9 +1829,12 @@ impl AcpHarness {
     /// wire is the source of truth — the spec's static catalog only enriches
     /// matching entries and names the pick when the agent advertises nothing.
     async fn discover_models(&self) -> Result<Vec<Model>, HarnessError> {
-        let (_scratch, mut child, stderr_tail) = self.spawn_agent(None, false, &[]).await?;
+        let (_scratch, mut child, stderr_tail, sign_in_prompted) =
+            self.spawn_agent(None, false, &[], None).await?;
         let (client, _incoming) = match (child.stdin.take(), child.stdout.take()) {
-            (Some(stdin), Some(stdout)) => RpcClient::new(stdin, stdout),
+            (Some(stdin), Some(stdout)) => {
+                client_with_sign_in_prompt(stdin, stdout, self.spec.id, &sign_in_prompted)
+            }
             _ => {
                 child.shutdown(self.kill_grace).await;
                 return Err(HarnessError::Protocol("agent child has no stdio".into()));
@@ -1502,6 +1865,8 @@ impl AcpHarness {
             }
             Ok::<Vec<Model>, HarnessError>(models)
         };
+        let discovery =
+            unless_sign_in_prompted(discovery, &sign_in_prompted, self.spec.display_name);
         let result = tokio::time::timeout(self.model_discovery_timeout, discovery).await;
         child.shutdown(self.kill_grace).await;
         match result {
@@ -1806,12 +2171,7 @@ impl Harness for AcpHarness {
         {
             return crate::executable::validate_native_override(&PathBuf::from(p)).is_ok();
         }
-        if self
-            .spec
-            .archive
-            .as_ref()
-            .is_some_and(|pin| crate::archive_install::installed_entry(pin).is_some())
-        {
+        if self.installed_archive_entry().is_some() {
             return true;
         }
         if self.spec.id == HarnessId::Antigravity {
@@ -1819,6 +2179,26 @@ impl Harness for AcpHarness {
         } else {
             find_on_paths(self.spec.cli_executable, (self.spec.cli_extra_paths)()).is_some()
         }
+    }
+
+    fn executable_path(&self) -> Option<PathBuf> {
+        if self.spec.id == HarnessId::Antigravity {
+            return match self.resolve_launch().ok()? {
+                Launch::Program(program, _) => Some(program),
+                Launch::Archive { entry, .. } => Some(entry),
+                Launch::Managed { .. } => None,
+            };
+        }
+        // Version checks and updates target the agent CLI when its transport differs.
+        if self.spec.executable == self.spec.cli_executable {
+            if let Some(path) = &self.executable {
+                return Some(path.clone());
+            }
+            if let Some(path) = std::env::var_os(self.spec.env_override).filter(|p| !p.is_empty()) {
+                return Some(PathBuf::from(path));
+            }
+        }
+        find_on_paths(self.spec.cli_executable, (self.spec.cli_extra_paths)())
     }
 
     /// Devin refreshes through its native catalog command on each request.
@@ -1831,8 +2211,7 @@ impl Harness for AcpHarness {
                 crate::adapter_install::installed_entry(&pin, bin_name)
                     .unwrap_or_else(|| PathBuf::from(format!("{}@{}", pin.name, pin.version)))
             }
-            Launch::Archive { pin, .. } => crate::archive_install::installed_entry(&pin)
-                .unwrap_or_else(|| PathBuf::from(format!("{}@{}", pin.name, pin.version))),
+            Launch::Archive { entry, .. } => entry,
         };
         let extra = if self.id() == HarnessId::Antigravity {
             let root = antigravity_paths::home()?.join("antigravity-acp");
@@ -1947,8 +2326,9 @@ impl Harness for AcpHarness {
         request: RunRequest,
         controls: RunControls,
     ) -> Result<BoxStream<'static, Result<AgentEvent, HarnessError>>, HarnessError> {
-        let (scratch, mut child, stderr_tail) =
-            self.spawn_agent(Some(&request.cwd), true, &[]).await?;
+        let (scratch, mut child, stderr_tail, sign_in_prompted) = self
+            .spawn_agent(Some(&request.cwd), true, &[], request.mcp.as_ref())
+            .await?;
         let stdin = child
             .stdin
             .take()
@@ -1957,8 +2337,40 @@ impl Harness for AcpHarness {
             .stdout
             .take()
             .ok_or_else(|| HarnessError::Protocol("agent child has no stdout".into()))?;
-        let (client, incoming) = RpcClient::new(stdin, stdout);
+        let (client, incoming) =
+            client_with_sign_in_prompt(stdin, stdout, self.spec.id, &sign_in_prompted);
         let (event_tx, event_rx) = mpsc::channel::<Result<AgentEvent, HarnessError>>(256);
+        let devin_selection = match request.model.as_deref() {
+            Some(model) if self.spec.id == HarnessId::Devin => {
+                let (exe, _) = self.resolve_program(false).await?;
+                let selection = self
+                    .devin_models
+                    .selection(
+                        &exe,
+                        self.model_discovery_timeout,
+                        model,
+                        &request.model_options,
+                    )
+                    .await;
+                if selection.is_none() && model == devin_models::FUSION {
+                    let chosen = |key: &str| {
+                        request
+                            .model_options
+                            .get(key)
+                            .and_then(Value::as_str)
+                            .unwrap_or("default")
+                            .to_owned()
+                    };
+                    return Err(HarnessError::Protocol(format!(
+                        "Devin Fusion does not offer lead {} with sidekick {}; pick another sidekick",
+                        chosen("lead"),
+                        chosen("sidekick")
+                    )));
+                }
+                selection
+            }
+            _ => None,
+        };
         tokio::spawn(run_session(Session {
             child,
             scratch,
@@ -1972,6 +2384,9 @@ impl Harness for AcpHarness {
             prompt_transform: self.spec.prompt_transform,
             effort_values: self.spec.effort_values,
             prompt_complete_extension: self.spec.prompt_complete_extension,
+            preempt_steers: self.spec.steering_mode == SteeringMode::StepBoundary,
+            devin_selection,
+            resend_unstarted: self.spec.drops_unstarted_cancelled_prompt,
             prompt_stall: self.spec.prompt_stall,
             stall_hint: self.spec.stall_hint,
             effort_in_model_id: self.spec.effort_in_model_id,
@@ -1981,6 +2396,7 @@ impl Harness for AcpHarness {
             kill_grace: self.kill_grace,
             handshake_timeout: self.handshake_timeout,
             stderr_tail,
+            sign_in_prompted,
         }));
 
         let events = futures::stream::unfold(event_rx, |mut rx| async move {
@@ -2010,6 +2426,12 @@ struct Session {
     harness: HarnessId,
     agent_name: &'static str,
     prompt_complete_extension: bool,
+    /// Steers preempt the generation (descriptor: mid-turn steering).
+    preempt_steers: bool,
+    /// Devin: the requested model's catalog group (see `devin_models`).
+    devin_selection: Option<devin_models::Selection>,
+    /// See `AcpAgentSpec::drops_unstarted_cancelled_prompt`.
+    resend_unstarted: bool,
     prompt_stall: Option<Duration>,
     stall_hint: &'static str,
     effort_in_model_id: bool,
@@ -2022,6 +2444,7 @@ struct Session {
     kill_grace: Duration,
     handshake_timeout: Duration,
     stderr_tail: crate::StderrTail,
+    sign_in_prompted: CancellationToken,
 }
 
 fn initialize_params(harness: HarnessId) -> Value {
@@ -2048,6 +2471,27 @@ fn initialize_params(harness: HarnessId) -> Value {
         // the diff pane, and commands belong to the agent's own sandbox.
         "clientCapabilities": capabilities,
     })
+}
+
+/// `session/new` `mcpServers` for an injected server: ACP spells a stdio
+/// server as name/command/args plus `[{name, value}]` env pairs. Empty when
+/// the host injected nothing — the user's own servers come from the agent's
+/// config, never from here.
+fn acp_mcp_servers(mcp: Option<&zeron_proto::McpServer>) -> Vec<Value> {
+    mcp.into_iter()
+        .map(|mcp| {
+            json!({
+                "name": mcp.name,
+                "command": mcp.command,
+                "args": mcp.args,
+                "env": mcp
+                    .env
+                    .iter()
+                    .map(|(name, value)| json!({ "name": name, "value": value }))
+                    .collect::<Vec<_>>(),
+            })
+        })
+        .collect()
 }
 
 /// `initialize._meta.steering.supported` — the `_session/steering` extension
@@ -2490,16 +2934,16 @@ fn prompt_turn(
     text: String,
     prompt_id: Option<String>,
 ) -> BoxFuture<'static, Result<Value, HarnessError>> {
-    Box::pin(async move {
-        let mut params = json!({
-            "sessionId": session_id,
-            "prompt": [{ "type": "text", "text": text }],
-        });
-        if let Some(id) = prompt_id {
-            params["_meta"] = json!({ "promptId": id, "requestId": id });
-        }
-        client.request("session/prompt", params).await
-    })
+    let mut params = json!({
+        "sessionId": session_id,
+        "prompt": [{ "type": "text", "text": text }],
+    });
+    if let Some(id) = prompt_id {
+        params["_meta"] = json!({ "promptId": id, "requestId": id });
+    }
+    // Written now, not on first poll: a steer's `session/cancel` issued in
+    // the same loop iteration must reach the agent after this prompt.
+    client.request_now("session/prompt", params)
 }
 
 /// Answer a server→client request. Permission requests are auto-accepted with
@@ -2611,6 +3055,8 @@ fn handle_server_request_live(
             .unwrap_or("The agent needs your input.")
             .to_owned(),
         options: names.clone(),
+        prefill: None,
+        multiline: false,
         multi_select: false,
     };
     let client = client.clone();
@@ -2646,6 +3092,84 @@ fn not_signed_in(agent_name: &str) -> String {
     format!(
         "{agent_name} isn't signed in. Open Settings → Providers → {agent_name} and connect an account."
     )
+}
+
+fn is_sign_in_prompt(harness: HarnessId, line: &str) -> bool {
+    harness == HarnessId::Antigravity
+        && line.contains("Open the following link to authenticate the ACP server")
+}
+
+fn client_with_sign_in_prompt(
+    stdin: ChildStdin,
+    stdout: ChildStdout,
+    harness: HarnessId,
+    sign_in_prompted: &CancellationToken,
+) -> (RpcClient, mpsc::Receiver<Incoming>) {
+    if harness != HarnessId::Antigravity {
+        return RpcClient::new(stdin, stdout);
+    }
+    let prompted = sign_in_prompted.clone();
+    RpcClient::with_stdout_observer(stdin, stdout, Some(Box::new(move |_| prompted.cancel())))
+}
+
+async fn unless_sign_in_prompted<T>(
+    work: impl std::future::Future<Output = Result<T, HarnessError>>,
+    sign_in_prompted: &CancellationToken,
+    agent_name: &str,
+) -> Result<T, HarnessError> {
+    tokio::select! {
+        result = work => result,
+        _ = sign_in_prompted.cancelled() => Err(HarnessError::Protocol(not_signed_in(agent_name))),
+    }
+}
+
+#[cfg(not(windows))]
+fn noop_browser() -> Result<String, HarnessError> {
+    unix_noop_browser(
+        &[Path::new("/usr/bin/true"), Path::new("/bin/true")],
+        std::env::current_exe().ok().as_deref(),
+    )
+}
+
+/// python's `webbrowser` splits `BROWSER` on `:` and then shell-splits each
+/// entry. hosts without `true` (nixos, minimal containers) fall back to
+/// zeron's own `--noop-browser` mode.
+#[cfg(any(not(windows), test))]
+fn unix_noop_browser(
+    candidates: &[&Path],
+    executable: Option<&Path>,
+) -> Result<String, HarnessError> {
+    if let Some(noop) = candidates.iter().find(|path| path.is_file()) {
+        return Ok(format!("{} %s", noop.display()));
+    }
+    let executable = executable
+        .and_then(Path::to_str)
+        .ok_or_else(|| HarnessError::Protocol("No executable can suppress the browser".into()))?;
+    if executable.contains([':', '\'', '%']) {
+        return Err(HarnessError::Protocol(
+            "The executable path cannot be used for browser suppression".into(),
+        ));
+    }
+    Ok(format!("'{executable}' --noop-browser %s"))
+}
+
+#[cfg(windows)]
+fn noop_browser() -> Result<String, HarnessError> {
+    windows_noop_browser(&std::env::current_exe()?)
+}
+
+#[cfg(any(windows, test))]
+fn windows_noop_browser(executable: &Path) -> Result<String, HarnessError> {
+    let executable = executable.to_str().ok_or_else(|| {
+        HarnessError::Protocol("Browser suppression requires a Unicode executable path".into())
+    })?;
+    if executable.contains([';', '"', '%']) {
+        return Err(HarnessError::Protocol(
+            "The executable path cannot be used for browser suppression".into(),
+        ));
+    }
+    let executable = executable.replace('\\', "\\\\");
+    Ok(format!("\"{executable}\" --noop-browser %s"))
 }
 
 /// `session/new`. Agents that sign in from Settings never start a browser
@@ -2964,6 +3488,9 @@ async fn run_session(session: Session) {
         harness,
         agent_name,
         prompt_complete_extension,
+        preempt_steers,
+        devin_selection,
+        resend_unstarted,
         prompt_stall,
         stall_hint,
         effort_in_model_id,
@@ -2975,8 +3502,11 @@ async fn run_session(session: Session) {
         kill_grace,
         handshake_timeout,
         stderr_tail,
+        sign_in_prompted,
     } = session;
     let RunControls {
+        realtime: _,
+        execution_lease: _execution_lease,
         request_input,
         mut steering,
         interrupt,
@@ -2991,7 +3521,10 @@ async fn run_session(session: Session) {
         let steer_ext = steering_supported(&init);
         let init_commands = scan_available_commands(&init);
 
-        let session_params = json!({ "cwd": request.cwd, "mcpServers": [] });
+        let session_params = json!({
+            "cwd": request.cwd,
+            "mcpServers": acp_mcp_servers(request.mcp.as_ref()),
+        });
         let (session_id, mut session_response) = if let Some(resume) = &request.resume {
             let mut load = session_params.clone();
             load["sessionId"] = Value::String(resume.clone());
@@ -3048,17 +3581,32 @@ async fn run_session(session: Session) {
                 "session/new returned no sessionId".into(),
             ));
         }
+        // Devin selects one advertised member of the requested model's group;
+        // effort and speed baked into a saved id apply unless the run chose
+        // its own.
+        let mut request = request.clone();
         if harness == HarnessId::Devin
-            && let Some(model) = request.model.as_deref()
+            && let Some(model) = request.model.clone()
         {
-            devin_models::wait_for_model(
+            let selection = devin_selection.clone().unwrap_or_default();
+            let advertised = devin_models::wait_for_model(
                 &client,
                 &mut incoming,
                 &session_id,
                 &mut session_response,
-                model,
+                &model,
+                &selection.members,
             )
             .await?;
+            request.model = Some(advertised);
+            if request.reasoning.is_none() {
+                request.reasoning = selection.effort;
+            }
+            if selection.fast && !request.model_options.contains_key("speed") {
+                request
+                    .model_options
+                    .insert("speed".into(), Value::String("fast".into()));
+            }
         }
         // ACP has had two model-selection surfaces. Newer config-option agents
         // use category=model below; Grok Build currently advertises only the
@@ -3109,43 +3657,74 @@ async fn run_session(session: Session) {
         } else {
             session_commands
         };
-        let options_snapshot = session_response;
-        for (config_id, payload) in config_option_sets(
+        let mut options_snapshot = session_response;
+        let mut sets = config_option_sets(
             &options_snapshot,
             requested_model.as_deref(),
             &efforts,
             &request.model_options,
-        ) {
-            let mut params = serde_json::Map::new();
-            params.insert("sessionId".into(), session_id.clone().into());
-            params.insert("configId".into(), config_id.clone().into());
-            if let Some(payload) = payload.as_object() {
-                for (k, v) in payload {
-                    params.insert(k.clone(), v.clone());
+        );
+        // Devin's effort and speed choices depend on the selected model:
+        // switch the model first, then choose them from what it offers.
+        let deferred = harness == HarnessId::Devin
+            && sets
+                .iter()
+                .any(|(id, _)| is_model_config_option(&options_snapshot, id));
+        if deferred {
+            sets.retain(|(id, _)| is_model_config_option(&options_snapshot, id));
+        }
+        let mut pass = 0;
+        loop {
+            for (config_id, payload) in std::mem::take(&mut sets) {
+                let mut params = serde_json::Map::new();
+                params.insert("sessionId".into(), session_id.clone().into());
+                params.insert("configId".into(), config_id.clone().into());
+                if let Some(payload) = payload.as_object() {
+                    for (k, v) in payload {
+                        params.insert(k.clone(), v.clone());
+                    }
                 }
-            }
-            if let Err(e) = request_draining(
-                &client,
-                &mut incoming,
-                "session/set_config_option",
-                Value::Object(params),
-            )
-            .await
-            {
-                if matches!(harness, HarnessId::Antigravity | HarnessId::Devin)
-                    && requested_model.is_some()
-                    && is_model_config_option(&options_snapshot, &config_id)
+                match request_draining(
+                    &client,
+                    &mut incoming,
+                    "session/set_config_option",
+                    Value::Object(params),
+                )
+                .await
                 {
-                    return Err(HarnessError::Protocol(format!(
-                        "agent rejected requested model {}: {e}",
-                        requested_model.as_deref().unwrap_or_default()
-                    )));
+                    Ok(response) => {
+                        if let Some(options) = response.get("configOptions") {
+                            options_snapshot["configOptions"] = options.clone();
+                        }
+                    }
+                    Err(e) => {
+                        if matches!(harness, HarnessId::Antigravity | HarnessId::Devin)
+                            && requested_model.is_some()
+                            && is_model_config_option(&options_snapshot, &config_id)
+                        {
+                            return Err(HarnessError::Protocol(format!(
+                                "agent rejected requested model {}: {e}",
+                                requested_model.as_deref().unwrap_or_default()
+                            )));
+                        }
+                        tracing::debug!(
+                            target: "zeron_harness::acp",
+                            "session/set_config_option {config_id}={payload} rejected (agent default runs): {e}"
+                        );
+                    }
                 }
-                tracing::debug!(
-                    target: "zeron_harness::acp",
-                    "session/set_config_option {config_id}={payload} rejected (agent default runs): {e}"
-                );
             }
+            pass += 1;
+            if !deferred || pass > 1 {
+                break;
+            }
+            sets = config_option_sets(
+                &options_snapshot,
+                requested_model.as_deref(),
+                &efforts,
+                &request.model_options,
+            );
+            sets.retain(|(id, _)| !is_model_config_option(&options_snapshot, id));
         }
         Ok::<(String, bool, Vec<SlashCommand>), HarnessError>((
             session_id,
@@ -3153,6 +3732,7 @@ async fn run_session(session: Session) {
             init_commands,
         ))
     };
+    let setup = unless_sign_in_prompted(setup, &sign_in_prompted, agent_name);
     let (session_id, steer_ext, init_commands) = tokio::select! {
         res = tokio::time::timeout(handshake_timeout, setup) => {
             let res = res.unwrap_or_else(|_| {
@@ -3281,11 +3861,14 @@ async fn run_session(session: Session) {
     };
     let mut prompt_stall_deadline: Option<tokio::time::Instant> =
         prompt_stall.map(|d| tokio::time::Instant::now() + d);
+    // The text of the prompt in flight (re-sent by a preempt when the agent
+    // drops an unstarted cancelled prompt).
+    let mut current_prompt_text = prompt_transform(request.reasoning, &request.prompt);
     let mut turn: Option<BoxFuture<'static, Result<Value, HarnessError>>> = Some({
         prompt_turn(
             client.clone(),
             session_id.clone(),
-            prompt_transform(request.reasoning, &request.prompt),
+            current_prompt_text.clone(),
             current_prompt_id.clone(),
         )
     });
@@ -3301,6 +3884,16 @@ async fn run_session(session: Session) {
     let mut steering_call: Option<(String, BoxFuture<'static, Result<Value, HarnessError>>)> = None;
     let mut steer_backlog: VecDeque<String> = VecDeque::new();
     let mut steering_open = true;
+    // Immediate steering for agents without a mid-turn steering extension:
+    // a steer cancels the current generation (never a running tool — it
+    // waits for open tools to finish) and the cancelled turn continues as the
+    // steer's prompt in the same session, the way Codex `turn/steer` behaves.
+    let mut preempt_pending = false;
+    let mut preempt_sent = false;
+    // The prompt (`prompt_seq`) that last showed progress (text, thought,
+    // tool or plan). Pi and Devin keep a prompt cancelled before that in
+    // their history; Grok drops it, so its preempt re-sends the text.
+    let mut progress_seq: u64 = 0;
     let mut interrupted = false;
     let mut interrupt_sent = false;
     let mut done_current = false;
@@ -3345,6 +3938,18 @@ async fn run_session(session: Session) {
     let mut exit_drain_deadline = None;
     'main: loop {
         tokio::select! {
+            _ = sign_in_prompted.cancelled() => {
+                if !interrupted && !done_current {
+                    done_current = true;
+                    let _ = send(&event_tx, AgentEvent::Done {
+                        status: DoneStatus::Errored,
+                        result: None,
+                        error: Some(not_signed_in(agent_name)),
+                        session_id: Some(session_id.clone()),
+                    }).await;
+                }
+                break 'main;
+            },
             status = child.wait(), if child_exit.is_none() => {
                 escalation_deadline = None;
                 child_exit = Some(status.ok());
@@ -3475,45 +4080,65 @@ async fn run_session(session: Session) {
                 {
                     break 'main;
                 }
-                let (status, mut error) = stop_outcome(&res, interrupted);
-                if !interrupted && auth_method.is_some() && res.as_ref().is_err_and(is_auth_required) {
-                    error = Some(not_signed_in(agent_name));
-                }
-                done_current = true;
-                if interrupted {
-                    done_after_interrupt = true;
-                }
-                if !send(
-                    &event_tx,
-                    AgentEvent::Done {
-                        status,
-                        result: None,
-                        error,
-                        session_id: Some(session_id.clone()),
-                    },
-                )
-                .await
-                {
-                    break 'main;
-                }
-                if interrupted || res.is_err() {
-                    break 'main;
-                }
-                // Persistent session: a queued steer becomes the next turn;
-                // otherwise stay alive for the mailbox — the caller owns
-                // teardown (mirrors the codex harness).
-                if let Some(text) = queued_steers.pop_front() {
-                    let (prev, next) = rotate(&mut assistant_message_id);
+                // A steer preempted this turn: the session lives on and the
+                // steers continue it below, so there is no turn end to report.
+                let preempted = std::mem::take(&mut preempt_sent)
+                    && !interrupted
+                    && res.is_ok()
+                    && !queued_steers.is_empty();
+                preempt_pending = false;
+                if !preempted {
+                    let (status, mut error) = stop_outcome(&res, interrupted);
+                    if !interrupted
+                        && auth_method.is_some()
+                        && res.as_ref().is_err_and(is_auth_required)
+                    {
+                        error = Some(not_signed_in(agent_name));
+                    }
+                    done_current = true;
+                    if interrupted {
+                        done_after_interrupt = true;
+                    }
                     if !send(
                         &event_tx,
-                        AgentEvent::Steered {
-                            assistant_message_id: Some(prev),
-                            next_assistant_message_id: Some(next),
+                        AgentEvent::Done {
+                            status,
+                            result: None,
+                            error,
+                            session_id: Some(session_id.clone()),
                         },
                     )
                     .await
                     {
                         break 'main;
+                    }
+                    if interrupted || res.is_err() {
+                        break 'main;
+                    }
+                }
+                // Persistent session: queued steers become the next prompt —
+                // all of them at once, each confirmed by its own Steered
+                // boundary; otherwise stay alive for the mailbox — the caller
+                // owns teardown (mirrors the codex harness).
+                if !queued_steers.is_empty() {
+                    let mut texts = Vec::with_capacity(queued_steers.len() + 1);
+                    if preempted && resend_unstarted && progress_seq != prompt_seq {
+                        texts.push(std::mem::take(&mut current_prompt_text));
+                    }
+                    while let Some(text) = queued_steers.pop_front() {
+                        let (prev, next) = rotate(&mut assistant_message_id);
+                        if !send(
+                            &event_tx,
+                            AgentEvent::Steered {
+                                assistant_message_id: Some(prev),
+                                next_assistant_message_id: Some(next),
+                            },
+                        )
+                        .await
+                        {
+                            break 'main;
+                        }
+                        texts.push(text);
                     }
                     done_current = false;
                     open_tools.clear();
@@ -3523,10 +4148,11 @@ async fn run_session(session: Session) {
                         prompt_complete_extension.then(|| format!("zeron-p{prompt_seq}"));
                     prompt_stall_deadline =
                         prompt_stall.map(|d| tokio::time::Instant::now() + d);
+                    current_prompt_text = texts.join("\n\n");
                     turn = Some(prompt_turn(
                         client.clone(),
                         session_id.clone(),
-                        text,
+                        current_prompt_text.clone(),
                         current_prompt_id.clone(),
                     ));
                 } else if !steering_open {
@@ -3560,6 +4186,20 @@ async fn run_session(session: Session) {
                         );
                     if !boilerplate {
                         prompt_stall_deadline = None;
+                    }
+                    if method == "session/update" {
+                        match params
+                            .get("update")
+                            .and_then(|u| u.get("sessionUpdate"))
+                            .and_then(Value::as_str)
+                        {
+                            Some("agent_message_chunk")
+                            | Some("agent_thought_chunk")
+                            | Some("tool_call")
+                            | Some("tool_call_update")
+                            | Some("plan") => progress_seq = prompt_seq,
+                            _ => {}
+                        }
                     }
                     // `_x.ai/session/prompt_complete` — the AUTHORITATIVE
                     // turn end for agents advertising it (grok): the
@@ -3611,6 +4251,16 @@ async fn run_session(session: Session) {
                         if !send(&event_tx, ev).await {
                             break 'main;
                         }
+                    }
+                    // A waiting steer preempts once no tool is open and the
+                    // agent is generating again.
+                    if preempt_pending
+                        && !preempt_sent
+                        && turn.is_some()
+                        && open_tools.is_empty()
+                    {
+                        client.notify("session/cancel", Some(json!({ "sessionId": session_id })));
+                        preempt_sent = true;
                     }
                 }
                 Some(Incoming::Request { id, method, params }) => {
@@ -3809,6 +4459,7 @@ async fn run_session(session: Session) {
                         prompt_complete_extension.then(|| format!("zeron-p{prompt_seq}"));
                     prompt_stall_deadline =
                         prompt_stall.map(|d| tokio::time::Instant::now() + d);
+                    current_prompt_text = text.clone();
                     turn = Some(prompt_turn(
                         client.clone(),
                         session_id.clone(),
@@ -3858,6 +4509,7 @@ async fn run_session(session: Session) {
                         prompt_complete_extension.then(|| format!("zeron-p{prompt_seq}"));
                     prompt_stall_deadline =
                         prompt_stall.map(|d| tokio::time::Instant::now() + d);
+                    current_prompt_text = text.clone();
                     turn = Some(prompt_turn(
                         client.clone(),
                         session_id.clone(),
@@ -3930,6 +4582,7 @@ async fn run_session(session: Session) {
                         prompt_complete_extension.then(|| format!("zeron-p{prompt_seq}"));
                     prompt_stall_deadline =
                         prompt_stall.map(|d| tokio::time::Instant::now() + d);
+                    current_prompt_text = text.clone();
                     turn = Some(prompt_turn(
                         client.clone(),
                         session_id.clone(),
@@ -3993,6 +4646,7 @@ async fn run_session(session: Session) {
                         prompt_complete_extension.then(|| format!("zeron-p{prompt_seq}"));
                     prompt_stall_deadline =
                         prompt_stall.map(|d| tokio::time::Instant::now() + d);
+                    current_prompt_text = text.clone();
                     turn = Some(prompt_turn(
                         client.clone(),
                         session_id.clone(),
@@ -4011,8 +4665,20 @@ async fn run_session(session: Session) {
                             steering_call = Some((text, fut));
                         }
                     } else {
-                        // No extension (Grok today): turn-boundary delivery.
+                        // No extension: preempt the generation and continue
+                        // the turn with this steer (see `preempt_pending`).
                         queued_steers.push_back(text);
+                        preempt_pending = preempt_steers;
+                        if preempt_pending
+                            && !preempt_sent
+                            && open_tools.is_empty()
+                        {
+                            client.notify(
+                                "session/cancel",
+                                Some(json!({ "sessionId": session_id })),
+                            );
+                            preempt_sent = true;
+                        }
                     }
                 }
                 None => {
@@ -4156,11 +4822,79 @@ mod tests {
     use super::*;
 
     #[test]
-    fn pi_discovery_allows_cold_extension_startup() {
-        let pi = AcpHarness::pi();
-        assert_eq!(pi.model_discovery_timeout, Duration::from_secs(60));
-        assert_eq!(pi.handshake_timeout, Duration::from_secs(120));
-        assert!(pi.spec.prompt_stall.is_none());
+    fn unix_browser_suppression_falls_back_to_zerons_noop_mode() {
+        let present = std::env::current_exe().unwrap();
+        assert_eq!(
+            unix_noop_browser(&[Path::new("/missing/true"), &present], None).unwrap(),
+            format!("{} %s", present.display())
+        );
+        let missing = [
+            Path::new("/missing/usr/bin/true"),
+            Path::new("/missing/bin/true"),
+        ];
+        assert_eq!(
+            unix_noop_browser(&missing, Some(Path::new("/opt/My Apps/zeron"))).unwrap(),
+            "'/opt/My Apps/zeron' --noop-browser %s"
+        );
+        for path in ["/opt/a:b/zeron", "/opt/it's/zeron", "/opt/100%s/zeron"] {
+            assert!(
+                unix_noop_browser(&missing, Some(Path::new(path))).is_err(),
+                "{path}"
+            );
+        }
+        assert!(unix_noop_browser(&missing, None).is_err());
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn signed_release_must_report_the_registry_version() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = tempfile::tempdir().unwrap();
+        let server = dir.path().join("agy_acp_server.par");
+        std::fs::write(
+            &server,
+            "#!/bin/sh\necho 'Built from changelist 1 based on //depot/branches/agy_acp_server_release_branch/973763860.1'\necho 'Build label: 1.2.0'\n",
+        )
+        .unwrap();
+        std::fs::set_permissions(&server, std::fs::Permissions::from_mode(0o755)).unwrap();
+        confirm_reported_version(&server, "1.2.0").await.unwrap();
+        let error = confirm_reported_version(&server, "9.9.9")
+            .await
+            .unwrap_err();
+        assert!(error.to_string().contains("contains 1.2.0"), "{error}");
+
+        std::fs::write(&server, "#!/bin/sh\necho 'agy 9.9.9'\n").unwrap();
+        let error = confirm_reported_version(&server, "9.9.9")
+            .await
+            .unwrap_err();
+        assert!(error.to_string().contains("no build label"), "{error}");
+    }
+
+    #[test]
+    fn antigravity_build_version_reads_the_label_not_the_branch() {
+        let legacy = "Built from changelist 975248206 based on //depot/branches/agy_acp_server_release_branch/973763860.1/google3\nBuild label: agy_acp_server_1.1.1";
+        assert_eq!(antigravity_build_version(legacy).as_deref(), Some("1.1.1"));
+        assert_eq!(
+            antigravity_build_version("Build label: 1.2.1\nBuild platform: darwin_arm64")
+                .as_deref(),
+            Some("1.2.1")
+        );
+        assert_eq!(antigravity_build_version("Build label: nightly"), None);
+        assert_eq!(antigravity_build_version("Built on Sep 2"), None);
+    }
+
+    #[test]
+    fn windows_browser_suppression_quotes_the_executable_path() {
+        let command = windows_noop_browser(Path::new(r"C:\Program Files\Zeron\zeron.exe"))
+            .expect("browser command");
+        assert_eq!(
+            command,
+            r#""C:\\Program Files\\Zeron\\zeron.exe" --noop-browser %s"#
+        );
+        for path in [r"C:\semi;colon\zeron.exe", r"C:\percent%s\zeron.exe"] {
+            assert!(windows_noop_browser(Path::new(path)).is_err());
+        }
     }
 
     #[test]
@@ -4432,6 +5166,205 @@ mod tests {
             sign_in_url("Open http://127.0.0.1:8080/callback"),
             Some("http://127.0.0.1:8080/callback".into())
         );
+    }
+
+    /// runs in a child process, since installs resolve through the
+    /// process-wide `ZERON_ADAPTERS_DIR`.
+    #[cfg(any(unix, windows))]
+    #[test]
+    fn antigravity_launches_the_newest_trusted_install_and_prunes_the_rest() {
+        let Ok(adapters) = std::env::var("ZERON_TEST_AGY_ADAPTERS") else {
+            let root = tempfile::tempdir().unwrap();
+            let output = std::process::Command::new(std::env::current_exe().unwrap())
+                .args([
+                    "--exact",
+                    "acp::tests::antigravity_launches_the_newest_trusted_install_and_prunes_the_rest",
+                    "--nocapture",
+                ])
+                .env("ZERON_ADAPTERS_DIR", root.path())
+                .env("ZERON_TEST_AGY_ADAPTERS", root.path())
+                .env("PATH", root.path().join("bin"))
+                .env("ZERON_NO_LOGIN_SHELL", "1")
+                .env_remove("ANTIGRAVITY_ACP_EXECUTABLE")
+                .output()
+                .unwrap();
+            assert!(
+                output.status.success(),
+                "{}{}",
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
+            return;
+        };
+        let (Some(current), Some(legacy)) = (antigravity_archive(), antigravity_legacy_archive())
+        else {
+            return;
+        };
+        let root = PathBuf::from(adapters).join(ANTIGRAVITY_ARCHIVE_NAME);
+        let install = |version: &str, marker: &str| {
+            let dir = root.join(version);
+            std::fs::create_dir_all(&dir).unwrap();
+            std::fs::write(dir.join(crate::adapter_install::OK_MARKER), marker).unwrap();
+            let server = dir.join(antigravity_entry());
+            std::fs::write(&server, "").unwrap();
+            server
+        };
+        let harness = AcpHarness::antigravity();
+        assert!(!harness.installed());
+
+        let legacy_server = install(legacy.version, legacy.sha512);
+        assert!(harness.installed());
+        assert_eq!(harness.executable_path(), Some(legacy_server.clone()));
+        assert!(is_managed_antigravity_server(&legacy_server));
+
+        let current_server = install(current.version, current.sha512);
+        install("9.0.0", "tampered");
+        install("not-a-version", ANTIGRAVITY_SIGNED_MARKER);
+        assert_eq!(harness.executable_path(), Some(current_server.clone()));
+        assert!(!is_managed_antigravity_server(&legacy_server));
+
+        let signed_server = install("99.0.0", ANTIGRAVITY_SIGNED_MARKER);
+        let newest = if crate::code_signature::SUPPORTED {
+            signed_server
+        } else {
+            current_server.clone()
+        };
+        assert_eq!(harness.executable_path(), Some(newest.clone()));
+        assert!(is_managed_antigravity_server(&newest));
+
+        #[cfg(unix)]
+        let mut running = {
+            let mut command = std::process::Command::new("/bin/sh");
+            command
+                .args(["-c", "while :; do /bin/sleep 0.1; done"])
+                .arg(&legacy_server);
+            command
+        };
+        #[cfg(windows)]
+        let mut running = {
+            let system = std::env::var_os("SystemRoot").unwrap();
+            std::fs::copy(
+                Path::new(&system).join("System32").join("PING.EXE"),
+                &legacy_server,
+            )
+            .unwrap();
+            let mut command = std::process::Command::new(&legacy_server);
+            command.args(["-n", "60", "127.0.0.1"]);
+            command
+        };
+        let mut running = running
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn()
+            .unwrap();
+        prune_superseded_antigravity_installs();
+        assert!(legacy_server.is_file(), "a running server is kept");
+        assert_eq!(current_server.is_file(), newest == current_server);
+        assert!(newest.is_file());
+        assert!(
+            root.join("9.0.0").is_dir(),
+            "untrusted installs are left alone"
+        );
+        assert!(root.join("not-a-version").is_dir());
+
+        running.kill().unwrap();
+        running.wait().unwrap();
+        // windows can hold an exited image's mapping for a moment
+        for _ in 0..50 {
+            prune_superseded_antigravity_installs();
+            if !legacy_server.exists() {
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(100));
+        }
+        assert!(!legacy_server.exists());
+        assert_eq!(harness.executable_path(), Some(newest));
+        let leftovers: Vec<_> = std::fs::read_dir(root.parent().unwrap())
+            .unwrap()
+            .flatten()
+            .filter(|entry| entry.file_name().to_string_lossy().starts_with(".trash-"))
+            .collect();
+        assert!(leftovers.is_empty(), "{leftovers:?}");
+    }
+
+    /// downloads google's real archive (~110 MB). run with
+    /// `ZERON_TEST_AGY_LIVE_SIGNED=1 ZERON_ADAPTERS_DIR=<empty dir>`.
+    #[tokio::test]
+    async fn antigravity_live_release_is_refused_when_it_misreports_its_version() {
+        if std::env::var_os("ZERON_TEST_AGY_LIVE_SIGNED").is_none() {
+            return;
+        }
+        let pin = antigravity_archive().unwrap();
+        // google's signed archive, listed under a version it does not contain
+        let release = AntigravityRelease {
+            version: "9.9.9".into(),
+            archive_url: Some(pin.url.to_owned()),
+        };
+        assert!(release.installable());
+        let error = install_antigravity_release(&release).await.unwrap_err();
+        assert!(
+            error
+                .to_string()
+                .contains(&format!("contains {}", pin.version)),
+            "{error}"
+        );
+        assert!(trusted_antigravity_installs().is_empty());
+        let adapters = crate::adapter_install::adapters_root().unwrap();
+        assert!(
+            !adapters
+                .join(ANTIGRAVITY_ARCHIVE_NAME)
+                .join("9.9.9")
+                .exists()
+        );
+    }
+
+    #[test]
+    fn antigravity_registry_release_accepts_only_google_hosted_archives() {
+        let Some(platform) = antigravity_registry_platform() else {
+            return;
+        };
+        let manifest = |version: &str, archive: &str, cmd: &str| {
+            json!({
+                "id": "antigravity-acp",
+                "version": version,
+                "distribution": {"binary": {platform: {"archive": archive, "cmd": cmd}}}
+            })
+        };
+        let url = "https://dl.google.com/agy-extensions/releases/x/agy-acp-server-1.3.0.zip";
+        let cmd = format!("./{}", antigravity_entry());
+        let release = antigravity_release(&manifest("1.3.0", url, &cmd)).unwrap();
+        assert_eq!(release.version, "1.3.0");
+        assert_eq!(release.archive_url.as_deref(), Some(url));
+        assert_eq!(release.installable(), crate::code_signature::SUPPORTED);
+
+        for rejected in [
+            "http://dl.google.com/agy-extensions/releases/x.zip",
+            "https://dl.google.com.evil.test/agy-extensions/releases/x.zip",
+            "https://dl.google.com:8443/agy-extensions/releases/x.zip",
+            "https://user@dl.google.com/agy-extensions/releases/x.zip",
+            "https://dl.google.com/other/x.zip",
+            "https://example.com/agy-extensions/releases/x.zip",
+        ] {
+            let release = antigravity_release(&manifest("1.3.0", rejected, &cmd)).unwrap();
+            assert_eq!(release.archive_url, None, "{rejected}");
+            assert!(!release.installable(), "{rejected}");
+        }
+        let renamed = antigravity_release(&manifest("1.3.0", url, "./other_server")).unwrap();
+        assert_eq!(renamed.archive_url, None);
+
+        assert!(antigravity_release(&manifest("latest", url, &cmd)).is_none());
+        assert!(antigravity_release(&manifest("../1.3.0", url, &cmd)).is_none());
+        assert!(antigravity_release(&json!({"id": "other", "version": "1.3.0"})).is_none());
+
+        if let Some(pin) = antigravity_archive() {
+            let pinned =
+                antigravity_release(&json!({"id": "antigravity-acp", "version": pin.version}))
+                    .unwrap();
+            assert!(
+                pinned.installable(),
+                "the pinned digest needs no registry archive"
+            );
+        }
     }
 
     #[test]
@@ -4910,7 +5843,7 @@ mod tests {
         );
     }
 
-    /// the pinned 1.1.1 server fetches a signed-in account's flash list
+    /// the pinned server fetches a signed-in account's flash list
     /// dynamically, so a newer flagship than the static catalog knows about can
     /// arrive on the wire; it has to reach the picker on its own merits rather
     /// than be filtered down to the ids we happen to have curated.
@@ -4973,7 +5906,7 @@ mod tests {
     }
 
     /// the offline list is what an unreachable or signed-out server falls back
-    /// to, so it stays at what the pinned 1.1.1 archive itself bundles. a newer
+    /// to, so it stays at what the pinned archive itself bundles. a newer
     /// flash belongs here only once that pin advertises it.
     #[test]
     fn antigravity_static_fallback_stays_on_the_pinned_servers_models() {
@@ -5138,4 +6071,32 @@ fn explicit_program_launches_do_not_get_archive_scratch_roots() {
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/fake-antigravity-acp.sh"),
     );
     assert!(harness.adapter_scratch().unwrap().is_none());
+}
+
+#[cfg(test)]
+mod mcp_injection_tests {
+    use super::*;
+
+    #[test]
+    fn acp_mcp_servers_spell_env_as_name_value_pairs_and_default_empty() {
+        assert!(acp_mcp_servers(None).is_empty());
+        let mcp = zeron_proto::McpServer {
+            name: "zeron".into(),
+            command: "/opt/zeron/zeron".into(),
+            args: vec!["mcp".into()],
+            env: [("ZERON_IPC_PORT".to_owned(), "27654".to_owned())]
+                .into_iter()
+                .collect(),
+        };
+        let servers = acp_mcp_servers(Some(&mcp));
+        assert_eq!(
+            servers,
+            vec![json!({
+                "name": "zeron",
+                "command": "/opt/zeron/zeron",
+                "args": ["mcp"],
+                "env": [{ "name": "ZERON_IPC_PORT", "value": "27654" }],
+            })]
+        );
+    }
 }

@@ -26,6 +26,10 @@ has "$line" '"method":"initialized"' || exit 1
 
 # ---- thread start / resume -------------------------------------------------
 read -r line || exit 1
+if has "$line" '"method":"account/read"'; then
+  emit "{\"id\":$(rid "$line"),\"result\":{\"account\":null,\"requiresOpenaiAuth\":false}}"
+  read -r line || exit 1
+fi
 if has "$line" '"method":"config/read"'; then
   emit "{\"id\":$(rid "$line"),\"result\":{\"config\":{\"mcp_servers\":{\"test\":{\"enabled\":true}}}}}"
   read -r line || exit 1
@@ -139,6 +143,16 @@ case "$turnline" in
   emit '{"method":"turn/completed","params":{"turn":{"id":"t-2","status":"completed"}}}'
   ;;
 
+
+*scenario:lease-shutdown*)
+  # Keep the child alive until the harness escalates and reaps it. The update
+  # writer must not acquire its gate just because the host drops the stream.
+  trap '' TERM
+  printf '%s\n' "$$" > lease-child.pid
+  emit "{\"id\":$tid,\"result\":{\"turn\":{\"id\":\"t-1\"}}}"
+  emit '{"method":"turn/completed","params":{"threadId":"th-1","turn":{"id":"t-1","status":"completed"}}}'
+  exec sleep 30
+  ;;
 
 *scenario:image-*)
   emit "{\"id\":$tid,\"result\":{\"turn\":{\"id\":\"t-1\"}}}"

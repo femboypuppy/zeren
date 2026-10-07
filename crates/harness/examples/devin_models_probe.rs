@@ -27,6 +27,8 @@ async fn main() -> anyhow::Result<()> {
     };
     let (_steering, steering) = tokio::sync::mpsc::channel(8);
     let controls = RunControls {
+        realtime: None,
+        execution_lease: None,
         request_input: Box::new(|_| {
             let (tx, rx) = tokio::sync::oneshot::channel();
             let _ = tx.send(Vec::new());
@@ -36,6 +38,7 @@ async fn main() -> anyhow::Result<()> {
         interrupt: CancellationToken::new(),
     };
     let request = RunRequest {
+        mcp: None,
         prompt: "Reply with exactly: Devin model discovery verified. Do not use tools.".into(),
         harness: None,
         model: Some(model.clone()),

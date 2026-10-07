@@ -33,15 +33,16 @@ use std::sync::{Arc, Weak};
 use std::time::{Duration, Instant};
 
 use gpui::{
-    AnyElement, BorderStyle, Bounds, ClipboardItem, ContentMask, Context, Entity, ListAlignment,
-    ListOffset, ListScrollEvent, ListState, MouseButton, MouseMoveEvent, MouseUpEvent, ObjectFit,
-    PathBuilder, Pixels, Point, SharedString, StyledImage as _, StyledText, Subscription, Task,
-    TextAlign, TextRun, Window, canvas, div, img, list, point, prelude::*, px, quad, size,
+    AnyElement, Bounds, ClipboardItem, ContentMask, Context, Entity, ListAlignment, ListOffset,
+    ListScrollEvent, ListState, MouseButton, MouseMoveEvent, MouseUpEvent, ObjectFit, PathBuilder,
+    Pixels, Point, SharedString, StyledImage as _, StyledText, Subscription, Task, TextAlign,
+    TextRun, Window, canvas, div, img, list, point, prelude::*, px, size,
 };
 
 use zeron_doc::{MessagePart, MessageRole, MessageStatus, SessionMessageEntry, SubagentStatus};
 use zeron_proto::ToolCall;
 
+use crate::markdown::mermaid_cache::{self, MermaidCache};
 use crate::markdown::parser::{
     Block, BlockTree, IncrementalParser, InlineRun, InlineStyle, parse_full,
 };
@@ -889,7 +890,14 @@ pub fn call_block(call: &ToolCall) -> Option<ToolDetail> {
         ToolCall::WebSearch { query } => query.clone(),
         ToolCall::Todo { items } => items
             .iter()
-            .map(|i| format!("{} {}", if i.done { "[x]" } else { "[ ]" }, i.text))
+            .map(|i| {
+                let mark = match i.status() {
+                    zeron_proto::TodoStatus::Completed => "[x]",
+                    zeron_proto::TodoStatus::InProgress => "[~]",
+                    zeron_proto::TodoStatus::Pending => "[ ]",
+                };
+                format!("{mark} {}", i.text)
+            })
             .collect::<Vec<_>>()
             .join("\n"),
         ToolCall::Mcp {
@@ -1055,6 +1063,12 @@ pub enum RowKind {
     },
     ErrorChip {
         message: SharedString,
+    },
+    /// The fork seam: a labeled divider between copied history and the
+    /// chat's own turns.
+    ForkMarker {
+        source_chat_id: SharedString,
+        source_title: SharedString,
     },
 }
 
@@ -1309,10 +1323,34 @@ pub fn rows_for_entry(
         // Lifted before the mention projection, so a comment body's own
         // Markdown never lands in the bubble.
         let (body, badges) = crate::badges::split(&parsed.text);
-        let (text, mentions) = match crate::composer::sent_mention_display(&body) {
+        let body = agent_message_display(&body);
+        // Chips stand in for their attachments: those leave the strip, and a
+        // chip carries its upload's path for its progress and, for an image,
+        // a click opening it.
+        let chips = zeron_proto::attachment_mentions::attachment_mentions(&body);
+        let mut attachments = parsed.attachments;
+        let (text, mut mentions) = match crate::composer::sent_mention_display(&body) {
             Some((display, spans)) => (display, spans),
             None => (body, Vec::new()),
         };
+        for span in &mut mentions {
+            let Some(chip) = chips
+                .iter()
+                .find(|chip| Some(chip.index) == span.attachment)
+            else {
+                continue;
+            };
+            span.upload = attachments
+                .iter()
+                .find(|att| crate::attachments::chip_names_attachment(chip, &att.path))
+                .map(|att| att.path.clone().into());
+        }
+        attachments.retain(|att| {
+            att.appshot.is_some()
+                || !chips
+                    .iter()
+                    .any(|chip| crate::attachments::chip_names_attachment(chip, &att.path))
+        });
         let copy_text = (!text.trim().is_empty()).then(|| SharedString::from(text.clone()));
         return vec![Row {
             id: entry.id.clone().into(),
@@ -1321,7 +1359,7 @@ pub fn rows_for_entry(
             kind: RowKind::User {
                 text: text.into(),
                 mentions: Arc::new(mentions),
-                attachments: Arc::new(parsed.attachments),
+                attachments: Arc::new(attachments),
                 badges: Arc::new(badges),
                 pending,
             },
@@ -1618,6 +1656,25 @@ pub fn rows_for_entry(
                             compact_fold: None,
                         });
                     }
+                    MessagePart::Fork {
+                        id: part_id,
+                        source_chat_id,
+                        source_title,
+                    } => {
+                        rows.push(Row {
+                            id: format!("{}#{}", entry.id, part_id).into(),
+                            version: fnv1a(source_title.as_bytes()),
+                            turn_start: false,
+                            kind: RowKind::ForkMarker {
+                                source_chat_id: source_chat_id.clone().into(),
+                                source_title: single_line(source_title).into(),
+                            },
+                            entry_id: entry_id.clone(),
+                            timestamp: None,
+                            copy_text: None,
+                            compact_fold: None,
+                        });
+                    }
                     // Tools and thoughts are grouped by the outer arms;
                     // nothing reaches here.
                     MessagePart::Tool { .. } | MessagePart::Reasoning { .. } => {}
@@ -1700,7 +1757,10 @@ pub fn rows_for_entry(
     // (chat-view.tsx: "No timestamp hover mid-stream"). The version bit keeps
     // the diff key honest for last-row kinds whose own version wouldn't
     // change when streaming flips off (chips).
-    if !streaming && let Some(last) = rows.last_mut() {
+    if !streaming
+        && let Some(last) = rows.last_mut()
+        && !matches!(last.kind, RowKind::ForkMarker { .. })
+    {
         last.timestamp = Some(entry.created_at);
         last.copy_text = assistant_copy_text(entry);
         last.version ^= 1 << 62;
@@ -3115,6 +3175,17 @@ pub struct Transcript {
     /// boundary invalidates only the live tail per commit.
     render_cache: Rc<RefCell<RenderCache>>,
     workspace_link: Option<render::LinkUi>,
+    /// File-link roots per linking chat, valid for one
+    /// `AppState::link_roots_revision`: every rendered row asks for them.
+    file_link_roots: (
+        u64,
+        HashMap<SharedString, Rc<Vec<crate::workspace_links::FileLinkRoot>>>,
+    ),
+    /// Inline code spans that name an existing file, rewritten into the
+    /// Markdown links they stand for per text part (see
+    /// [`crate::markdown::inline_code_links`]). Reset with the same
+    /// link-roots revision that resets `file_link_roots`.
+    inline_code_links: crate::markdown::inline_code_links::InlineCodeLinkCache,
     rendered_rows: HashSet<SharedString>,
     /// Last UI typography generation reflected in `list` item measurements.
     /// Family and size changes can alter prose wrapping without changing row
@@ -3213,6 +3284,17 @@ pub struct Transcript {
     /// Focused while the lightbox is open so Escape reaches it.
     attachment_preview_focus: gpui::FocusHandle,
     attachment_preview_return_focus: Option<gpui::FocusHandle>,
+    /// Mermaid fences drawn as diagrams in settled Markdown blocks. Each
+    /// row's media handler requests its fences while laying out, so only
+    /// painted diagrams are rendered (see [`MermaidCache`]).
+    diagrams: Rc<RefCell<MermaidCache>>,
+    /// The media handler over `diagrams`, built once and shared by every row.
+    diagram_media: Option<render::MediaUi>,
+    /// The single serialized diagram render loop, while requests remain.
+    diagram_worker: Option<Task<()>>,
+    /// Prepared diagram shown in the lightbox: its natural size frames the
+    /// enlarged raster, which is released when the lightbox closes.
+    diagram_zoom: Option<crate::image_media::MediaImage>,
     /// In-flight ReadAttachmentChunk loads, keyed by device, path and validation
     /// policy; results land in the global attachment cache.
     attachment_loads: HashMap<crate::attachments::AttachmentKey, Task<()>>,
@@ -3266,13 +3348,77 @@ impl Transcript {
         self.workspace_link = Some(handler);
     }
 
-    pub(crate) fn link_ui(&self) -> Option<render::LinkUi> {
+    pub(crate) fn link_ui(&mut self, cx: &mut Context<Self>) -> Option<render::LinkUi> {
+        let source = self
+            .workspace_link
+            .as_ref()
+            .and_then(|link| link.source_session.clone())
+            .or_else(|| self.chat_id.clone())?;
+        self.link_ui_for(&SharedString::from(source), cx)
+    }
+
+    /// The workspace-link handler bound to `source_chat_id`: the linking
+    /// chat's own checkout resolves first, then its parent's and this
+    /// device's project roots, and the roots come along for the trailing
+    /// open glyph and the file menu.
+    fn link_ui_for(
+        &mut self,
+        source_chat_id: &SharedString,
+        cx: &mut Context<Self>,
+    ) -> Option<render::LinkUi> {
+        let roots = self.file_link_roots(source_chat_id, cx);
+        let source_local = self.state.read(cx).chat_is_local(source_chat_id);
         self.workspace_link.clone().map(|mut link| {
-            if link.source_session.is_none() {
-                link.source_session = self.chat_id.clone();
-            }
+            link.source_session = Some(source_chat_id.to_string());
+            link.source_local = source_local;
+            link.file_roots = Some(roots);
             link
         })
+    }
+
+    /// The ordered checkouts a file link from `chat_id` may open against:
+    /// the chat's own, its parent's, then this device's project roots. The
+    /// memo keeps row rendering from rebuilding them every frame; a state
+    /// change that can move a root clears it.
+    fn file_link_roots(
+        &mut self,
+        chat_id: &SharedString,
+        cx: &gpui::App,
+    ) -> Rc<Vec<crate::workspace_links::FileLinkRoot>> {
+        let state = self.state.read(cx);
+        let (revision, memo) = &mut self.file_link_roots;
+        if *revision != state.link_roots_revision {
+            *revision = state.link_roots_revision;
+            memo.clear();
+        }
+        memo.entry(chat_id.clone())
+            .or_insert_with(|| Rc::new(state.file_link_roots(chat_id)))
+            .clone()
+    }
+
+    /// The row's text with every inline code span that names an existing
+    /// file rewritten into the Markdown link it stands for (see
+    /// [`crate::markdown::inline_code_links`]). The walk is memoized per part
+    /// and link-roots revision; a revision change also drops the flatten
+    /// cache, whose entries were shaped with the previous roots' styling.
+    fn inline_code_tree(
+        &mut self,
+        tree: &Arc<BlockTree>,
+        ui: Option<&render::LinkUi>,
+        cx: &gpui::App,
+    ) -> Arc<BlockTree> {
+        let Some(ui) = ui else {
+            return tree.clone();
+        };
+        let Some(roots) = ui.file_roots.as_deref() else {
+            return tree.clone();
+        };
+        let revision = self.state.read(cx).link_roots_revision;
+        if self.inline_code_links.set_revision(revision) {
+            self.render_cache.borrow_mut().clear();
+        }
+        self.inline_code_links
+            .linked_tree(tree, roots, ui.source_local)
     }
 
     pub fn new(state: Entity<AppState>, cx: &mut Context<Self>) -> Self {
@@ -3327,6 +3473,11 @@ impl Transcript {
             .ok();
         });
         let observe = cx.observe(&state, |this: &mut Self, _, cx| this.sync(cx));
+        cx.on_release(|this: &mut Self, cx| {
+            this.close_diagram_zoom(cx);
+            crate::image_media::release_media(this.diagrams.borrow_mut().drain(), cx);
+        })
+        .detach();
         let text_changes = cx.subscribe(
             &state,
             |this: &mut Self, state, event: &crate::state::TranscriptTextChanged, cx| {
@@ -3386,6 +3537,8 @@ impl Transcript {
             veil_attach_pending: true,
             render_cache: Rc::new(RefCell::new(RenderCache::default())),
             workspace_link: None,
+            file_link_roots: Default::default(),
+            inline_code_links: Default::default(),
             rendered_rows: HashSet::new(),
             typography_generation: crate::typography::generation(cx),
             content_width: crate::settings::transcript_width(cx),
@@ -3425,6 +3578,10 @@ impl Transcript {
             attachment_preview: None,
             attachment_preview_focus: cx.focus_handle(),
             attachment_preview_return_focus: None,
+            diagrams: Rc::default(),
+            diagram_media: None,
+            diagram_worker: None,
+            diagram_zoom: None,
             attachment_loads: HashMap::new(),
             attachment_retries: HashMap::new(),
             blob_details: HashMap::new(),
@@ -4808,6 +4965,11 @@ impl Transcript {
             .collect();
         self.code_fences
             .retain(|key, _| active_code_fences.contains(key));
+        // Diagram source toggles follow the same stable row identity.
+        if self.diagrams.borrow().has_source_toggles() {
+            let row_ids: HashSet<&str> = new_rows.iter().map(|row| row.id.as_ref()).collect();
+            self.diagrams.borrow_mut().retain_rows(&row_ids);
+        }
 
         // Text already streamed before this (re)attach is the veil BASELINE:
         // its rows' veils seed instead of fading (render creates them from
@@ -5332,10 +5494,23 @@ impl Transcript {
         let mut keys = std::collections::HashSet::new();
         for row in &self.rows {
             // Generated images use bounded LRU retention, not history-wide protection.
-            if let RowKind::User { attachments, .. } = &row.kind {
-                for att in attachments.iter() {
+            if let RowKind::User {
+                attachments,
+                mentions,
+                ..
+            } = &row.kind
+            {
+                let chipped = mentions
+                    .iter()
+                    .filter(|span| span.kind == crate::composer::ChipKind::Image)
+                    .filter_map(|span| span.upload.as_ref().map(|path| path.to_string()));
+                for path in attachments
+                    .iter()
+                    .map(|att| att.path.clone())
+                    .chain(chipped)
+                {
                     for dev in &devices {
-                        keys.insert((dev.clone(), att.path.clone()));
+                        keys.insert((dev.clone(), path.clone()));
                     }
                 }
             }
@@ -5506,6 +5681,120 @@ impl Transcript {
         self.attachment_retries.insert(key, task);
     }
 
+    /// Open a sent image chip's upload full size, as its thumbnail did. An
+    /// image still loading opens on a later click.
+    fn open_chip_image(
+        &mut self,
+        path: &SharedString,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let device_ids = self.attachment_device_ids(cx);
+        if let crate::attachments::AttachmentSnapshot::Loaded(image) =
+            self.attachment_state(&device_ids, path, None, cx)
+        {
+            let preview = crate::attachments::PreviewImage::new(image.name, image.image.clone());
+            self.attachment_preview_return_focus = window.focused(cx);
+            preview.viewer.reset();
+            self.attachment_preview = Some(preview);
+            window.focus(&self.attachment_preview_focus, cx);
+            cx.notify();
+        }
+    }
+
+    /// Whether an attachment ref is still crossing to the chat's host, and
+    /// how far along it is. Two ref shapes mean "still crossing": the queued
+    /// flow's `pending://` (bytes ship engine-side after the send; the host
+    /// rewrites the ref to an absolute path once they land and the run
+    /// starts) and the legacy echo's synthetic `pending/`. Percent sources, in
+    /// order: this attachment's own relay transfer (`WatchTransfers`, by the
+    /// uploadId its ref names — the leg that actually takes time), else the
+    /// send-wide staging/legacy upload percent. Neither → no number, so a
+    /// ring never shows one that isn't a real transfer position (2026-08-20
+    /// report: the staging-only percent blinked out in ~100ms and lied about
+    /// the slow part).
+    fn upload_status(&self, path: &str, cx: &Context<Self>) -> (bool, Option<u8>) {
+        let sending = path.starts_with("pending://") || path.starts_with("pending/");
+        let upload_id = path
+            .strip_prefix("pending://")
+            .and_then(|rest| rest.split_once('/'))
+            .map(|(id, _)| id);
+        let percent = upload_id
+            .and_then(|id| self.state.read(cx).transfer_percent(id))
+            .or_else(|| {
+                sending
+                    .then(|| self.state.read(cx).upload_progress_percent())
+                    .flatten()
+            });
+        (sending, percent)
+    }
+
+    /// What a sent bubble's attachment chips show beyond their label: the
+    /// progress of an upload still crossing to the host in place of the icon
+    /// (the strip's thumbnails used to carry it), a warning for an image that
+    /// can't be read back, and a click target opening a loaded image.
+    fn chip_overlays(
+        &mut self,
+        row_id: &SharedString,
+        mentions: &[crate::composer::SentMentionSpan],
+        theme: &Theme,
+        cx: &mut Context<Self>,
+    ) -> Vec<ChipOverlay> {
+        use crate::attachments::AttachmentSnapshot;
+        if mentions.iter().all(|span| span.upload.is_none()) {
+            return Vec::new();
+        }
+        let device_ids = self.attachment_device_ids(cx);
+        let mut overlays = Vec::new();
+        for (ix, span) in mentions.iter().enumerate() {
+            let Some(upload) = &span.upload else {
+                continue;
+            };
+            let (sending, percent) = self.upload_status(upload, cx);
+            let mut status = sending.then(|| match percent {
+                Some(pct) => crate::loaders::upload_progress_arc(
+                    pct,
+                    CHIP_STATUS_SIZE,
+                    theme.text_muted.opacity(0.35),
+                    theme.text,
+                ),
+                None => crate::loaders::mini_glyph_spinner(
+                    format!("chip-sending-{row_id}-{ix}"),
+                    2.0,
+                    theme.glyph,
+                    cx.entity_id(),
+                    cx,
+                )
+                .into_any_element(),
+            });
+            let mut open = None;
+            if span.kind == crate::composer::ChipKind::Image {
+                // Loading here keeps the image ready for a click, as the
+                // strip's thumbnail did.
+                match self.attachment_state(&device_ids, upload, None, cx) {
+                    AttachmentSnapshot::Loaded(_) => open = Some(upload.clone()),
+                    AttachmentSnapshot::Error { .. } if !sending => {
+                        status = Some(
+                            crate::icons::icon(crate::icons::DANGER_TRIANGLE)
+                                .size(px(CHIP_STATUS_SIZE - 2.0))
+                                .text_color(theme.text_muted)
+                                .into_any_element(),
+                        );
+                    }
+                    _ => {}
+                }
+            }
+            if open.is_some() || status.is_some() {
+                overlays.push(ChipOverlay {
+                    range: span.range.clone(),
+                    open,
+                    status,
+                });
+            }
+        }
+        overlays
+    }
+
     /// The inside of a user bubble: the prompt text, clipped to
     /// [`USER_COLLAPSED_LINES`] until expanded, plus the expander chevron for
     /// prompts past the cap. Returns the bubble's children in order.
@@ -5526,6 +5815,7 @@ impl Transcript {
         window: &Window,
         cx: &mut Context<Self>,
     ) -> AnyElement {
+        let chip_overlays = self.chip_overlays(row_id, &mentions, theme, cx);
         let fold = self.user_folds.get(row_id).copied().unwrap_or_default();
         let expanded = fold.open.unwrap_or(false);
         let line_height =
@@ -5597,6 +5887,10 @@ impl Transcript {
                 theme,
                 measured_h.clone(),
                 cx.entity_id(),
+                chip_overlays,
+                Rc::new(cx.listener(|this, path: &SharedString, window, cx| {
+                    this.open_chip_image(path, window, cx);
+                })),
             ));
         // Height motion uses the same ease-out curve as sidebars, tool folds,
         // and pane transitions, with duration scaled to travel distance. The
@@ -5712,6 +6006,180 @@ impl Transcript {
             .into_any_element()
     }
 
+    /// Media wiring for settled Markdown: Mermaid fences become diagrams
+    /// once rendered and keep their source until then (or on failure).
+    /// Inline images keep their ordinary chat rendering.
+    fn diagram_media(&mut self, cx: &Context<Self>) -> render::MediaUi {
+        let cache = self.diagrams.clone();
+        let owner = cx.weak_entity();
+        let media = self.diagram_media.get_or_insert_with(|| render::MediaUi {
+            image: None,
+            diagram: Some(Rc::new(move |code, id, _theme| {
+                let lookup = cache.borrow_mut().request(code, &id);
+                match lookup {
+                    mermaid_cache::Lookup::Pending => render::DiagramView::Source,
+                    mermaid_cache::Lookup::Failed(reason) => render::DiagramView::Failed(reason),
+                    mermaid_cache::Lookup::Ready(media) => {
+                        let show_source = cache.borrow().source_visible(&id);
+                        let body = if show_source {
+                            gpui::Empty.into_any_element()
+                        } else {
+                            let open = owner.clone();
+                            let source = media.clone();
+                            crate::image_media::preview_element(
+                                &media,
+                                format!("{id}-image").into(),
+                                move |window, cx| {
+                                    let _ = open.update(cx, |this, cx| {
+                                        this.open_diagram_preview(source.clone(), window, cx)
+                                    });
+                                },
+                            )
+                        };
+                        let toggle = owner.clone();
+                        render::DiagramView::Diagram(render::DiagramUi {
+                            body,
+                            show_source,
+                            toggle_source: Rc::new(move |_, cx| {
+                                let _ = toggle.update(cx, |this, cx| {
+                                    this.diagrams.borrow_mut().toggle_source(&id);
+                                    let row = mermaid_cache::frame_row(&id).to_owned();
+                                    this.diagram_layout_changed(&[row.into()], cx);
+                                });
+                            }),
+                        })
+                    }
+                }
+            })),
+        });
+        media.clone()
+    }
+
+    /// Render requested diagrams one at a time off the UI thread. The loop
+    /// picks its next source between renders, so rows that scrolled away in
+    /// the meantime are skipped rather than queued.
+    fn ensure_diagram_worker(&mut self, cx: &mut Context<Self>) {
+        if self.diagram_worker.is_some() || !self.diagrams.borrow_mut().take_new_requests() {
+            return;
+        }
+        self.diagram_worker = Some(cx.spawn(async move |this, cx| {
+            loop {
+                let job = this.update(cx, |this, cx| {
+                    let job = this.diagrams.borrow_mut().next_job();
+                    if job.is_none() {
+                        this.diagram_worker = None;
+                    }
+                    job.map(|code| {
+                        (
+                            code,
+                            crate::markdown::mermaid::Palette::from_theme(Theme::of(cx)),
+                            crate::theme::style_generation(),
+                        )
+                    })
+                });
+                let Ok(Some((code, palette, style))) = job else {
+                    return;
+                };
+                let source = code.clone();
+                let result = cx
+                    .background_executor()
+                    .spawn(async move {
+                        let svg = crate::markdown::mermaid::render(&source, &palette)?;
+                        crate::image_media::decode_image("image/svg+xml", svg.into_bytes())
+                    })
+                    .await;
+                if this
+                    .update(cx, |this, cx| this.finish_diagram(code, style, result, cx))
+                    .is_err()
+                {
+                    return;
+                }
+            }
+        }));
+    }
+
+    fn finish_diagram(
+        &mut self,
+        code: String,
+        style: u32,
+        result: Result<crate::image_media::MediaImage, String>,
+        cx: &mut Context<Self>,
+    ) {
+        let Some((rows, released)) = self.diagrams.borrow_mut().finish(code, style, result) else {
+            return;
+        };
+        crate::image_media::release_media(released, cx);
+        self.diagram_layout_changed(&rows, cx);
+    }
+
+    /// A diagram replaced its source (or the reverse): remeasure the rows
+    /// painting it and let the bottom pin and the own-turn runway absorb the
+    /// height change, exactly like any other layout-affecting row update.
+    fn diagram_layout_changed(&mut self, rows: &[SharedString], cx: &mut Context<Self>) {
+        let mut changed = false;
+        for (ix, row) in self.rows.iter().enumerate() {
+            if rows.contains(&row.id) {
+                self.list.remeasure_items(ix..ix + 1);
+                changed = true;
+            }
+        }
+        if !changed {
+            return;
+        }
+        self.viewport_layout_revision = self.viewport_layout_revision.wrapping_add(1);
+        if self.pinned {
+            self.wake_spring();
+        }
+        if self.own_turn.is_some() {
+            self.own_turn_kick = true;
+        }
+        cx.notify();
+    }
+
+    /// Open a diagram in the shared lightbox, rasterized for the window
+    /// within the memory the retained diagrams leave available.
+    fn open_diagram_preview(
+        &mut self,
+        source: crate::image_media::MediaImage,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        self.close_diagram_zoom(cx);
+        let viewport = window.viewport_size();
+        let available = mermaid_cache::MAX_RETAINED_BYTES
+            .saturating_sub(self.diagrams.borrow().retained_bytes());
+        let enlarged = source.enlarged(
+            (
+                f32::from(viewport.width) * 0.9,
+                f32::from(viewport.height) * 0.85,
+            ),
+            window.scale_factor(),
+            available,
+            None,
+        );
+        self.attachment_preview_return_focus = window.focused(cx);
+        self.attachment_preview = Some(
+            crate::attachments::PreviewImage::new("Mermaid diagram", enlarged.image)
+                .with_plate(crate::markdown::mermaid::Palette::plate(Theme::of(cx))),
+        );
+        self.diagram_zoom = Some(source);
+        window.focus(&self.attachment_preview_focus, cx);
+        cx.notify();
+    }
+
+    /// Release a diagram lightbox's dedicated raster. The row's own preview
+    /// stays with the diagram cache.
+    fn close_diagram_zoom(&mut self, cx: &mut gpui::App) {
+        let Some(source) = self.diagram_zoom.take() else {
+            return;
+        };
+        if let Some(preview) = self.attachment_preview.take()
+            && !Arc::ptr_eq(&preview.image, &source.image)
+        {
+            cx.defer(move |cx| gpui::ImageSource::Image(preview.image).evict(None, cx));
+        }
+    }
+
     fn render_generated_image(
         &mut self,
         row_id: &SharedString,
@@ -5806,34 +6274,16 @@ impl Transcript {
             .pt(px(4.0))
             .pb(px(6.0));
         for (aix, att) in atts.iter().enumerate() {
+            if !crate::attachments::is_image_path(&att.path) {
+                strip = strip.child(user_file_pill(&att.name, Theme::of(cx)));
+                continue;
+            }
             let state = self.attachment_state(&device_ids, &att.path, None, cx);
             // The in-flight send's progress belongs ON the thumbnail
-            // (2026-08-18 user request). Two ref shapes mean "still
-            // crossing": the queued flow's `pending://` (bytes ship
-            // engine-side after the send; the host rewrites the ref to an
-            // absolute path once they land and the run starts) and the
-            // legacy echo's synthetic `pending/`. Percent sources, in order:
-            // this attachment's own relay transfer (`WatchTransfers`, by the
-            // uploadId its ref names — the leg that actually takes time),
-            // else the send-wide staging/legacy upload percent. Neither → the
-            // indeterminate spinner (staged-but-waiting, retry backoff, or
-            // committed-awaiting-rewrite), so the ring never shows a number
-            // that isn't a real transfer position (2026-08-20 report: the
-            // staging-only percent blinked out in ~100ms and lied about the
-            // slow part).
-            let sending = att.path.starts_with("pending://") || att.path.starts_with("pending/");
-            let upload_id = att
-                .path
-                .strip_prefix("pending://")
-                .and_then(|rest| rest.split_once('/'))
-                .map(|(id, _)| id);
-            let uploading = upload_id
-                .and_then(|id| self.state.read(cx).transfer_percent(id))
-                .or_else(|| {
-                    sending
-                        .then(|| self.state.read(cx).upload_progress_percent())
-                        .flatten()
-                });
+            // (2026-08-18 user request). No percent → the indeterminate
+            // spinner (staged-but-waiting, retry backoff, or
+            // committed-awaiting-rewrite); see `upload_status`.
+            let (sending, uploading) = self.upload_status(&att.path, cx);
             if let Some(appshot) = &att.appshot {
                 let has_image = matches!(&state, AttachmentSnapshot::Loaded(_));
                 let theme = Theme::of(cx).clone();
@@ -6120,7 +6570,10 @@ impl Transcript {
 
     fn render_working_trailer(&mut self, cx: &mut Context<Self>) -> Option<AnyElement> {
         let now = chrono::Utc::now();
-        let (sending, queued, elapsed_secs, seed) = if let Some(doc_id) = &self.doc_override {
+        // `turn` (the turn's start, ms) keys the rolling word and timer, so a
+        // new turn's labels appear fresh instead of rolling from the last
+        // turn's final values.
+        let (sending, queued, elapsed_secs, seed, turn) = if let Some(doc_id) = &self.doc_override {
             // A subagent doc has no Session row — `indicator_for` would read
             // the PARENT chat's live state into this tab. Liveness rides the
             // doc itself instead: the sink's assistant entry streams until
@@ -6138,7 +6591,7 @@ impl Transcript {
                 return None;
             }
             let elapsed = ((now.timestamp_millis() - last.created_at).max(0) / 1000) as i64;
-            (false, false, elapsed, flavour_seed(doc_id))
+            (false, false, elapsed, flavour_seed(doc_id), last.created_at)
         } else {
             let chat_id = self.chat_id.clone()?;
             // Failed-send state first: past the grace window the trailer IS
@@ -6161,7 +6614,7 @@ impl Transcript {
                         .into_any_element(),
                 );
             }
-            let (sending, queued, elapsed) = {
+            let (sending, queued, elapsed, turn) = {
                 let state = self.state.read(cx);
                 if state.indicator_for(&chat_id, now) != crate::state::Indicator::Working {
                     return None;
@@ -6173,8 +6626,8 @@ impl Transcript {
                 // with no timer instead; the word + timer start with the
                 // turn.
                 let turn_started = state.session_for(&chat_id).and_then(|s| s.started_at);
-                let sending =
-                    sending_bridge(state.pending_send_started(&chat_id, now), turn_started);
+                let send_started = state.pending_send_started(&chat_id, now);
+                let sending = sending_bridge(send_started, turn_started);
                 // Degraded delivery path: the send is a durable local write
                 // waiting on connectivity — say so instead of faking
                 // progress. (The overlay holds while degraded, so this line
@@ -6183,9 +6636,14 @@ impl Transcript {
                 let elapsed = turn_started
                     .map(|t| now.signed_duration_since(t).num_seconds().max(0))
                     .unwrap_or(0);
-                (sending, queued, elapsed)
+                // While sending, the session row still carries the PREVIOUS
+                // turn: the bridge keys on its own send instead, so it never
+                // rolls out of that turn's word or an earlier send's.
+                let turn = if sending { send_started } else { turn_started }
+                    .map_or(0, |t| t.timestamp_millis());
+                (sending, queued, elapsed, turn)
             };
-            (sending, queued, elapsed, flavour_seed(&chat_id))
+            (sending, queued, elapsed, flavour_seed(&chat_id), turn)
         };
         if self.compact_mode && !sending && !queued && elapsed_secs > 0 {
             let entry_id = if let Some(doc_id) = &self.doc_override {
@@ -6231,6 +6689,7 @@ impl Transcript {
                     cx,
                 ))
                 .child(
+                    // The flavour word rotates every 7s; roll it as it turns.
                     div()
                         .text_size(crate::typography::ui_rems(12.0))
                         .text_color(if queued {
@@ -6238,19 +6697,29 @@ impl Transcript {
                         } else {
                             theme.text_muted
                         })
-                        .child(SharedString::from(if queued {
-                            word.to_string()
-                        } else {
-                            format!("{word}…")
-                        })),
+                        .child(crate::roll_text::roll_text(
+                            format!("working-word-{}-{turn}", cx.entity_id()),
+                            SharedString::from(if queued {
+                                word.to_string()
+                            } else {
+                                format!("{word}…")
+                            }),
+                            cx.reduce_motion(),
+                        )),
                 )
                 .when(!sending, |el| {
+                    // The timer ticks every second; its digits roll in place
+                    // (the unit suffix holds).
                     el.child(
                         div()
                             .relative()
                             .top(px(1.0))
                             .text_color(theme.text_faint)
-                            .child(SharedString::from(format_elapsed(elapsed_secs))),
+                            .child(crate::roll_text::roll_text(
+                                format!("working-timer-{}-{turn}", cx.entity_id()),
+                                SharedString::from(format_elapsed(elapsed_secs)),
+                                cx.reduce_motion(),
+                            )),
                     )
                 })
                 .into_any_element(),
@@ -6376,23 +6845,25 @@ impl Transcript {
                 column.into_any_element()
             }
             RowKind::Markdown { tree, block_ix } => {
+                let link = self.link_ui(cx);
+                let tree = self.inline_code_tree(tree, link.as_ref(), cx);
                 let Some(top) = tree.blocks.get(*block_ix) else {
                     return gpui::Empty.into_any_element();
                 };
                 let code = self.code_uis_for(&row.id, &top.block, *block_ix, cx);
                 let opts = RenderOptions {
                     tasks: None,
-                    media: None,
+                    media: Some(self.diagram_media(cx)),
                     row_key: row.id.clone(),
                     veil: None,
                     cache: (!render_cache_disabled()).then(|| self.render_cache.clone()),
                     now: Instant::now(),
                     copy: Some(self.copy_ui_for(&row.id, cx)),
-                    link: self.link_ui(),
+                    link,
                     workspace_root: workspace_root.clone(),
                     code,
                 };
-                let highlight = self.code_highlight_for(&row.id, tree, Some(*block_ix), cx);
+                let highlight = self.code_highlight_for(&row.id, &tree, Some(*block_ix), cx);
                 render::render_block(
                     &top.block,
                     *block_ix,
@@ -6407,6 +6878,8 @@ impl Transcript {
                 )
             }
             RowKind::LiveMarkdown { tree, block_ix } => {
+                let link = self.link_ui(cx);
+                let tree = self.inline_code_tree(tree, link.as_ref(), cx);
                 let Some(top) = tree.blocks.get(*block_ix) else {
                     return gpui::Empty.into_any_element();
                 };
@@ -6416,9 +6889,18 @@ impl Transcript {
                 // Baseline rows (text already streamed when the transcript
                 // attached) start seeded: the existing reply must not fade in
                 // on a session switch — only fresh appends animate.
+                let reduced_motion = motion::reduced_motion(cx);
+                if reduced_motion {
+                    // Motion can resume mid-stream (background pause, or the OS
+                    // setting flipping back). Text painted meanwhile is already
+                    // on screen, so the next veil seeds it rather than
+                    // dissolving the reply in again.
+                    self.veils.remove(&row.id);
+                    self.veil_baseline.insert(row.id.clone());
+                }
                 let seed_history = !self.veils.contains_key(&row.id)
                     && self.historical_markdown.contains_key(&row.id);
-                let veil = (!motion::reduced_motion(cx)).then(|| {
+                let veil = (!reduced_motion).then(|| {
                     self.veils
                         .entry(row.id.clone())
                         .or_insert_with(|| {
@@ -6430,15 +6912,24 @@ impl Transcript {
                         })
                         .clone()
                 });
+                // A streaming fence may still be growing, so only blocks the
+                // reply has already moved past draw diagrams: a later row of
+                // the same entry proves this block is complete. The tail
+                // keeps its source until the next block or completion, and
+                // per-token commits never start a render.
+                let settled = self
+                    .rows
+                    .get(ix + 1)
+                    .is_some_and(|next| next.entry_id == row.entry_id);
                 let opts = RenderOptions {
                     tasks: None,
-                    media: None,
+                    media: settled.then(|| self.diagram_media(cx)),
                     row_key: row.id.clone(),
                     veil: veil.clone(),
                     cache: (!render_cache_disabled()).then(|| self.render_cache.clone()),
                     now: Instant::now(),
                     copy: Some(self.copy_ui_for(&row.id, cx)),
-                    link: self.link_ui(),
+                    link,
                     workspace_root: workspace_root.clone(),
                     code,
                 };
@@ -6452,6 +6943,8 @@ impl Transcript {
                         let seed_opts = RenderOptions {
                             cache: None,
                             link: None,
+                            // Seed fences as source text, never request diagrams.
+                            media: None,
                             ..opts.clone()
                         };
                         let _ = render::render_block(
@@ -6460,7 +6953,7 @@ impl Transcript {
                         veil.borrow_mut().finish_seeding();
                     }
                 }
-                let highlight = self.code_highlight_for(&row.id, tree, Some(*block_ix), cx);
+                let highlight = self.code_highlight_for(&row.id, &tree, Some(*block_ix), cx);
                 let timer = frame_stats_enabled().then(Instant::now);
                 let el = render::render_block(
                     &top.block,
@@ -6517,7 +7010,10 @@ impl Transcript {
                 mime_type,
             } => self.render_generated_image(&row.id, owner, path, name, mime_type, cx),
             RowKind::ErrorChip { message } => error_chip(message.clone(), &theme),
+            RowKind::ForkMarker { source_title, .. } => fork_marker(source_title.clone(), &theme),
         };
+        // Diagram fences this row just requested start rendering after layout.
+        self.ensure_diagram_worker(cx);
 
         // Hover-revealed metadata strip: a RESERVED 32px lane under the
         // entry's last row. Timestamp, copy action, and copied feedback only
@@ -6566,6 +7062,7 @@ impl Transcript {
                     .on_click(cx.listener(move |this, _, _, cx| {
                         this.copy_message(entry_id.clone(), text.clone(), cx)
                     }))
+                    .tooltip(crate::settings::widgets::text_tooltip("Copy message"))
                     .child(
                         crate::icons::icon(if copied_message {
                             crate::icons::CHECK
@@ -7599,29 +8096,42 @@ impl Transcript {
 /// run when there are none), with the same selection machinery as rendered
 /// markdown — the element registers into the frame's document-ordered
 /// registry, so drags select, span into adjacent rows, and Cmd+C copies.
-fn user_bubble_text(
-    row_id: &SharedString,
-    text: SharedString,
-    mentions: Arc<Vec<crate::composer::SentMentionSpan>>,
+/// Keep routing instructions in the stored prompt for agents, but show a
+/// concise attribution in the human transcript (including existing messages).
+fn agent_message_display(text: &str) -> String {
+    let Some(rest) = text.strip_prefix("[Message from Zeron chat ") else {
+        return text.to_owned();
+    };
+    let Some((header, body)) = rest.split_once("]\n\n") else {
+        return text.to_owned();
+    };
+    let Some((label, id)) =
+        header.rsplit_once(". Reply to it with the Zeron `send_message` tool, chat ")
+    else {
+        return text.to_owned();
+    };
+    let Some(id) = id.strip_suffix('.') else {
+        return text.to_owned();
+    };
+    let suffix = format!(" ({id})");
+    let name = label.strip_suffix(&suffix).unwrap_or(label);
+    format!("Message from {name}\n\n{body}")
+}
+
+/// The bubble text's runs: body text in the sans font, chips as labels in it
+/// with their padding pinned to [`crate::composer::CHIP_PAD_FAMILY`], and an
+/// agent attribution's name in bold.
+fn user_bubble_runs(
+    text: &str,
+    mentions: &[crate::composer::SentMentionSpan],
     theme: &Theme,
-    measured_h: Rc<Cell<f32>>,
-    entity_id: gpui::EntityId,
-) -> AnyElement {
-    // Split runs at chip boundaries (spans are in order): body text keeps the
-    // sans font, chips read as inline code. Size/line-height flow from the
-    // bubble's div like every text child.
+) -> Vec<TextRun> {
+    // Split runs at chip boundaries (spans are in order). Size and line
+    // height flow from the bubble's div like every text child.
     let body_run = |len: usize| TextRun {
         len,
         font: gpui::font(theme.font_sans.clone()),
         color: theme.text,
-        background_color: None,
-        underline: None,
-        strikethrough: None,
-    };
-    let chip_run = |len: usize| TextRun {
-        len,
-        font: gpui::font(theme.font_mono.clone()),
-        color: theme.code_text,
         background_color: None,
         underline: None,
         strikethrough: None,
@@ -7632,33 +8142,113 @@ fn user_bubble_text(
         if at < span.range.start {
             runs.push(body_run(span.range.start - at));
         }
-        runs.push(chip_run(span.range.len()));
+        // Chips are labels in the body font, like the composer's, with their
+        // padding pinned to the face its insets are tuned for.
+        let [lead, trail] = crate::composer::chip_pad_ranges(&span.range);
+        for (len, pad) in [
+            (lead.len(), true),
+            (trail.start - lead.end, false),
+            (trail.len(), true),
+        ] {
+            if len > 0 {
+                let mut run = body_run(len);
+                if pad {
+                    run.font.family = crate::composer::CHIP_PAD_FAMILY.into();
+                }
+                runs.push(run);
+            }
+        }
         at = span.range.end;
     }
     if at < text.len() {
         runs.push(body_run(text.len() - at));
     }
+    // Attribution names are bold sans text, never Markdown/italic. Split
+    // existing runs so file-mention styling and selection offsets stay intact.
+    if let Some(rest) = text.strip_prefix("Message from ")
+        && let Some((name, _)) = rest.split_once("\n\n")
+    {
+        let bold = "Message from ".len().."Message from ".len() + name.len();
+        let mut offset = 0;
+        runs = runs
+            .into_iter()
+            .flat_map(|run| {
+                let end = offset + run.len;
+                let mut pieces = Vec::new();
+                while offset < end {
+                    let in_name = bold.contains(&offset);
+                    let next = if offset < bold.start {
+                        end.min(bold.start)
+                    } else if in_name {
+                        end.min(bold.end)
+                    } else {
+                        end
+                    };
+                    let mut piece = run.clone();
+                    piece.len = next - offset;
+                    if in_name {
+                        piece.font.weight = gpui::FontWeight::BOLD;
+                    }
+                    pieces.push(piece);
+                    offset = next;
+                }
+                pieces
+            })
+            .collect();
+    }
+    runs
+}
+
+fn user_bubble_text(
+    row_id: &SharedString,
+    text: SharedString,
+    mentions: Arc<Vec<crate::composer::SentMentionSpan>>,
+    theme: &Theme,
+    measured_h: Rc<Cell<f32>>,
+    entity_id: gpui::EntityId,
+    overlays: Vec<ChipOverlay>,
+    open_image: Rc<dyn Fn(&SharedString, &mut Window, &mut gpui::App)>,
+) -> AnyElement {
+    let runs = user_bubble_runs(&text, &mentions, theme);
     let styled = StyledText::new(text.clone()).with_runs(runs);
     let layout = styled.layout().clone();
-    let wash = theme.code_wash;
+    let chip_layout = layout.clone();
+    // A chip showing a status paints it over its icon well instead.
+    let chip_icons: Vec<Option<crate::composer::ChipIcon>> = mentions
+        .iter()
+        .map(|span| {
+            (!overlays
+                .iter()
+                .any(|overlay| overlay.status.is_some() && overlay.range == span.range))
+            .then(|| crate::composer::chip_icon(span.kind, &span.path, theme.appearance))
+        })
+        .collect();
     let sel_key: std::sync::Arc<str> = format!("{row_id}:u").into();
     let sel_theme = theme.clone();
     let underlay = canvas(
-        |_, _, _| (),
-        move |_, _, window, cx| {
-            for span in mentions.iter() {
-                for rect in render::range_rects(&layout, &span.range, 0.0, 2.0) {
-                    window.paint_quad(quad(
-                        rect,
-                        px(5.0),
-                        wash,
-                        px(0.0),
-                        gpui::transparent_black(),
-                        BorderStyle::default(),
-                    ));
+        |bounds, window, _| window.insert_hitbox(bounds, gpui::HitboxBehavior::Normal),
+        move |_, hitbox, window, cx| {
+            for (span, icon) in mentions.iter().zip(&chip_icons) {
+                // Centered on the label like the composer's chips.
+                let label = crate::composer::chip_pad_ranges(&span.range)[0].end;
+                for (row, rect) in render::range_rects(&layout, &span.range, 0.0, 2.0)
+                    .into_iter()
+                    .enumerate()
+                {
+                    let row_top = rect.origin.y - px(2.0);
+                    let offset = crate::composer::text_chip_label_offset(
+                        &layout,
+                        label,
+                        row_top,
+                        px(2.0),
+                        window,
+                    );
+                    let rect = Bounds::new(rect.origin + point(px(0.0), offset), rect.size);
+                    let icon = icon.as_ref().filter(|_| row == 0);
+                    crate::composer::paint_chip(window, rect, icon, &sel_theme, cx);
                 }
             }
-            render::paint_text_selection(window, &sel_key, &text, &layout, &sel_theme);
+            render::paint_text_selection(window, hitbox, &sel_key, &text, &layout, &sel_theme);
             // Passive geometry cache only: no entity update and no notify.
             // `bounds().height` can be the collapsed clip height, so derive
             // the full text height from the wrapped line layouts instead. The
@@ -7684,9 +8274,206 @@ fn user_bubble_text(
     .size_full();
     // Same wrapper as the assistant markdown: user-bubble text is
     // selectable (paint_text_selection above), so it gets the I-beam too.
-    render::selectable_text_wrap()
+    let text = render::selectable_text_wrap()
         .child(underlay)
         .child(styled)
+        .into_any_element();
+    if overlays.is_empty() {
+        return text;
+    }
+    ChipOverlays {
+        id: format!("{row_id}-chip-overlays").into(),
+        child: text,
+        layout: chip_layout,
+        overlays,
+        open: open_image,
+        well: crate::file_icons::well_bg(theme),
+    }
+    .into_any_element()
+}
+
+/// The upload status painted in a sent chip's icon well.
+const CHIP_STATUS_SIZE: f32 = 14.0;
+
+/// One sent chip's extras, laid over its pill: a status in place of its icon
+/// and, for a loaded image, a click target opening it full size.
+struct ChipOverlay {
+    range: Range<usize>,
+    open: Option<SharedString>,
+    status: Option<AnyElement>,
+}
+
+/// Wraps a sent bubble's text with its chips' overlays. They follow the
+/// shaped text, so a chip that wraps gets a click target per row; its status
+/// sits on the first row, where the icon would be.
+struct ChipOverlays {
+    id: SharedString,
+    child: AnyElement,
+    layout: gpui::TextLayout,
+    overlays: Vec<ChipOverlay>,
+    open: Rc<dyn Fn(&SharedString, &mut Window, &mut gpui::App)>,
+    well: gpui::Hsla,
+}
+
+impl IntoElement for ChipOverlays {
+    type Element = Self;
+    fn into_element(self) -> Self {
+        self
+    }
+}
+
+impl gpui::Element for ChipOverlays {
+    type RequestLayoutState = ();
+    type PrepaintState = Vec<AnyElement>;
+
+    fn id(&self) -> Option<gpui::ElementId> {
+        Some(self.id.clone().into())
+    }
+
+    fn source_location(&self) -> Option<&'static core::panic::Location<'static>> {
+        None
+    }
+
+    fn request_layout(
+        &mut self,
+        _: Option<&gpui::GlobalElementId>,
+        _: Option<&gpui::InspectorElementId>,
+        window: &mut Window,
+        cx: &mut gpui::App,
+    ) -> (gpui::LayoutId, ()) {
+        (self.child.request_layout(window, cx), ())
+    }
+
+    fn prepaint(
+        &mut self,
+        _: Option<&gpui::GlobalElementId>,
+        _: Option<&gpui::InspectorElementId>,
+        _: Bounds<Pixels>,
+        _: &mut (),
+        window: &mut Window,
+        cx: &mut gpui::App,
+    ) -> Vec<AnyElement> {
+        self.child.prepaint(window, cx);
+        let mut targets = Vec::new();
+        for (index, overlay) in self.overlays.iter_mut().enumerate() {
+            let rects = render::range_rects(&self.layout, &overlay.range, 0.0, 2.0);
+            if let (Some(status), Some(first)) = (overlay.status.take(), rects.first()) {
+                // Matches `paint_chip`'s icon well.
+                let side = first.size.height - px(2.0);
+                let mut well = div()
+                    .size(side)
+                    .rounded(px(4.0))
+                    .bg(self.well)
+                    .flex()
+                    .items_center()
+                    .justify_center()
+                    .child(status)
+                    .into_any_element();
+                well.prepaint_as_root(
+                    first.origin + point(px(1.0), px(1.0)),
+                    size(side, side).map(gpui::AvailableSpace::Definite),
+                    window,
+                    cx,
+                );
+                targets.push(well);
+            }
+            let Some(path) = overlay.open.clone() else {
+                continue;
+            };
+            for (part, rect) in rects.into_iter().enumerate() {
+                let open = self.open.clone();
+                let path = path.clone();
+                let mut target = div()
+                    .id(SharedString::from(format!("{}-{index}-{part}", self.id)))
+                    .w(rect.size.width)
+                    .h(rect.size.height)
+                    .cursor_pointer()
+                    .role(gpui::Role::Button)
+                    .aria_label(format!(
+                        "Preview {}",
+                        crate::attachments::attachment_display_name(
+                            path.rsplit(['/', '\\']).next().unwrap_or(&path),
+                        )
+                    ))
+                    .on_click(move |event, window, cx| {
+                        // A drag that selects text across the chip is not a click.
+                        if event.click_count() == 1
+                            && crate::markdown::selection::selected_text().is_none()
+                        {
+                            open(&path, window, cx);
+                        }
+                    })
+                    .into_any_element();
+                target.prepaint_as_root(
+                    rect.origin,
+                    rect.size.map(gpui::AvailableSpace::Definite),
+                    window,
+                    cx,
+                );
+                targets.push(target);
+            }
+        }
+        targets
+    }
+
+    fn paint(
+        &mut self,
+        _: Option<&gpui::GlobalElementId>,
+        _: Option<&gpui::InspectorElementId>,
+        _: Bounds<Pixels>,
+        _: &mut (),
+        targets: &mut Vec<AnyElement>,
+        window: &mut Window,
+        cx: &mut gpui::App,
+    ) {
+        self.child.paint(window, cx);
+        for target in targets {
+            target.paint(window, cx);
+        }
+    }
+}
+
+/// A sent message's non-image attachment: the file's icon and name on the
+/// same soft pill the transcript uses for file badges. Its bytes are never
+/// read back to the transcript, so there is no thumbnail to wait for.
+fn user_file_pill(name: &str, theme: &Theme) -> AnyElement {
+    let name = crate::attachments::attachment_display_name(name);
+    div()
+        .h(px(28.0))
+        .max_w(px(260.0))
+        .min_w_0()
+        .flex()
+        .items_center()
+        .gap(px(6.0))
+        .rounded(px(7.0))
+        .bg(theme.ink(0.06))
+        .pl(px(2.0))
+        .pr(px(10.0))
+        .text_size(px(13.0))
+        .text_color(theme.text.opacity(0.85))
+        .child(
+            div()
+                .size(px(24.0))
+                .flex_none()
+                .flex()
+                .items_center()
+                .justify_center()
+                .rounded(px(5.0))
+                .bg(crate::file_icons::well_bg(theme))
+                .child(
+                    crate::file_icons::icon(
+                        crate::file_icons::FileIconIdentity::file(name),
+                        theme.appearance,
+                    )
+                    .size(px(16.0)),
+                ),
+        )
+        .child(
+            div()
+                .min_w_0()
+                .truncate()
+                .child(SharedString::from(name.to_owned())),
+        )
         .into_any_element()
 }
 
@@ -7705,6 +8492,49 @@ fn error_chip(message: SharedString, theme: &Theme) -> AnyElement {
             notice_chip(theme, false, "Error", message, Tile)
                 .overflow_hidden()
                 .w_full(),
+        )
+        .into_any_element()
+}
+
+/// A quiet fork seam. The source gets its own constrained line so long
+/// titles cannot widen a narrow side-chat pane. No message metadata lane.
+fn fork_marker(source_title: SharedString, theme: &Theme) -> AnyElement {
+    let rule = || div().flex_1().min_w_0().h(px(1.0)).bg(theme.border_strong);
+    div()
+        .py(px(14.0))
+        .w_full()
+        .min_w_0()
+        .overflow_hidden()
+        .flex()
+        .flex_col()
+        .gap(px(6.0))
+        .child(
+            div()
+                .w_full()
+                .min_w_0()
+                .flex()
+                .items_center()
+                .gap(px(10.0))
+                .child(rule())
+                .child(
+                    div()
+                        .flex_none()
+                        .text_size(crate::typography::ui_rems(12.0))
+                        .text_color(theme.text_muted.opacity(0.7))
+                        .child("Forked from"),
+                )
+                .child(rule()),
+        )
+        .child(
+            div()
+                .w_full()
+                .min_w_0()
+                .truncate()
+                .text_center()
+                .text_size(crate::typography::ui_rems(13.0))
+                .font_weight(gpui::FontWeight::MEDIUM)
+                .text_color(theme.text_muted)
+                .child(source_title),
         )
         .into_any_element()
 }
@@ -8325,7 +9155,7 @@ fn strip_spawn_prefix(text: &str) -> &str {
 /// a fixed-width tab spent on "Agent: " never shows the task, so the genus
 /// is stripped here and the call input's description/prompt fields back up
 /// a bare name (older docs); "Subagent" only as the last resort.
-fn subagent_tab_title(call: &ToolCall) -> SharedString {
+pub(crate) fn subagent_tab_title(call: &ToolCall) -> SharedString {
     let (name, input) = match call {
         ToolCall::Unknown { name, input } => (name.as_str(), input.as_ref()),
         ToolCall::Mcp { tool, input, .. } => (tool.as_str(), input.as_ref()),
@@ -8715,6 +9545,23 @@ impl Render for Transcript {
         // Release gpui-side decoded copies of any images the attachment LRU
         // evicted since the last frame (no-op when nothing was evicted).
         crate::attachments::flush_evicted(Some(window), cx);
+        // Diagram requests are scoped to paint passes; rasters follow the
+        // reading column and display density (a no-op while both hold).
+        let released_diagrams = {
+            let mut diagrams = self.diagrams.borrow_mut();
+            let mut released = diagrams.begin_frame(crate::theme::style_generation());
+            let list_width = f32::from(self.list.viewport_bounds().size.width);
+            let column = if list_width > 0.0 {
+                self.content_width.min(list_width)
+            } else {
+                self.content_width
+            };
+            released.extend(diagrams.set_view((column.max(1.0), 480.0), window.scale_factor()));
+            released
+        };
+        if !released_diagrams.is_empty() {
+            crate::image_media::release_media(released_diagrams, cx);
+        }
         // Own-turn driver: measurements are only authoritative after layout,
         // so reservation sizing, the send glide, and the outgrown-handoff
         // each advance at most once per requested frame. Scheduled on every
@@ -8847,22 +9694,33 @@ impl Render for Transcript {
             .on_mouse_move(cx.listener(Self::on_selection_mouse_move))
             .on_mouse_up(MouseButton::Left, cx.listener(Self::on_selection_mouse_up))
             .on_mouse_up_out(MouseButton::Left, cx.listener(Self::on_selection_mouse_up))
-            // FIRST child ⇒ paints first: clears the frame's markdown text-
-            // selection registry before any row's text elements re-register
-            // (document paint order = selection order; see markdown/render.rs).
-            .child(crate::markdown::render::selection_frame_reset())
+            // FIRST child ⇒ paints first: clears this transcript's slice of the
+            // frame's markdown text-selection registry before any row's text
+            // elements re-register (document paint order = selection order;
+            // see markdown/render.rs). Keyed by entity so a side chat or
+            // subagent tab painted in the same frame can't wipe it.
+            .child(crate::markdown::render::selection_frame_reset_for(
+                cx.entity_id().as_u64(),
+            ))
             .child(content)
             .child(rail);
         // Full-size viewer for a clicked user-bubble thumbnail
         // (AttachmentPreviewDialog: bare lightbox, click closes).
         if let Some(preview) = self.attachment_preview.clone() {
             let weak = cx.weak_entity();
-            return root.child(crate::attachments::lightbox(
+            // A diagram's enlarged raster is framed by its natural size.
+            let natural_size = self
+                .diagram_zoom
+                .as_ref()
+                .map(|source| size(px(source.width), px(source.height)));
+            return root.child(crate::attachments::lightbox_with_size(
                 window,
                 &preview,
                 &self.attachment_preview_focus,
+                natural_size,
                 move |window, cx| {
                     if let Ok(focus) = weak.update(cx, |this, cx| {
+                        this.close_diagram_zoom(cx);
                         this.attachment_preview = None;
                         cx.notify();
                         this.attachment_preview_return_focus.take()
@@ -11828,6 +12686,73 @@ mod tests {
         }
 
         #[test]
+        fn text_streamed_under_reduced_motion_does_not_fade_in_when_motion_resumes() {
+            fn render_rows(
+                transcript: &Entity<Transcript>,
+                window: gpui::WindowHandle<CachedTranscript>,
+                cx: &mut gpui::App,
+            ) {
+                cx.update_window(window.into(), |_, window, cx| {
+                    transcript.update(cx, |this, cx| {
+                        for ix in 0..this.list.item_count() {
+                            let _ = this.render_row(ix, window, cx);
+                        }
+                    });
+                })
+                .unwrap();
+            }
+            fn streaming(text: &str) -> Vec<SessionMessageEntry> {
+                vec![
+                    prompt("ask"),
+                    assistant(
+                        "reply",
+                        MessageStatus::Streaming,
+                        vec![text_part("body", text)],
+                    ),
+                ]
+            }
+            with_window(|transcript, window, cx| {
+                let body = SharedString::from("reply#body.0");
+                // Attach on the prompt alone, so the reply is live text rather
+                // than an attach-time baseline.
+                transcript.update(cx, |this, cx| feed(this, vec![prompt("ask")], cx));
+                render_rows(&transcript, window, cx);
+
+                // A row that first streams while motion is reduced.
+                cx.set_reduce_motion(true);
+                transcript.update(cx, |this, cx| feed(this, streaming("uno"), cx));
+                render_rows(&transcript, window, cx);
+                assert!(!transcript.read(cx).veils.contains_key(&body));
+                cx.set_reduce_motion(false);
+                render_rows(&transcript, window, cx);
+                let veil = transcript.read(cx).veils[&body].clone();
+                assert!(
+                    veil.borrow_mut()
+                        .advance(0, "uno", Instant::now())
+                        .is_empty(),
+                    "text painted under reduced motion must not dissolve in"
+                );
+
+                // A row already fading when motion pauses, then resumes.
+                cx.set_reduce_motion(true);
+                transcript.update(cx, |this, cx| feed(this, streaming("uno dos"), cx));
+                render_rows(&transcript, window, cx);
+                cx.set_reduce_motion(false);
+                render_rows(&transcript, window, cx);
+                let veil = transcript.read(cx).veils[&body].clone();
+                assert!(
+                    veil.borrow_mut()
+                        .advance(0, "uno dos", Instant::now())
+                        .is_empty(),
+                    "text streamed while paused is already on screen"
+                );
+                let spans = veil.borrow_mut().advance(0, "uno dos tres", Instant::now());
+                assert_eq!(spans.len(), 1);
+                assert_eq!(spans[0].0, "uno dos".len().."uno dos tres".len());
+            });
+        }
+
+        #[test]
         fn replay_growth_snaps_only_when_following_the_tail() {
             with_window(|transcript, window, cx| {
                 let entries: Vec<_> = (0..30).map(|ix| prompt(&format!("prompt-{ix}"))).collect();
@@ -12816,6 +13741,275 @@ mod tests {
             });
         }
 
+        /// Run the next queued diagram synchronously, as the worker would.
+        fn render_next_diagram(transcript: &Entity<Transcript>, cx: &mut gpui::App) -> bool {
+            transcript.update(cx, |this, cx| {
+                let Some(code) = this.diagrams.borrow_mut().next_job() else {
+                    return false;
+                };
+                let palette = crate::markdown::mermaid::Palette::from_theme(Theme::of(cx));
+                let result = crate::markdown::mermaid::render(&code, &palette).and_then(|svg| {
+                    crate::image_media::decode_image("image/svg+xml", svg.into_bytes())
+                });
+                assert!(result.is_ok(), "fixture diagram must render");
+                this.finish_diagram(code, crate::theme::style_generation(), result, cx);
+                true
+            })
+        }
+
+        const MERMAID_FENCE: &str =
+            "```mermaid\nflowchart TD\n    A[Request] --> B[Plan]\n    B --> C[Done]\n```\n";
+
+        #[test]
+        fn mermaid_streaming_tail_keeps_source_until_the_reply_moves_past_it() {
+            with_window(|transcript, window, cx| {
+                let reply = |status, text: String| {
+                    vec![
+                        prompt("prompt"),
+                        assistant("reply", status, vec![text_part("text", &text)]),
+                    ]
+                };
+                let mut text = String::from("Intro.\n\n");
+                // Token-sized commits through the open fence, then the closed
+                // fence while it is still the reply's tail.
+                for token in MERMAID_FENCE.split_inclusive([' ', '\n']) {
+                    text.push_str(token);
+                    transcript.update(cx, |this, cx| {
+                        this.rail_enabled = false;
+                        feed(this, reply(MessageStatus::Streaming, text.clone()), cx)
+                    });
+                    tick(&transcript, window, cx);
+                    let this = transcript.read(cx);
+                    assert!(
+                        this.diagram_worker.is_none(),
+                        "a streaming tail fence must not start a render"
+                    );
+                    assert!(this.diagrams.borrow_mut().next_job().is_none());
+                }
+                // Enough reply after the fence that the viewport can anchor on
+                // it without clamping back to the end.
+                text.push_str(&format!(
+                    "\nAfter the diagram. {}",
+                    "More detail. ".repeat(300)
+                ));
+                transcript.update(cx, |this, cx| {
+                    feed(this, reply(MessageStatus::Streaming, text.clone()), cx)
+                });
+                draw(window, cx);
+                assert!(
+                    transcript.read(cx).diagram_worker.is_some(),
+                    "a fence followed by more reply renders"
+                );
+                // A pinned end is glued, where rows report no bounds; read
+                // them with the viewport anchored at the diagram row instead.
+                transcript.update(cx, |this, cx| {
+                    this.pinned = false;
+                    let ix = this
+                        .rows
+                        .iter()
+                        .position(|row| row.id.as_ref() == "reply#text.1")
+                        .unwrap();
+                    this.list.scroll_to(ListOffset {
+                        item_ix: ix,
+                        offset_in_item: px(0.0),
+                    });
+                    cx.notify();
+                });
+                draw(window, cx);
+                let fence_height = |cx: &gpui::App| {
+                    let this = transcript.read(cx);
+                    let ix = this
+                        .rows
+                        .iter()
+                        .position(|row| row.id.as_ref() == "reply#text.1")
+                        .unwrap();
+                    this.list.bounds_for_item(ix).unwrap().size.height
+                };
+                let source_height = fence_height(cx);
+                assert!(render_next_diagram(&transcript, cx));
+                assert!(
+                    !render_next_diagram(&transcript, cx),
+                    "one request per source"
+                );
+                draw(window, cx);
+                assert_ne!(
+                    fence_height(cx),
+                    source_height,
+                    "the diagram replaced its source"
+                );
+                let frame: SharedString = "reply#text.1-mermaid-1".into();
+                transcript.update(cx, |this, cx| {
+                    assert_eq!(this.diagrams.borrow().ready_count(), 1);
+                    this.diagrams.borrow_mut().toggle_source(&frame);
+                    this.diagram_layout_changed(&["reply#text.1".into()], cx);
+                });
+                draw(window, cx);
+                assert_eq!(
+                    fence_height(cx),
+                    source_height,
+                    "the toggle restores the source"
+                );
+                // Completion keeps row identity, the rendered diagram and
+                // the reader's source toggle; nothing renders again.
+                transcript.update(cx, |this, cx| {
+                    feed(this, reply(MessageStatus::Complete, text.clone()), cx)
+                });
+                draw(window, cx);
+                let this = transcript.read(cx);
+                assert!(this.diagrams.borrow().source_visible(&frame));
+                assert!(this.diagrams.borrow_mut().next_job().is_none());
+            });
+        }
+
+        #[test]
+        fn mermaid_diagram_swap_keeps_a_pinned_stream_at_the_bottom() {
+            with_window(|transcript, window, cx| {
+                let intro = "A paragraph that explains the result in detail. ".repeat(12);
+                let reply = |status, tail: &str| {
+                    let mut text = String::new();
+                    for section in 0..8 {
+                        text.push_str(&format!("Section {section}. {intro}\n\n"));
+                    }
+                    text.push_str(MERMAID_FENCE);
+                    text.push_str(tail);
+                    vec![
+                        prompt("prompt"),
+                        assistant("reply", status, vec![text_part("text", &text)]),
+                    ]
+                };
+                transcript.update(cx, |this, cx| {
+                    this.rail_enabled = false;
+                    feed(
+                        this,
+                        reply(MessageStatus::Streaming, "\nAfter the diagram."),
+                        cx,
+                    )
+                });
+                for _ in 0..50 {
+                    tick(&transcript, window, cx);
+                }
+                let this = transcript.read(cx);
+                assert!(this.pinned);
+                assert!(
+                    this.list.max_offset_for_scrollbar().y > px(100.0),
+                    "must overflow"
+                );
+                assert!(this.distance_from_bottom() <= 1.0);
+                assert!(render_next_diagram(&transcript, cx));
+                for _ in 0..50 {
+                    tick(&transcript, window, cx);
+                }
+                let this = transcript.read(cx);
+                assert!(this.pinned, "a diagram swap is not user input");
+                assert!(this.distance_from_bottom() <= 1.0, "pin follows the swap");
+                // More streaming after the swap keeps following.
+                transcript.update(cx, |this, cx| {
+                    feed(
+                        this,
+                        reply(
+                            MessageStatus::Streaming,
+                            &format!("\nAfter the diagram.\n\n{intro}\n\n{intro}"),
+                        ),
+                        cx,
+                    )
+                });
+                for _ in 0..50 {
+                    tick(&transcript, window, cx);
+                }
+                let this = transcript.read(cx);
+                assert!(this.pinned);
+                assert!(this.distance_from_bottom() <= 1.0);
+                assert!(this.diagrams.borrow_mut().next_job().is_none());
+            });
+        }
+
+        #[test]
+        fn mermaid_completion_renders_the_tail_without_moving_the_runway_prompt() {
+            with_window(|transcript, window, cx| {
+                transcript.update(cx, |this, cx| {
+                    feed(this, vec![prompt("prompt")], cx);
+                    this.rail_enabled = false;
+                });
+                draw(window, cx);
+                transcript.update(cx, |this, cx| {
+                    this.on_own_send("chat".into(), "prompt".into(), cx)
+                });
+                draw(window, cx);
+                for _ in 0..80 {
+                    tick(&transcript, window, cx);
+                }
+                let reply = |status| {
+                    vec![
+                        prompt("prompt"),
+                        assistant(
+                            "reply",
+                            status,
+                            vec![text_part(
+                                "text",
+                                &format!("Here it is:\n\n{MERMAID_FENCE}"),
+                            )],
+                        ),
+                    ]
+                };
+                transcript.update(cx, |this, cx| {
+                    feed(this, reply(MessageStatus::Streaming), cx)
+                });
+                for _ in 0..50 {
+                    tick(&transcript, window, cx);
+                }
+                assert!(transcript.read(cx).diagram_worker.is_none());
+                transcript.update(cx, |this, cx| {
+                    feed(this, reply(MessageStatus::Complete), cx)
+                });
+                for _ in 0..50 {
+                    tick(&transcript, window, cx);
+                }
+                let prompt_top = |cx: &gpui::App| {
+                    let this = transcript.read(cx);
+                    assert!(this.own_turn.is_some(), "a short reply keeps its runway");
+                    this.list.bounds_for_item(0).unwrap().top()
+                };
+                let before = prompt_top(cx);
+                assert!(render_next_diagram(&transcript, cx));
+                // No controller tick between the swap and this paint.
+                draw(window, cx);
+                assert_eq!(prompt_top(cx), before, "the diagram swap moved the prompt");
+                let this = transcript.read(cx);
+                assert!(
+                    this.list.max_offset_for_scrollbar().y <= px(2.5),
+                    "the swap opened blank space below the runway"
+                );
+                for _ in 0..50 {
+                    tick(&transcript, window, cx);
+                }
+                assert_eq!(prompt_top(cx), before);
+
+                // The lightbox frames an enlarged raster by the diagram's
+                // natural size and releases it on close.
+                let media = transcript
+                    .read(cx)
+                    .diagrams
+                    .borrow()
+                    .ready_media()
+                    .expect("rendered diagram");
+                cx.update_window(window.into(), |_, window, cx| {
+                    transcript.update(cx, |this, cx| {
+                        this.open_diagram_preview(media.clone(), window, cx)
+                    });
+                })
+                .unwrap();
+                draw(window, cx);
+                transcript.update(cx, |this, cx| {
+                    assert!(this.attachment_preview.is_some());
+                    assert!(this.diagram_zoom.is_some());
+                    this.close_diagram_zoom(cx);
+                    assert!(this.attachment_preview.is_none());
+                    assert!(this.diagram_zoom.is_none());
+                });
+                draw(window, cx);
+            });
+        }
+
         #[test]
         fn send_glide_never_crosses_the_prompt_during_remeasurement() {
             with_window(|transcript, window, cx| {
@@ -13232,10 +14426,202 @@ mod tests {
         assert_eq!(attachments.len(), 1);
     }
 
+    /// A sent bubble shapes each chip's padding in Geist and its label, like
+    /// the rest of the body, in the interface font.
+    #[test]
+    fn bubble_chip_padding_is_shaped_in_geist() {
+        let raw = format!(
+            "open {} and {}",
+            zeron_proto::attachment_mentions::attachment_mention_link(1, None),
+            zeron_proto::attachment_mentions::attachment_mention_link(2, Some("notes.md")),
+        );
+        let (text, spans) = crate::composer::sent_mention_display(&raw).expect("chips project");
+        let mut theme = Theme::dark();
+        theme.font_sans = "Geist Mono".into();
+        let runs = user_bubble_runs(&text, &spans, &theme);
+        assert_eq!(runs.iter().map(|run| run.len).sum::<usize>(), text.len());
+        let mut at = 0;
+        let mut pads = Vec::new();
+        for run in &runs {
+            let range = at..at + run.len;
+            at = range.end;
+            if run.font.family.as_ref() == crate::composer::CHIP_PAD_FAMILY {
+                pads.push(range);
+            } else {
+                assert_eq!(run.font.family.as_ref(), "Geist Mono");
+            }
+        }
+        let expected: Vec<_> = spans
+            .iter()
+            .flat_map(|span| crate::composer::chip_pad_ranges(&span.range))
+            .collect();
+        assert_eq!(pads, expected);
+    }
+
     /// A sent prompt's file mentions render as chips in the transcript: the
     /// row carries the projected display text plus spans, while ordinary
     /// prompts keep the empty-spans fast path. The row version derives from
     /// the RAW text either way, so projection never perturbs the diff key.
+    /// A chip whose upload is still crossing to the host shows its progress
+    /// in place of its icon, as the strip's thumbnail did; once the bytes
+    /// land (the ref is rewritten to a local path) the icon comes back.
+    #[gpui::test]
+    fn sent_chips_show_upload_progress_until_their_bytes_land(cx: &mut gpui::TestAppContext) {
+        use zeron_proto::attachment_mentions::attachment_mention_link;
+        let dir = tempfile::tempdir().unwrap();
+        cx.update(|cx| {
+            gpui_base::init(cx);
+            cx.set_global(Theme::dark());
+            crate::settings::init(crate::settings::UiSettings::default(), dir.path(), cx);
+        });
+        let state = cx.new(|_| AppState::new());
+        state.update(cx, |state, _| {
+            state.apply_transfers(vec![zeron_proto::TransferProgress {
+                upload_id: "att-1".into(),
+                file_name: "Image 1.png".into(),
+                done: 430,
+                total: 1_000,
+            }])
+        });
+        let transcript = cx.new(|cx| Transcript::new(state, cx));
+        let body = format!(
+            "compare {} with {} and {}",
+            attachment_mention_link(1, None),
+            attachment_mention_link(2, Some("notes.md")),
+            attachment_mention_link(3, Some("done.md")),
+        );
+        let raw = crate::attachments::with_attachments(
+            &body,
+            &[
+                "pending://att-1/Image 1.png".to_string(),
+                "pending://att-2/notes.md".to_string(),
+                "/uploads/ef56ab78-done.md".to_string(),
+            ],
+        );
+        let mut entry = assistant("u5", MessageStatus::Complete, vec![]);
+        entry.role = MessageRole::User;
+        entry.status = None;
+        entry.parts = vec![text_part("t0", &raw)];
+        let rows = rows_for_entry(&entry, true, false, &mut parse);
+        let RowKind::User {
+            mentions,
+            attachments,
+            ..
+        } = &rows[0].kind
+        else {
+            panic!("expected a user row");
+        };
+        assert!(attachments.is_empty());
+        let mentions = mentions.clone();
+        transcript.update(cx, |transcript, cx| {
+            let overlays = transcript.chip_overlays(&"u5".into(), &mentions, &Theme::dark(), cx);
+            // The image (43% across) and the file still crossing show a
+            // status; the landed file shows its icon.
+            assert_eq!(
+                overlays
+                    .iter()
+                    .map(|overlay| (overlay.range.clone(), overlay.status.is_some()))
+                    .collect::<Vec<_>>(),
+                [
+                    (mentions[0].range.clone(), true),
+                    (mentions[1].range.clone(), true)
+                ]
+            );
+            assert_eq!(
+                transcript.upload_status("pending://att-1/Image 1.png", cx),
+                (true, Some(43))
+            );
+            assert_eq!(
+                transcript.upload_status("/uploads/ef56ab78-done.md", cx),
+                (false, None)
+            );
+        });
+    }
+
+    /// A sent message with image, file-attachment and workspace-file chips
+    /// reads as chips in the bubble; only attachments without a chip stay in
+    /// the strip above.
+    #[test]
+    fn user_bubbles_project_attachment_chips_in_place_of_the_strip() {
+        use crate::composer::ChipKind;
+        use zeron_proto::attachment_mentions::attachment_mention_link;
+        let body = format!(
+            "compare {} with {} and {}",
+            attachment_mention_link(1, None),
+            attachment_mention_link(2, Some("notes.md")),
+            "[composer.rs](zeron-file:crates/ui/src/composer.rs)",
+        );
+        let raw = crate::attachments::with_attachments(
+            &body,
+            &[
+                "/uploads/ab12cd34-Image_1.png".to_string(),
+                "/uploads/ef56ab78-notes.md".to_string(),
+                "/uploads/0a1b2c3d-Image_3.png".to_string(),
+            ],
+        );
+        let mut entry = assistant("u4", MessageStatus::Complete, vec![]);
+        entry.role = MessageRole::User;
+        entry.status = None;
+        entry.parts = vec![text_part("t0", &raw)];
+        let rows = rows_for_entry(&entry, false, false, &mut parse);
+        let RowKind::User {
+            text,
+            mentions,
+            attachments,
+            ..
+        } = &rows[0].kind
+        else {
+            panic!("expected a user row");
+        };
+        assert!(!text.contains("zeron-") && !text.contains("Attached images"));
+        assert_eq!(
+            mentions.iter().map(|m| m.kind).collect::<Vec<_>>(),
+            [ChipKind::Image, ChipKind::File, ChipKind::File]
+        );
+        let labels: Vec<String> = mentions
+            .iter()
+            .map(|m| {
+                text[m.range.clone()]
+                    .trim_matches(|c: char| !c.is_alphanumeric())
+                    .replace('\u{a0}', " ")
+            })
+            .collect();
+        assert_eq!(labels, ["Image 1", "notes.md", "composer.rs"]);
+        // Chips stand in for their attachments: only the unchipped image is
+        // left in the strip, and each attachment chip carries its upload.
+        assert_eq!(
+            attachments
+                .iter()
+                .map(|a| a.path.as_str())
+                .collect::<Vec<_>>(),
+            ["/uploads/0a1b2c3d-Image_3.png"]
+        );
+        assert_eq!(
+            mentions
+                .iter()
+                .map(|m| m.upload.as_deref())
+                .collect::<Vec<_>>(),
+            [
+                Some("/uploads/ab12cd34-Image_1.png"),
+                Some("/uploads/ef56ab78-notes.md"),
+                None
+            ]
+        );
+
+        // A files-only send hides the placeholder body.
+        let raw = crate::attachments::with_attachments("", &["/uploads/ef56ab78-notes.md".into()]);
+        entry.parts = vec![text_part("t0", &raw)];
+        let rows = rows_for_entry(&entry, false, false, &mut parse);
+        let RowKind::User {
+            text, attachments, ..
+        } = &rows[0].kind
+        else {
+            panic!("expected a user row");
+        };
+        assert!(text.is_empty());
+        assert_eq!(attachments.len(), 1);
+    }
+
     #[test]
     fn user_rows_project_file_mentions_into_chips() {
         let raw = "look at [composer.rs](zeron-file:crates/ui/src/composer.rs) please";
@@ -13253,12 +14639,10 @@ mod tests {
         );
         assert!(text.contains("composer.rs"));
         assert_eq!(mentions.len(), 1);
-        assert!(!mentions[0].is_dir);
+        assert_eq!(mentions[0].kind, crate::composer::ChipKind::File);
         assert_eq!(mentions[0].path.as_ref(), "crates/ui/src/composer.rs");
-        assert_eq!(&text[mentions[0].range.clone()], {
-            let projected: &str = "\u{00A0}@composer.rs\u{00A0}";
-            projected
-        });
+        let chip = &text[mentions[0].range.clone()];
+        assert!(chip.starts_with('\u{00A0}') && chip.contains("composer.rs"));
         assert_eq!(rows[0].version, (raw.len() as u64) << 1);
 
         entry.parts = vec![text_part("t0", "no mentions here")];
@@ -13577,14 +14961,8 @@ mod tests {
         );
         let todo = ToolCall::Todo {
             items: vec![
-                zeron_proto::TodoItem {
-                    text: "a".into(),
-                    done: true,
-                },
-                zeron_proto::TodoItem {
-                    text: "b".into(),
-                    done: false,
-                },
+                zeron_proto::TodoItem::new("a", zeron_proto::TodoStatus::Completed),
+                zeron_proto::TodoItem::new("b", zeron_proto::TodoStatus::Pending),
             ],
         };
         assert_eq!(tool_chip_content(&todo), ("Todo", "1/2 done".to_string()));
@@ -13664,21 +15042,16 @@ mod tests {
         // Todos list one item per line with checkbox state.
         let Some(ToolDetail::Output { lines, .. }) = call_block(&ToolCall::Todo {
             items: vec![
-                zeron_proto::TodoItem {
-                    text: "a".into(),
-                    done: true,
-                },
-                zeron_proto::TodoItem {
-                    text: "b".into(),
-                    done: false,
-                },
+                zeron_proto::TodoItem::new("a", zeron_proto::TodoStatus::Completed),
+                zeron_proto::TodoItem::new("b", zeron_proto::TodoStatus::InProgress),
+                zeron_proto::TodoItem::new("c", zeron_proto::TodoStatus::Pending),
             ],
         }) else {
             panic!("expected an output block")
         };
         assert_eq!(
             lines.iter().map(|l| l.as_ref()).collect::<Vec<_>>(),
-            vec!["[x] a", "[ ] b"]
+            vec!["[x] a", "[~] b", "[ ] c"]
         );
 
         // Blank invocation → no block; the chip stays a plain card.

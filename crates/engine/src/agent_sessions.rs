@@ -29,7 +29,7 @@ use zeron_doc::{
 };
 use zeron_proto::{
     AgentPreviewMessage, AgentPreviewRole, AgentSession, AgentSessionPreview, Chat, ChatConfig,
-    HarnessId, ImportedAgentSession, SandboxLevel, TodoItem, ToolCall,
+    HarnessId, ImportedAgentSession, SandboxLevel, TodoItem, TodoStatus, ToolCall,
 };
 
 use crate::EngineError;
@@ -1193,9 +1193,11 @@ fn codex_function_call(name: &str, arguments: &str) -> ToolCall {
                 .and_then(Value::as_array)
                 .into_iter()
                 .flatten()
-                .map(|step| TodoItem {
-                    text: step["step"].as_str().unwrap_or_default().to_string(),
-                    done: step["status"].as_str() == Some("completed"),
+                .map(|step| {
+                    TodoItem::new(
+                        step["step"].as_str().unwrap_or_default(),
+                        TodoStatus::parse(step["status"].as_str().unwrap_or_default()),
+                    )
                 })
                 .collect(),
         },

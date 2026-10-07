@@ -289,6 +289,7 @@ fn space(id: &str, device_id: &str, path: &str) -> Space {
         git_detected: false,
         git_checked_at: None,
         checkout_id: None,
+        repository_id: None,
         created_at: ts(1_500),
     }
 }
@@ -567,16 +568,26 @@ fn spaces_round_trip_and_mutate() {
     assert_eq!(ws.space("sp-1").unwrap().unwrap().display_name(), "project");
 
     assert!(
-        ws.set_space_git("sp-1", true, Some("checkout-abc"), ts(4_000))
-            .unwrap()
+        ws.set_space_git(
+            "sp-1",
+            true,
+            Some("checkout-abc"),
+            Some("github.com/owner/project"),
+            ts(4_000),
+        )
+        .unwrap()
     );
     let row = ws.space("sp-1").unwrap().unwrap();
     assert!(row.git_detected);
     assert_eq!(row.checkout_id.as_deref(), Some("checkout-abc"));
+    assert_eq!(
+        row.repository_id.as_deref(),
+        Some("github.com/owner/project")
+    );
     assert_eq!(row.git_checked_at, Some(ts(4_000)));
 
     assert!(!ws.rename_space("nope", Some("x")).unwrap());
-    assert!(!ws.set_space_git("nope", true, None, ts(1)).unwrap());
+    assert!(!ws.set_space_git("nope", true, None, None, ts(1)).unwrap());
 }
 
 #[test]
@@ -1484,5 +1495,36 @@ fn sidebar_sections_honor_pin_toggles_from_older_clients() {
     assert_eq!(
         doc.sidebar_preferences().unwrap().sections[0].session_ids,
         ["session"]
+    );
+}
+
+#[test]
+fn side_chat_origin_syncs_and_survives_updates_and_restart() {
+    let mut a = RegistryDoc::new("dev-a");
+    let mut b = RegistryDoc::new("dev-b");
+    let mut side = chat("side", "dev-a");
+    side.parent_chat_id = Some("main".into());
+    side.room_gen = Some(2);
+    a.upsert_chat(&side).unwrap();
+    let mut server = HashMap::new();
+    let mut seq = 0;
+    server_round(&mut server, &mut seq, &mut [&mut a, &mut b]);
+    assert_eq!(b.chat("side").unwrap(), Some(side.clone()));
+    b.rename_chat("side", "Investigate caching").unwrap();
+    server_round(&mut server, &mut seq, &mut [&mut a, &mut b]);
+    assert_eq!(
+        a.chat("side").unwrap().unwrap().parent_chat_id.as_deref(),
+        Some("main")
+    );
+    let persisted = a.to_bytes().unwrap();
+    let restored = RegistryDoc::from_bytes(&persisted, "dev-a").unwrap();
+    assert_eq!(
+        restored
+            .chat("side")
+            .unwrap()
+            .unwrap()
+            .parent_chat_id
+            .as_deref(),
+        Some("main")
     );
 }

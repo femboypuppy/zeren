@@ -25,6 +25,7 @@ mod chat_persistence;
 pub mod diff_sync;
 pub mod doc_host;
 mod handoff;
+pub mod harness_updates;
 mod http_error;
 pub mod instance_lock;
 pub mod local_import;
@@ -43,6 +44,7 @@ pub mod terminals;
 pub mod titles;
 mod transcript_history;
 pub mod uploads;
+pub mod voice;
 pub mod workspace_files;
 pub mod workspace_host;
 
@@ -143,6 +145,7 @@ pub struct EngineCore {
     pub spaces_sync: SpacesSync,
     pub uploads: Uploads,
     pub agent_accounts: AgentAccounts,
+    pub harness_updates: harness_updates::HarnessUpdateCoordinator,
     pub device_id: String,
     /// Local→synced profile import (account-scoped runtimes only).
     pub local_import: Option<local_import::LocalImporter>,
@@ -305,6 +308,9 @@ impl EngineCore {
         // the P2P service, which serves it to that device alone.
         let agent_accounts =
             AgentAccounts::with_callback_routes(agent_accounts_config, previews.callback_routes());
+        let harness_updates =
+            harness_updates::HarnessUpdateCoordinator::new(data_dir, registry.clone());
+        harness_updates.start();
         sessions.set_titles(TitleGenerator::new(
             workspace.clone(),
             registry.clone(),
@@ -332,6 +338,7 @@ impl EngineCore {
             spaces_sync,
             uploads,
             agent_accounts,
+            harness_updates,
             device_id,
             local_import,
             workspace_scope: profile.scope(),
@@ -465,7 +472,8 @@ impl EngineCore {
             self.workspace_scope,
         )
         .with_auth(self.auth())
-        .with_previews(self.previews.clone());
+        .with_previews(self.previews.clone())
+        .with_harness_updates(self.harness_updates.clone());
         if let Some(links) = self.links() {
             rpc = rpc.with_links(links);
         }
@@ -495,6 +503,7 @@ impl EngineCore {
     /// snapshot.
     pub async fn shutdown(&self) {
         self.previews.shutdown().await;
+        self.harness_updates.shutdown().await;
         // A run interruption transitions its chat to Idle, and Idle normally
         // releases the next queued row. Freeze first so quitting never starts
         // recovered work while the engine is being torn down.
@@ -808,7 +817,7 @@ impl Engine {
             tokens: Arc::new(auth.clone()),
         });
         core.previews.start(projects, preview_signaling).await;
-        // Release checker: polls {edge}/releases on a 6h cadence; headless
+        // Release checker: polls {edge}/releases hourly (wall clock); headless
         // installs with ZERON_AUTO_UPDATE=1 apply + restart themselves — gated
         // on quiescence so a restart never lands under a live run or open PTY.
         // Spawned for every install: application updates must not depend on
@@ -887,6 +896,11 @@ impl Engine {
             .ok_or_else(|| EngineError::Other("synced workspace profile is not ready".into()))?;
 
         let runtime = Self::assemble_runtime(&config, auth, profile).await?;
+        // The desktop app or `zeron update` may install a newer binary under
+        // a running service; restart into it once no run or terminal is live.
+        if let Some(updater) = runtime.core().updater() {
+            updater.restart_when_superseded();
+        }
 
         // A daemon exists to serve this port, so a bind failure is fatal here —
         // unlike the headed app, which can still work over its in-process
@@ -897,6 +911,9 @@ impl Engine {
             stop_tx,
         });
         let server = serve_ipc(config.ipc_port, service).await?;
+        // Only a port this process actually serves goes to agents: the
+        // injected MCP server must dial back into THIS engine.
+        runtime.core().sessions.set_ipc_port(config.ipc_port);
 
         tokio::select! {
             result = shutdown_signal() => result?,

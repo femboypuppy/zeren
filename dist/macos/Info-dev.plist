@@ -34,6 +34,8 @@
         <key>ZERON_IPC_PORT</key>
         <string>__IPC_PORT__</string>
     </dict>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Zeron uses your microphone for on-device dictation and for voice sessions you start. Voice sessions stream your audio to OpenAI through your ChatGPT-authenticated Codex account.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSSupportsAutomaticGraphicsSwitching</key>

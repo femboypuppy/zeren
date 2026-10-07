@@ -31,8 +31,8 @@
 //! - AUTH: the SDK's credentials are SEPARATE from `cursor-agent login`
 //!   (verified live). Runs need `CURSOR_API_KEY` (or a prior SDK browser
 //!   login); the shim surfaces the exact fix as an error chip otherwise.
-//! - Steering: turn-boundary — steers queue and become the next turn on the
-//!   parked session (parity with the previous ACP behavior).
+//! - Steering: native SDK input at the next model step, acknowledged only
+//!   when consumed. Inputs that race turn completion become a coalesced follow-up.
 
 use std::path::PathBuf;
 use std::time::Duration;
@@ -49,7 +49,7 @@ use tokio::sync::mpsc;
 
 use zeron_proto::{
     AgentEvent, DoneStatus, HarnessId, Model, ModelOption, ModelOptionChoice, ReasoningLevel,
-    RunRequest, SteeringMode, TodoItem, ToolCall,
+    RunRequest, SteeringMode, TodoItem, TodoStatus, ToolCall,
 };
 
 use crate::process::{Child, ChildStdin, Command, Stdio};
@@ -229,9 +229,9 @@ impl Harness for CursorHarness {
     fn supports_steering(&self) -> bool {
         true
     }
-    /// The SDK has no mid-turn injection; steers queue for the next turn.
+    /// Native SDK steering appends input to the active turn.
     fn steering_mode(&self) -> SteeringMode {
-        SteeringMode::TurnBoundary
+        SteeringMode::StepBoundary
     }
     fn reasoning_levels(&self) -> &[ReasoningLevel] {
         &[]
@@ -242,6 +242,11 @@ impl Harness for CursorHarness {
     fn installed(&self) -> bool {
         self.executable.is_some()
             || crate::acp::find_on_paths("cursor-agent", cursor_cli_paths()).is_some()
+    }
+    fn executable_path(&self) -> Option<PathBuf> {
+        self.executable
+            .clone()
+            .or_else(|| crate::acp::find_on_paths("cursor-agent", cursor_cli_paths()))
     }
     /// Done is the SDK run's terminal result, for every turn shape.
     fn deterministic_turn_end(&self) -> bool {
@@ -352,6 +357,7 @@ impl Harness for CursorHarness {
             // shim folds them into the SDK's ModelSelection params.
             "modelOptions": request.model_options,
             "resume": request.resume,
+            "mcp": request.mcp,
             "storeDir": lease.as_ref().and_then(|lease| lease.store_dir.as_ref()),
         });
         let _ = stdin_tx.send(first.to_string());
@@ -510,6 +516,8 @@ async fn run_session(session: Session) {
         stderr_tail,
     } = session;
     let RunControls {
+        realtime: _,
+        execution_lease: _execution_lease,
         request_input: _request_input,
         mut steering,
         interrupt,
@@ -524,7 +532,7 @@ async fn run_session(session: Session) {
     let mut done_after_interrupt = false;
     // A turn is settled and the session is parked awaiting the next prompt.
     let mut parked = false;
-    let mut queued_steers: std::collections::VecDeque<String> = std::collections::VecDeque::new();
+    let mut pending_steers = 0usize;
     let mut escalation: Option<tokio::task::JoinHandle<()>> = None;
 
     let send = |ev: AgentEvent| {
@@ -586,6 +594,16 @@ async fn run_session(session: Session) {
                                 break 'main;
                             }
                         }
+                        "steered" => {
+                            pending_steers = pending_steers.saturating_sub(1);
+                            parked = false;
+                            any_done = false;
+                            let prev = std::mem::replace(&mut assistant_message_id, new_message_id());
+                            if !send(AgentEvent::Steered {
+                                assistant_message_id: Some(prev),
+                                next_assistant_message_id: Some(assistant_message_id.clone()),
+                            }).await { break 'main; }
+                        }
                         _ => {
                             if frame.get("ev").and_then(Value::as_str) == Some("fatal")
                                 || frame.get("status").and_then(Value::as_str) == Some("error")
@@ -615,33 +633,10 @@ async fn run_session(session: Session) {
                                         break 'main;
                                     }
                                     if failed { break 'main; }
-                                    // Turn boundary: a queued steer becomes
-                                    // the next turn; otherwise park for the
-                                    // mailbox (caller owns teardown).
-                                    if let Some(text) = queued_steers.pop_front() {
-                                        any_done = false;
-                                        let prev = std::mem::replace(
-                                            &mut assistant_message_id,
-                                            new_message_id(),
-                                        );
-                                        if !send(AgentEvent::Steered {
-                                            assistant_message_id: Some(prev),
-                                            next_assistant_message_id: Some(
-                                                assistant_message_id.clone(),
-                                            ),
-                                        })
-                                        .await
-                                        {
-                                            break 'main;
-                                        }
-                                        let _ = stdin_tx.send(
-                                            json!({ "op": "user", "prompt": text }).to_string(),
-                                        );
-                                    } else if !steering_open {
+                                    if !steering_open && pending_steers == 0 {
                                         break 'main;
-                                    } else {
-                                        parked = true;
                                     }
+                                    parked = pending_steers == 0;
                                 }
                             }
                         }
@@ -656,28 +651,14 @@ async fn run_session(session: Session) {
 
             steer = steering.recv(), if steering_open && !interrupted => match steer {
                 Some(msg) => {
-                    if parked {
-                        parked = false;
-                        any_done = false;
-                        let prev = std::mem::replace(&mut assistant_message_id, new_message_id());
-                        if !send(AgentEvent::Steered {
-                            assistant_message_id: Some(prev),
-                            next_assistant_message_id: Some(assistant_message_id.clone()),
-                        })
-                        .await
-                        {
-                            break 'main;
-                        }
-                        let _ = stdin_tx
-                            .send(json!({ "op": "user", "prompt": msg.prompt }).to_string());
-                    } else {
-                        // Turn-boundary steering: queue for the next boundary.
-                        queued_steers.push_back(msg.prompt);
-                    }
+                    pending_steers += 1;
+                    parked = false;
+                    any_done = false;
+                    let _ = stdin_tx.send(json!({ "op": "steer", "prompt": msg.prompt }).to_string());
                 }
                 None => {
                     steering_open = false;
-                    if parked && queued_steers.is_empty() {
+                    if parked && pending_steers == 0 {
                         break 'main;
                     }
                 }
@@ -787,15 +768,19 @@ fn decode_tool(name: &str, args: &Value) -> ToolCall {
                 .map(|a| a.as_slice())
                 .unwrap_or_default()
                 .iter()
-                .map(|t| TodoItem {
-                    text: t
-                        .get("content")
-                        .or_else(|| t.get("text"))
-                        .and_then(Value::as_str)
-                        .unwrap_or("")
-                        .into(),
-                    done: t.get("status").and_then(Value::as_str) == Some("completed")
-                        || t.get("completed").and_then(Value::as_bool) == Some(true),
+                .map(|t| {
+                    let status = if t.get("completed").and_then(Value::as_bool) == Some(true) {
+                        TodoStatus::Completed
+                    } else {
+                        TodoStatus::parse(t.get("status").and_then(Value::as_str).unwrap_or(""))
+                    };
+                    TodoItem::new(
+                        t.get("content")
+                            .or_else(|| t.get("text"))
+                            .and_then(Value::as_str)
+                            .unwrap_or(""),
+                        status,
+                    )
                 })
                 .collect(),
         },
