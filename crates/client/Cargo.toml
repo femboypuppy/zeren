@@ -1,5 +1,5 @@
 [package]
-name = "zeron-client"
+name = "zeren-client"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -12,11 +12,11 @@ publish.workspace = true
 # frontend (iOS, Android, tests, CLIs).
 
 [dependencies]
-zeron-voice-session.workspace = true
-zeron-proto.workspace = true
-zeron-doc.workspace = true
-zeron-sync.workspace = true
-zeron-rpc.workspace = true
+zeren-voice-session.workspace = true
+zeren-proto.workspace = true
+zeren-doc.workspace = true
+zeren-sync.workspace = true
+zeren-rpc.workspace = true
 loro.workspace = true
 tokio.workspace = true
 tokio-util.workspace = true
@@ -32,7 +32,7 @@ async-trait.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true
-zeron-sync = { workspace = true, features = ["mock-server"] }
+zeren-sync = { workspace = true, features = ["mock-server"] }
 tokio-tungstenite.workspace = true
 async-trait.workspace = true
 tokio = { workspace = true, features = ["test-util"] }

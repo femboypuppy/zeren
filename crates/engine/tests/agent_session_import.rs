@@ -6,11 +6,11 @@ use std::path::Path;
 use std::sync::Arc;
 
 use serde_json::json;
-use zeron_doc::{MessagePart, MessageRole};
-use zeron_engine::agent_projects::AgentStoreRoots;
-use zeron_engine::agent_sessions::import_session_with;
-use zeron_engine::{EngineCore, EngineProfile, HarnessId, default_registry};
-use zeron_proto::ImportedAgentSession;
+use zeren_doc::{MessagePart, MessageRole};
+use zeren_engine::agent_projects::AgentStoreRoots;
+use zeren_engine::agent_sessions::import_session_with;
+use zeren_engine::{EngineCore, EngineProfile, HarnessId, default_registry};
+use zeren_proto::ImportedAgentSession;
 
 fn roots(stores: &Path) -> AgentStoreRoots {
     AgentStoreRoots {

@@ -1,6 +1,7 @@
 //! Canonical file chips shared by the editor and harness delivery boundary.
 use std::ops::Range;
-pub const FILE_MENTION_SCHEME: &str = "zeron-file:";
+pub const FILE_MENTION_SCHEME: &str = "zeren-file:";
+const LEGACY_FILE_MENTION_SCHEME: &str = "zeron-file:";
 
 pub struct FileMentionLink {
     pub range: Range<usize>,
@@ -74,7 +75,7 @@ pub fn local_path_is_safe(path: &str) -> bool {
 
 /// Only decode canonical chip links, never escaped text or code examples.
 pub fn file_mention_links(text: &str) -> Vec<FileMentionLink> {
-    if !text.contains(FILE_MENTION_SCHEME) {
+    if !text.contains(FILE_MENTION_SCHEME) && !text.contains(LEGACY_FILE_MENTION_SCHEME) {
         return Vec::new();
     }
     let mut image_depth = 0;
@@ -97,7 +98,12 @@ pub fn file_mention_links(text: &str) -> Vec<FileMentionLink> {
             else {
                 return None;
             };
-            let target = percent_decode_path(dest_url.strip_prefix(FILE_MENTION_SCHEME)?)?;
+            let scheme = if dest_url.starts_with(FILE_MENTION_SCHEME) {
+                FILE_MENTION_SCHEME
+            } else {
+                LEGACY_FILE_MENTION_SCHEME
+            };
+            let target = percent_decode_path(dest_url.strip_prefix(scheme)?)?;
             let is_dir = target.ends_with('/');
             let path = target.strip_suffix('/').unwrap_or(&target);
             if !local_path_is_safe(path) {
@@ -106,6 +112,7 @@ pub fn file_mention_links(text: &str) -> Vec<FileMentionLink> {
             let canonical = local_file_link(path, is_dir);
             let source = &text[range.clone()];
             // Keep old recognizable selections after escaping new labels.
+            let canonical = canonical.replace(FILE_MENTION_SCHEME, scheme);
             if canonical != source && canonical.replace("\\`", "`") != source {
                 return None;
             }
@@ -142,6 +149,13 @@ pub fn file_mention_prompt(text: &str) -> String {
 mod tests {
     use super::*;
     #[test]
+    fn legacy_file_chip_remains_readable() {
+        let old = "[main.rs](zeron-file:src/main.rs)";
+        assert_eq!(file_mention_links(old)[0].path, "src/main.rs");
+        assert_eq!(file_mention_prompt(old), "[main.rs](src/main.rs)");
+    }
+
+    #[test]
     fn provider_text_preserves_paths_and_literal_examples() {
         let file = local_file_link("src/a file#[x].rs", false);
         let folder = local_file_link("src/components", true);
@@ -155,8 +169,8 @@ mod tests {
             format!("```\n{file}\n```"),
             format!("\\{file}"),
             format!("![example {file}](example.png)"),
-            "[x](zeron-file:../x)".into(),
-            "[other](zeron-file:src/x)".into(),
+            "[x](zeren-file:../x)".into(),
+            "[other](zeren-file:src/x)".into(),
         ] {
             assert!(file_mention_links(&literal).is_empty());
             assert_eq!(file_mention_prompt(&literal), literal);
@@ -165,10 +179,10 @@ mod tests {
         let links = file_mention_links(&image_then_file);
         assert_eq!(links.len(), 1);
         assert_eq!(&image_then_file[links[0].range.clone()], file);
-        for name in ["src/é.rs", "src/](zeron-file:x)", "src/what?.rs"] {
+        for name in ["src/é.rs", "src/](zeren-file:x)", "src/what?.rs"] {
             let raw = local_file_link(name, false);
             assert_eq!(file_mention_links(&raw)[0].path, name);
-            assert!(!file_mention_prompt(&raw).contains("](zeron-file:src/"));
+            assert!(!file_mention_prompt(&raw).contains("](zeren-file:src/"));
         }
     }
 }

@@ -1,4 +1,4 @@
-//! Zeron's source-neutral theme domain model.
+//! Zeren's source-neutral theme domain model.
 //!
 //! Runtime code consumes complete [`ThemeVariant`] values. Import formats such
 //! as VS Code are deliberately isolated in [`vscode`], so a component never
@@ -276,7 +276,7 @@ pub struct ColorParseError;
 #[serde(rename_all = "camelCase")]
 pub enum AccentPreset {
     #[default]
-    Zeron,
+    Zeren,
     Orange,
     Amber,
     Green,
@@ -287,7 +287,7 @@ pub enum AccentPreset {
 
 impl AccentPreset {
     pub const ALL: [Self; 7] = [
-        Self::Zeron,
+        Self::Zeren,
         Self::Orange,
         Self::Amber,
         Self::Green,
@@ -298,7 +298,7 @@ impl AccentPreset {
 
     pub fn label(self) -> &'static str {
         match self {
-            Self::Zeron => "Zeron",
+            Self::Zeren => "Zeren",
             Self::Orange => "Orange",
             Self::Amber => "Amber",
             Self::Green => "Green",
@@ -310,7 +310,7 @@ impl AccentPreset {
 
     pub fn color(self, appearance: Appearance) -> Color {
         let (dark, light) = match self {
-            Self::Zeron => ("#8b7cf6", "#5b43e8"),
+            Self::Zeren => ("#8b7cf6", "#5b43e8"),
             Self::Orange => ("#fb923c", "#c2410c"),
             Self::Amber => ("#fbbf24", "#a16207"),
             Self::Green => ("#4ade80", "#15803d"),
@@ -400,8 +400,8 @@ pub struct ThemeSelection {
 impl Default for ThemeSelection {
     fn default() -> Self {
         Self {
-            light: "zeron-light".into(),
-            dark: "zeron-dark".into(),
+            light: "zeren-light".into(),
+            dark: "zeren-dark".into(),
         }
     }
 }
@@ -554,12 +554,12 @@ impl ThemeRegistry {
         self.variant(selection.variant_id(appearance))
             .or_else(|| {
                 self.variant(if appearance.is_dark() {
-                    "zeron-dark"
+                    "zeren-dark"
                 } else {
-                    "zeron-light"
+                    "zeren-light"
                 })
             })
-            .expect("the built-in registry always contains both Zeron variants")
+            .expect("the built-in registry always contains both Zeren variants")
     }
 
     pub fn validate(&self) -> Vec<ValidationIssue> {
@@ -812,8 +812,8 @@ mod tests {
     fn builtins_have_complete_provenance_and_no_validation_errors() {
         let registry = ThemeRegistry::builtin();
         assert_eq!(registry.families.len(), 19);
-        assert!(registry.variant("zeron-light").is_some());
-        assert!(registry.variant("zeron-dark").is_some());
+        assert!(registry.variant("zeren-light").is_some());
+        assert!(registry.variant("zeren-dark").is_some());
         let errors: Vec<_> = registry
             .validate()
             .into_iter()

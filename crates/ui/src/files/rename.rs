@@ -58,7 +58,7 @@ impl FilesSurface {
             })
             && self.tree.node(path).is_some_and(|n| {
                 n.entry.mutation_revision.is_some()
-                    && n.entry.kind != zeron_proto::WorkspaceEntryKind::Symlink
+                    && n.entry.kind != zeren_proto::WorkspaceEntryKind::Symlink
             })
     }
     pub(super) fn begin_tree_rename(
@@ -79,7 +79,7 @@ impl FilesSurface {
             state.set_selected_range(
                 name_selection(
                     &entry.name,
-                    entry.kind == zeron_proto::WorkspaceEntryKind::Directory,
+                    entry.kind == zeren_proto::WorkspaceEntryKind::Directory,
                 ),
                 cx,
             )
@@ -275,7 +275,7 @@ impl FilesSurface {
         let directory = self
             .tree
             .node(&dialog.path)
-            .is_some_and(|n| n.entry.kind == zeron_proto::WorkspaceEntryKind::Directory);
+            .is_some_and(|n| n.entry.kind == zeren_proto::WorkspaceEntryKind::Directory);
         let name = dialog.path.rsplit('/').next().unwrap_or(&dialog.path);
         let copy = format!(
             "Permanently delete {}? {}Open editor buffers will be kept for recovery.",
@@ -450,10 +450,10 @@ mod tests {
             let input = files.tree_rename.as_ref().unwrap().input.clone();
             input.update(cx, |input, cx| input.set_value("renamed.txt", window, cx));
             let mut entry =
-                super::super::test_support::entry("a.txt", zeron_proto::WorkspaceEntryKind::File);
+                super::super::test_support::entry("a.txt", zeren_proto::WorkspaceEntryKind::File);
             entry.mutation_revision = Some("external-edit".into());
             files.tree.apply_page(
-                zeron_proto::WorkspaceDirectoryPage {
+                zeren_proto::WorkspaceDirectoryPage {
                     directory: "".into(),
                     checkout_id: Some("checkout".into()),
                     mutation_capabilities: files.mutation_capabilities,

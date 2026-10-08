@@ -5,17 +5,17 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleDisplayName</key>
-    <string>Zeron Dev</string>
+    <string>Zeren Dev</string>
     <key>CFBundleExecutable</key>
-    <string>zeron</string>
+    <string>zeren</string>
     <key>CFBundleIconFile</key>
-    <string>zeron.icns</string>
+    <string>zeren.icns</string>
     <key>CFBundleIdentifier</key>
     <string>sh.zeron.app.dev</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>Zeron Dev</string>
+    <string>Zeren Dev</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -29,13 +29,13 @@
          the same isolated development instance. -->
     <key>LSEnvironment</key>
     <dict>
-        <key>ZERON_DATA_DIR</key>
+        <key>ZEREN_DATA_DIR</key>
         <string>__DATA_DIR__</string>
-        <key>ZERON_IPC_PORT</key>
+        <key>ZEREN_IPC_PORT</key>
         <string>__IPC_PORT__</string>
     </dict>
     <key>NSMicrophoneUsageDescription</key>
-    <string>Zeron uses your microphone for on-device dictation and for voice sessions you start. Voice sessions stream your audio to OpenAI through your ChatGPT-authenticated Codex account.</string>
+    <string>Zeren uses your microphone for on-device dictation and for voice sessions you start. Voice sessions stream your audio to OpenAI through your ChatGPT-authenticated Codex account.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSSupportsAutomaticGraphicsSwitching</key>

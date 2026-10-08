@@ -2,7 +2,7 @@
 //! decoding, error-code mapping).
 
 use serde_json::Value;
-use zeron_proto::{AgentEvent, DoneStatus, HarnessId, TodoItem, TodoStatus, ToolCall};
+use zeren_proto::{AgentEvent, DoneStatus, HarnessId, TodoItem, TodoStatus, ToolCall};
 
 use super::wire::{ContentBlock, Frame};
 
@@ -722,7 +722,7 @@ impl Normalizer {
                         .partition(|m| is_internal_diagnostic(m));
                     for diagnostic in &diagnostics {
                         tracing::debug!(
-                            target: "zeron_harness::claude",
+                            target: "zeren_harness::claude",
                             "internal CLI diagnostic (not surfaced): {diagnostic}"
                         );
                     }

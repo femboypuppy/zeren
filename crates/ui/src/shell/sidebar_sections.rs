@@ -1,7 +1,7 @@
 //! Account-synced sections; local workspaces keep their settings on this device.
 use super::*;
 use crate::settings::SidebarSection;
-use zeron_proto::{SidebarPinChange, SidebarSectionChange};
+use zeren_proto::{SidebarPinChange, SidebarSectionChange};
 
 pub(super) struct SectionDialog {
     profile: String,
@@ -608,14 +608,14 @@ mod tests {
                     edge_token: None,
                     org_id: None,
                     workos_client_id: None,
-                    default_harness: zeron_proto::HarnessId::Mock,
+                    default_harness: zeren_proto::HarnessId::Mock,
                 },
                 cx,
             )
         })
     }
 
-    fn chat(id: &str) -> zeron_proto::Chat {
+    fn chat(id: &str) -> zeren_proto::Chat {
         serde_json::from_value(serde_json::json!({"id":id,"title":id,"deviceId":"local","archived":false,"createdAt":"2026-09-20T00:00:00Z"})).unwrap()
     }
     fn prepare(shell: &mut Shell, cx: &mut Context<Shell>) {
@@ -794,7 +794,7 @@ mod tests {
         let (out, mut requests) = tokio::sync::mpsc::channel(16);
         let (replies, inbound) = tokio::sync::mpsc::channel(16);
         let engine =
-            crate::state::EngineHandle::from_test_client(zeron_rpc::RpcClient::new(out, inbound));
+            crate::state::EngineHandle::from_test_client(zeren_rpc::RpcClient::new(out, inbound));
         let dir = tempfile::tempdir().unwrap();
         let window = test_shell(cx, dir.path());
         window
@@ -861,7 +861,7 @@ mod tests {
         let (out, _requests) = tokio::sync::mpsc::channel(16);
         let (_replies, inbound) = tokio::sync::mpsc::channel(16);
         let engine =
-            crate::state::EngineHandle::from_test_client(zeron_rpc::RpcClient::new(out, inbound));
+            crate::state::EngineHandle::from_test_client(zeren_rpc::RpcClient::new(out, inbound));
         let dir = tempfile::tempdir().unwrap();
         let window = test_shell(cx, dir.path());
         window
@@ -869,8 +869,8 @@ mod tests {
                 prepare(shell, cx);
                 shell.state.update(cx, |state, _| {
                     state.workspace_scope = Some(WorkspaceScope::Synced);
-                    state.auth = Some(zeron_proto::AuthState::SignedIn {
-                        user: zeron_proto::UserProfile {
+                    state.auth = Some(zeren_proto::AuthState::SignedIn {
+                        user: zeren_proto::UserProfile {
                             id: "user".into(),
                             email: "test@example.test".into(),
                             name: None,
@@ -898,7 +898,7 @@ mod tests {
                     session_ids: vec![],
                     ..section.clone()
                 };
-                let pin = zeron_proto::SidebarPinChange::Pin {
+                let pin = zeren_proto::SidebarPinChange::Pin {
                     session_id: "regular".into(),
                     after: None,
                     before: None,
@@ -924,7 +924,7 @@ mod tests {
                     engine: engine.clone(),
                     queue: std::collections::VecDeque::from([
                         pin.clone(),
-                        zeron_proto::SidebarPinChange::Section {
+                        zeren_proto::SidebarPinChange::Section {
                             change: SidebarSectionChange::Assign {
                                 session_id: "regular".into(),
                                 section_id: Some("a".into()),
@@ -935,7 +935,7 @@ mod tests {
                 });
                 shell.finish_sidebar_pin_write(
                     2,
-                    Ok(zeron_proto::SidebarPreferencesState {
+                    Ok(zeren_proto::SidebarPreferencesState {
                         sections: vec![empty_section.clone()],
                         revision: 1,
                         synced: true,
@@ -951,7 +951,7 @@ mod tests {
                 assert!(shell.active_sidebar_pins(cx).is_empty());
                 shell.finish_sidebar_pin_write(
                     2,
-                    Ok(zeron_proto::SidebarPreferencesState {
+                    Ok(zeren_proto::SidebarPreferencesState {
                         sections: vec![section.clone()],
                         revision: 2,
                         synced: true,
@@ -969,7 +969,7 @@ mod tests {
                 });
                 shell.finish_sidebar_pin_write(
                     3,
-                    Ok(zeron_proto::SidebarPreferencesState {
+                    Ok(zeren_proto::SidebarPreferencesState {
                         sections: vec![empty_section],
                         revision: 3,
                         synced: true,
@@ -995,7 +995,7 @@ mod tests {
         let (out, _requests) = tokio::sync::mpsc::channel(16);
         let (_replies, inbound) = tokio::sync::mpsc::channel(16);
         let engine =
-            crate::state::EngineHandle::from_test_client(zeron_rpc::RpcClient::new(out, inbound));
+            crate::state::EngineHandle::from_test_client(zeren_rpc::RpcClient::new(out, inbound));
         let dir = tempfile::tempdir().unwrap();
         let window = test_shell(cx, dir.path());
         window
@@ -1003,8 +1003,8 @@ mod tests {
                 prepare(shell, cx);
                 shell.state.update(cx, |state, _| {
                     state.workspace_scope = Some(WorkspaceScope::Synced);
-                    state.auth = Some(zeron_proto::AuthState::SignedIn {
-                        user: zeron_proto::UserProfile {
+                    state.auth = Some(zeren_proto::AuthState::SignedIn {
+                        user: zeren_proto::UserProfile {
                             id: "user".into(),
                             email: "test@example.test".into(),
                             name: None,
@@ -1039,7 +1039,7 @@ mod tests {
                 let id = shell.sidebar_pin_write.as_ref().unwrap().id;
                 shell.finish_sidebar_pin_write(
                     id,
-                    Ok(zeron_proto::SidebarPreferencesState {
+                    Ok(zeren_proto::SidebarPreferencesState {
                         revision: 1,
                         synced: true,
                         initialized: true,

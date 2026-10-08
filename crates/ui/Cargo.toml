@@ -1,5 +1,5 @@
 [package]
-name = "zeron-ui"
+name = "zeren-ui"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -48,21 +48,21 @@ name = "compact-picker-fixture"
 required-features = ["compact-picker-fixture"]
 
 [dependencies]
-zeron-voice-media.workspace = true
-zeron-voice-session.workspace = true
-zeron-orb.workspace = true
-zeron-veil.workspace = true
-zeron-voice = { path = "../voice" }
+zeren-voice-media.workspace = true
+zeren-voice-session.workspace = true
+zeren-orb.workspace = true
+zeren-veil.workspace = true
+zeren-voice = { path = "../voice" }
 url = "2"
-zeron-proto.workspace = true
+zeren-proto.workspace = true
 similar.workspace = true
-zeron-doc.workspace = true
-zeron-engine.workspace = true
-zeron-harness.workspace = true
-zeron-rpc.workspace = true
-zeron-update.workspace = true
-zeron-syntax.workspace = true
-zeron-theme.workspace = true
+zeren-doc.workspace = true
+zeren-engine.workspace = true
+zeren-harness.workspace = true
+zeren-rpc.workspace = true
+zeren-update.workspace = true
+zeren-syntax.workspace = true
+zeren-theme.workspace = true
 gpui.workspace = true
 gpui_platform.workspace = true
 gpui_tokio.workspace = true
@@ -74,7 +74,7 @@ async-trait.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 pulldown-cmark.workspace = true
-zeron-markdown.workspace = true
+zeren-markdown.workspace = true
 alacritty_terminal.workspace = true
 base64 = "0.22"
 image = { version = "0.25.10", default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp", "tiff", "ico"] }

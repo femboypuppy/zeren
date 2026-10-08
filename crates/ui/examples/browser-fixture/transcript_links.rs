@@ -79,7 +79,7 @@ pub(super) async fn exercise(
         let entries = serde_json::from_value(serde_json::json!([
             {"id":"fixture-links","role":"assistant","parts":[{"id":"text","kind":"text","text":markdown}],"createdAt":1788900001000_i64,"deviceId":"local","status":"complete"}
         ])).unwrap();
-        s.receive_transcript_frame(zeron_doc::TranscriptFrame::Reset { reset: entries }, cx).unwrap();
+        s.receive_transcript_frame(zeren_doc::TranscriptFrame::Reset { reset: entries }, cx).unwrap();
     });
     pause(cx, 900).await;
     let (position, _) = markdown::render::fixture_link(origin)
@@ -124,7 +124,7 @@ pub(super) async fn exercise(
             == Some(&format!("{origin}/"))),
         "wrong browser destination"
     );
-    let missing_runtime = std::env::var_os("ZERON_LINK_FIXTURE_MISSING_RUNTIME").is_some();
+    let missing_runtime = std::env::var_os("ZEREN_LINK_FIXTURE_MISSING_RUNTIME").is_some();
     let deadline = std::time::Instant::now() + Duration::from_secs(25);
     loop {
         let state = page.read_with(cx, |p, _| p.page.clone());

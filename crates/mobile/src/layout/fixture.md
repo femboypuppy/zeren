@@ -29,9 +29,9 @@ fn main() {
 
 | Crate | Role | Lines |
 |:------|:----:|------:|
-| zeron-text | measurement + line breaking | 3,100 |
-| zeron-markdown | incremental parse | 1,700 |
-| zeron-mobile | layout + FFI | 1,400 |
+| zeren-text | measurement + line breaking | 3,100 |
+| zeren-markdown | incremental parse | 1,700 |
+| zeren-mobile | layout + FFI | 1,400 |
 
 ---
 

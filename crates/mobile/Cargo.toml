@@ -1,5 +1,5 @@
 [package]
-name = "zeron-mobile"
+name = "zeren-mobile"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -9,7 +9,7 @@ publish.workspace = true
 # link. Platform code paints, scrolls and handles gestures; everything that
 # decides *what* to paint and *where* lives here.
 [lib]
-name = "zeron_mobile"
+name = "zeren_mobile"
 crate-type = ["lib", "staticlib", "cdylib"]
 
 [[bin]]
@@ -21,20 +21,20 @@ required-features = ["bindgen"]
 bindgen = ["uniffi/cli"]
 
 [dependencies]
-zeron-voice-session.workspace = true
-zeron-orb.workspace = true
-zeron-veil.workspace = true
+zeren-voice-session.workspace = true
+zeren-orb.workspace = true
+zeren-veil.workspace = true
 tokio.workspace = true
 tokio-util.workspace = true
 async-trait.workspace = true
 uniffi = "0.32"
-zeron-markdown.workspace = true
-zeron-text.workspace = true
-zeron-doc.workspace = true
-zeron-proto.workspace = true
-zeron-client.workspace = true
+zeren-markdown.workspace = true
+zeren-text.workspace = true
+zeren-doc.workspace = true
+zeren-proto.workspace = true
+zeren-client.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 similar.workspace = true
-zeron-syntax.workspace = true
+zeren-syntax.workspace = true
 thiserror.workspace = true

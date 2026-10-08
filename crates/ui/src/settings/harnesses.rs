@@ -23,11 +23,11 @@ use gpui::{
     px,
 };
 
-use zeron_engine::registry::{HarnessDescriptor, descriptor_enabled};
+use zeren_engine::registry::{HarnessDescriptor, descriptor_enabled};
 
-use zeron_proto::{HarnessId, HarnessUpdatePhase, HarnessUpdatePolicy, HarnessUpdateStatus};
+use zeren_proto::{HarnessId, HarnessUpdatePhase, HarnessUpdatePolicy, HarnessUpdateStatus};
 
-use zeron_rpc::methods;
+use zeren_rpc::methods;
 
 use crate::motion;
 use crate::pickers::visible_harnesses;
@@ -87,7 +87,7 @@ fn install_hint(harness: HarnessId, enabled: bool, can_install: bool) -> String 
     } else {
         format!("Install the {} CLI to enable", cli_name(harness))
     };
-    if !can_install && let Some(command) = zeron_harness::install::manual_command(harness) {
+    if !can_install && let Some(command) = zeren_harness::install::manual_command(harness) {
         format!("{hint}. Install with `{command}`")
     } else {
         hint
@@ -190,7 +190,7 @@ pub struct HarnessesPage {
     /// providers expand, so every provider shares the same sign-in flow.
     accounts_page: Option<Entity<AccountsPage>>,
     /// Model catalogs for the Models section, per agent on the target device.
-    models: std::collections::HashMap<HarnessId, Loadable<Vec<zeron_proto::Model>>>,
+    models: std::collections::HashMap<HarnessId, Loadable<Vec<zeren_proto::Model>>>,
     model_tasks: std::collections::HashMap<HarnessId, Task<()>>,
     custom_model: Option<models::CustomModelDialog>,
     /// The Models row being dragged into a new place, if any.
@@ -378,9 +378,9 @@ impl HarnessesPage {
             || {
                 engine
                     .engine_info()
-                    .supports(zeron_proto::capabilities::HARNESS_UPDATES_V1)
+                    .supports(zeren_proto::capabilities::HARNESS_UPDATES_V1)
             },
-            |device| state.device_supports(device, zeron_proto::capabilities::HARNESS_UPDATES_V1),
+            |device| state.device_supports(device, zeren_proto::capabilities::HARNESS_UPDATES_V1),
         )
     }
 
@@ -882,7 +882,7 @@ impl HarnessesPage {
                     HarnessId::Cursor => meta.push(
                         div()
                             .text_color(theme.text_muted.opacity(0.65))
-                            .child("Cursor SDK · Managed by Zeron")
+                            .child("Cursor SDK · Managed by Zeren")
                             .into_any_element(),
                     ),
                     HarnessId::Pi => meta.push(
@@ -1275,11 +1275,11 @@ mod tests {
             let state = cx.new(|_| crate::state::AppState::new());
             super::HarnessesPage::new(state, cx)
         });
-        let descriptor = |id, name: &str| zeron_engine::registry::HarnessDescriptor {
+        let descriptor = |id, name: &str| zeren_engine::registry::HarnessDescriptor {
             id,
             name: name.into(),
             supports_steering: false,
-            steering_mode: zeron_proto::SteeringMode::TurnBoundary,
+            steering_mode: zeren_proto::SteeringMode::TurnBoundary,
             reasoning_levels: Vec::new(),
             installed: true,
             can_install: false,
@@ -1288,13 +1288,13 @@ mod tests {
         window
             .update(cx, |page, _, cx| {
                 page.harnesses = super::Loadable::Ready(vec![
-                    descriptor(zeron_proto::HarnessId::ClaudeCode, "Claude Code"),
-                    descriptor(zeron_proto::HarnessId::Codex, "Codex"),
+                    descriptor(zeren_proto::HarnessId::ClaudeCode, "Claude Code"),
+                    descriptor(zeren_proto::HarnessId::Codex, "Codex"),
                 ]);
-                page.toggle_agent_details(zeron_proto::HarnessId::ClaudeCode, cx);
+                page.toggle_agent_details(zeren_proto::HarnessId::ClaudeCode, cx);
                 assert_eq!(
                     page.expanded_harness,
-                    Some(zeron_proto::HarnessId::ClaudeCode)
+                    Some(zeren_proto::HarnessId::ClaudeCode)
                 );
                 assert_eq!(
                     page.accounts_page
@@ -1302,7 +1302,7 @@ mod tests {
                         .unwrap()
                         .read(cx)
                         .embedded_harness(),
-                    Some(zeron_proto::HarnessId::ClaudeCode)
+                    Some(zeren_proto::HarnessId::ClaudeCode)
                 );
             })
             .unwrap();
@@ -1310,15 +1310,15 @@ mod tests {
             .unwrap();
         window
             .update(cx, |page, _, cx| {
-                page.toggle_agent_details(zeron_proto::HarnessId::Codex, cx);
-                assert_eq!(page.expanded_harness, Some(zeron_proto::HarnessId::Codex));
+                page.toggle_agent_details(zeren_proto::HarnessId::Codex, cx);
+                assert_eq!(page.expanded_harness, Some(zeren_proto::HarnessId::Codex));
                 assert_eq!(
                     page.accounts_page
                         .as_ref()
                         .unwrap()
                         .read(cx)
                         .embedded_harness(),
-                    Some(zeron_proto::HarnessId::Codex)
+                    Some(zeren_proto::HarnessId::Codex)
                 );
             })
             .unwrap();
@@ -1328,17 +1328,17 @@ mod tests {
         window
             .update(cx, |page, _, cx| {
                 page.harnesses = super::Loadable::Ready(vec![descriptor(
-                    zeron_proto::HarnessId::Antigravity,
+                    zeren_proto::HarnessId::Antigravity,
                     "Antigravity",
                 )]);
-                page.toggle_agent_details(zeron_proto::HarnessId::Antigravity, cx);
+                page.toggle_agent_details(zeren_proto::HarnessId::Antigravity, cx);
                 assert_eq!(
                     page.accounts_page
                         .as_ref()
                         .unwrap()
                         .read(cx)
                         .embedded_harness(),
-                    Some(zeron_proto::HarnessId::Antigravity)
+                    Some(zeren_proto::HarnessId::Antigravity)
                 );
             })
             .unwrap();

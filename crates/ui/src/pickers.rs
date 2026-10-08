@@ -24,11 +24,11 @@ use gpui::{
     Subscription, Task, Window, div, prelude::*, px,
 };
 
-use zeron_engine::registry::{HarnessDescriptor, TitleSettings};
-use zeron_proto::{
+use zeren_engine::registry::{HarnessDescriptor, TitleSettings};
+use zeren_proto::{
     ChatConfig, FolderListing, HarnessId, Model, ReasoningLevel, RepoRef, SandboxLevel, Space,
 };
-use zeron_rpc::methods;
+use zeren_rpc::methods;
 
 /// Display cap for the ref list (t3code shows pages of 100 with a status
 /// footer; a flat cap + "Showing X of Y refs" reads the same without
@@ -56,12 +56,12 @@ use crate::settings::composer::ComposerDefaults;
 use crate::state::{AppState, EngineHandle};
 use crate::theme::Theme;
 
-/// Dev/testing knob: `ZERON_SLOW_CATALOG_MS=<ms>` delays every harness and
+/// Dev/testing knob: `ZEREN_SLOW_CATALOG_MS=<ms>` delays every harness and
 /// model catalog result app-side — the chip/tab/list loading states are
 /// sub-second against a warm local daemon and unstageable otherwise
-/// (headless-rig captures; same family as `ZERON_OPEN_PICKER`).
+/// (headless-rig captures; same family as `ZEREN_OPEN_PICKER`).
 fn slow_catalog_delay() -> Option<std::time::Duration> {
-    std::env::var("ZERON_SLOW_CATALOG_MS")
+    std::env::var("ZEREN_SLOW_CATALOG_MS")
         .ok()
         .and_then(|ms| ms.parse::<u64>().ok())
         .map(std::time::Duration::from_millis)
@@ -141,7 +141,7 @@ pub enum CheckoutPlan {
     CurrentCheckout { branch: Option<String> },
     /// Reuse the picked ref's existing worktree (a cwd override; no git).
     ReuseWorktree { path: String, branch: String },
-    /// `CreateWorktree` off `base` on send (zeron mints a `zeron/<name>`
+    /// `CreateWorktree` off `base` on send (zeren mints a `zeren/<name>`
     /// branch). `base: None` = refs never loaded — send falls back to the
     /// space folder rather than failing.
     NewWorktree { base: Option<String> },
@@ -176,7 +176,7 @@ impl ResolvedRunConfig {
 // ---------------------------------------------------------------------------
 
 /// The harness's default model: the first catalog row (both curated catalogs
-/// lead with the flagship — zeron's `pickDefaultModel` Opus preference maps to
+/// lead with the flagship — zeren's `pickDefaultModel` Opus preference maps to
 /// the same row here).
 pub fn default_model(models: &[Model]) -> Option<&Model> {
     models.first()
@@ -190,7 +190,7 @@ fn selected_catalog_model<'a>(models: &'a [Model], selected: Option<&str>) -> Op
     }
 }
 
-/// A model's default reasoning: X-High when the ladder offers it (zeron
+/// A model's default reasoning: X-High when the ladder offers it (zeren
 /// `DEFAULT_REASONING = "xhigh"`), else High, else the ladder's first entry.
 /// `None` only for ladder-less models (e.g. Haiku's thinking toggle instead).
 pub fn default_reasoning(ladder: &[ReasoningLevel]) -> Option<ReasoningLevel> {
@@ -207,7 +207,7 @@ pub fn default_reasoning(ladder: &[ReasoningLevel]) -> Option<ReasoningLevel> {
 
 /// Clamp a picked/remembered level to what the model actually offers: keep it
 /// when the ladder lists it, else fall to the model's default (never a stale
-/// or foreign level — zeron use-run-config.ts's derived-model discipline).
+/// or foreign level — zeren use-run-config.ts's derived-model discipline).
 pub fn clamp_reasoning(
     level: Option<ReasoningLevel>,
     ladder: &[ReasoningLevel],
@@ -407,7 +407,7 @@ pub fn breadcrumbs(path: &str) -> Vec<(String, String)> {
 }
 
 /// Directory rows of a listing (files never render in the browser).
-pub fn browser_rows(listing: &FolderListing) -> Vec<&zeron_proto::FolderEntry> {
+pub fn browser_rows(listing: &FolderListing) -> Vec<&zeren_proto::FolderEntry> {
     listing.entries.iter().filter(|e| e.is_dir).collect()
 }
 
@@ -421,7 +421,7 @@ pub fn browser_rows(listing: &FolderListing) -> Vec<&zeron_proto::FolderEntry> {
 const NO_ACTIVE_ROW: usize = usize::MAX;
 
 /// One project-picker row: every space of a project
-/// ([`zeron_proto::view::project_key`]), named for its representative.
+/// ([`zeren_proto::view::project_key`]), named for its representative.
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct ProjectRow {
     key: String,
@@ -605,7 +605,7 @@ pub struct Pickers {
     /// emits the local device's title settings instead of a composer draft.
     /// `config.harness` then only tracks the tab being browsed.
     title: Option<TitleSettings>,
-    /// Sticky last-used picks (zeron `zeron.composer.defaults:v1`): seeds the
+    /// Sticky last-used picks (zeren `zeren.composer.defaults:v1`): seeds the
     /// new-chat chips and is rewritten on every new-chat pick.
     defaults: ComposerDefaults,
     /// Where [`Self::defaults`] persists (`{data_dir}/composer-defaults.json`);
@@ -708,7 +708,7 @@ pub struct Pickers {
     /// [`Self::toggle`]'s programmatic clear (see the subscription).
     search_reset_muted: bool,
     focus: FocusHandle,
-    /// `ZERON_OPEN_PICKER` boot: keep claiming focus until it sticks, so
+    /// `ZEREN_OPEN_PICKER` boot: keep claiming focus until it sticks, so
     /// keyboard nav drives the data-side-opened popover (headless rigs have
     /// no synthetic pointer, but synthetic keys do arrive).
     boot_focus_pending: bool,
@@ -863,10 +863,10 @@ impl Pickers {
             this.ensure_harnesses(true, cx);
             cx.notify();
         });
-        // Dev/testing knob: `ZERON_OPEN_PICKER=model|traits|repo|branch` boots
+        // Dev/testing knob: `ZEREN_OPEN_PICKER=model|traits|repo|branch` boots
         // with that popover open — synthetic input can't reach the app on
         // headless compositors, so captures need a data-side path.
-        let boot_open = match std::env::var("ZERON_OPEN_PICKER").ok().as_deref() {
+        let boot_open = match std::env::var("ZEREN_OPEN_PICKER").ok().as_deref() {
             _ if title.is_some() => None,
             Some("model") => Some(PickerKind::HarnessModel),
             Some("traits") => Some(PickerKind::HarnessModel),
@@ -1010,7 +1010,7 @@ impl Pickers {
     /// Move an existing chat to another agent, on `model` or that agent's
     /// remembered one. The old agent's native session can't resume under the
     /// new one, so the engine starts it fresh and hands it the conversation so
-    /// far (`zeron_engine::handoff`); the switch applies from the next message.
+    /// far (`zeren_engine::handoff`); the switch applies from the next message.
     fn switch_chat_harness(
         &mut self,
         harness: HarnessId,
@@ -1035,7 +1035,7 @@ impl Pickers {
     fn offered(&self, list: &[HarnessDescriptor]) -> Vec<HarnessDescriptor> {
         let mut offered = offered_harnesses(list);
         if self.title.is_some() {
-            offered.retain(|d| zeron_harness::supports_titles(d.id) && d.id != HarnessId::Mock);
+            offered.retain(|d| zeren_harness::supports_titles(d.id) && d.id != HarnessId::Mock);
         }
         offered
     }
@@ -1099,7 +1099,7 @@ impl Pickers {
         // Fall back to the first OFFERED harness: the registry lists the mock
         // harness first, and resolving chips against it would boot the
         // new-chat canvas onto "Mock" instead of Claude Code + its default
-        // model (it stays available under `ZERON_HARNESS=mock`).
+        // model (it stays available under `ZEREN_HARNESS=mock`).
         fresh.and_then(|list| offered_harnesses(list).first().map(|d| d.id))
     }
 
@@ -1264,7 +1264,7 @@ impl Pickers {
                 list.iter().find(|h| h.id == selected)
             })
             .is_some_and(|h| {
-                h.supports_steering && h.steering_mode == zeron_proto::SteeringMode::StepBoundary
+                h.supports_steering && h.steering_mode == zeren_proto::SteeringMode::StepBoundary
             })
     }
 
@@ -1343,7 +1343,7 @@ impl Pickers {
         cx.notify();
     }
 
-    /// Capture knob (`ZERON_OPEN_DIALOG=model`): open the combined
+    /// Capture knob (`ZEREN_OPEN_DIALOG=model`): open the combined
     /// harness/model menu programmatically.
     /// A jump-slot press while the model menu is open. The shell's session
     /// bindings (Mod+1…9) win the dispatch race — gpui runs a matched
@@ -2514,7 +2514,7 @@ impl Pickers {
         let state = self.state.read(cx);
         let mut rows: Vec<ProjectRow> = Vec::new();
         for space in &state.spaces {
-            let key = zeron_proto::view::project_key(space);
+            let key = zeren_proto::view::project_key(space);
             if rows.iter().any(|row| row.key == key) {
                 continue;
             }
@@ -2549,7 +2549,7 @@ impl Pickers {
             .state
             .read(cx)
             .selected_space_row()
-            .map(zeron_proto::view::project_key);
+            .map(zeren_proto::view::project_key);
         selected
             .and_then(|key| self.project_rows(cx).iter().position(|row| row.key == key))
             .unwrap_or(NO_ACTIVE_ROW)
@@ -2564,7 +2564,7 @@ impl Pickers {
             let Some(member) = state
                 .spaces
                 .iter()
-                .find(|s| zeron_proto::view::project_key(s) == key)
+                .find(|s| zeren_proto::view::project_key(s) == key)
             else {
                 return;
             };
@@ -2668,7 +2668,7 @@ impl Pickers {
                 })
                 .collect();
         }
-        let mut devices: Vec<&zeron_proto::Device> = state.devices.iter().collect();
+        let mut devices: Vec<&zeren_proto::Device> = state.devices.iter().collect();
         devices.sort_by_key(|d| {
             (
                 local.as_deref() != Some(d.id.as_str()),
@@ -2858,7 +2858,7 @@ impl Pickers {
             .state
             .read(cx)
             .selected_space_row()
-            .map(zeron_proto::view::project_key);
+            .map(zeren_proto::view::project_key);
         let active = self.active;
         let no_project_index = rows.len();
         let scrollbar = popover::rail(self, "space-scrollbar", &theme, cx);
@@ -3299,7 +3299,7 @@ impl Pickers {
         let id: SharedString = format!("{base}-{}", cx.entity_id()).into();
         let open = self.open_kind() == Some(kind);
         let resizing = kind == PickerKind::HarnessModel && self.chip_resizing;
-        // Ghost pill (zeron composer/styles.tsx `pill`): `h-8 rounded-lg px-2.5
+        // Ghost pill (zeren composer/styles.tsx `pill`): `h-8 rounded-lg px-2.5
         // gap-1.5 text-[12px] font-medium text-muted-foreground`, icons size-4,
         // hover/open wash — no border, no caret; the actions row stays quiet.
         div()
@@ -3326,7 +3326,7 @@ impl Pickers {
             .rounded(px(8.0))
             .text_size(crate::typography::ui_rems(12.0))
             .font_weight(gpui::FontWeight::MEDIUM)
-            // zeron composer/styles.tsx `pill`: `transition-colors` — the wash
+            // zeren composer/styles.tsx `pill`: `transition-colors` — the wash
             // and text brighten fade over 150ms.
             .text_color(motion::hover_blend(
                 &id,
@@ -3841,7 +3841,7 @@ impl Pickers {
         let theme = Theme::of(cx).for_popup();
         popover::popover_card(&theme)
             .w(px(width))
-            // zeron caps its tallest picker at min(640px, 75vh).
+            // zeren caps its tallest picker at min(640px, 75vh).
             .max_h(px(self.menu_geometry().height))
             .track_focus(&self.focus)
             .on_key_down(cx.listener(|this, event: &KeyDownEvent, window, cx| {
@@ -3877,7 +3877,7 @@ impl Pickers {
     }
 
     /// [`Self::popover_frame`] without the p-1 inset — the harness/model
-    /// picker's rail + list panes bleed to the card edge (zeron
+    /// picker's rail + list panes bleed to the card edge (zeren
     /// harness-model-picker.tsx `className="w-80 p-0"`).
     fn popover_frame_flush(
         &self,
@@ -5846,7 +5846,7 @@ pub(crate) fn normalize_model_rows(harness: HarnessId, models: Vec<Model>) -> Ve
             .to_ascii_lowercase()
     }
     let catalog = match harness {
-        HarnessId::ClaudeCode => zeron_harness::claude::catalog::static_models(),
+        HarnessId::ClaudeCode => zeren_harness::claude::catalog::static_models(),
         _ => Vec::new(),
     };
     // Curated label for an id: exact normalized match, else — for bare
@@ -5887,15 +5887,15 @@ pub(crate) fn normalize_model_rows(harness: HarnessId, models: Vec<Model>) -> Ve
                     }
                 }
                 if !model.options.iter().any(|o| o.id == "contextWindow") {
-                    model.options.push(zeron_proto::ModelOption {
+                    model.options.push(zeren_proto::ModelOption {
                         id: "contextWindow".into(),
                         label: "Context Window".into(),
                         choices: vec![
-                            zeron_proto::ModelOptionChoice {
+                            zeren_proto::ModelOptionChoice {
                                 id: "200k".into(),
                                 label: "200K".into(),
                             },
-                            zeron_proto::ModelOptionChoice {
+                            zeren_proto::ModelOptionChoice {
                                 id: "1m".into(),
                                 label: "1M".into(),
                             },
@@ -5933,10 +5933,10 @@ pub(crate) fn harness_brand_icon(harness: HarnessId) -> (&'static str, Option<gp
     }
 }
 
-/// `ZERON_HARNESS=mock` (the e2e/dev rig) opts the mock harness into the UI;
+/// `ZEREN_HARNESS=mock` (the e2e/dev rig) opts the mock harness into the UI;
 /// production launches never set it, so the mock never surfaces there.
 fn mock_harness_enabled() -> bool {
-    std::env::var("ZERON_HARNESS")
+    std::env::var("ZEREN_HARNESS")
         .ok()
         .as_deref()
         .map(str::trim)
@@ -5946,7 +5946,7 @@ fn mock_harness_enabled() -> bool {
 /// Production pickers AND chip resolution hide the mock harness — the
 /// registry always lists it, but it must never surface in real UI (neither in
 /// the picker rail nor as the eager default the chips resolve against).
-/// `ZERON_HARNESS=mock` shows it; otherwise it only remains when it's
+/// `ZEREN_HARNESS=mock` shows it; otherwise it only remains when it's
 /// literally all there is (a dev build with no real harness registered).
 pub fn visible_harnesses(list: &[HarnessDescriptor]) -> Vec<HarnessDescriptor> {
     visible_harnesses_impl(list, mock_harness_enabled())
@@ -5982,7 +5982,7 @@ fn offered_harnesses_impl(list: &[HarnessDescriptor], allow_mock: bool) -> Vec<H
         .into_iter()
         .filter(|d| {
             d.installed
-                && (zeron_engine::registry::descriptor_enabled(d)
+                && (zeren_engine::registry::descriptor_enabled(d)
                     || (allow_mock && d.id == HarnessId::Mock))
         })
         .collect()
@@ -6047,7 +6047,7 @@ fn resizing_chip_text(
 /// or a tier/speed option offering `fast` (Codex, Devin). Off is the default
 /// when fast isn't, else the other choice — Cursor runs some models fast by
 /// default. Every model then gets the same fast-mode UI.
-fn fast_mode_values(option: &zeron_proto::ModelOption) -> Option<(&str, &str)> {
+fn fast_mode_values(option: &zeren_proto::ModelOption) -> Option<(&str, &str)> {
     let has = |id: &str| option.choices.iter().any(|choice| choice.id == id);
     let on = if matches!(option.id.as_str(), "fastMode" | "fast_mode") && has("on") {
         "on"
@@ -6130,7 +6130,7 @@ fn attach_overlay_end(
 impl Render for Pickers {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let theme = Theme::of(cx).clone();
-        // A ZERON_OPEN_PICKER popover never went through `toggle`, so claim
+        // A ZEREN_OPEN_PICKER popover never went through `toggle`, so claim
         // its keyboard focus here (re-claim until it sticks — the shell's
         // first-paint fallback focuses the composer after our first render).
         if self.boot_focus_pending {
@@ -6185,7 +6185,7 @@ impl Render for Pickers {
         // opens, and rail switches inside the picker are instant.
         self.ensure_harnesses(false, cx);
         self.prefetch_models(false, cx);
-        // A popover opened data-side (ZERON_OPEN_PICKER) never went through
+        // A popover opened data-side (ZEREN_OPEN_PICKER) never went through
         // `toggle`, so kick its loads here (all ensure_* are idempotent).
         if matches!(
             self.open_kind(),
@@ -6194,7 +6194,7 @@ impl Render for Pickers {
         {
             self.ensure_refs(false, cx);
         }
-        // Chip shows the model's display name alone (zeron `modelText`); the
+        // Chip shows the model's display name alone (zeren `modelText`); the
         // harness reads from the brand mark beside it. Never "Default model":
         // before the catalog lands the remembered label (or the configured id)
         // names the pick; the loaded list then resolves it to a concrete row.
@@ -6360,7 +6360,7 @@ impl Render for Pickers {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zeron_proto::{FolderEntry, Model, ModelOption, ModelOptionChoice};
+    use zeren_proto::{FolderEntry, Model, ModelOption, ModelOptionChoice};
 
     struct ModelShortcutHost {
         focus_sub: Option<gpui::Subscription>,
@@ -6550,7 +6550,7 @@ mod tests {
             cx.set_global(Theme::dark());
             let (state, pickers) = side_chat_picker(true, cx);
             state.update(cx, |state, _| {
-                state.set_test_engine(EngineHandle::from_test_client(zeron_rpc::RpcClient::new(
+                state.set_test_engine(EngineHandle::from_test_client(zeren_rpc::RpcClient::new(
                     out, inbound,
                 )));
             });
@@ -8449,7 +8449,7 @@ mod tests {
             can_install: false,
             enabled: Some(true),
             reasoning_levels: Vec::new(),
-            steering_mode: zeron_proto::SteeringMode::StepBoundary,
+            steering_mode: zeren_proto::SteeringMode::StepBoundary,
             supports_steering: false,
         }
     }
@@ -9456,7 +9456,7 @@ mod tests {
     #[test]
     fn windows_folder_paths_and_breadcrumbs() {
         assert_eq!(
-            parent_path(r"D:\Random\zeron"),
+            parent_path(r"D:\Random\zeren"),
             Some(r"D:\Random".to_string())
         );
         assert_eq!(parent_path(r"D:\Random"), Some(r"D:\".to_string()));
@@ -9464,10 +9464,10 @@ mod tests {
         assert_eq!(parent_path(r"D:\"), None);
         assert_eq!(parent_path("D:"), None);
         assert_eq!(child_path(r"D:\", "Random"), r"D:\Random");
-        assert_eq!(child_path(r"D:\Random", "zeron"), r"D:\Random\zeron");
-        let crumbs = breadcrumbs(r"D:\Random\zeron");
+        assert_eq!(child_path(r"D:\Random", "zeren"), r"D:\Random\zeren");
+        let crumbs = breadcrumbs(r"D:\Random\zeren");
         let labels: Vec<&str> = crumbs.iter().map(|(l, _)| l.as_str()).collect();
-        assert_eq!(labels, [r"D:\", "Random", "zeron"]);
+        assert_eq!(labels, [r"D:\", "Random", "zeren"]);
         assert_eq!(crumbs[0].1, r"D:\");
         assert_eq!(crumbs[1].1, r"D:\Random");
         assert_eq!(breadcrumbs(r"D:\").len(), 1);
@@ -9480,9 +9480,9 @@ mod tests {
         // Case-insensitive; the length indexes into the NAME's bytes.
         assert_eq!(completion_prefix_len("Documents", "doc"), Some(3));
         assert_eq!(&"Documents"[3..], "uments");
-        assert_eq!(completion_prefix_len("zeron", "zeron"), Some(5));
-        assert_eq!(completion_prefix_len("zeron", ""), Some(0));
-        assert_eq!(completion_prefix_len("zeron", "dev"), None);
+        assert_eq!(completion_prefix_len("zeren", "zeren"), Some(5));
+        assert_eq!(completion_prefix_len("zeren", ""), Some(0));
+        assert_eq!(completion_prefix_len("zeren", "dev"), None);
         // Longer than the name → not a prefix.
         assert_eq!(completion_prefix_len("dev", "devel"), None);
         // Multibyte names slice on a char boundary.
@@ -9534,13 +9534,13 @@ mod tests {
         assert_eq!(typed_path_target("D:", home), Some(r"D:\".into()));
         assert_eq!(typed_path_target("D:/", home), Some(r"D:\".into()));
         assert_eq!(
-            typed_path_target(r"D:\Random\zeron\", home),
-            Some(r"D:\Random\zeron".into())
+            typed_path_target(r"D:\Random\zeren\", home),
+            Some(r"D:\Random\zeren".into())
         );
         // Forward slashes normalise so the crumb trail can match the path.
         assert_eq!(
-            typed_path_target("D:/Random/zeron", None),
-            Some(r"D:\Random\zeron".into())
+            typed_path_target("D:/Random/zeren", None),
+            Some(r"D:\Random\zeren".into())
         );
         assert!(is_typed_path(r"D:\x"));
         assert!(is_typed_path("/x") && is_typed_path("~"));
@@ -9563,7 +9563,7 @@ mod tests {
                     is_repo: false,
                 },
                 FolderEntry {
-                    name: "zeron".into(),
+                    name: "zeren".into(),
                     is_dir: true,
                     is_repo: true,
                 },
@@ -9572,7 +9572,7 @@ mod tests {
         };
         // Files never show as rows.
         assert_eq!(browser_rows(&listing).len(), 2);
-        assert_eq!(browser_rows(&listing)[1].name, "zeron");
+        assert_eq!(browser_rows(&listing)[1].name, "zeren");
     }
 
     #[test]
@@ -9646,7 +9646,7 @@ mod tests {
             id,
             name: name.into(),
             supports_steering: true,
-            steering_mode: zeron_proto::SteeringMode::StepBoundary,
+            steering_mode: zeren_proto::SteeringMode::StepBoundary,
             reasoning_levels: vec![],
             installed: true,
             can_install: false,
@@ -9662,7 +9662,7 @@ mod tests {
         assert_eq!(visible[0].id, HarnessId::ClaudeCode);
         let only_mock = vec![descriptor(HarnessId::Mock, "Mock")];
         assert_eq!(visible_harnesses_impl(&only_mock, false).len(), 1);
-        // …and opted back in by ZERON_HARNESS=mock (the e2e rig).
+        // …and opted back in by ZEREN_HARNESS=mock (the e2e rig).
         assert_eq!(visible_harnesses_impl(&mixed, true).len(), 2);
         assert_eq!(visible_harnesses_impl(&mixed, true)[0].id, HarnessId::Mock);
     }
@@ -9673,7 +9673,7 @@ mod tests {
             id,
             name: name.into(),
             supports_steering: true,
-            steering_mode: zeron_proto::SteeringMode::StepBoundary,
+            steering_mode: zeren_proto::SteeringMode::StepBoundary,
             reasoning_levels: vec![],
             installed: true,
             can_install: false,
@@ -9726,7 +9726,7 @@ mod tests {
                 id,
                 name: name.into(),
                 supports_steering: true,
-                steering_mode: zeron_proto::SteeringMode::StepBoundary,
+                steering_mode: zeren_proto::SteeringMode::StepBoundary,
                 reasoning_levels: vec![],
                 installed,
                 can_install: false,

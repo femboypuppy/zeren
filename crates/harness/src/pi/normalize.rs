@@ -1,6 +1,6 @@
 use serde_json::Value;
 use std::collections::HashMap;
-use zeron_proto::{AgentEvent, DoneStatus, ToolCall, ToolDiff};
+use zeren_proto::{AgentEvent, DoneStatus, ToolCall, ToolDiff};
 
 #[derive(Default)]
 pub(super) struct Normalizer {
@@ -202,8 +202,8 @@ fn tool(name: &str, args: &Value) -> ToolCall {
         "find" => ToolCall::Glob {
             pattern: string(args, "pattern").into(),
         },
-        name if name.starts_with("zeron_") => ToolCall::Mcp {
-            server: "zeron".into(),
+        name if name.starts_with("zeren_") => ToolCall::Mcp {
+            server: "zeren".into(),
             tool: name[6..].into(),
             input: Some(args.clone()),
         },

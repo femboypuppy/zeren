@@ -3,7 +3,8 @@
 use serde::{Deserialize, Serialize};
 use std::ops::Range;
 
-pub const INVOCATION_SCHEME: &str = "zeron-invoke:";
+pub const INVOCATION_SCHEME: &str = "zeren-invoke:";
+const LEGACY_INVOCATION_SCHEME: &str = "zeron-invoke:";
 
 fn escape_label(label: &str) -> String {
     label
@@ -119,7 +120,7 @@ impl Invocation {
 }
 
 pub fn invocation_links(text: &str) -> Vec<(Range<usize>, Invocation)> {
-    if !text.contains(INVOCATION_SCHEME) {
+    if !text.contains(INVOCATION_SCHEME) && !text.contains(LEGACY_INVOCATION_SCHEME) {
         return Vec::new();
     }
     let mut links = Vec::new();
@@ -141,7 +142,12 @@ pub fn invocation_links(text: &str) -> Vec<(Range<usize>, Invocation)> {
         let pulldown_cmark::Event::Start(pulldown_cmark::Tag::Link { dest_url, .. }) = event else {
             continue;
         };
-        let Some(hex) = dest_url.strip_prefix(INVOCATION_SCHEME) else {
+        let scheme = if dest_url.starts_with(INVOCATION_SCHEME) {
+            INVOCATION_SCHEME
+        } else {
+            LEGACY_INVOCATION_SCHEME
+        };
+        let Some(hex) = dest_url.strip_prefix(scheme) else {
             continue;
         };
         let (start, end) = (range.start, range.end);
@@ -167,7 +173,7 @@ pub fn invocation_links(text: &str) -> Vec<(Range<usize>, Invocation)> {
         {
             continue;
         }
-        let canonical = invocation.link();
+        let canonical = invocation.link().replace(INVOCATION_SCHEME, scheme);
         // Older transcripts did not escape label backticks. Accept an old
         // token only when Markdown still identifies the complete link.
         let source = &text[start..end];
@@ -291,6 +297,17 @@ mod tests {
             path: path.into(),
             command: None,
         }
+    }
+
+    #[test]
+    fn legacy_invocation_chip_remains_readable() {
+        let old = Invocation::Command {
+            name: "compact".into(),
+        }
+        .link()
+        .replace(INVOCATION_SCHEME, LEGACY_INVOCATION_SCHEME);
+        assert_eq!(invocation_links(&old).len(), 1);
+        assert_eq!(invocation_prompt(&old), "/compact");
     }
 
     const HARNESSES: [crate::HarnessId; 9] = [
@@ -604,7 +621,7 @@ mod tests {
             "first /compact then [$review](/repo/a%20b/SKILL.md) finally"
         );
         assert_eq!(invocation_prompt("/$not-a-chip"), "/$not-a-chip");
-        assert!(invocation_links("[x](zeron-invoke:bad)").is_empty());
+        assert!(invocation_links("[x](zeren-invoke:bad)").is_empty());
         for code in [
             format!("`{}`", command.link()),
             format!("```\n{}\n```", command.link()),

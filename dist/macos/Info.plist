@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- Template for Zeron.app/Contents/Info.plist — see dist/README.md for the
+<!-- Template for Zeren.app/Contents/Info.plist — see dist/README.md for the
      bundling steps. Replace __VERSION__ before packaging. -->
 <plist version="1.0">
 <dict>
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleDisplayName</key>
-    <string>Zeron</string>
+    <string>Zeren</string>
     <key>CFBundleExecutable</key>
-    <string>zeron</string>
+    <string>zeren</string>
     <key>CFBundleIconFile</key>
-    <string>zeron.icns</string>
+    <string>zeren.icns</string>
     <key>CFBundleIdentifier</key>
     <string>sh.zeron.app</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>Zeron</string>
+    <string>Zeren</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -31,6 +31,7 @@
             <string>sh.zeron.app.conversation</string>
             <key>CFBundleURLSchemes</key>
             <array>
+                <string>zeren</string>
                 <string>zeron</string>
             </array>
         </dict>
@@ -38,7 +39,7 @@
     <key>LSMinimumSystemVersion</key>
     <string>12.0</string>
     <key>NSMicrophoneUsageDescription</key>
-    <string>Zeron uses your microphone for on-device dictation and for voice sessions you start. Voice sessions stream your audio to OpenAI through your ChatGPT-authenticated Codex account.</string>
+    <string>Zeren uses your microphone for on-device dictation and for voice sessions you start. Voice sessions stream your audio to OpenAI through your ChatGPT-authenticated Codex account.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <!-- Browser tabs load user-selected HTTP dev servers. Keep the exception

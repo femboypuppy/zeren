@@ -24,7 +24,7 @@ transcript merging is performed.
   its card to running without fabricating user text. Actual child user messages
   are still persisted when supplied by the provider.
 - On `thread/resume`, stored parent spawn items rebuild the child ownership
-  table without replaying cards or content into Zeron's existing documents.
+  table without replaying cards or content into Zeren's existing documents.
 - Root self-activity never registers a child or produces a spawn card.
 
 ## Offline regression coverage
@@ -39,8 +39,8 @@ content isolation and final card status, then restarts the engine and appends a
 resumed child's output to the original document.
 
 ```sh
-cargo test --locked -p zeron-harness -p zeron-doc -p zeron-proto
-cargo test --locked -p zeron-engine --lib --test e2e --test codex_subagents
+cargo test --locked -p zeren-harness -p zeren-doc -p zeren-proto
+cargo test --locked -p zeren-engine --lib --test e2e --test codex_subagents
 ```
 
 ## Live validation
@@ -71,7 +71,7 @@ overrides; the test does not edit the user's Codex config.
 CODEX_SUBAGENT_TEST_MODE=v1 \
 CODEX_SUBAGENT_TEST_MODEL=gpt-5.6-luna \
 CODEX_SUBAGENT_TEST_EXECUTABLE=/absolute/path/to/v1-wrapper \
-cargo test --locked -p zeron-harness --test codex \
+cargo test --locked -p zeren-harness --test codex \
   live_subagent_spawn_and_followup_keep_one_transcript -- --ignored --nocapture
 ```
 

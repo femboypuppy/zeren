@@ -1,8 +1,8 @@
-// Zeron glyph field — a dark-mode descendant of anara.com's hero ASCII background.
+// Zeren glyph field — a dark-mode descendant of anara.com's hero ASCII background.
 //
 // Anara: pale-gray math equations on white, cut into cloud-like gaps by a noise field,
 // a pointer trail that darkens cells, 0.88 scroll parallax.
-// Zeron: the same grid, but set in engraved stone. Text is agent traces and zero-math,
+// Zeren: the same grid, but set in engraved stone. Text is agent traces and zero-math,
 // glyphs sit barely above the obsidian, a slow violet light shaft sweeps through them
 // (the canyon beam), and the pointer leaves a violet afterglow instead of ink.
 //
@@ -12,7 +12,7 @@
 // mountGlyphField(host, opts) → { destroy }
 
 const DEFAULT_LINES = [
-  'zeron run --harness claude',
+  'zeren run --harness claude',
   'lim n→∞ 1/n = 0',
   'git worktree add ../quiet-aperture',
   'codex › plan → edit → test',
@@ -25,7 +25,7 @@ const DEFAULT_LINES = [
   'await turn.complete()',
   'Σ tokens → ∅',
   'opencode › reasoning',
-  'ssh zeron@threshold',
+  'ssh zeren@threshold',
   'f(0) = 0',
   'claude › subagent › explore',
   'git merge --ff-only',

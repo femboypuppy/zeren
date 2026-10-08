@@ -6,7 +6,7 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'rust-toolchain.toml'
-      - 'apps/zeron/**'
+      - 'apps/zeren/**'
       - 'dist/windows/**'
       - 'crates/**'
       - 'scripts/test-windows-*.ps1'
@@ -18,7 +18,7 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'rust-toolchain.toml'
-      - 'apps/zeron/**'
+      - 'apps/zeren/**'
       - 'dist/windows/**'
       - 'crates/**'
       - 'scripts/test-windows-*.ps1'
@@ -57,9 +57,9 @@ jobs:
         run: |
           # Native platform initialization runs in its own process. Keep the
           # real-font assertion and the complete headless suite mandatory.
-          cargo test --release --locked -p zeron-ui --lib native_diff_font_geometry -- --test-threads=1 --nocapture
+          cargo test --release --locked -p zeren-ui --lib native_diff_font_geometry -- --test-threads=1 --nocapture
           $nativeResult = $LASTEXITCODE
-          cargo test --release --locked -p zeron-ui --lib -- --test-threads=1 --skip native_diff_font_geometry --nocapture
+          cargo test --release --locked -p zeren-ui --lib -- --test-threads=1 --skip native_diff_font_geometry --nocapture
           $headlessResult = $LASTEXITCODE
           if ($nativeResult -ne 0 -or $headlessResult -ne 0) { exit 1 }
 
@@ -72,11 +72,11 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: ./.github/actions/windows-ci-setup
       - name: Native harness security and integration tests
-        run: cargo test --release --locked -p zeron-harness --features native-fixture --lib --test codex_availability --test windows_native
+        run: cargo test --release --locked -p zeren-harness --features native-fixture --lib --test codex_availability --test windows_native
       - name: Shader layout tests
         run: cargo test --release --locked -p gpui_windows --lib layout
       - name: Application and updater tests
-        run: cargo test --release --locked -p zeron -p zeron-update
+        run: cargo test --release --locked -p zeren -p zeren-update
 
   engine-tests:
     runs-on: windows-2022
@@ -85,11 +85,11 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: ./.github/actions/windows-ci-setup
       - name: Engine unit tests
-        run: cargo test --release --locked -p zeron-engine --lib
+        run: cargo test --release --locked -p zeren-engine --lib
       - name: Harness catalog and login tests
-        run: cargo test --release --locked -p zeron-engine --test codex_catalog --test codex_login_resolution
+        run: cargo test --release --locked -p zeren-engine --test codex_catalog --test codex_login_resolution
       - name: Auth integration tests
-        run: cargo test --release --locked -p zeron-engine --test auth
+        run: cargo test --release --locked -p zeren-engine --test auth
 
   app:
     runs-on: windows-2022
@@ -98,7 +98,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: ./.github/actions/windows-ci-setup
       - name: Build application
-        run: cargo build --release --locked -p zeron
+        run: cargo build --release --locked -p zeren
       - name: Verify portable and installer packaging
         run: ./scripts/package-windows.ps1 -ReleasesUrl "https://github.com/$env:GITHUB_REPOSITORY/releases/latest/download"
       - name: Installer install/uninstall
@@ -110,13 +110,13 @@ jobs:
           # Exercise real path resolution without touching the runner's account.
           # Port zero cannot connect to another running engine.
           $env:HOME = $null
-          $env:ZERON_DATA_DIR = $null
-          $env:ZERON_EDGE_TOKEN = $null
-          $env:ZERON_IPC_PORT = '0'
-          $env:LOCALAPPDATA = Join-Path $env:RUNNER_TEMP "zeron smoke O'Brien 日本語"
-          $expected = Join-Path $env:LOCALAPPDATA 'Zeron'
+          $env:ZEREN_DATA_DIR = $null
+          $env:ZEREN_EDGE_TOKEN = $null
+          $env:ZEREN_IPC_PORT = '0'
+          $env:LOCALAPPDATA = Join-Path $env:RUNNER_TEMP "zeren smoke O'Brien 日本語"
+          $expected = Join-Path $env:LOCALAPPDATA 'Zeren'
           $probe = [Diagnostics.ProcessStartInfo]::new()
-          $probe.FileName = (Resolve-Path -LiteralPath './target/release/zeron.exe').Path
+          $probe.FileName = (Resolve-Path -LiteralPath './target/release/zeren.exe').Path
           $probe.Arguments = 'status'
           $probe.UseShellExecute = $false
           $probe.CreateNoWindow = $true
@@ -135,21 +135,21 @@ jobs:
           } finally { $process.Dispose() }
           $output
           if (-not ($output -contains "Data dir: $expected")) {
-            throw 'Windows startup did not select LOCALAPPDATA/Zeron'
+            throw 'Windows startup did not select LOCALAPPDATA/Zeren'
           }
           if (-not ($output -match '^Mode:\s+local only$')) {
             throw 'An isolated Windows startup must select local-only mode'
           }
       - name: Build rendering fixture
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.native_gui }}
-        run: cargo build --release --locked -p zeron-ui --example windows-render-fixture --features windows-render-fixture
+        run: cargo build --release --locked -p zeren-ui --example windows-render-fixture --features windows-render-fixture
       - name: Upload GUI test binaries
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.native_gui }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: windows-gui-binaries
           path: |
-            target/release/zeron.exe
+            target/release/zeren.exe
             target/release/examples/windows-render-fixture.exe
           if-no-files-found: error
           retention-days: 1

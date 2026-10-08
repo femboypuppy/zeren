@@ -11,10 +11,10 @@ use async_trait::async_trait;
 use futures::StreamExt;
 use futures::stream::BoxStream;
 
-use zeron_doc::{MessageRole, MessageStatus, SessionCommandPayload, SessionMessageEntry};
-use zeron_engine::{EngineCore, HarnessRegistry};
-use zeron_harness::{Harness, HarnessError, RunControls};
-use zeron_proto::{
+use zeren_doc::{MessageRole, MessageStatus, SessionCommandPayload, SessionMessageEntry};
+use zeren_engine::{EngineCore, HarnessRegistry};
+use zeren_harness::{Harness, HarnessError, RunControls};
+use zeren_proto::{
     AgentEvent, DoneStatus, HarnessId, Model, ReasoningLevel, RunRequest, SandboxLevel,
     SteeringMode,
 };
@@ -115,7 +115,7 @@ async fn projectless_chat_runs_from_home_and_mints_no_space() {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn projectless_terminal_resolves_home_and_preserves_explicit_paths() {
-    use zeron_rpc::methods;
+    use zeren_rpc::methods;
 
     let tmp = tempfile::tempdir().unwrap();
     let core = EngineCore::assemble(
@@ -125,7 +125,7 @@ async fn projectless_terminal_resolves_home_and_preserves_explicit_paths() {
         None,
     )
     .expect("engine core assembles");
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     let home = std::env::var("HOME").expect("HOME set in test env");
 
     for (chat_id, cwd, expected) in [
@@ -247,11 +247,11 @@ async fn exercise_projectless(command_first: bool) {
 
     // The composer's exact wire shape for "Don't work in a project": a
     // deviceId, no spaceId, no cwd.
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     if !command_first {
         client
             .call(
-                zeron_rpc::methods::MUTATE,
+                zeren_rpc::methods::MUTATE,
                 serde_json::json!({
                     "op": "createChat",
                     "chatId": CHAT,
@@ -312,7 +312,7 @@ async fn exercise_projectless(command_first: bool) {
     for _ in 0..2 {
         client
             .call(
-                zeron_rpc::methods::MUTATE,
+                zeren_rpc::methods::MUTATE,
                 serde_json::json!({
                     "op": "createChat", "chatId": CHAT, "deviceId": core.device_id,
                 }),

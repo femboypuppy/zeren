@@ -1,6 +1,6 @@
-//! Zeron's own window frost on Windows: a heavily blurred copy of the desktop
+//! Zeren's own window frost on Windows: a heavily blurred copy of the desktop
 //! wallpaper painted behind the whole window, aligned with the window's place
-//! on its display — the Mica look, drawn by Zeron instead of DWM.
+//! on its display — the Mica look, drawn by Zeren instead of DWM.
 //!
 //! DWM backdrops (legacy accent blur, Acrylic, Mica) quietly fall back to a
 //! flat tint on some systems (virtual displays such as Parsec's, GPU or power

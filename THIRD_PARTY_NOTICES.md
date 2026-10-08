@@ -1,6 +1,6 @@
 # Third-party notices
 
-Zeron bundles the following syntax-highlighting components. Unless noted otherwise, their parsers and queries are consumed from the pinned Rust crates listed in `Cargo.lock`. The Kotlin highlight query is maintained as Zeron source code and is not attributed to the grammar crate.
+Zeren bundles the following syntax-highlighting components. Unless noted otherwise, their parsers and queries are consumed from the pinned Rust crates listed in `Cargo.lock`. The Kotlin highlight query is maintained as Zeren source code and is not attributed to the grammar crate.
 
 | Component | Version | License | Source |
 | --- | --- | --- | --- |
@@ -13,7 +13,7 @@ Zeron bundles the following syntax-highlighting components. Unless noted otherwi
 | Tree-sitter TOML, Markdown, YAML, Swift, SQL, Lua, Nix, Make and Containerfile grammars and queries | pinned in `Cargo.lock` | MIT-compatible; see each crate | Crate repositories recorded in `Cargo.lock` |
 | Tree-sitter Kotlin grammar | 1.1.0 | MIT | https://github.com/tree-sitter-grammars/tree-sitter-kotlin |
 
-Zeron also uses the following editor foundations from the pinned `zeronsh/gpui-component` fork. The fork aligns these crates with the same GPUI revision used by Comet.
+Zeren also uses the following editor foundations from the pinned `zeronsh/gpui-component` fork. The fork aligns these crates with the same GPUI revision used by Comet.
 
 | Component | Version | License | Source |
 | --- | --- | --- | --- |
@@ -21,21 +21,21 @@ Zeron also uses the following editor foundations from the pinned `zeronsh/gpui-c
 | mermaid-rs-renderer | 0.3.1 | MIT | https://github.com/1jehuang/mermaid-rs-renderer |
 | Ropey | 2.0.0-beta.1 | MIT | https://github.com/cessen/ropey |
 
-Zeron's own source code is licensed under the terms in `LICENSE`. Bundled third-party components retain their respective licenses and notices.
+Zeren's own source code is licensed under the terms in `LICENSE`. Bundled third-party components retain their respective licenses and notices.
 
 ## Symbols
 
-Zeron bundles the SVG icon set and filename/folder associations from
+Zeren bundles the SVG icon set and filename/folder associations from
 [Symbols](https://github.com/miguelsolorio/vscode-symbols/tree/296ef1b62287fb2315cb5651e552e09e8c8e1de8).
 Symbols is MIT licensed. The complete upstream license and copyright notice is
 retained at `crates/ui/assets/file-icons/LICENSE.symbols`.
 
 ## Bundled theme palette adaptations
 
-Zeron includes manually curated palette adaptations derived from the projects
+Zeren includes manually curated palette adaptations derived from the projects
 below. The source repository and exact audited revision are also embedded in
 each resolved theme variant. These projects are not affiliated with or endorsed
-by Zeron. Their names identify the corresponding palette adaptations.
+by Zeren. Their names identify the corresponding palette adaptations.
 
 | Theme project | Audited revision | License and upstream notice |
 | --- | --- | --- |
@@ -54,7 +54,7 @@ by Zeron. Their names identify the corresponding palette adaptations.
 | Winter is Coming | `260547834cb6ac37dd5b8bb5842cc1c8d3164946` | [MIT](https://github.com/johnpapa/vscode-winteriscoming/blob/260547834cb6ac37dd5b8bb5842cc1c8d3164946/LICENSE.md) |
 | Palenight Theme | `6291efaace90855abe3d79025327ca41b9a3138c` | [MIT](https://github.com/whizkydee/vscode-palenight-theme/blob/6291efaace90855abe3d79025327ca41b9a3138c/license.md) |
 | SynthWave '84 | `ecfa2fe1279f7233663fa3f98a96e6756000567b` | [MIT](https://github.com/robb0wen/synthwave-vscode/blob/ecfa2fe1279f7233663fa3f98a96e6756000567b/LICENSE) |
-| Shades of Purple | `e8eb49f33e5db05ceba6677367b33ddb27ad821c` | [MIT text with an additional “With condition” section](https://github.com/ahmadawais/shades-of-purple-vscode/blob/e8eb49f33e5db05ceba6677367b33ddb27ad821c/LICENSE.md); Zeron is MIT-licensed, satisfying the stated condition |
+| Shades of Purple | `e8eb49f33e5db05ceba6677367b33ddb27ad821c` | [MIT text with an additional “With condition” section](https://github.com/ahmadawais/shades-of-purple-vscode/blob/e8eb49f33e5db05ceba6677367b33ddb27ad821c/LICENSE.md); Zeren is MIT-licensed, satisfying the stated condition |
 | Cobalt2 | `c4e9574372b85afad1682ed0fdd1ac0411c62512` | [MIT](https://github.com/wesbos/cobalt2-vscode/blob/c4e9574372b85afad1682ed0fdd1ac0411c62512/LICENSE) |
 | Andromeda | `d1abb48c69493000aa0133a32d594eb25e523d4f` | [MIT](https://github.com/EliverLara/Andromeda/blob/d1abb48c69493000aa0133a32d594eb25e523d4f/LICENSE.md) |
 
@@ -104,7 +104,7 @@ The common MIT permission notice for the adaptations above follows:
 > SOFTWARE.
 
 The pinned Shades of Purple license additionally says that anything built with
-it should also be MIT licensed. Zeron is distributed under MIT terms.
+it should also be MIT licensed. Zeren is distributed under MIT terms.
 
 ## mermaid-rs-renderer
 
@@ -136,7 +136,7 @@ The macOS browser uses [Wry 0.56.0](https://github.com/tauri-apps/wry/tree/wry-v
 (MIT OR Apache-2.0) to host the system WebKit engine, with the `objc2` family
 of bindings (MIT) and `block2` (MIT). Exact versions and transitive dependencies
 are pinned in `Cargo.lock`. The browser integration is independently written
-Zeron code.
+Zeren code.
 
 The Zui native overlay renderer adapts Apache-2.0 GPUI code from
 [`egoist/zed` at `57bd4fe`](https://github.com/egoist/zed/tree/57bd4fe181639797d395978d5de17bc9e10a6219/crates/gpui_macos).
@@ -195,17 +195,17 @@ The bounded helper control protocol and native runtime environment in
 `codex-rs/realtime-webrtc/src/{protocol,client,linux_alsa}.rs`.
 Copyright 2025 OpenAI. Licensed under the Apache License, Version 2.0.
 Upstream NOTICE: "OpenAI Codex. Copyright 2025 OpenAI."
-Zeron runs the helper of the user's separately installed standalone Codex, on
-every platform; Zeron packages do not contain or redistribute Codex binaries or
+Zeren runs the helper of the user's separately installed standalone Codex, on
+every platform; Zeren packages do not contain or redistribute Codex binaries or
 its native audio runtime. This adaptation uses asynchronous bounded pipes and
-the Zeron engine's owner leases. The iOS voice endpoint
-(`apps/ios/Zeron/Voice/CodexVoicePeer.swift`) implements the transport behavior
+the Zeren engine's owner leases. The iOS voice endpoint
+(`apps/ios/Zeren/Voice/CodexVoicePeer.swift`) implements the transport behavior
 described by `codex-rs/voice-host/src/transport.rs` at
 `a956835d020762cb2b570053af06f643a11c0ecc` without copying its code.
 
 Voice sessions use OpenAI's service under the user's own ChatGPT-authenticated
 Codex account and OpenAI's terms; this license covers the adapted code only.
-OpenAI, ChatGPT and Codex are trademarks of OpenAI. Zeron is not affiliated
+OpenAI, ChatGPT and Codex are trademarks of OpenAI. Zeren is not affiliated
 with or endorsed by OpenAI. The license text follows.
 
                                  Apache License

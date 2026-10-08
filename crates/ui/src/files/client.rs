@@ -4,12 +4,12 @@ use async_trait::async_trait;
 use serde::{Serialize, de::DeserializeOwned};
 use serde_json::Value;
 use tokio::sync::mpsc;
-use zeron_proto::{
+use zeren_proto::{
     ListWorkspaceDirectoryRequest, ReadWorkspaceFileRequest, SearchWorkspaceFilesRequest,
     WatchWorkspaceFilesRequest, WorkspaceDirectoryPage, WorkspaceFileSearchMatch,
     WorkspaceFileText, WorkspaceTarget, WriteWorkspaceFileOutcome, WriteWorkspaceFileRequest,
 };
-use zeron_rpc::{RpcError, methods};
+use zeren_rpc::{RpcError, methods};
 
 use crate::state::{AppState, EngineHandle};
 
@@ -192,7 +192,7 @@ impl WorkspaceFilesClient {
         checkout_id: String,
     ) -> Result<(String, Vec<u8>), FilesClientError> {
         use base64::Engine as _;
-        use zeron_proto::{MAX_WORKSPACE_IMAGE_BYTES, WORKSPACE_IMAGE_CHUNK_BYTES};
+        use zeren_proto::{MAX_WORKSPACE_IMAGE_BYTES, WORKSPACE_IMAGE_CHUNK_BYTES};
         // Outside files carry no checkout identity — the device resolves
         // them by absolute path.
         if checkout_id.is_empty() && !path.starts_with('/') {
@@ -200,7 +200,7 @@ impl WorkspaceFilesClient {
                 "Workspace checkout identity unavailable".into(),
             ));
         }
-        let mut request = zeron_proto::ReadWorkspaceImageRequest {
+        let mut request = zeren_proto::ReadWorkspaceImageRequest {
             target: self.context.target.clone(),
             path,
             expected_checkout_id: checkout_id,
@@ -211,7 +211,7 @@ impl WorkspaceFilesClient {
         let mut mime = None;
         let mut size = None;
         for _ in 0..=MAX_WORKSPACE_IMAGE_BYTES / WORKSPACE_IMAGE_CHUNK_BYTES {
-            let chunk: zeron_proto::WorkspaceImageChunk =
+            let chunk: zeren_proto::WorkspaceImageChunk =
                 self.call(methods::READ_WORKSPACE_IMAGE, &request).await?;
             if chunk.checkout_id != request.expected_checkout_id
                 || chunk.content_hash.is_empty()
@@ -263,15 +263,15 @@ impl WorkspaceFilesClient {
 
     pub async fn move_entry(
         &self,
-        request: zeron_proto::MoveWorkspaceEntryRequest,
-    ) -> Result<zeron_proto::WorkspaceMutationOutcome, FilesClientError> {
+        request: zeren_proto::MoveWorkspaceEntryRequest,
+    ) -> Result<zeren_proto::WorkspaceMutationOutcome, FilesClientError> {
         self.call(methods::MOVE_WORKSPACE_ENTRY, &request).await
     }
 
     pub async fn delete_entry(
         &self,
-        request: zeron_proto::DeleteWorkspaceEntryRequest,
-    ) -> Result<zeron_proto::WorkspaceMutationOutcome, FilesClientError> {
+        request: zeren_proto::DeleteWorkspaceEntryRequest,
+    ) -> Result<zeren_proto::WorkspaceMutationOutcome, FilesClientError> {
         self.call(methods::DELETE_WORKSPACE_ENTRY, &request).await
     }
 
@@ -391,14 +391,14 @@ mod tests {
             },
         );
         let result = client
-            .move_entry(zeron_proto::MoveWorkspaceEntryRequest {
+            .move_entry(zeren_proto::MoveWorkspaceEntryRequest {
                 target: target(),
                 operation_id: "op".into(),
                 expected_checkout_id: "checkout".into(),
                 source_path: "a".into(),
                 destination_path: "folder/a".into(),
                 expected_source_revision: "rev".into(),
-                expected_kind: zeron_proto::WorkspaceEntryKind::File,
+                expected_kind: zeren_proto::WorkspaceEntryKind::File,
             })
             .await;
         assert!(result.is_err());
@@ -714,8 +714,8 @@ mod tests {
                 path: "src/lib.rs".into(),
                 text: "fn main() {}".into(),
                 expected_content_hash: "hash".into(),
-                encoding: zeron_proto::WorkspaceWritableEncoding::Utf8,
-                line_ending: zeron_proto::WorkspaceWritableLineEnding::Lf,
+                encoding: zeren_proto::WorkspaceWritableEncoding::Utf8,
+                line_ending: zeren_proto::WorkspaceWritableLineEnding::Lf,
             })
             .await
             .unwrap();
@@ -764,8 +764,8 @@ mod tests {
                 path: "src/lib.rs".into(),
                 text: "changed".into(),
                 expected_content_hash: "hash".into(),
-                encoding: zeron_proto::WorkspaceWritableEncoding::Utf8,
-                line_ending: zeron_proto::WorkspaceWritableLineEnding::Lf,
+                encoding: zeren_proto::WorkspaceWritableEncoding::Utf8,
+                line_ending: zeren_proto::WorkspaceWritableLineEnding::Lf,
             })
             .await
             .unwrap();
@@ -822,7 +822,7 @@ mod tests {
     }
     fn image_chunk(data: &[u8], end: usize, done: bool) -> Value {
         use base64::Engine as _;
-        serde_json::to_value(zeron_proto::WorkspaceImageChunk {
+        serde_json::to_value(zeren_proto::WorkspaceImageChunk {
             checkout_id: "checkout".into(),
             content_hash: "hash".into(),
             mime_type: "image/png".into(),
@@ -892,7 +892,7 @@ mod tests {
     }
     #[tokio::test]
     async fn image_reads_reject_malformed_repeated_and_oversized_chunks() {
-        use zeron_proto::{MAX_WORKSPACE_IMAGE_BYTES, WORKSPACE_IMAGE_CHUNK_BYTES};
+        use zeren_proto::{MAX_WORKSPACE_IMAGE_BYTES, WORKSPACE_IMAGE_CHUNK_BYTES};
         let cases = [
             ("data", serde_json::json!("%%%")),
             (

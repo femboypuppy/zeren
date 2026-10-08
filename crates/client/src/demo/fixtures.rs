@@ -2,8 +2,8 @@
 //! projectless, child, archived), live statuses, and PRs in every state.
 
 use chrono::Utc;
-use zeron_doc::RegistryDoc;
-use zeron_proto::{
+use zeren_doc::RegistryDoc;
+use zeren_proto::{
     ChangeRequestState, ChangeRequestSummary, Chat, ChatConfig, CheckoutChangeRequestStatus,
     ConversationSourceContext, Device, HarnessId, ReasoningLevel, SandboxLevel, Session,
     SessionStatus, SidebarPinChange, SidebarSectionChange, Space,
@@ -71,7 +71,7 @@ pub(crate) fn chats() -> Vec<DemoChat> {
             created_ago_ms: HOUR,
             ..chat(
                 "chat-veil",
-                Some("space-zeron"),
+                Some("space-zeren"),
                 MAC,
                 "Streaming veil on transcript rows",
                 "Opening the PR now. Running the checks first:",
@@ -87,7 +87,7 @@ pub(crate) fn chats() -> Vec<DemoChat> {
             model: "claude-opus-5",
             ..chat(
                 "chat-picker",
-                Some("space-zeron"),
+                Some("space-zeren"),
                 MAC,
                 "Model picker catalog sync",
                 "Before I wire the RPC, two decisions:",
@@ -103,7 +103,7 @@ pub(crate) fn chats() -> Vec<DemoChat> {
             seen: false,
             ..chat(
                 "chat-tabs",
-                Some("space-zeron"),
+                Some("space-zeren"),
                 MAC,
                 "Tool group header colors",
                 "Done — failed children stay quiet.",
@@ -178,7 +178,7 @@ pub(crate) fn chats() -> Vec<DemoChat> {
             last_ago_ms: 10 * MIN,
             ..chat(
                 "chat-cjk",
-                Some("space-zeron-vps"),
+                Some("space-zeren-vps"),
                 VPS,
                 "多言語テキストのレイアウト 🌏",
                 "日本語の長い段落です。",
@@ -200,7 +200,7 @@ pub(crate) fn chats() -> Vec<DemoChat> {
             last_ago_ms: 30 * MIN,
             ..chat(
                 "chat-side",
-                Some("space-zeron"),
+                Some("space-zeren"),
                 MAC,
                 "Side chat: veil timing",
                 "α = 0.2 over inter-append gaps",
@@ -212,7 +212,7 @@ pub(crate) fn chats() -> Vec<DemoChat> {
             created_ago_ms: 4 * DAY,
             ..chat(
                 "chat-oklch",
-                Some("space-zeron"),
+                Some("space-zeren"),
                 MAC,
                 "OKLCH conversion drift",
                 "Gamma encode matches now.",
@@ -249,7 +249,7 @@ pub(crate) fn spaces(now: i64) -> Vec<Space> {
             repository_id: None,
             created_at: ms(now - ago),
         };
-    let zeron = |mut space: Space| {
+    let zeren = |mut space: Space| {
         space.repository_id = Some("github.com/zeronsh/zeron".into());
         space
     };
@@ -262,19 +262,19 @@ pub(crate) fn spaces(now: i64) -> Vec<Space> {
             false,
             20 * DAY,
         ),
-        zeron(space(
-            "space-zeron",
+        zeren(space(
+            "space-zeren",
             MAC,
-            "/Users/dev/zeron",
+            "/Users/dev/zeren",
             None,
             true,
             9 * DAY,
         )),
         // A second clone of the same repository on the VPS.
-        zeron(space(
-            "space-zeron-vps",
+        zeren(space(
+            "space-zeren-vps",
             VPS,
-            "/srv/src/zeron",
+            "/srv/src/zeren",
             None,
             true,
             6 * DAY,
@@ -283,8 +283,8 @@ pub(crate) fn spaces(now: i64) -> Vec<Space> {
         space(
             "space-mobile",
             MAC,
-            "/Users/dev/zeron-ios",
-            Some("Zeron iOS"),
+            "/Users/dev/zeren-ios",
+            Some("Zeren iOS"),
             true,
             2 * DAY,
         ),
@@ -360,7 +360,7 @@ pub(crate) fn seed(
     fixture: DemoFixture,
     self_id: &str,
     self_name: &str,
-) -> Result<Seeded, zeron_doc::DocError> {
+) -> Result<Seeded, zeren_doc::DocError> {
     let now = crate::now_ms();
     let all_devices = devices(self_id, self_name, now);
     let mut change_requests = Vec::new();

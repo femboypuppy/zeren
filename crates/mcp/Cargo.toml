@@ -1,14 +1,14 @@
 [package]
-name = "zeron-mcp"
+name = "zeren-mcp"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 publish.workspace = true
 
 [dependencies]
-zeron-proto.workspace = true
-zeron-doc.workspace = true
-zeron-rpc.workspace = true
+zeren-proto.workspace = true
+zeren-doc.workspace = true
+zeren-rpc.workspace = true
 tokio.workspace = true
 serde.workspace = true
 serde_json.workspace = true

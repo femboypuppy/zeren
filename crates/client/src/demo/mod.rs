@@ -20,11 +20,11 @@ use std::time::Duration;
 
 use chrono::Utc;
 use tokio_util::sync::CancellationToken;
-use zeron_doc::{
+use zeren_doc::{
     MessagePart, MessageRole, MessageStatus, QueueDeliveryGate, RegistryDoc, RegistryRow, RowOp,
     SegmentWriter, SessionCommandPayload, SessionCommandStatus, SessionDoc, apply_op,
 };
-use zeron_proto::{FolderEntry, FolderListing, RepoRef, Session, SessionStatus};
+use zeren_proto::{FolderEntry, FolderListing, RepoRef, Session, SessionStatus};
 
 use crate::catalog::{self, HarnessInfo, ModelInfo};
 use crate::client::ClientInner;
@@ -123,7 +123,7 @@ pub(crate) struct DemoHost {
     cancel: Mutex<Option<CancellationToken>>,
 }
 
-fn doc_err(err: zeron_doc::DocError) -> ClientError {
+fn doc_err(err: zeren_doc::DocError) -> ClientError {
     ClientError::Internal(err.to_string())
 }
 
@@ -440,7 +440,7 @@ impl DemoHost {
             let Some((upload_id, name)) = crate::attachments::parse_pending_ref(reference) else {
                 continue;
             };
-            let path = format!("/Users/dev/.zeron/uploads/{upload_id}-{name}");
+            let path = format!("/Users/dev/.zeren/uploads/{upload_id}-{name}");
             if let Some(bytes) = client.attachment_cache.get(host, reference) {
                 lock(&self.uploads).insert(path.clone(), bytes.clone());
                 client.attachment_cache.put(host, &path, bytes);
@@ -607,11 +607,11 @@ impl DemoHost {
             let _ = client.registry_write(|doc| {
                 doc.set_chat_last_message(
                     chat_id,
-                    &zeron_proto::view::single_line(&preview),
+                    &zeren_proto::view::single_line(&preview),
                     Utc::now(),
                 )?;
                 if untitled {
-                    let title: String = zeron_proto::view::single_line(&preview)
+                    let title: String = zeren_proto::view::single_line(&preview)
                         .chars()
                         .take(48)
                         .collect();
@@ -761,7 +761,7 @@ impl DemoHost {
                 _ => None,
             })
             .map(|t| {
-                zeron_proto::view::single_line(
+                zeren_proto::view::single_line(
                     t.lines().find(|l| !l.trim().is_empty()).unwrap_or(""),
                 )
             })
@@ -806,7 +806,7 @@ impl DemoHost {
         method: &'static str,
         params: serde_json::Value,
     ) -> Result<serde_json::Value> {
-        use zeron_rpc::methods as m;
+        use zeren_rpc::methods as m;
         let client = self.client()?;
         if !client.network_online() || !self.host_online(&client, device_id) {
             return Err(ClientError::HostUnavailable(device_id.to_owned()));
@@ -978,13 +978,13 @@ impl DemoHost {
             current,
             worktree_path: worktree.map(str::to_owned),
         };
-        if path.contains("zeron") {
+        if path.contains("zeren") {
             vec![
                 r("main", true, None),
                 r(
                     "veil-fade",
                     false,
-                    Some("/Users/dev/.zeron/worktrees/zeron-veil-fade"),
+                    Some("/Users/dev/.zeren/worktrees/zeren-veil-fade"),
                 ),
                 r("feature/diff-pane", false, None),
                 r("fix/tool-colors", false, None),
@@ -1021,7 +1021,7 @@ impl DemoHost {
         tokio::time::sleep(Duration::from_millis(250)).await;
         let folder = path.rsplit('/').next().unwrap_or("repo");
         let worktree = format!(
-            "/Users/dev/.zeron/worktrees/{folder}-{}",
+            "/Users/dev/.zeren/worktrees/{folder}-{}",
             base.replace('/', "-")
         );
         let mut refs = lock(&self.refs);
@@ -1055,20 +1055,20 @@ impl DemoHost {
                 "Downloads",
                 "Projects",
                 "scratch",
-                "zeron",
-                "zeron-ios",
+                "zeren",
+                "zeren-ios",
             ],
             "/Users/dev/Documents" => &["notes", "specs"],
-            "/Users/dev/Projects" => &["blog", "dotfiles", "playground", "zeron"],
-            "/Users/dev/Projects/zeron" => &["apps", "crates", "docs", "edge"],
+            "/Users/dev/Projects" => &["blog", "dotfiles", "playground", "zeren"],
+            "/Users/dev/Projects/zeren" => &["apps", "crates", "docs", "edge"],
             "/Users/dev/Projects/blog" => &["content", "public"],
             "/srv" => &["backups", "deploys"],
             "/srv/deploys" => &["edge", "landing"],
             _ => &[],
         };
         const REPOS: &[&str] = &[
-            "zeron",
-            "zeron-ios",
+            "zeren",
+            "zeren-ios",
             "dotfiles",
             "blog",
             "playground",
@@ -1103,7 +1103,7 @@ impl DemoHost {
                 progress(step as f64 / 4.0);
             }
         }
-        let path = format!("/Users/dev/.zeron/uploads/{}-{name}", &crate::new_id()[..8]);
+        let path = format!("/Users/dev/.zeren/uploads/{}-{name}", &crate::new_id()[..8]);
         let bytes = Arc::new(data);
         lock(&self.uploads).insert(path.clone(), bytes.clone());
         client.attachment_cache.put(device_id, &path, bytes);

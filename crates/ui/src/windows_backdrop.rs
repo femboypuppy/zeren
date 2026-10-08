@@ -5,7 +5,7 @@
 //! gpui's `Blurred` background is the legacy accent-policy acrylic
 //! (`SetWindowCompositionAttribute`), which recent Windows 11 builds render as
 //! black behind composition-swapchain windows, and which also keeps the
-//! documented system backdrop from showing. For live blur Zeron clears that
+//! documented system backdrop from showing. For live blur Zeren clears that
 //! accent, extends the frame over the whole client area, and asks DWM for the
 //! system Acrylic backdrop instead.
 //!
@@ -13,7 +13,7 @@
 //! Transparency effects on (and Energy saver off). Tools that rewrite other
 //! apps' backdrops — e.g. Windhawk's "Translucent Windows" mod, whose global
 //! Mica setting replaces this request with a wallpaper-only backdrop — need a
-//! rule leaving `zeron.exe` on its default.
+//! rule leaving `zeren.exe` on its default.
 
 use gpui::Window;
 

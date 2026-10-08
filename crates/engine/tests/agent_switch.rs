@@ -10,10 +10,10 @@ use async_trait::async_trait;
 use futures::StreamExt;
 use futures::stream::BoxStream;
 
-use zeron_doc::{MessageRole, MessageStatus, SessionCommandPayload, SessionMessageEntry};
-use zeron_engine::{EngineCore, HarnessRegistry};
-use zeron_harness::{Harness, HarnessError, RunControls};
-use zeron_proto::{
+use zeren_doc::{MessageRole, MessageStatus, SessionCommandPayload, SessionMessageEntry};
+use zeren_engine::{EngineCore, HarnessRegistry};
+use zeren_harness::{Harness, HarnessError, RunControls};
+use zeren_proto::{
     AgentEvent, DoneStatus, HarnessId, Model, ReasoningLevel, RunRequest, SandboxLevel,
     SteeringMode,
 };
@@ -215,7 +215,7 @@ async fn switching_agents_hands_the_conversation_to_a_fresh_session() {
         .iter()
         .filter(|e| e.role == MessageRole::User)
         .map(|e| match &e.parts[0] {
-            zeron_doc::MessagePart::Text { text, .. } => text.clone(),
+            zeren_doc::MessagePart::Text { text, .. } => text.clone(),
             other => panic!("unexpected part {other:?}"),
         })
         .collect();
@@ -286,7 +286,7 @@ async fn rewinding_forks_before_a_message_and_hands_over_the_history() {
     turn(&core, "write the whole app", HarnessId::Mock, "m2").await;
 
     let forked =
-        zeron_engine::rewind::fork_chat(&core.doc_host, &core.workspace, CHAT, "m2").unwrap();
+        zeren_engine::rewind::fork_chat(&core.doc_host, &core.workspace, CHAT, "m2").unwrap();
     assert_eq!(
         forked.prompt, "write the whole app",
         "offered back for editing"
@@ -309,7 +309,7 @@ async fn rewinding_forks_before_a_message_and_hands_over_the_history() {
         "never resumes the source"
     );
     assert!(
-        zeron_engine::rewind::fork_chat(&core.doc_host, &core.workspace, CHAT, "missing").is_err()
+        zeren_engine::rewind::fork_chat(&core.doc_host, &core.workspace, CHAT, "missing").is_err()
     );
 
     // The fork's first run: fresh session, forked history handed over.

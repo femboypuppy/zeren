@@ -2,7 +2,7 @@ name: Windows build
 
 # Builds the portable Windows app on GitHub's runners and attaches it to the
 # run as a downloadable artifact (Actions → Windows build → the run →
-# Artifacts → zeron-windows-x64), so no local toolchain, disk space, or
+# Artifacts → zeren-windows-x64), so no local toolchain, disk space, or
 # memory is needed. Runs on every push to main that touches the app, or
 # manually via "Run workflow".
 
@@ -13,7 +13,7 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'rust-toolchain.toml'
-      - 'apps/zeron/**'
+      - 'apps/zeren/**'
       - 'crates/**'
       - 'dist/windows/**'
       - 'scripts/package-windows.ps1'
@@ -51,7 +51,7 @@ jobs:
         run: ./scripts/package-windows.ps1 -ReleasesUrl "https://github.com/$env:GITHUB_REPOSITORY/releases/latest/download"
       - uses: actions/upload-artifact@v4
         with:
-          name: zeron-windows-x64
+          name: zeren-windows-x64
           path: |
             target/package/*.zip
             target/package/*.exe

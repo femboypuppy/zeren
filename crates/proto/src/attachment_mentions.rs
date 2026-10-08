@@ -8,8 +8,10 @@
 //! the same name.
 use std::ops::Range;
 
-pub const IMAGE_MENTION_SCHEME: &str = "zeron-image:";
-pub const ATTACHMENT_MENTION_SCHEME: &str = "zeron-attachment:";
+pub const IMAGE_MENTION_SCHEME: &str = "zeren-image:";
+pub const ATTACHMENT_MENTION_SCHEME: &str = "zeren-attachment:";
+const LEGACY_IMAGE_MENTION_SCHEME: &str = "zeron-image:";
+const LEGACY_ATTACHMENT_MENTION_SCHEME: &str = "zeron-attachment:";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AttachmentMention {
@@ -116,7 +118,15 @@ fn unescape_label(raw: &str) -> Option<String> {
 
 /// Only canonical chip links are decoded, never escaped text or code examples.
 pub fn attachment_mentions(text: &str) -> Vec<AttachmentMention> {
-    if !text.contains(IMAGE_MENTION_SCHEME) && !text.contains(ATTACHMENT_MENTION_SCHEME) {
+    if ![
+        IMAGE_MENTION_SCHEME,
+        ATTACHMENT_MENTION_SCHEME,
+        LEGACY_IMAGE_MENTION_SCHEME,
+        LEGACY_ATTACHMENT_MENTION_SCHEME,
+    ]
+    .iter()
+    .any(|scheme| text.contains(scheme))
+    {
         return Vec::new();
     }
     let mut image_depth = 0;
@@ -141,8 +151,12 @@ pub fn attachment_mentions(text: &str) -> Vec<AttachmentMention> {
             };
             let (scheme, is_image) = if dest_url.starts_with(IMAGE_MENTION_SCHEME) {
                 (IMAGE_MENTION_SCHEME, true)
-            } else {
+            } else if dest_url.starts_with(LEGACY_IMAGE_MENTION_SCHEME) {
+                (LEGACY_IMAGE_MENTION_SCHEME, true)
+            } else if dest_url.starts_with(ATTACHMENT_MENTION_SCHEME) {
                 (ATTACHMENT_MENTION_SCHEME, false)
+            } else {
+                (LEGACY_ATTACHMENT_MENTION_SCHEME, false)
             };
             let digits = dest_url.strip_prefix(scheme)?;
             if digits.is_empty() || !digits.bytes().all(|b| b.is_ascii_digit()) {
@@ -151,7 +165,9 @@ pub fn attachment_mentions(text: &str) -> Vec<AttachmentMention> {
             let index: u32 = digits.parse().ok().filter(|index| *index > 0)?;
             let source = &text[range.clone()];
             let label = if is_image {
-                (source == attachment_mention_link(index, None)).then(|| image_label(index))?
+                let canonical =
+                    attachment_mention_link(index, None).replace(IMAGE_MENTION_SCHEME, scheme);
+                (source == canonical).then(|| image_label(index))?
             } else {
                 let tail = format!("]({scheme}{index})");
                 unescape_label(source.strip_prefix('[')?.strip_suffix(&tail)?)?
@@ -214,10 +230,17 @@ mod tests {
     }
 
     #[test]
+    fn legacy_attachment_chips_remain_readable() {
+        let old = "[Image 2](zeron-image:2) [notes.md](zeron-attachment:3)";
+        assert_eq!(attachment_mention_indices(old), vec![2, 3]);
+        assert_eq!(attachment_mention_prompt(old), "Image 2 notes.md");
+    }
+
+    #[test]
     fn links_round_trip_and_become_plain_labels() {
-        assert_eq!(image(2), "[Image 2](zeron-image:2)");
+        assert_eq!(image(2), "[Image 2](zeren-image:2)");
         let notes = attachment_mention_link(3, Some("my [notes].md"));
-        assert_eq!(notes, "[my \\[notes\\].md](zeron-attachment:3)");
+        assert_eq!(notes, "[my \\[notes\\].md](zeren-attachment:3)");
         let text = format!("compare {} with {notes} and {}", image(2), image(10));
         let mentions = attachment_mentions(&text);
         assert_eq!(
@@ -253,21 +276,21 @@ mod tests {
             format!("![example {link}](example.png)"),
             format!("`{file}`"),
             format!("\\{file}"),
-            "[Image 1](zeron-image:0)".to_string(),
-            "[Image 1](zeron-image:)".to_string(),
-            "[Image 1](zeron-image:1x)".to_string(),
-            "[Image 1](zeron-image:-1)".to_string(),
-            "[Image 1](zeron-image:../x)".to_string(),
-            "[Image 2](zeron-image:1)".to_string(),
-            "[Other](zeron-image:1)".to_string(),
-            "[Image 1](zeron-image:99999999999)".to_string(),
-            "[Image 01](zeron-image:01)".to_string(),
-            "[](zeron-attachment:1)".to_string(),
-            "[a.md](zeron-attachment:0)".to_string(),
-            "[a.md](zeron-attachment:1 \"title\")".to_string(),
-            "[a\nb.md](zeron-attachment:1)".to_string(),
-            "[a`b.md](zeron-attachment:1)".to_string(),
-            "[a\\xb.md](zeron-attachment:1)".to_string(),
+            "[Image 1](zeren-image:0)".to_string(),
+            "[Image 1](zeren-image:)".to_string(),
+            "[Image 1](zeren-image:1x)".to_string(),
+            "[Image 1](zeren-image:-1)".to_string(),
+            "[Image 1](zeren-image:../x)".to_string(),
+            "[Image 2](zeren-image:1)".to_string(),
+            "[Other](zeren-image:1)".to_string(),
+            "[Image 1](zeren-image:99999999999)".to_string(),
+            "[Image 01](zeren-image:01)".to_string(),
+            "[](zeren-attachment:1)".to_string(),
+            "[a.md](zeren-attachment:0)".to_string(),
+            "[a.md](zeren-attachment:1 \"title\")".to_string(),
+            "[a\nb.md](zeren-attachment:1)".to_string(),
+            "[a`b.md](zeren-attachment:1)".to_string(),
+            "[a\\xb.md](zeren-attachment:1)".to_string(),
         ] {
             assert!(attachment_mentions(&literal).is_empty(), "{literal}");
             assert_eq!(attachment_mention_prompt(&literal), literal);

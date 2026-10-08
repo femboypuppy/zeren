@@ -3,7 +3,7 @@ use super::*;
 use futures::{SinkExt, StreamExt};
 use std::time::Duration;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use zeron_sync::chat_frames::{decode, encode, frame_type};
+use zeren_sync::chat_frames::{decode, encode, frame_type};
 
 #[derive(Clone, Copy)]
 enum Hold {
@@ -1012,7 +1012,7 @@ async fn forty_eight_parent_and_subagent_writers_all_get_service_at_capacity() {
                         .unwrap()
                         <= ACTIVE_SYNC_CAP as u64
                 );
-                assert!(zeron_sync::budget::shared().stats().sockets <= 32);
+                assert!(zeren_sync::budget::shared().stats().sockets <= 32);
                 assert_eq!(
                     lock(&relay.joins_by_chat).get(&handles[0].chat_id),
                     Some(&1),
@@ -1125,14 +1125,14 @@ async fn global_saturation_rotates_between_profiles_below_their_local_caps() {
             handles.push(h);
         }
     }
-    until(|| zeron_sync::budget::shared().stats().socket_waiting > 0).await;
+    until(|| zeren_sync::budget::shared().stats().socket_waiting > 0).await;
     tokio::time::timeout(Duration::from_secs(15), async {
         loop {
             for h in &handles {
                 h.sync_last_started
                     .store(now_ms() - SYNC_QUANTUM_MS - 1, Ordering::Release);
             }
-            assert!(zeron_sync::budget::shared().stats().sockets <= 32);
+            assert!(zeren_sync::budget::shared().stats().sockets <= 32);
             if lock(&relay.joins_by_chat).len() == 40 {
                 break;
             }
@@ -1145,8 +1145,8 @@ async fn global_saturation_rotates_between_profiles_below_their_local_caps() {
         host.shutdown_workers().await;
     }
     until(|| {
-        zeron_sync::budget::shared().stats().sockets == 0
-            && zeron_sync::budget::shared().stats().socket_waiting == 0
+        zeren_sync::budget::shared().stats().sockets == 0
+            && zeren_sync::budget::shared().stats().socket_waiting == 0
     })
     .await;
 }

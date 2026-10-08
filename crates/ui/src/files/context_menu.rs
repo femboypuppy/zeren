@@ -127,7 +127,7 @@ impl FilesSurface {
             self.close_tree_context_menu(cx);
             return;
         };
-        let is_directory = node.entry.kind == zeron_proto::WorkspaceEntryKind::Directory;
+        let is_directory = node.entry.kind == zeren_proto::WorkspaceEntryKind::Directory;
         self.close_tree_context_menu(cx);
         match action {
             0 => cx.emit(FilesEvent::AddToChat {

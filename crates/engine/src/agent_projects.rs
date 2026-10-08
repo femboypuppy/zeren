@@ -26,7 +26,7 @@ use std::time::Duration;
 
 use chrono::{DateTime, Utc};
 use rusqlite::OpenFlags;
-use zeron_proto::{AgentProject, AgentProjectSource, HarnessId};
+use zeren_proto::{AgentProject, AgentProjectSource, HarnessId};
 
 use crate::EngineError;
 use crate::repos::{disposable_worker, home_dir};

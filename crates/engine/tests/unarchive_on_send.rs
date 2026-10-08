@@ -9,10 +9,10 @@ use async_trait::async_trait;
 use futures::StreamExt;
 use futures::stream::BoxStream;
 
-use zeron_doc::{MessageRole, MessageStatus, SessionCommandPayload, SessionMessageEntry};
-use zeron_engine::{EngineCore, HarnessRegistry};
-use zeron_harness::{Harness, HarnessError, RunControls};
-use zeron_proto::{
+use zeren_doc::{MessageRole, MessageStatus, SessionCommandPayload, SessionMessageEntry};
+use zeren_engine::{EngineCore, HarnessRegistry};
+use zeren_harness::{Harness, HarnessError, RunControls};
+use zeren_proto::{
     AgentEvent, DoneStatus, HarnessId, Model, ReasoningLevel, RunRequest, SandboxLevel,
     SteeringMode,
 };
@@ -138,10 +138,10 @@ async fn sending_a_message_unarchives_the_chat() {
     )
     .expect("engine core assembles");
 
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     client
         .call(
-            zeron_rpc::methods::MUTATE,
+            zeren_rpc::methods::MUTATE,
             serde_json::json!({
                 "op": "createChat",
                 "chatId": CHAT,

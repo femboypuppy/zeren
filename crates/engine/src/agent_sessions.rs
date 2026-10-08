@@ -1,8 +1,8 @@
 //! Conversations other coding agents recorded on this device: list them per
-//! project folder, preview one, and import one into a Zeron chat.
+//! project folder, preview one, and import one into a Zeren chat.
 //!
 //! An import copies the conversation into a new chat's transcript, so it reads
-//! like any Zeron session, and stores the agent's own session id as the chat's
+//! like any Zeren session, and stores the agent's own session id as the chat's
 //! harness session. The chat's next message therefore resumes the native
 //! session and the agent keeps the full context. Supported stores (read-only):
 //!
@@ -11,7 +11,7 @@
 //!   `threads` table / `session_index.jsonl`.
 //! - opencode — the `session` / `message` / `part` tables of `opencode.db`.
 //!
-//! Tool calls map onto Zeron's typed [`ToolCall`]s (with the live drivers'
+//! Tool calls map onto Zeren's typed [`ToolCall`]s (with the live drivers'
 //! decoders where they exist) and pass the doc's usual privacy strip; tool
 //! output is not copied, matching live transcripts.
 
@@ -23,11 +23,11 @@ use std::time::Duration;
 use chrono::{DateTime, Utc};
 use rusqlite::OpenFlags;
 use serde_json::Value;
-use zeron_doc::{
+use zeren_doc::{
     MessagePart, MessageRole, MessageStatus, SessionDoc, SessionMessageEntry, continuation_id,
     sanitize_tool_call, split_parts,
 };
-use zeron_proto::{
+use zeren_proto::{
     AgentPreviewMessage, AgentPreviewRole, AgentSession, AgentSessionPreview, Chat, ChatConfig,
     HarnessId, ImportedAgentSession, SandboxLevel, TodoItem, TodoStatus, ToolCall,
 };
@@ -558,7 +558,7 @@ fn preview(transcript: &Transcript) -> AgentSessionPreview {
 }
 
 fn tool_label(call: &ToolCall) -> String {
-    let (label, detail) = zeron_proto::view::tool_chip_content(call);
+    let (label, detail) = zeren_proto::view::tool_chip_content(call);
     if detail.is_empty() {
         label.to_string()
     } else {
@@ -812,7 +812,7 @@ fn claude_transcript(path: &Path) -> Result<Transcript, EngineError> {
                             let name = block["name"].as_str().unwrap_or_default();
                             transcript.tool(
                                 block["id"].as_str().unwrap_or_default().to_string(),
-                                zeron_harness::claude::decode_tool_use(name, &block["input"]),
+                                zeren_harness::claude::decode_tool_use(name, &block["input"]),
                                 at,
                             );
                         }
@@ -877,7 +877,7 @@ fn claude_user_line(line: &Value) -> (Option<String>, Vec<(String, bool)>) {
 fn claude_prompt_text(raw: &str) -> Option<String> {
     let text = strip_tag_blocks(raw, "system-reminder");
     let text = text.trim();
-    if text.is_empty() || zeron_harness::claude::is_synthetic_user_text(text) {
+    if text.is_empty() || zeren_harness::claude::is_synthetic_user_text(text) {
         return None;
     }
     const NOISE: [&str; 6] = [
@@ -1455,7 +1455,7 @@ fn opencode_transcript(
                             let name = part["tool"].as_str().unwrap_or_default();
                             transcript.tool(
                                 id.clone(),
-                                zeron_harness::opencode::decode_tool_call(
+                                zeren_harness::opencode::decode_tool_call(
                                     name,
                                     &part["state"]["input"],
                                 ),
@@ -1583,7 +1583,7 @@ mod tests {
                     ..
                 } => format!(
                     "tool:{}:{is_error}:{resolved}",
-                    zeron_proto::view::tool_chip_content(call).0
+                    zeren_proto::view::tool_chip_content(call).0
                 ),
                 other => format!("{other:?}"),
             })

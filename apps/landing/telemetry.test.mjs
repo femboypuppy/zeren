@@ -14,7 +14,7 @@ function load({ url = "https://zeron.sh/", referrer = "", navigator = {}, transp
     const href = html.match(new RegExp(`id="${id}" href="([^"]+)"`))[1];
     const listeners = {};
     return [id, {
-      href: href === "#downloads" ? "https://zeron.sh/releases/zeron-0.2.10-macos-arm64.dmg" : href,
+      href: href === "#downloads" ? "https://github.com/femboypuppy/zeren/releases/download/v0.2.109/zeren-0.2.109-macos-arm64.dmg" : href,
       addEventListener: (type, listener) => { listeners[type] = listener; },
       activate(type = "click", button = 0) {
         listeners[type]?.({ button, defaultPrevented: false });
@@ -150,7 +150,7 @@ for (const referrer of ["not a URL", "about:blank", "file:///private/secret"]) {
 for (const [id, placement] of Object.entries(placements)) {
   test(`tracks ${placement} download clicks with the current release version`, () => {
     const { requests, links } = load();
-    links[id].href = "https://zeron.sh/releases/zeron-1.2.3-macos-arm64.dmg?private=secret#fragment";
+    links[id].href = "https://github.com/femboypuppy/zeren/releases/download/v1.2.3/zeren-1.2.3-macos-arm64.dmg?private=secret#fragment";
     links[id].activate();
     assert.equal(requests.length, 2);
     const { payload } = requests[1];
@@ -165,11 +165,11 @@ for (const [id, placement] of Object.entries(placements)) {
   });
 }
 
-test("tracks the pinned fallback download when release lookup has not completed", () => {
+test("does not treat the release page as a direct download", () => {
   const { requests, links } = load();
+  links["hero-download"].href = "https://github.com/femboypuppy/zeren/releases/latest";
   links["hero-download"].activate();
-  assert.equal(requests.length, 2);
-  assert.match(requests[1].payload.properties.version, /^\d+\.\d+\.\d+$/);
+  assert.equal(requests.length, 1);
 });
 
 test("counts middle clicks but ignores right clicks", () => {
@@ -179,7 +179,7 @@ test("counts middle clicks but ignores right clicks", () => {
   assert.equal(requests.length, 2);
 });
 
-for (const href of ["https://example.invalid/releases/zeron-1.2.3-macos-arm64.dmg", "https://zeron.sh/private", "invalid"]) {
+for (const href of ["https://example.invalid/releases/zeren-1.2.3-macos-arm64.dmg", "https://zeron.sh/private", "invalid"]) {
   test(`does not report unexpected download targets: ${href}`, () => {
     const { requests, links } = load();
     links["hero-download"].href = href;

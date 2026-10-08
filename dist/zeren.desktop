@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=Zeren
+GenericName=Coding Agent Controller
+Comment=Multi-device controller for coding agents
+Exec=zeren %u
+TryExec=zeren
+Icon=zeren
+Terminal=false
+StartupNotify=true
+Categories=Development;Utility;
+Keywords=agent;claude;codex;ai;coding;
+StartupWMClass=zeren
+MimeType=x-scheme-handler/zeren;x-scheme-handler/zeron;

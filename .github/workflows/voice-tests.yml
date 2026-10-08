@@ -10,8 +10,8 @@ on:
       - 'crates/rpc/**'
       - 'crates/client/**'
       - 'crates/mobile/**'
-      - 'apps/ios/Zeron/Voice/**'
-      - 'apps/ios/ZeronTests/RemoteVoiceLifecycleTests.swift'
+      - 'apps/ios/Zeren/Voice/**'
+      - 'apps/ios/ZerenTests/RemoteVoiceLifecycleTests.swift'
       - 'dist/voice/**'
       - 'scripts/package-voice-runtime.py'
       - 'crates/proto/src/voice.rs'
@@ -76,22 +76,22 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Protocol, transport and idle runtime (no provider access)
         run: |
-          cargo test --locked -p zeron-voice-media --lib
-          cargo test --locked -p zeron-orb
-          cargo test --locked -p zeron-voice-session --lib
-          cargo test --locked -p zeron-mobile --lib voice
-          cargo test --locked -p zeron-mobile --lib orb
-          cargo test --locked -p zeron-proto voice --lib
-          cargo test --locked -p zeron-harness --lib
-          cargo test --locked -p zeron-harness --test codex --test acp
-          cargo test --locked -p zeron-doc voice --lib
-          cargo test --locked -p zeron-engine --lib voice
-          cargo test --locked -p zeron-engine --test voice_runtime
-          cargo test --locked -p zeron-engine --test device_routing
-          cargo test --locked -p zeron-rpc --test device_room
-          cargo test --locked -p zeron-mcp --lib
+          cargo test --locked -p zeren-voice-media --lib
+          cargo test --locked -p zeren-orb
+          cargo test --locked -p zeren-voice-session --lib
+          cargo test --locked -p zeren-mobile --lib voice
+          cargo test --locked -p zeren-mobile --lib orb
+          cargo test --locked -p zeren-proto voice --lib
+          cargo test --locked -p zeren-harness --lib
+          cargo test --locked -p zeren-harness --test codex --test acp
+          cargo test --locked -p zeren-doc voice --lib
+          cargo test --locked -p zeren-engine --lib voice
+          cargo test --locked -p zeren-engine --test voice_runtime
+          cargo test --locked -p zeren-engine --test device_routing
+          cargo test --locked -p zeren-rpc --test device_room
+          cargo test --locked -p zeren-mcp --lib
       - name: Native audio and WebRTC AEC3
-        run: cargo test --locked -p zeron-audio --features aec --lib
+        run: cargo test --locked -p zeren-audio --features aec --lib
 
   native-platform-check:
     strategy:
@@ -107,9 +107,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Compile subscription bridge without audio hardware or provider access
-        run: cargo check --locked -p zeron-harness -p zeron-engine
+        run: cargo check --locked -p zeren-harness -p zeren-engine
       - name: Installed and development runtime resolution
-        run: cargo test --locked -p zeron-voice-media --lib
+        run: cargo test --locked -p zeren-voice-media --lib
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         if: runner.os == 'Windows'
         with:
@@ -117,7 +117,7 @@ jobs:
       - name: Initialize a projected Windows runtime (no provider or audio devices)
         if: runner.os == 'Windows'
         run: |
-          $env:ZERON_VOICE_MEDIA_DIR = Join-Path $env:RUNNER_TEMP 'zeron-media/codex-resources/voice'
-          python scripts/package-voice-runtime.py --download --destination $env:ZERON_VOICE_MEDIA_DIR
+          $env:ZEREN_VOICE_MEDIA_DIR = Join-Path $env:RUNNER_TEMP 'zeren-media/codex-resources/voice'
+          python scripts/package-voice-runtime.py --download --destination $env:ZEREN_VOICE_MEDIA_DIR
           if ($LASTEXITCODE -ne 0) { throw 'Voice runtime packaging failed' }
-          cargo test --locked -p zeron-voice-media --lib packaged_native_runtime_initializes_without_audio_devices -- --ignored
+          cargo test --locked -p zeren-voice-media --lib packaged_native_runtime_initializes_without_audio_devices -- --ignored

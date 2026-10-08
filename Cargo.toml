@@ -23,37 +23,37 @@ members = [
     "crates/client",
     "crates/mcp",
     "crates/text",
-    "apps/zeron",
+    "apps/zeren",
 ]
 
 [workspace.package]
-version = "0.2.108"
+version = "0.2.109"
 edition = "2024"
 license = "MIT"
 publish = false
 
 [workspace.dependencies]
-zeron-voice-session = { path = "crates/voice-session" }
-zeron-orb = { path = "crates/orb" }
-zeron-veil = { path = "crates/veil" }
-zeron-voice-media = { path = "crates/voice-media" }
-zeron-audio = { path = "crates/audio" }
-zeron-proto = { path = "crates/proto" }
-zeron-preview = { path = "crates/preview" }
-zeron-doc = { path = "crates/doc" }
-zeron-sync = { path = "crates/sync" }
-zeron-harness = { path = "crates/harness" }
-zeron-engine = { path = "crates/engine" }
-zeron-rpc = { path = "crates/rpc" }
-zeron-update = { path = "crates/update" }
-zeron-ui = { path = "crates/ui" }
-zeron-syntax = { path = "crates/syntax" }
-zeron-markdown = { path = "crates/markdown" }
-zeron-mobile = { path = "crates/mobile" }
-zeron-client = { path = "crates/client" }
-zeron-theme = { path = "crates/theme" }
-zeron-mcp = { path = "crates/mcp" }
-zeron-text = { path = "crates/text" }
+zeren-voice-session = { path = "crates/voice-session" }
+zeren-orb = { path = "crates/orb" }
+zeren-veil = { path = "crates/veil" }
+zeren-voice-media = { path = "crates/voice-media" }
+zeren-audio = { path = "crates/audio" }
+zeren-proto = { path = "crates/proto" }
+zeren-preview = { path = "crates/preview" }
+zeren-doc = { path = "crates/doc" }
+zeren-sync = { path = "crates/sync" }
+zeren-harness = { path = "crates/harness" }
+zeren-engine = { path = "crates/engine" }
+zeren-rpc = { path = "crates/rpc" }
+zeren-update = { path = "crates/update" }
+zeren-ui = { path = "crates/ui" }
+zeren-syntax = { path = "crates/syntax" }
+zeren-markdown = { path = "crates/markdown" }
+zeren-mobile = { path = "crates/mobile" }
+zeren-client = { path = "crates/client" }
+zeren-theme = { path = "crates/theme" }
+zeren-mcp = { path = "crates/mcp" }
+zeren-text = { path = "crates/text" }
 
 # CRDT
 loro = "1.13"
@@ -74,7 +74,7 @@ loro-protocol = "0.3"
 # sidebar); a6c1ad5 adds BackdropBlur + horizontal EdgeFade + glass fixes;
 # 9b672fa bounds renderer GPU memory (region-sized backdrop blur scratch,
 # idle release of blur/path intermediates, instance pool shrink,
-# ZERON_GPU_STATS=1 diagnostics); b687328 adds ImageSource::evict (frees
+# ZEREN_GPU_STATS=1 diagnostics); b687328 adds ImageSource::evict (frees
 # sprite-atlas tiles — remove_asset alone leaked them, see
 # attachments::flush_evicted); ac135eb adds device memory to the stats line;
 # f596cde fixes destination alpha on transparent windows (Porter-Duff OVER,

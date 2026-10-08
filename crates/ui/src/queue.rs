@@ -1,7 +1,7 @@
 //! The pending-message queue, docked above the composer.
 //!
 //! Everything you typed while the agent was busy, in the order it will be sent.
-//! The rows live on the session doc ([`zeron_doc::QueuedMessage`]), so the phone
+//! The rows live on the session doc ([`zeren_doc::QueuedMessage`]), so the phone
 //! shows the same queue and either device can reorder it.
 //!
 //! Text rows steer the live agent; attachment rows offer an explicit interrupt.
@@ -13,8 +13,8 @@ use gpui::{
     SharedString, StatefulInteractiveElement as _, Styled, Window, div, prelude::*, px,
 };
 
-use zeron_doc::{QueueDeliveryGate, QueuedMessage};
-use zeron_rpc::methods;
+use zeren_doc::{QueueDeliveryGate, QueuedMessage};
+use zeren_rpc::methods;
 
 use crate::composer::{Composer, QUEUE_COMPOSER_OVERLAP};
 use crate::icons::{self, icon};
@@ -342,7 +342,7 @@ impl Composer {
             let chat_id = state.selected_chat.clone()?;
             let host_supports_actions = state.chat_host_supports(
                 &chat_id,
-                zeron_proto::capabilities::MESSAGE_QUEUE_ACTIONS_V1,
+                zeren_proto::capabilities::MESSAGE_QUEUE_ACTIONS_V1,
             );
             (state.queue.clone(), chat_id, host_supports_actions)
         };
@@ -1193,7 +1193,7 @@ impl Composer {
             };
             let supported = state.chat_host_supports(
                 &chat_id,
-                zeron_proto::capabilities::MESSAGE_QUEUE_ACTIONS_V1,
+                zeren_proto::capabilities::MESSAGE_QUEUE_ACTIONS_V1,
             );
             (chat_id, host_device_id, supported)
         };
@@ -1318,7 +1318,7 @@ impl Composer {
                 item.delivery_gate.is_some(),
                 state.chat_host_supports(
                     chat_id,
-                    zeron_proto::capabilities::MESSAGE_QUEUE_ACTIONS_V1,
+                    zeren_proto::capabilities::MESSAGE_QUEUE_ACTIONS_V1,
                 ),
                 !item.attachments.is_empty(),
             )
@@ -1355,7 +1355,7 @@ impl Composer {
             else {
                 return;
             };
-            let capability = zeron_proto::capabilities::MESSAGE_QUEUE_EDIT_LEASE_V1;
+            let capability = zeren_proto::capabilities::MESSAGE_QUEUE_EDIT_LEASE_V1;
             let supported = engine.engine_info().supports(capability)
                 && state.chat_host_supports(&chat_id, capability);
             (chat_id, host_device_id, supported)
@@ -1555,7 +1555,7 @@ impl Composer {
     /// saved as its plain label.
     pub(crate) fn queue_edit_text(&self, cx: &gpui::App) -> String {
         let attached: Vec<u32> = self.staged().iter().filter_map(|att| att.mention).collect();
-        zeron_proto::attachment_mentions::demote_unattached_mentions(
+        zeren_proto::attachment_mentions::demote_unattached_mentions(
             self.input.read(cx).text(),
             &attached,
         )
@@ -1830,7 +1830,7 @@ impl Composer {
             let supported = !queue_action_needs_host(method)
                 || state.chat_host_supports(
                     &chat_id,
-                    zeron_proto::capabilities::MESSAGE_QUEUE_ACTIONS_V1,
+                    zeren_proto::capabilities::MESSAGE_QUEUE_ACTIONS_V1,
                 );
             (chat_id, host, supported)
         };
@@ -1926,7 +1926,7 @@ impl Composer {
 
 #[cfg(test)]
 mod tests {
-    use zeron_rpc::methods;
+    use zeren_rpc::methods;
 
     use super::{
         PANEL_PAD_TOP, PANEL_PAD_X, PANEL_RADIUS, QueuePrimaryAction, ROW_RADIUS, ROW_SLOT,
@@ -1984,8 +1984,8 @@ mod tests {
     #[test]
     fn queue_shortcut_targets_the_most_recently_added_row() {
         let items = vec![
-            zeron_doc::QueuedMessage::new("older", "first", "device"),
-            zeron_doc::QueuedMessage::new("newer", "second", "device"),
+            zeren_doc::QueuedMessage::new("older", "first", "device"),
+            zeren_doc::QueuedMessage::new("newer", "second", "device"),
         ];
         assert_eq!(latest_queued_message(&items).unwrap().id, "newer");
         assert!(latest_queued_message(&[]).is_none());
@@ -2152,11 +2152,11 @@ mod tests {
     }
 
     /// Rows label references the way the transcript does, never as raw
-    /// `zeron-invoke:`/`zeron-file:` links, and still hide attachment trailers.
+    /// `zeren-invoke:`/`zeren-file:` links, and still hide attachment trailers.
     #[test]
     fn queue_rows_label_commands_skills_and_files() {
         use crate::composer::ChipKind;
-        use zeron_proto::invocation::Invocation;
+        use zeren_proto::invocation::Invocation;
         let command = Invocation::Command {
             name: "compact".into(),
         }
@@ -2167,7 +2167,7 @@ mod tests {
             command: None,
         }
         .link();
-        let file = zeron_proto::file_mentions::local_file_link("src/queue.rs", false);
+        let file = zeren_proto::file_mentions::local_file_link("src/queue.rs", false);
         let text = format!("{command} then {skill}\non {file}");
         let (display, spans) = super::queue_row_text(&text, &[]);
         assert_eq!(plain(&display), "compact then review-pr on queue.rs");
@@ -2191,7 +2191,7 @@ mod tests {
     /// and an attachments-only message names what it holds.
     #[test]
     fn queue_rows_label_attachment_chips_and_file_only_sends() {
-        use zeron_proto::attachment_mentions::attachment_mention_link;
+        use zeren_proto::attachment_mentions::attachment_mention_link;
         let paths = vec![
             "/uploads/ab12cd34-Image_1.png".to_string(),
             "/uploads/ef56ab78-notes.md".to_string(),

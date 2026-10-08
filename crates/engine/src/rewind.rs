@@ -11,8 +11,8 @@
 //! ([`crate::handoff`]).
 
 use chrono::Utc;
-use zeron_doc::{MessagePart, MessageRole, MessageStatus, SessionDoc};
-use zeron_proto::{Chat, ForkedChat};
+use zeren_doc::{MessagePart, MessageRole, MessageStatus, SessionDoc};
+use zeren_proto::{Chat, ForkedChat};
 
 use crate::EngineError;
 use crate::doc_host::DocHost;

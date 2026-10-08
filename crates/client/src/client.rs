@@ -7,8 +7,8 @@ use std::time::Duration;
 
 use chrono::{TimeZone, Utc};
 use tokio_util::sync::CancellationToken;
-use zeron_doc::RegistryDoc;
-use zeron_proto::{Chat, ChatConfig, SidebarPinChange, SidebarSectionChange};
+use zeren_doc::RegistryDoc;
+use zeren_proto::{Chat, ChatConfig, SidebarPinChange, SidebarSectionChange};
 
 use crate::attachments::{self, AttachmentCache};
 use crate::auth::TokenProvider;
@@ -280,7 +280,7 @@ impl ClientInner {
 
     pub(crate) fn registry_write<R>(
         self: &Arc<Self>,
-        f: impl FnOnce(&mut RegistryDoc) -> std::result::Result<R, zeron_doc::DocError>,
+        f: impl FnOnce(&mut RegistryDoc) -> std::result::Result<R, zeren_doc::DocError>,
     ) -> Result<R> {
         let result = self.workspace.mutate(f)?;
         self.after_registry_write();
@@ -410,7 +410,7 @@ impl ClientInner {
             queued_attachments: device
                 .version
                 .as_deref()
-                .and_then(zeron_proto::version_triple)
+                .and_then(zeren_proto::version_triple)
                 .is_some_and(|v| v >= QUEUED_ATTACHMENTS_MIN),
             mid_turn_steering,
         }
@@ -560,7 +560,7 @@ impl Client {
     pub async fn voice_transport(
         &self,
         device_id: &str,
-    ) -> Result<Arc<zeron_voice_session::RpcTransport>> {
+    ) -> Result<Arc<zeren_voice_session::RpcTransport>> {
         let live = self.inner.live().ok_or_else(|| {
             ClientError::Unsupported("remote voice requires a connected account".into())
         })?;
@@ -784,7 +784,7 @@ impl Client {
     fn chat_write(
         &self,
         chat_id: &str,
-        f: impl FnOnce(&mut RegistryDoc) -> std::result::Result<bool, zeron_doc::DocError>,
+        f: impl FnOnce(&mut RegistryDoc) -> std::result::Result<bool, zeren_doc::DocError>,
     ) -> Result<()> {
         if self.inner.registry_write(f)? {
             Ok(())
@@ -961,7 +961,7 @@ impl Client {
         {
             return Ok(existing.id.clone());
         }
-        let space = zeron_proto::Space {
+        let space = zeren_proto::Space {
             id: crate::new_id(),
             device_id: device_id.to_owned(),
             path: path.to_owned(),
@@ -981,7 +981,7 @@ impl Client {
                 .relay
                 .call(
                     device_id,
-                    zeron_rpc::methods::MUTATE,
+                    zeren_rpc::methods::MUTATE,
                     serde_json::json!({
                         "op": "createSpace",
                         "spaceId": id,
@@ -1113,7 +1113,7 @@ impl Client {
                     .relay
                     .call(
                         device_id,
-                        zeron_rpc::methods::LIST_HARNESSES,
+                        zeren_rpc::methods::LIST_HARNESSES,
                         serde_json::json!({}),
                     )
                     .await
@@ -1156,7 +1156,7 @@ impl Client {
                     .relay
                     .call(
                         device_id,
-                        zeron_rpc::methods::LIST_MODELS,
+                        zeren_rpc::methods::LIST_MODELS,
                         serde_json::json!({ "harness": harness }),
                     )
                     .await
@@ -1249,7 +1249,7 @@ impl Client {
                     .relay
                     .call(
                         device_id,
-                        zeron_rpc::methods::LIST_REFS,
+                        zeren_rpc::methods::LIST_REFS,
                         serde_json::json!({ "repoPath": repo_path }),
                     )
                     .await?;
@@ -1266,7 +1266,7 @@ impl Client {
         chat_id: Option<String>,
         space_id: Option<String>,
         query: &str,
-    ) -> Result<Vec<zeron_proto::FileSearchMatch>> {
+    ) -> Result<Vec<zeren_proto::FileSearchMatch>> {
         match self.inner.backend() {
             Backend::Demo(_) => {
                 const FILES: &[&str] = &[
@@ -1276,8 +1276,8 @@ impl Client {
                     "crates/text/src/layout.rs",
                     "crates/text/src/prepare.rs",
                     "crates/markdown/src/parser.rs",
-                    "apps/ios/Zeron/Transcript/TranscriptListView.swift",
-                    "apps/ios/Zeron/Composer/ComposerBar.swift",
+                    "apps/ios/Zeren/Transcript/TranscriptListView.swift",
+                    "apps/ios/Zeren/Composer/ComposerBar.swift",
                     "docs/mobile-rewrite.md",
                     "README.md",
                 ];
@@ -1285,7 +1285,7 @@ impl Client {
                 Ok(FILES
                     .iter()
                     .filter(|p| q.is_empty() || p.to_lowercase().contains(&q))
-                    .map(|p| zeron_proto::FileSearchMatch {
+                    .map(|p| zeren_proto::FileSearchMatch {
                         path: (*p).to_owned(),
                         is_dir: false,
                     })
@@ -1296,7 +1296,7 @@ impl Client {
                     .relay
                     .call(
                         device_id,
-                        zeron_rpc::methods::SEARCH_FILES,
+                        zeren_rpc::methods::SEARCH_FILES,
                         serde_json::json!({ "query": query, "chatId": chat_id, "spaceId": space_id }),
                     )
                     .await?;
@@ -1320,7 +1320,7 @@ impl Client {
                 };
                 let value = live
                     .relay
-                    .call(device_id, zeron_rpc::methods::LIST_FOLDERS, params)
+                    .call(device_id, zeren_rpc::methods::LIST_FOLDERS, params)
                     .await?;
                 serde_json::from_value(value).map_err(|e| ClientError::HostError(e.to_string()))
             }
@@ -1335,7 +1335,7 @@ impl Client {
                 .relay
                 .call(
                     device_id,
-                    zeron_rpc::methods::SWITCH_REF,
+                    zeren_rpc::methods::SWITCH_REF,
                     serde_json::json!({ "repoPath": repo_path, "refName": ref_name }),
                 )
                 .await
@@ -1360,7 +1360,7 @@ impl Client {
                 }
                 let value = live
                     .relay
-                    .call(device_id, zeron_rpc::methods::CREATE_WORKTREE, params)
+                    .call(device_id, zeren_rpc::methods::CREATE_WORKTREE, params)
                     .await?;
                 value
                     .get("path")
@@ -1427,8 +1427,8 @@ impl Client {
     pub fn set_network_online(&self, online: bool) {
         let was = self.inner.path_online.swap(online, Ordering::AcqRel);
         if !self.inner.is_demo() {
-            // Parks/un-parks every sync backoff in the process (zeron-sync).
-            zeron_sync::wake::set_path_online(online);
+            // Parks/un-parks every sync backoff in the process (zeren-sync).
+            zeren_sync::wake::set_path_online(online);
         }
         if was != online {
             self.inner.recompute_connectivity();

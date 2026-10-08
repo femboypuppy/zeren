@@ -1,5 +1,5 @@
 [package]
-name = "zeron-harness"
+name = "zeren-harness"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -22,8 +22,8 @@ path = "tests/fixtures/pi_rpc.rs"
 required-features = ["native-fixture"]
 
 [dependencies]
-zeron-voice-media.workspace = true
-zeron-proto.workspace = true
+zeren-voice-media.workspace = true
+zeren-proto.workspace = true
 base64 = "0.22"
 reqwest.workspace = true
 tokio.workspace = true

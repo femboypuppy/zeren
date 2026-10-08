@@ -148,20 +148,20 @@ jobs:
           # certificate limit. The export below signs for distribution with
           # the cloud-managed certificate instead; entitlements are put on
           # the archived app in the next step.
-          xcodebuild -project Zeron.xcodeproj -scheme Zeron \
+          xcodebuild -project Zeren.xcodeproj -scheme Zeren \
             -configuration Release -destination 'generic/platform=iOS' \
-            -archivePath "$RUNNER_TEMP/Zeron.xcarchive" archive \
+            -archivePath "$RUNNER_TEMP/Zeren.xcarchive" archive \
             CODE_SIGNING_ALLOWED=NO \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
 
       - name: Entitlements for export
         run: |
           # An unsigned archive carries no entitlements, and export re-signs
-          # with the ones it finds: ad-hoc sign the app with Zeron.entitlements
+          # with the ones it finds: ad-hoc sign the app with Zeren.entitlements
           # (push) so the distribution signature keeps them (aps-environment
           # becomes production from the App Store profile).
-          app="$RUNNER_TEMP/Zeron.xcarchive/Products/Applications/Zeron.app"
-          codesign --force --sign - --entitlements apps/ios/Zeron.entitlements "$app"
+          app="$RUNNER_TEMP/Zeren.xcarchive/Products/Applications/Zeren.app"
+          codesign --force --sign - --entitlements apps/ios/Zeren.entitlements "$app"
           codesign -d --entitlements :- "$app" | grep -q aps-environment
 
       - name: Upload to TestFlight
@@ -177,7 +177,7 @@ jobs:
             plutil -insert testFlightInternalTestingOnly -bool true "$options"
           fi
           xcodebuild -exportArchive \
-            -archivePath "$RUNNER_TEMP/Zeron.xcarchive" \
+            -archivePath "$RUNNER_TEMP/Zeren.xcarchive" \
             -exportPath "$RUNNER_TEMP/TestFlightExport" \
             -exportOptionsPlist "$options" \
             -allowProvisioningUpdates \

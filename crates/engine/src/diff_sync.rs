@@ -1,5 +1,5 @@
 //! CheckoutDiffSync — checkout-scoped working-tree diff production (feature-inventory
-//! §3.5; port of zeron's `checkout-diff-sync.ts` + `git-metadata-sync.ts`).
+//! §3.5; port of zeren's `checkout-diff-sync.ts` + `git-metadata-sync.ts`).
 //!
 //! Chats do not own working-tree state: a concrete Git checkout does. This service
 //! groups this device's chats by their canonical checkout identity (`chat.cwd` →
@@ -45,7 +45,7 @@ use tokio::io::AsyncReadExt;
 use tokio::sync::{mpsc, watch};
 use tokio_util::sync::CancellationToken;
 
-use zeron_proto::{Chat, CheckoutDiff, DiffFileSummary};
+use zeren_proto::{Chat, CheckoutDiff, DiffFileSummary};
 
 use crate::EngineError;
 use crate::doc_host::EdgeConfig;
@@ -94,7 +94,7 @@ pub struct DiffSidecar {
 /// One bounded atomic snapshot of a checkout's working tree.
 #[derive(Debug, Clone)]
 pub struct DiffSnapshot {
-    pub git_status: Option<(Vec<zeron_proto::GitFileStatus>, bool)>,
+    pub git_status: Option<(Vec<zeren_proto::GitFileStatus>, bool)>,
     pub branch: String,
     pub head_sha: Option<String>,
     pub patch: String,
@@ -168,7 +168,7 @@ struct DiffSyncInner {
     /// How long an entry may sit chat-less before reconcile removes it.
     orphan_grace: Duration,
     diffs_tx: watch::Sender<Vec<CheckoutDiff>>,
-    statuses_tx: watch::Sender<Vec<zeron_proto::CheckoutGitStatus>>,
+    statuses_tx: watch::Sender<Vec<zeren_proto::CheckoutGitStatus>>,
     /// chat_id → turn-start tree (see [`TurnSnapshot`]).
     turn_trees: Mutex<HashMap<String, TurnSnapshot>>,
     /// The tasks hold `Weak` refs, but an in-flight iteration holds an
@@ -256,7 +256,7 @@ impl CheckoutDiffSync {
     }
 
     /// Consumers filter this shared cache; subscribing never starts another Git scan.
-    pub fn watch_git_statuses(&self) -> watch::Receiver<Vec<zeron_proto::CheckoutGitStatus>> {
+    pub fn watch_git_statuses(&self) -> watch::Receiver<Vec<zeren_proto::CheckoutGitStatus>> {
         self.inner.statuses_tx.subscribe()
     }
 
@@ -1274,7 +1274,7 @@ pub async fn capture_diff_against(
     if tracked.truncated {
         let boundary = patch.rfind('\n').unwrap_or(0);
         patch.truncate(boundary);
-        patch.push_str("\n# Zeron diff truncated\n");
+        patch.push_str("\n# Zeren diff truncated\n");
     }
 
     // `?? path` records; rename records (`R  new\0old`) consume their extra field.
@@ -1732,7 +1732,7 @@ pub async fn merge_base(root: &Path, base_ref: &str) -> Result<String, EngineErr
 /// capture already does.
 pub async fn snapshot_tree(root: &Path) -> Result<String, EngineError> {
     let index = std::env::temp_dir().join(format!(
-        "zeron-turn-index-{}-{}",
+        "zeren-turn-index-{}-{}",
         std::process::id(),
         chrono::Utc::now().timestamp_micros()
     ));
@@ -1843,7 +1843,7 @@ pub async fn capture_turn_diff(
     if tracked.truncated {
         let boundary = patch.rfind('\n').unwrap_or(0);
         patch.truncate(boundary);
-        patch.push_str("\n# Zeron diff truncated\n");
+        patch.push_str("\n# Zeren diff truncated\n");
     }
 
     let additions: u32 = files.iter().map(|f| f.additions).sum();

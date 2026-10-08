@@ -61,7 +61,7 @@ impl BrowserData {
             return;
         };
         if url.scheme() != "http"
-            || url.port() != Some(zeron_proto::PREVIEW_PROXY_PORT)
+            || url.port() != Some(zeren_proto::PREVIEW_PROXY_PORT)
             || !host.ends_with(".localhost")
         {
             return;
@@ -161,7 +161,7 @@ struct ObserverState {
 define_class!(
     #[unsafe(super(NSObject))]
     #[thread_kind = MainThreadOnly]
-    #[name = "ZeronBrowserObserver"]
+    #[name = "ZerenBrowserObserver"]
     #[ivars = ObserverState]
     struct Observer;
     unsafe impl NSObjectProtocol for Observer {}
@@ -253,7 +253,7 @@ struct ClipState {
 define_class!(
     #[unsafe(super(NSView))]
     #[thread_kind = MainThreadOnly]
-    #[name = "ZeronBrowserClipView"]
+    #[name = "ZerenBrowserClipView"]
     #[ivars = ClipState]
     struct BrowserClipView;
     impl BrowserClipView {

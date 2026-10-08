@@ -2,8 +2,8 @@
 use futures::StreamExt;
 use std::time::Duration;
 use tokio::sync::{mpsc, oneshot};
-use zeron_harness::{CancellationToken, Harness, PiHarness, RunControls, SteerMessage};
-use zeron_proto::{AgentEvent, DoneStatus, RunRequest, SandboxLevel};
+use zeren_harness::{CancellationToken, Harness, PiHarness, RunControls, SteerMessage};
+use zeren_proto::{AgentEvent, DoneStatus, RunRequest, SandboxLevel};
 fn harness() -> PiHarness {
     PiHarness::new()
         .with_executable(env!("CARGO_BIN_EXE_harness-pi-fixture"))
@@ -327,9 +327,9 @@ async fn discovers_model_specific_thinking_and_extension_commands() {
     assert_eq!(
         models[0].reasoning_levels,
         vec![
-            zeron_proto::ReasoningLevel::Low,
-            zeron_proto::ReasoningLevel::Medium,
-            zeron_proto::ReasoningLevel::High
+            zeren_proto::ReasoningLevel::Low,
+            zeren_proto::ReasoningLevel::Medium,
+            zeren_proto::ReasoningLevel::High
         ]
     );
     assert_eq!(models[0].options[0].id, "pi_thinking");
@@ -404,7 +404,7 @@ async fn extension_dialogs_roundtrip_without_autoaccepting_and_preserve_editor_t
             let _ = tx.send(
                 label
                     .map(|l| {
-                        vec![zeron_proto::UserInputAnswer {
+                        vec![zeren_proto::UserInputAnswer {
                             question_id: questions[0].id.clone(),
                             labels: vec![l.into()],
                         }]

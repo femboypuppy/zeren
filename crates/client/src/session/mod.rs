@@ -17,12 +17,12 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, RwLock, Weak};
 
 use tokio::sync::watch;
-use zeron_doc::{
+use zeren_doc::{
     CommandBasedOn, MessagePart, MessageRole, MessageStatus, QueueDeliveryGate, QueuedMessage,
     SessionCommandEntry, SessionCommandPayload, SessionCommandStatus, SessionDoc,
     SessionMessageEntry,
 };
-use zeron_proto::{
+use zeren_proto::{
     ChatIndicator, ContextUsage, RunRequest, SandboxLevel, UserInputAnswer, WorktreeSpec,
 };
 
@@ -377,7 +377,7 @@ impl SessionCore {
     /// Serialized doc write, then an incremental refresh.
     pub(crate) fn write<R>(
         &self,
-        f: impl FnOnce(&SessionDoc) -> std::result::Result<R, zeron_doc::DocError>,
+        f: impl FnOnce(&SessionDoc) -> std::result::Result<R, zeren_doc::DocError>,
     ) -> Result<R> {
         let result = {
             let _gate = lock(&self.write_gate);
@@ -581,7 +581,7 @@ impl SessionCore {
                 turn_id: Some(turn_id),
                 frontier: None,
             }),
-            expires_at: Some(now + zeron_doc::COMMAND_DEFAULT_TTL_MS),
+            expires_at: Some(now + zeren_doc::COMMAND_DEFAULT_TTL_MS),
             status: SessionCommandStatus::Pending,
             resolution: None,
         };
@@ -992,7 +992,7 @@ impl SessionHandle {
             && !client.is_demo()
         {
             return Err(ClientError::Unsupported(
-                "the host is too old for image attachments — update Zeron on it".into(),
+                "the host is too old for image attachments — update Zeren on it".into(),
             ));
         }
         let refs =
@@ -1199,7 +1199,7 @@ impl SessionHandle {
         };
         let reply = self
             .queue_rpc(
-                zeron_rpc::methods::BEGIN_QUEUED_MESSAGE_EDIT,
+                zeren_rpc::methods::BEGIN_QUEUED_MESSAGE_EDIT,
                 serde_json::json!({
                     "chatId": self.core.chat_id,
                     "id": id,
@@ -1238,7 +1238,7 @@ impl SessionHandle {
 
     pub async fn renew_queued_edit(&self, lease: &QueueEditLease) -> bool {
         self.queue_rpc(
-            zeron_rpc::methods::RENEW_QUEUED_MESSAGE_EDIT,
+            zeren_rpc::methods::RENEW_QUEUED_MESSAGE_EDIT,
             serde_json::json!({
                 "chatId": self.core.chat_id,
                 "id": lease.row_id,
@@ -1266,7 +1266,7 @@ impl SessionHandle {
             params["text"] = serde_json::Value::String(text);
         }
         match self
-            .queue_rpc(zeron_rpc::methods::FINISH_QUEUED_MESSAGE_EDIT, params)
+            .queue_rpc(zeren_rpc::methods::FINISH_QUEUED_MESSAGE_EDIT, params)
             .await
         {
             Ok(value) => match value.get("outcome").and_then(|o| o.as_str()) {
@@ -1298,9 +1298,9 @@ impl SessionHandle {
             self.core.recompute_composer(&client);
         }
         let method = match action {
-            QueueAction::SendNow => zeron_rpc::methods::SEND_QUEUED_MESSAGE_NOW,
-            QueueAction::Steer => zeron_rpc::methods::STEER_QUEUED_MESSAGE_NOW,
-            QueueAction::Remove => zeron_rpc::methods::REMOVE_QUEUED_MESSAGE,
+            QueueAction::SendNow => zeren_rpc::methods::SEND_QUEUED_MESSAGE_NOW,
+            QueueAction::Steer => zeren_rpc::methods::STEER_QUEUED_MESSAGE_NOW,
+            QueueAction::Remove => zeren_rpc::methods::REMOVE_QUEUED_MESSAGE,
         };
         let result = self
             .queue_rpc(

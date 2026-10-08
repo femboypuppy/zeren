@@ -1,7 +1,7 @@
 //! The explorer's footer: two collapsible sections docked under the file
 //! tree — **Subagents** (the spawn chips of the active chat's transcript,
 //! with their live status) and **Chats** (the side chats hanging off the
-//! active chat: forks, and chats an agent spawned through the Zeron MCP
+//! active chat: forks, and chats an agent spawned through the Zeren MCP
 //! server). Rows borrow the left sidebar's compact session row — 29px, status
 //! glyph, title, time — minus the harness, project and device icons, which
 //! say nothing here (every row shares the parent's context). Clicking a row
@@ -21,8 +21,8 @@ use gpui::{
     Animation, AnimationExt as _, AnyElement, Context, Entity, EntityId, MouseButton, ScrollHandle,
     SharedString, div, prelude::*, px,
 };
-use zeron_doc::{MessagePart, SubagentStatus};
-use zeron_proto::{Chat, ChatIndicator};
+use zeren_doc::{MessagePart, SubagentStatus};
+use zeren_proto::{Chat, ChatIndicator};
 
 use crate::composer::ComposerInput;
 use crate::icons::{self, icon};
@@ -312,7 +312,7 @@ pub(super) struct ChildChatRow {
     pub status: ChatIndicator,
     pub time_ago: SharedString,
     /// The chat's linked pull request, drawn as the sidebar's badge.
-    pub change_request: Option<zeron_proto::ChangeRequestSummary>,
+    pub change_request: Option<zeren_proto::ChangeRequestSummary>,
     activity: DateTime<Utc>,
 }
 
@@ -333,7 +333,7 @@ pub(super) fn child_chat_rows(
                 chat_id: chat.id.clone(),
                 title: child_chat_title(chat).into(),
                 status: state.display_status_for(chat, now),
-                time_ago: zeron_proto::view::format_time_ago(activity, now).into(),
+                time_ago: zeren_proto::view::format_time_ago(activity, now).into(),
                 change_request: state.change_request_for_chat(chat).cloned(),
                 activity,
             }
@@ -806,7 +806,7 @@ impl FilesSurface {
                         row.title.clone(),
                     ))
                     .child(time_ago_label(
-                        zeron_proto::view::format_time_ago(row.spawned_at, now).into(),
+                        zeren_proto::view::format_time_ago(row.spawned_at, now).into(),
                         theme,
                     )),
             );
@@ -1137,8 +1137,8 @@ fn status_glyph(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zeron_doc::{MessageRole, MessageStatus, SessionMessageEntry};
-    use zeron_proto::ToolCall;
+    use zeren_doc::{MessageRole, MessageStatus, SessionMessageEntry};
+    use zeren_proto::ToolCall;
 
     fn chat(id: &str, parent: Option<&str>, minutes_ago: i64) -> Chat {
         serde_json::from_value(serde_json::json!({

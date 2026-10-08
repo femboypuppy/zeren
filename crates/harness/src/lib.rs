@@ -1,4 +1,4 @@
-//! zeron-harness — one interface over coding agents (plus a mock for tests).
+//! zeren-harness — one interface over coding agents (plus a mock for tests).
 //!
 //! NATIVE DRIVERS speak each agent's own wire directly: Claude Code over
 //! stream-json ([`ClaudeHarness`]), Codex over the app-server JSON-RPC
@@ -19,7 +19,7 @@ use futures::stream::BoxStream;
 use tokio::sync::{mpsc, oneshot};
 pub use tokio_util::sync::CancellationToken;
 
-use zeron_proto::{
+use zeren_proto::{
     AgentEvent, HarnessId, Model, ReasoningLevel, RunRequest, SlashCommand, SteeringMode,
     UserInputAnswer, UserInputQuestion,
 };
@@ -54,7 +54,7 @@ pub struct RunControls {
     /// detached session task must retain this lease through its cleanup.
     /// Standalone callers without an update coordinator can leave it unset.
     pub execution_lease: Option<std::sync::Arc<tokio::sync::OwnedRwLockReadGuard<()>>>,
-    /// The run sends questions and awaits answers (blocks the agent, mirrors zeron).
+    /// The run sends questions and awaits answers (blocks the agent, mirrors zeren).
     pub request_input: Box<
         dyn Fn(Vec<UserInputQuestion>) -> oneshot::Receiver<Vec<UserInputAnswer>> + Send + Sync,
     >,
@@ -142,7 +142,7 @@ pub trait Harness: Send + Sync {
     async fn skills(
         &self,
         cwd: &std::path::Path,
-    ) -> Result<Option<Vec<zeron_proto::invocation::Skill>>, HarnessError> {
+    ) -> Result<Option<Vec<zeren_proto::invocation::Skill>>, HarnessError> {
         if self.id() == HarnessId::Mock {
             return Ok(None);
         }
@@ -245,7 +245,7 @@ fn compose_path<'a>(
 /// Rolling tail of a child's stderr, shared between the reader task and the
 /// crash-message composer: an unexpected exit surfaces "<name> exited
 /// unexpectedly (<status>): <last stderr lines>" instead of a bare shrug —
-/// the proper background-crash message old zeron showed (user requirement).
+/// the proper background-crash message old zeren showed (user requirement).
 #[derive(Clone, Default)]
 pub(crate) struct StderrTail(
     std::sync::Arc<std::sync::Mutex<std::collections::VecDeque<String>>>,

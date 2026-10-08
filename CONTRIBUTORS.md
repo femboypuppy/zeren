@@ -1,6 +1,6 @@
-# Contributing to Zeron
+# Contributing to Zeren
 
-Thanks for helping build Zeron. This guide covers how to set up, what a good
+Thanks for helping build Zeren. This guide covers how to set up, what a good
 pull request looks like, and the handful of rules that keep a local-first,
 multi-device app working across versions.
 
@@ -31,36 +31,36 @@ sudo apt-get install -y libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev \
 **macOS** needs Xcode. **Windows** is covered in
 [docs/reference/windows-development.md](docs/reference/windows-development.md).
 
-Build and run the app with `cargo run -p zeron`.
+Build and run the app with `cargo run -p zeren`.
 
-### Running a dev build next to an installed Zeron
+### Running a dev build next to an installed Zeren
 
 An installed daemon holds the default data directory and IPC port. Give your
 dev build its own so the two never share state:
 
 ```sh
-ZERON_DATA_DIR=~/.zeron-dev ZERON_IPC_PORT=27700 cargo run -p zeron
+ZEREN_DATA_DIR=~/.zeren-dev ZEREN_IPC_PORT=27700 cargo run -p zeren
 ```
 
 Useful knobs for exercising the UI without a real agent or account:
 
 | Variable | Effect |
 | --- | --- |
-| `ZERON_HARNESS=mock` | Offers the mock harness, which streams canned turns |
-| `ZERON_MOCK_SUBAGENT=1` | Mock turns spawn subagents |
-| `ZERON_MOCK_THINKING=1` | Mock turns include markdown-heavy thinking |
-| `ZERON_MOCK_TODO=1` | Mock turns work through an 8-item checklist (pair with `ZERON_MOCK_DELAY_MS=900` to watch the todo panel) |
+| `ZEREN_HARNESS=mock` | Offers the mock harness, which streams canned turns |
+| `ZEREN_MOCK_SUBAGENT=1` | Mock turns spawn subagents |
+| `ZEREN_MOCK_THINKING=1` | Mock turns include markdown-heavy thinking |
+| `ZEREN_MOCK_TODO=1` | Mock turns work through an 8-item checklist (pair with `ZEREN_MOCK_DELAY_MS=900` to watch the todo panel) |
 
 ## Tests
 
 Run the suites for the crates you touched before opening a PR. These mirror CI:
 
 ```sh
-cargo test --locked -p zeron-ui --lib -- --test-threads=1
-cargo test --locked -p zeron-engine --lib
-cargo test --locked -p zeron-harness            # includes tests/ fixtures, not just --lib
-cargo test --locked -p zeron-sync --lib
-cargo test --locked -p zeron-preview
+cargo test --locked -p zeren-ui --lib -- --test-threads=1
+cargo test --locked -p zeren-engine --lib
+cargo test --locked -p zeren-harness            # includes tests/ fixtures, not just --lib
+cargo test --locked -p zeren-sync --lib
+cargo test --locked -p zeren-preview
 ```
 
 - CI does not cover every crate on every platform. For engine, harness, and sync
@@ -89,15 +89,15 @@ cargo test --locked -p zeron-preview
 
 ### Compatibility across versions
 
-Zeron runs on several devices at once, and they update independently. A UI may
+Zeren runs on several devices at once, and they update independently. A UI may
 talk to an older local daemon, and a chat may be hosted on a remote device
 running an older engine. So:
 
-- New fields on wire and document types (`zeron-proto`, `zeron-doc`) must be
+- New fields on wire and document types (`zeren-proto`, `zeren-doc`) must be
   optional or `#[serde(default)]`. Older peers must still parse newer frames,
   and newer code must accept frames without the field.
 - New behavior that needs the other side's cooperation is gated on a
-  capability (`zeron_proto::capabilities`) or a device version check. Features
+  capability (`zeren_proto::capabilities`) or a device version check. Features
   degrade when a peer lacks them; they don't fail.
 - Never rename or repurpose persisted keys, RPC method names, or document
   fields. Add new ones instead.
@@ -170,5 +170,5 @@ running an older engine. So:
 
 ## License
 
-Zeron is [MIT licensed](LICENSE). By contributing, you agree that your
+Zeren is [MIT licensed](LICENSE). By contributing, you agree that your
 contributions are licensed under the same terms.

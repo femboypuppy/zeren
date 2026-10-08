@@ -22,7 +22,7 @@ use gpui::{
 };
 use std::time::{Duration, Instant};
 
-use crate::motion::{self, ZERON_PULSE};
+use crate::motion::{self, ZEREN_PULSE};
 use crate::theme::{Theme, hairline, ink};
 
 // ---------------------------------------------------------------------------
@@ -300,7 +300,7 @@ pub fn classify_key(key: &str, cmd: bool, ctrl: bool) -> MenuKey {
 // Elements
 // ---------------------------------------------------------------------------
 
-/// The floating-menu surface (zeron `.glass-surface` + `menuSurface`):
+/// The floating-menu surface (zeren `.glass-surface` + `menuSurface`):
 /// Shared floating surface used by palettes, popovers, dropdowns and menus.
 /// Mount helpers supply the same 16px backdrop blur as the composer.
 /// Corner radius must match the frost wrapper's mask.
@@ -901,7 +901,7 @@ fn modal_with(
     .into_any_element()
 }
 
-/// One menu row (zeron `menuItem`): `gap-2.5 rounded-lg px-2 py-1.5
+/// One menu row (zeren `menuItem`): `gap-2.5 rounded-lg px-2 py-1.5
 /// text-[13px]`, active = `bg-white/10 text-foreground`, hover wash
 /// `white/[0.08]` fading over `transition-colors` (floating-styles.ts) via the
 /// per-`fade_key` [`motion::hover_blend`]. The caller adds the id/click
@@ -944,7 +944,7 @@ pub fn menu_row(theme: &Theme, active: bool, fade_key: impl Into<SharedString>) 
 
 /// [`menu_row`] with a distinct keyboard-navigation highlight: a selected row
 /// carries the full `bg-white/10` wash, the keyboard cursor the lighter
-/// `bg-white/[0.08]` (zeron's `data-[highlighted]` styling) — two selected-
+/// `bg-white/[0.08]` (zeren's `data-[highlighted]` styling) — two selected-
 /// looking rows never appear at once.
 pub fn menu_row_nav(
     theme: &Theme,
@@ -961,7 +961,7 @@ pub fn menu_row_nav(
     }
 }
 
-/// Small uppercase section heading inside a floating menu (zeron
+/// Small uppercase section heading inside a floating menu (zeren
 /// `MenuHeading`): `px-2 pb-1 pt-1.5 text-[10px] font-medium uppercase
 /// tracking-[0.1em] text-muted-foreground/60`. gpui has no letter-spacing at
 /// the pinned rev; the tracking is approximated with hair spaces.
@@ -992,7 +992,7 @@ pub fn tracked_upper(label: &str) -> String {
     out
 }
 
-/// Hairline divider between menu sections (zeron `MenuSeparator`:
+/// Hairline divider between menu sections (zeren `MenuSeparator`:
 /// `mx-1 my-1 h-px bg-white/[0.07]`).
 pub fn menu_separator() -> gpui::Div {
     // Full-bleed: negative margins cancel the card's inset so the hairline
@@ -1157,7 +1157,7 @@ pub fn kbd_hint(theme: &Theme, label: &str) -> gpui::Div {
         .child(SharedString::from(label.to_string()))
 }
 
-/// The search/text input frame at the top of a picker popover (zeron
+/// The search/text input frame at the top of a picker popover (zeren
 /// `searchInput`: `w-full rounded-lg bg-white/[0.04] px-2.5 py-1.5
 /// text-[13px]` + `mb-1`, borderless — full width inside the card's own
 /// p-1, only a 4px bottom margin).
@@ -1172,7 +1172,7 @@ pub fn search_input_frame(_theme: &Theme, input: AnyElement) -> gpui::Div {
         .child(input)
 }
 
-/// A bordered trailing menu section (zeron picker action groups /
+/// A bordered trailing menu section (zeren picker action groups /
 /// branch-picker worktree block: `mt-1 flex flex-col gap-0.5 border-t
 /// border-white/[0.06] pt-1` — the hairline runs edge-to-edge of the card's
 /// p-1 inset, unlike [`menu_separator`]'s mx-1).
@@ -1188,7 +1188,7 @@ pub fn menu_section() -> gpui::Div {
 }
 
 // ---------------------------------------------------------------------------
-// Dialog primitives (zeron dialog.tsx / sidebar dialogs.tsx)
+// Dialog primitives (zeren dialog.tsx / sidebar dialogs.tsx)
 // ---------------------------------------------------------------------------
 
 /// Centered dialog with the shared popover surface. A filled drop shadow
@@ -1241,7 +1241,7 @@ pub fn dialog_field(input: AnyElement) -> gpui::Div {
 }
 
 /// Ghost button (`btnGhost`): quiet text, hover wash fading over
-/// `transition-colors` (zeron dialogs.tsx). Caller adds id + click; `fade_key`
+/// `transition-colors` (zeren dialogs.tsx). Caller adds id + click; `fade_key`
 /// as in [`menu_row`].
 pub fn btn_ghost(theme: &Theme, label: &str, fade_key: impl Into<SharedString>) -> gpui::Div {
     let fade_key = fade_key.into();
@@ -1293,7 +1293,7 @@ pub fn btn_danger(theme: &Theme, label: &str) -> gpui::Div {
         .child(SharedString::from(label.to_string()))
 }
 
-/// Pulsing skeleton rows shown while a list loads (zeron:
+/// Pulsing skeleton rows shown while a list loads (zeren:
 /// `h-7 animate-pulse rounded-md bg-white/[0.04]`).
 pub fn skeleton_rows(
     _id: &'static str,
@@ -1303,7 +1303,7 @@ pub fn skeleton_rows(
     cx: &mut gpui::App,
 ) -> AnyElement {
     let wash = ink(0.04);
-    let delta = motion::pulse_delta(&ZERON_PULSE, view, cx);
+    let delta = motion::pulse_delta(&ZEREN_PULSE, view, cx);
     div()
         .flex()
         .flex_col()
@@ -1324,7 +1324,7 @@ pub fn skeleton_rows(
 /// selected model still resolves (a chip collapsing to its bare icon read
 /// as broken; user report).
 pub fn skeleton_bar(width: f32, view: gpui::EntityId, cx: &mut gpui::App) -> AnyElement {
-    let delta = motion::pulse_delta(&ZERON_PULSE, view, cx);
+    let delta = motion::pulse_delta(&ZEREN_PULSE, view, cx);
     div()
         .w(px(width))
         .h(px(11.0))
@@ -1348,7 +1348,7 @@ pub fn skeleton_menu_rows(
 ) -> AnyElement {
     const WIDTHS: [f32; 4] = [0.42, 0.58, 0.48, 0.66];
     let wash = ink(0.05);
-    let delta = motion::pulse_delta(&ZERON_PULSE, view, cx);
+    let delta = motion::pulse_delta(&ZEREN_PULSE, view, cx);
     div()
         .flex()
         .flex_col()

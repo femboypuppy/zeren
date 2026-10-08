@@ -14,9 +14,9 @@ use sha2::{Digest as _, Sha256};
 use tokio::io::AsyncWriteExt as _;
 use tokio::sync::watch;
 use tokio_util::sync::CancellationToken;
-use zeron_harness::process::{Command, Stdio};
+use zeren_harness::process::{Command, Stdio};
 
-use zeron_proto::{
+use zeren_proto::{
     HarnessId, HarnessInstallSource, HarnessUpdateFailure, HarnessUpdatePhase, HarnessUpdatePolicy,
     HarnessUpdateProgress, HarnessUpdateStatus,
 };
@@ -127,8 +127,8 @@ struct CodexPackageManifest {
     path_dir: String,
 }
 
-/// Held for the complete standalone install so Zeron cannot race the Codex
-/// installer (which uses the same lock file) or another Zeron process.
+/// Held for the complete standalone install so Zeren cannot race the Codex
+/// installer (which uses the same lock file) or another Zeren process.
 struct InstallFileLock {
     file: File,
 }
@@ -267,7 +267,7 @@ fn provider(id: HarnessId) -> ProviderSpec {
         HarnessId::Antigravity => ProviderSpec {
             version_args: &["--version"],
             latest: LatestSource::AntigravityAcp,
-            // Zeron installs a pinned ACP server archive. It has no registered
+            // Zeren installs a pinned ACP server archive. It has no registered
             // self-update command; custom binaries remain installer-managed.
             update_args: None,
             manual_command: "Update the configured Antigravity ACP server",
@@ -300,7 +300,7 @@ fn update_plan(harness: HarnessId, executable: &Path) -> Result<UpdatePlan, Stri
         return Ok(UpdatePlan::CodexStandalone(install));
     }
     if harness == HarnessId::Antigravity
-        && zeron_harness::acp::is_managed_antigravity_server(executable)
+        && zeren_harness::acp::is_managed_antigravity_server(executable)
     {
         return Ok(UpdatePlan::AntigravityArchive);
     }
@@ -316,9 +316,9 @@ fn manual_update_command(harness: HarnessId, executable: &Path, can_apply: bool)
         return None;
     }
     if harness == HarnessId::Antigravity
-        && zeron_harness::acp::is_managed_antigravity_server(executable)
+        && zeren_harness::acp::is_managed_antigravity_server(executable)
     {
-        return Some("Update Zeron to install this release".into());
+        return Some("Update Zeren to install this release".into());
     }
     Some(
         claude_package_manager_command_for(harness, executable)
@@ -348,7 +348,7 @@ struct Inner {
     client: reqwest::Client,
     /// the registry release the last check reported, installed verbatim by
     /// apply so a registry change in between cannot swap what gets installed.
-    antigravity_release: Mutex<Option<zeron_harness::acp::AntigravityRelease>>,
+    antigravity_release: Mutex<Option<zeren_harness::acp::AntigravityRelease>>,
 }
 
 /// Cloneable engine service exposed to RPC and the periodic worker.
@@ -464,7 +464,7 @@ impl HarnessUpdateCoordinator {
                 worker: Mutex::new(None),
                 antigravity_release: Mutex::new(None),
                 client: reqwest::Client::builder()
-                    .user_agent(concat!("zeron/", env!("CARGO_PKG_VERSION")))
+                    .user_agent(concat!("zeren/", env!("CARGO_PKG_VERSION")))
                     .timeout(COMMAND_TIMEOUT)
                     .build()
                     .unwrap_or_default(),
@@ -762,8 +762,8 @@ impl HarnessUpdateCoordinator {
                 return self.fail_check_with_installed(harness, installed, source, error);
             }
         };
-        // zeron can only install the archive it has pinned and verified; a
-        // newer registry release waits for a zeron update that pins it.
+        // zeren can only install the archive it has pinned and verified; a
+        // newer registry release waits for a zeren update that pins it.
         let can_apply = can_apply
             && (harness != HarnessId::Antigravity
                 || lock(&self.inner.antigravity_release)
@@ -1047,7 +1047,7 @@ impl HarnessUpdateCoordinator {
                     .filter(|release| current.latest_version.as_ref() == Some(&release.version));
                 match release {
                     Some(release) => match self.begin_install(harness, &cancel) {
-                        Ok(()) => zeron_harness::acp::install_antigravity_release(&release)
+                        Ok(()) => zeren_harness::acp::install_antigravity_release(&release)
                             .await
                             .map(drop)
                             .map_err(|error| error.to_string()),
@@ -1135,7 +1135,7 @@ impl HarnessUpdateCoordinator {
             // pruning runs under the update lease, so none of this engine's
             // sessions can be launching the superseded server meanwhile.
             let _ = tokio::task::spawn_blocking(
-                zeron_harness::acp::prune_superseded_antigravity_installs,
+                zeren_harness::acp::prune_superseded_antigravity_installs,
             )
             .await;
         }
@@ -1407,7 +1407,7 @@ impl HarnessUpdateCoordinator {
         let response = self
             .inner
             .client
-            .get(zeron_harness::acp::ANTIGRAVITY_REGISTRY_URL)
+            .get(zeren_harness::acp::ANTIGRAVITY_REGISTRY_URL)
             .send()
             .await
             .map_err(|error| format!("Antigravity ACP release check failed: {error}"))?
@@ -1417,7 +1417,7 @@ impl HarnessUpdateCoordinator {
             .json()
             .await
             .map_err(|error| format!("Antigravity ACP release response was invalid: {error}"))?;
-        let release = zeron_harness::acp::antigravity_release(&json)
+        let release = zeren_harness::acp::antigravity_release(&json)
             .ok_or("Antigravity ACP release response contained no valid version")?;
         let version = release.version.clone();
         *lock(&self.inner.antigravity_release) = Some(release);
@@ -1542,7 +1542,7 @@ impl HarnessUpdateCoordinator {
         let _install_lock = InstallFileLock::acquire(&install.root)?;
         let releases = install.root.join("releases");
         let nonce = uuid::Uuid::new_v4();
-        let archive = install.root.join(format!(".zeron-codex-{nonce}.tar.gz"));
+        let archive = install.root.join(format!(".zeren-codex-{nonce}.tar.gz"));
         let staging = releases.join(format!(".{version}-{}-{nonce}.partial", install.target));
         std::fs::create_dir(&staging)
             .map_err(|error| format!("could not stage Codex update: {error}"))?;
@@ -1887,7 +1887,7 @@ fn activate_codex_release(
     if !canonical_destination.starts_with(canonical_root.join("releases")) {
         return Err("Codex release destination escaped the installation".into());
     }
-    let temporary = root.join(format!(".current.zeron-{nonce}"));
+    let temporary = root.join(format!(".current.zeren-{nonce}"));
     symlink(&canonical_destination, &temporary)
         .map_err(|error| format!("could not stage Codex activation: {error}"))?;
     if let Err(error) = std::fs::rename(&temporary, root.join("current")) {
@@ -2196,7 +2196,7 @@ async fn run_command_output_env(
     for (key, value) in env {
         command.env(*key, *value);
     }
-    zeron_harness::compose_child_path(&mut command, executable);
+    zeren_harness::compose_child_path(&mut command, executable);
     #[cfg(unix)]
     command.process_group(0);
     let mut child = command
@@ -2271,7 +2271,7 @@ fn extract_version(text: &str) -> Option<String> {
 
 fn installed_version(harness: HarnessId, output: &str) -> Option<String> {
     if harness == HarnessId::Antigravity {
-        return zeron_harness::acp::antigravity_build_version(output)
+        return zeren_harness::acp::antigravity_build_version(output)
             .or_else(|| output.lines().next().and_then(extract_version));
     }
     extract_version(output)
@@ -2333,8 +2333,8 @@ mod tests {
 
     use async_trait::async_trait;
     use futures::StreamExt as _;
-    use zeron_harness::{Harness, HarnessError, RunControls};
-    use zeron_proto::{
+    use zeren_harness::{Harness, HarnessError, RunControls};
+    use zeren_proto::{
         AgentEvent, HarnessId, HarnessUpdatePhase, Model, ReasoningLevel, RunRequest, SteeringMode,
     };
 
@@ -2645,7 +2645,7 @@ esac
     #[tokio::test]
     async fn hermes_commit_updates_can_install_without_changing_the_cli_version() {
         use std::os::unix::fs::PermissionsExt;
-        use zeron_proto::HarnessUpdatePolicy;
+        use zeren_proto::HarnessUpdatePolicy;
 
         let temp = tempfile::tempdir().unwrap();
         let executable = temp.path().join("hermes");
@@ -2752,7 +2752,7 @@ esac
     #[cfg(unix)]
     #[tokio::test]
     async fn notify_cancels_waiting_automatic_but_preserves_explicit_updates() {
-        use zeron_proto::HarnessUpdatePolicy;
+        use zeren_proto::HarnessUpdatePolicy;
         for automatic in [true, false] {
             let (temp, coordinator) = automatic_fixture();
             coordinator.check_one(HarnessId::Grok).await.unwrap();
@@ -2853,7 +2853,7 @@ esac
 
     #[tokio::test]
     async fn automatic_install_boundary_rechecks_policy_for_commands_and_downloads() {
-        use zeron_proto::HarnessUpdatePolicy;
+        use zeren_proto::HarnessUpdatePolicy;
         let temp = tempfile::tempdir().unwrap();
         let registry = Arc::new(HarnessRegistry::new());
         registry.register(Arc::new(ExecutableHarness(
@@ -2888,7 +2888,7 @@ esac
     #[cfg(unix)]
     #[tokio::test]
     async fn disabling_an_agent_cancels_its_waiting_automatic_update() {
-        use zeron_proto::HarnessUpdatePolicy;
+        use zeren_proto::HarnessUpdatePolicy;
         let (temp, coordinator) = automatic_fixture();
         let registry = &coordinator.inner.registry;
         registry.register(Arc::new(ExecutableHarness(
@@ -2961,7 +2961,7 @@ esac
     #[cfg(unix)]
     #[tokio::test]
     async fn enabling_auto_updates_installs_release_discovered_by_its_check() {
-        use zeron_proto::HarnessUpdatePolicy;
+        use zeren_proto::HarnessUpdatePolicy;
         for phase in [
             HarnessUpdatePhase::Dormant,
             HarnessUpdatePhase::Checking,
@@ -2982,7 +2982,7 @@ esac
     #[cfg(unix)]
     #[tokio::test]
     async fn retrying_one_failed_check_schedules_automatic_installation() {
-        use zeron_proto::HarnessUpdatePolicy;
+        use zeren_proto::HarnessUpdatePolicy;
         let (temp, coordinator) = automatic_fixture();
         std::fs::write(temp.path().join("fail-check"), "").unwrap();
         coordinator.set_policy(HarnessId::Grok, HarnessUpdatePolicy::AutoWhenIdle);
@@ -3510,7 +3510,7 @@ esac
     #[tokio::test]
     async fn unknown_claude_channel_clears_stale_release_and_never_auto_installs() {
         use std::os::unix::fs::PermissionsExt;
-        use zeron_proto::HarnessUpdatePolicy;
+        use zeren_proto::HarnessUpdatePolicy;
         let temp = tempfile::tempdir().unwrap();
         let executable = temp.path().join("claude");
         std::fs::write(&executable, "#!/bin/sh\ncase $1 in\n --version) echo '2.1.100 (Claude Code)' ;;\n doctor) echo 'Old diagnostic with no channel' ;;\n update) exit 42 ;;\nesac\n").unwrap();
@@ -3655,7 +3655,7 @@ esac
         assert!(
             !super::can_apply_update(
                 HarnessId::Codex,
-                std::path::Path::new("/tmp/zeron-not-installed/codex")
+                std::path::Path::new("/tmp/zeren-not-installed/codex")
             ),
             "an unclassified codex binary stays manual"
         );

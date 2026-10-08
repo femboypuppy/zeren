@@ -26,7 +26,7 @@ export interface Env {
    * key id. Unset ⇒ session notifications are decided and logged, not sent. */
   APNS_KEY_P8?: string;
   APNS_KEY_ID?: string;
-  /** Apple team id and the app's bundle id (defaults: the Zeron iOS app). */
+  /** Apple team id and the app's bundle id (defaults: the Zeren iOS app). */
   APNS_TEAM_ID?: string;
   APNS_TOPIC?: string;
 }
@@ -45,10 +45,10 @@ export const apnsConfig = (env: Env) =>
 /** Header the Worker stamps on requests it forwards into DOs after verifying
  * the caller's JWT. DOs trust it blindly — they are only reachable through
  * the Worker (design §2: "DO never sees an unauthenticated frame"). */
-export const AUTH_USER_HEADER = "x-zeron-auth-user";
+export const AUTH_USER_HEADER = "x-zeren-auth-user";
 
 /** Header the Worker stamps on requests forwarded into workspace-doc rooms
  * (`ws/{orgId}`). Membership (JWT org claim == orgId) is enforced at the
  * Worker; the SessionRoom DO sees this and skips its per-chat
  * claim-on-first-join ownership discipline for the room. */
-export const ROOM_KIND_HEADER = "x-zeron-room-kind";
+export const ROOM_KIND_HEADER = "x-zeren-room-kind";

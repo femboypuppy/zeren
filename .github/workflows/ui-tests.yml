@@ -67,7 +67,7 @@ jobs:
             libfontconfig1-dev libfreetype-dev libasound2-dev
             libvulkan-dev pkg-config cmake libwebkit2gtk-4.1-dev libjson-glib-dev
       - name: UI and headless layout regressions
-        run: cargo nextest run --config-file scripts/ci/nextest.toml --locked --no-fail-fast -p zeron-ui --lib --test voice_orb_geometry
+        run: cargo nextest run --config-file scripts/ci/nextest.toml --locked --no-fail-fast -p zeren-ui --lib --test voice_orb_geometry
 
   linux-browser:
     runs-on: ubuntu-24.04
@@ -87,7 +87,7 @@ jobs:
             libwebkit2gtk-4.1-dev libjson-glib-dev xvfb xdotool openbox
             weston ffmpeg imagemagick fonts-noto-cjk
       - name: Build browser fixture
-        run: cargo build --locked -p zeron-ui --example browser-fixture --features browser-fixture
+        run: cargo build --locked -p zeren-ui --example browser-fixture --features browser-fixture
       - name: X11 and Wayland browser regressions
         timeout-minutes: 5
         env:

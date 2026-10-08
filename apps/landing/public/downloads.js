@@ -1,5 +1,5 @@
 (() => {
-  const base = "https://zeron.sh/releases/";
+  const base = "https://github.com/femboypuppy/zeren/releases";
   const releases = {
     macos: ["macos-arm64.dmg", "Download for macOS", "Apple silicon"],
     windows: ["windows-x86_64-setup.exe", "Download for Windows", "Windows x64 · Installer"],
@@ -14,34 +14,31 @@
   const os = mobile ? null : /Win/i.test(platform) ? "windows"
     : /Mac/i.test(platform) ? "macos" : /Linux/i.test(platform)
     ? (/aarch64|arm64/i.test(`${platform} ${ua}`) ? "linux-arm" : "linux") : null;
-  const apply = (version) => {
+  const apply = (release) => {
+    const version = release.tag_name?.replace(/^v/, "");
+    if (!/^\d+\.\d+\.\d+$/.test(version)) return;
+    const assets = new Set(release.assets?.map((asset) => asset.name) || []);
+    const download = (file) => {
+      const name = `zeren-${version}-${file}`;
+      return assets.has(name) ? `${base}/download/v${version}/${name}` : `${base}/latest`;
+    };
     for (const link of document.querySelectorAll("[data-platform-download]")) {
       const release = releases[link.dataset.platformDownload];
-      if (release) link.href = `${base}zeron-${version}-${release[0]}`;
+      if (release) link.href = download(release[0]);
     }
     for (const id of ["nav-download", "hero-download", "closing-download"]) {
       const link = document.getElementById(id);
       if (!link || !os) continue;
       const [file, label, detail] = releases[os];
-      link.href = `${base}zeron-${version}-${file}`;
+      link.href = download(file);
       link.textContent = id === "nav-download" ? "Download" : label;
       link.setAttribute("data-download-os", os);
       link.setAttribute("aria-label", `${label} (${detail})`);
       link.title = detail;
     }
   };
-  // A published fallback keeps downloads usable without the version endpoint.
-  // 0.2.97 is the first release with the Windows installer.
-  const fallback = "0.2.97";
-  apply(fallback);
-  fetch(`${base}latest.txt`, { credentials: "omit" })
-    .then((r) => r.ok ? r.text() : Promise.reject())
-    .then((text) => {
-      const version = text.trim();
-      if (!/^\d+\.\d+\.\d+$/.test(version)) return;
-      const a = version.split(".").map(Number), b = fallback.split(".").map(Number);
-      const first = a.findIndex((value, i) => value !== b[i]);
-      if (first !== -1 && a[first] < b[first]) return;
-      apply(version);
-    }).catch(() => {});
+  fetch("https://api.github.com/repos/femboypuppy/zeren/releases/latest", { credentials: "omit" })
+    .then((response) => response.ok ? response.json() : Promise.reject())
+    .then(apply)
+    .catch(() => {});
 })();

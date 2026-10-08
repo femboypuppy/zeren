@@ -588,7 +588,7 @@ mod tests {
                     edge_token: None,
                     org_id: None,
                     workos_client_id: None,
-                    default_harness: zeron_proto::HarnessId::Mock,
+                    default_harness: zeren_proto::HarnessId::Mock,
                 },
                 cx,
             )
@@ -596,7 +596,7 @@ mod tests {
         (window, dir)
     }
 
-    fn chat(id: &str, parent: Option<&str>, archived: bool, age: i64) -> zeron_proto::Chat {
+    fn chat(id: &str, parent: Option<&str>, archived: bool, age: i64) -> zeren_proto::Chat {
         serde_json::from_value(serde_json::json!({
             "id": id, "title": id, "deviceId": "local", "archived": archived,
             "parentChatId": parent,
@@ -765,9 +765,9 @@ mod tests {
     fn search_matches_words_across_chat_metadata() {
         assert!(matches_query(
             "mac auth",
-            "Fix authentication Zeron @ MacBook main"
+            "Fix authentication Zeren @ MacBook main"
         ));
         assert!(matches_query("  ", "Any chat"));
-        assert!(!matches_query("mac windows", "Zeron @ MacBook"));
+        assert!(!matches_query("mac windows", "Zeren @ MacBook"));
     }
 }

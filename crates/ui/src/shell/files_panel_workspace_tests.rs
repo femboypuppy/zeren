@@ -1,5 +1,5 @@
 //! Exercise the explorer and editors against an isolated real workspace/RPC.
-//! Set ZERON_FILES_CAPTURES to a directory to run on X11 and capture the fixture.
+//! Set ZEREN_FILES_CAPTURES to a directory to run on X11 and capture the fixture.
 use super::*;
 use gpui::{AppContext, AsyncApp, WindowHandle};
 use std::{path::Path, sync::Arc};
@@ -109,10 +109,10 @@ fn files_panel_workspace_navigation_and_external_updates() {
     std::fs::write(project.join("src/new.rs"), "// new file\n").unwrap();
     let core = runtime
         .block_on(async {
-            zeron_engine::EngineCore::assemble(
+            zeren_engine::EngineCore::assemble(
                 &directory.path().join("engine"),
-                Arc::new(zeron_engine::default_registry()),
-                zeron_proto::HarnessId::Mock,
+                Arc::new(zeren_engine::default_registry()),
+                zeren_proto::HarnessId::Mock,
                 None,
             )
         })
@@ -144,9 +144,9 @@ fn files_panel_workspace_navigation_and_external_updates() {
     let port = listener.local_addr().unwrap().port();
     drop(listener);
     let _ipc = runtime
-        .block_on(zeron_engine::serve_ipc(port, core.rpc_service()))
+        .block_on(zeren_engine::serve_ipc(port, core.rpc_service()))
         .unwrap();
-    let output = std::env::var_os("ZERON_FILES_CAPTURES").map(PathBuf::from);
+    let output = std::env::var_os("ZEREN_FILES_CAPTURES").map(PathBuf::from);
     let application = if output.is_some() {
         gpui_platform::application()
     } else {
@@ -197,7 +197,7 @@ fn files_panel_workspace_navigation_and_external_updates() {
                 edge_token: None,
                 org_id: None,
                 workos_client_id: None,
-                default_harness: zeron_proto::HarnessId::Mock,
+                default_harness: zeren_proto::HarnessId::Mock,
             };
             let state = cx.new(|_| AppState::new());
             let window = cx

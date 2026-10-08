@@ -919,7 +919,7 @@ mod switch_tests {
 
     #[test]
     fn switch_material_keeps_dark_accent_and_opaque_fills() {
-        use zeron_theme::SurfaceTreatment;
+        use zeren_theme::SurfaceTreatment;
 
         let mut dark = Theme::dark();
         dark.surface_treatment = SurfaceTreatment::Opaque;
@@ -1032,7 +1032,7 @@ pub fn tab_selection_t(
 }
 
 /// One treatment for settings section tabs: the selected wash and text ease
-/// over Zeron's tab timing, while hover keeps the normal sidebar color fade.
+/// over Zeren's tab timing, while hover keeps the normal sidebar color fade.
 pub fn section_tab(
     theme: &Theme,
     selected: bool,

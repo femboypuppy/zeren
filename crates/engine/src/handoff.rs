@@ -8,8 +8,8 @@
 //! keeps the user's message as typed. Once the new agent's session exists, it
 //! resumes normally (it already holds the handed-off context).
 
-use zeron_doc::{MessagePart, MessageRole, SessionMessageEntry};
-use zeron_proto::HarnessId;
+use zeren_doc::{MessagePart, MessageRole, SessionMessageEntry};
+use zeren_proto::HarnessId;
 
 /// Most recent conversation text carried over; older turns are dropped first.
 const MAX_HANDOFF_CHARS: usize = 60_000;
@@ -43,8 +43,8 @@ pub(crate) fn handoff_prompt(
     to: HarnessId,
     prompt: &str,
 ) -> Option<String> {
-    let native = zeron_proto::invocation::harness_prompt(prompt, to);
-    if zeron_proto::invocation::leading_command(&native).is_some() {
+    let native = zeren_proto::invocation::harness_prompt(prompt, to);
+    if zeren_proto::invocation::leading_command(&native).is_some() {
         return None;
     }
     let assistant = from.map_or("Assistant", agent_label);
@@ -104,7 +104,7 @@ fn render_entry(entry: &SessionMessageEntry, assistant: &str) -> Option<String> 
                 text.push(body.trim().to_string())
             }
             MessagePart::Tool { call, is_error, .. } => {
-                let (label, detail) = zeron_proto::view::tool_chip_content(call);
+                let (label, detail) = zeren_proto::view::tool_chip_content(call);
                 let failed = if *is_error { " (failed)" } else { "" };
                 tools.push(if detail.is_empty() {
                     format!("- {label}{failed}")
@@ -148,8 +148,8 @@ fn clip(text: &str, max: usize) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zeron_doc::MessageStatus;
-    use zeron_proto::ToolCall;
+    use zeren_doc::MessageStatus;
+    use zeren_proto::ToolCall;
 
     fn entry(id: &str, role: MessageRole, parts: Vec<MessagePart>) -> SessionMessageEntry {
         SessionMessageEntry {

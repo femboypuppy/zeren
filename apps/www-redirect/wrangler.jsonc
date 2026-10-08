@@ -5,7 +5,7 @@
   // record. Redirect rules would be cleaner but need zone rulesets write,
   // which the deploy token doesn't have.
   "$schema": "https://unpkg.com/wrangler/config-schema.json",
-  "name": "zeron-www-redirect",
+  "name": "zeren-www-redirect",
   "main": "src/index.js",
   "compatibility_date": "2026-07-01",
   "account_id": "b57dde68ee5964dccc025437b5478a5b",

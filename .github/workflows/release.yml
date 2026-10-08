@@ -24,8 +24,8 @@ permissions:
 # Forks publish to their own GitHub releases, so their builds check for
 # updates there instead of zeron.sh (crates/update reads both at build time).
 env:
-  ZERON_RELEASE_FEED: ${{ github.repository != 'zeronsh/zeron' && format('https://github.com/{0}/releases/latest/download', github.repository) || '' }}
-  ZERON_RELEASES_PAGE: ${{ github.repository != 'zeronsh/zeron' && format('https://github.com/{0}/releases', github.repository) || '' }}
+  ZEREN_RELEASE_FEED: ${{ github.repository != 'zeronsh/zeron' && format('https://github.com/{0}/releases/latest/download', github.repository) || '' }}
+  ZEREN_RELEASES_PAGE: ${{ github.repository != 'zeronsh/zeron' && format('https://github.com/{0}/releases', github.repository) || '' }}
 
 jobs:
   cursor-compatibility:
@@ -169,7 +169,7 @@ jobs:
           for platform in linux-x86_64.tar.gz linux-aarch64.tar.gz \
               macos-arm64.dmg macos-arm64-app.tar.gz \
               windows-x86_64.zip windows-x86_64.exe windows-x86_64-setup.exe; do
-            test -f "dist/zeron-$ver-$platform" \
+            test -f "dist/zeren-$ver-$platform" \
               || { echo "missing artifact for tag v$ver: $platform — check builds and Cargo.toml version"; exit 1; }
           done
           echo "VERSION=$ver" >> "$GITHUB_ENV"

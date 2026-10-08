@@ -15,8 +15,8 @@ use gpui::{
     AnyElement, Context, Entity, Focusable as _, IntoElement, Render, SharedString, Subscription,
     Window, div, prelude::*, px,
 };
-use zeron_proto::{HarnessId, Model};
-use zeron_rpc::methods;
+use zeren_proto::{HarnessId, Model};
+use zeren_rpc::methods;
 
 use super::HarnessesPage;
 use crate::composer::{ComposerInput, ComposerInputEvent};

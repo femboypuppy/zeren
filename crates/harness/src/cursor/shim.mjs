@@ -1,7 +1,7 @@
-// zeron cursor shim — a thin, zeron-owned wrapper around the PINNED
+// zeren cursor shim — a thin, zeren-owned wrapper around the PINNED
 // @cursor/sdk (see CURSOR_SDK_PIN in crates/harness/src/cursor/mod.rs; the
 // SDK is public beta with ~weekly releases — expect churn, revalidate on
-// every bump). Materialized by zeron into the SDK's managed install dir so
+// every bump). Materialized by zeren into the SDK's managed install dir so
 // `import("@cursor/sdk")` resolves from the sibling node_modules.
 //
 // Why a shim at all: @cursor/sdk does NOT wrap the cursor-agent binary — it
@@ -98,7 +98,7 @@ const { Agent, Cursor, FileCredentialStore, JsonlLocalAgentStore } = sdk;
 // ---- per-run agent store --------------------------------------------------
 // The SDK's default local store is SQLite keyed by WORKSPACE
 // (`getDefaultSdkStateRoot(cwd)`), designed for one process per workspace.
-// Zeron runs concurrent shims on the same cwd as a matter of course — the
+// Zeren runs concurrent shims on the same cwd as a matter of course — the
 // chat turn and its title generation start together, and two chats can share
 // a worktree — and the second `Agent.create` dies with "database is locked"
 // (reproduced live, 1.0.28). The shared-root JSONL backend is no better: its
@@ -110,7 +110,7 @@ const { Agent, Cursor, FileCredentialStore, JsonlLocalAgentStore } = sdk;
 // it. Agents created before this scheme have no marker and fall back to the
 // SDK default store, which is where they live.
 const STATE_BASE =
-  process.env.ZERON_CURSOR_STATE_DIR || path.join(os.homedir(), ".zeron", "cursor-state");
+  process.env.ZEREN_CURSOR_STATE_DIR || path.join(os.homedir(), ".zeren", "cursor-state");
 
 function agentDirMarker(agentId) {
   return path.join(STATE_BASE, "by-agent", String(agentId));
@@ -147,7 +147,7 @@ function rememberAgentDir(agentId, dir) {
 let ownedStore = null;
 let ownerPath = null;
 async function claimStore(local) {
-  const marker = path.join(local.dir, ".zeron-owner.json");
+  const marker = path.join(local.dir, ".zeren-owner.json");
   let previous;
   try { previous = JSON.parse(fs.readFileSync(marker, "utf8")); }
   catch (error) { if (error.code !== "ENOENT") throw error; }
@@ -184,7 +184,7 @@ async function recoverInterruptedRun(agentId) {
   if (interruptedRun && ["queued", "running"].includes(interruptedRun.status)) {
     await ownedStore.runs.update({run: {
       ...interruptedRun, status: "cancelled", endedAt: Date.now(), updatedAt: Date.now(),
-      error: "The previous Zeron process stopped before completing this turn.",
+      error: "The previous Zeren process stopped before completing this turn.",
     }});
   }
   // Preserve the newest available conversation checkpoint; never start a new
@@ -314,7 +314,7 @@ if (process.argv[2] === "login") {
       openBrowser: false,
       onLoginUrl: (url) => out({ ev: "auth-url", url }),
       store: new FileCredentialStore(storePath),
-      apiKeyName: `zeron — ${os.hostname()}`,
+      apiKeyName: `zeren — ${os.hostname()}`,
     });
     out({
       ev: "logged-in",
@@ -458,7 +458,7 @@ let preempting = false;
 // steer's reply.
 let preemptedRun = null;
 // Tests of the native SDK steering path disable preemption.
-const NATIVE_STEER_ONLY = process.env.ZERON_CURSOR_NATIVE_STEER_ONLY === "1";
+const NATIVE_STEER_ONLY = process.env.ZEREN_CURSOR_NATIVE_STEER_ONLY === "1";
 function preemptForSteer() {
   if (NATIVE_STEER_ONLY) return false;
   if (!turnActive || !run || activeTools.size || preempting || interrupted || closing) return false;
@@ -622,7 +622,7 @@ function modelSelection(msg) {
 async function start(msg) {
   const model = modelSelection(msg);
   // The SDK loads NO ambient settings unless asked: without settingSources the
-  // user's ~/.cursor/mcp.json and plugins are invisible and the inline zeron
+  // user's ~/.cursor/mcp.json and plugins are invisible and the inline zeren
   // server is the only MCP the agent sees. "project" (and so "all") is left
   // out on purpose: the SDK hardcodes ignoreApprovals, so a repo's
   // .cursor/mcp.json and .cursor/hooks.json would spawn their commands at chat
@@ -657,7 +657,7 @@ async function start(msg) {
     } } } : {}),
     // askQuestion has no public answer channel in this SDK (SDKRequestMessage
     // carries only a request id) — a question would block the run forever.
-    // generateImage has nowhere to land in a zeron session (ACP parity).
+    // generateImage has nowhere to land in a zeren session (ACP parity).
     disallowedTools: ["askQuestion", "generateImage"],
     local,
   };
@@ -692,7 +692,7 @@ async function start(msg) {
   }
   if (runDir) {
     rememberAgentDir(agent.agentId, runDir);
-    receiptPath = path.join(runDir, ".zeron-user-receipt.json");
+    receiptPath = path.join(runDir, ".zeren-user-receipt.json");
   }
   await runTurn(msg.prompt ?? "", () => {
     out({ ev: "ready", agentId: agent.agentId, model: agent.model?.id ?? model.id });
