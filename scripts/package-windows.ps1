@@ -81,6 +81,21 @@ try {
     Copy-Item -LiteralPath 'crates/voice/NOTICE.md' -Destination (Join-Path $stage 'licenses/parakeet-v3.txt')
     Compress-Archive -Path "$stage/*" -DestinationPath "$stage.zip" -Force
     Copy-Item -LiteralPath './target/release/zeren.exe' -Destination "$stage.exe"
+    $legacy = Join-Path $out "zeron-$version-windows-$arch.exe"
+    Copy-Item -LiteralPath "$stage.exe" -Destination $legacy
+    $probe.FileName = $legacy
+    $process = [Diagnostics.Process]::Start($probe)
+    try {
+        $stdout = $process.StandardOutput.ReadToEndAsync()
+        $stderr = $process.StandardError.ReadToEndAsync()
+        if (-not $process.WaitForExit(10000)) {
+            $process.Kill()
+            throw 'Legacy executable version probe timed out'
+        }
+        if ($process.ExitCode -ne 0 -or $stdout.Result.Trim() -ne "zeron $version") {
+            throw "Legacy executable cannot satisfy the old updater: $($stderr.Result)"
+        }
+    } finally { $process.Dispose() }
     # The per-user installer wraps the same staged directory (zeren-update.json
     # included), so installed copies update in place like the portable zip.
     $iscc = Find-InnoSetupCompiler

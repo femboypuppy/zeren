@@ -14,10 +14,7 @@ use windows_sys::Win32::System::Threading::{
 };
 
 const CONFIG: &str = "zeren-update.json";
-/// The running image, moved aside during a swap. A running executable can be
-/// renamed but not deleted, so the file survives until the process exits and
-/// is removed by the relaunched instance (or the next update attempt).
-const BACKUP: &str = "zeren.exe.old";
+const LEGACY_CONFIG: &str = "zeron-update.json";
 /// Deterministic name for the copy that becomes the next installation; a
 /// crash between the two renames leaves at most this file behind.
 const INCOMING: &str = ".zeren-update-incoming.exe";
@@ -31,8 +28,19 @@ struct Config {
 }
 
 pub(super) fn is_managed(exe: &Path) -> bool {
-    exe.file_name().is_some_and(|name| name == "zeren.exe")
-        && exe.parent().is_some_and(|dir| dir.join(CONFIG).is_file())
+    config_name(exe).is_some_and(|config| exe.with_file_name(config).is_file())
+}
+
+fn config_name(exe: &Path) -> Option<&'static str> {
+    match exe.file_name()?.to_str()? {
+        "zeren.exe" => Some(CONFIG),
+        "zeron.exe" => Some(LEGACY_CONFIG),
+        _ => None,
+    }
+}
+
+fn backup_path(installed: &Path) -> PathBuf {
+    installed.with_extension("exe.old")
 }
 
 pub(super) fn release_url() -> anyhow::Result<Option<String>> {
@@ -40,7 +48,8 @@ pub(super) fn release_url() -> anyhow::Result<Option<String>> {
     if !is_managed(&exe) {
         return Ok(None);
     }
-    let config: Config = serde_json::from_slice(&std::fs::read(exe.with_file_name(CONFIG))?)
+    let config = config_name(&exe).context("unrecognized Windows executable")?;
+    let config: Config = serde_json::from_slice(&std::fs::read(exe.with_file_name(config))?)
         .context("reading Windows update configuration")?;
     super::validate_release_override(&config.releases_url).map(Some)
 }
@@ -136,9 +145,10 @@ fn verify_digest(path: &Path, expected: &str) -> anyhow::Result<()> {
 /// and [`Self::recover_from_backup`] cover the leftovers of a hard crash
 /// between the two renames.
 pub fn apply(staged: &Path, directory: &Path, relaunch: bool) -> anyhow::Result<()> {
-    let installed = directory.join("zeren.exe");
+    let current = std::env::current_exe()?;
+    let installed = directory.join(current.file_name().context("executable has no file name")?);
     ensure!(
-        std::env::current_exe()?.canonicalize()? == installed.canonicalize()?,
+        is_managed(&installed) && current.canonicalize()? == installed.canonicalize()?,
         "update must run from its installation"
     );
     verify(staged)?;
@@ -170,10 +180,7 @@ pub fn apply(staged: &Path, directory: &Path, relaunch: bool) -> anyhow::Result<
 /// installation itself is missing (a crash between the two renames), or drop
 /// the backup when the installation is already in place.
 fn recover_from_backup(installed: &Path) -> anyhow::Result<()> {
-    let Some(directory) = installed.parent() else {
-        return Ok(());
-    };
-    let backup = directory.join(BACKUP);
+    let backup = backup_path(installed);
     if !backup.exists() {
         return Ok(());
     }
@@ -191,7 +198,7 @@ fn swap_into_place(staged: &Path, installed: &Path) -> anyhow::Result<()> {
     let directory = installed
         .parent()
         .context("installation has no parent directory")?;
-    let backup = directory.join(BACKUP);
+    let backup = backup_path(installed);
     let incoming = directory.join(INCOMING);
     let expected = std::fs::read_to_string(staged.with_file_name("sha256"))
         .context("reading the staged checksum")?;
@@ -297,10 +304,7 @@ fn refresh_installer_version(version: &str) {
 
 fn remove_own_backup() -> std::io::Result<()> {
     let exe = std::env::current_exe()?;
-    let Some(directory) = exe.parent() else {
-        return Ok(());
-    };
-    std::fs::remove_file(directory.join(BACKUP))
+    std::fs::remove_file(backup_path(&exe))
 }
 
 #[cfg(test)]
@@ -359,10 +363,16 @@ mod tests {
     fn portable_install_requires_explicit_configuration() {
         let dir = tempfile::tempdir().unwrap();
         let exe = dir.path().join("zeren.exe");
+        let legacy = dir.path().join("zeron.exe");
         assert!(!is_managed(&exe));
+        assert!(!is_managed(&legacy));
         std::fs::write(dir.path().join(CONFIG), "{}").unwrap();
         assert!(is_managed(&exe));
+        assert!(!is_managed(&legacy));
+        std::fs::write(dir.path().join(LEGACY_CONFIG), "{}").unwrap();
+        assert!(is_managed(&legacy));
         assert!(!is_managed(&dir.path().join("another.exe")));
+        assert_eq!(backup_path(&legacy), dir.path().join("zeron.exe.old"));
     }
 
     #[test]
@@ -406,13 +416,13 @@ mod tests {
         // The launchable installation is the old executable again, and no
         // backup is left dangling.
         assert_eq!(std::fs::read(&installed).unwrap(), b"old image");
-        assert!(!install.path().join(BACKUP).exists());
+        assert!(!backup_path(&installed).exists());
 
         // With the lock released the same swap succeeds end to end.
         swap_into_place(&staged, &installed).unwrap();
         assert_eq!(std::fs::read(&installed).unwrap(), b"new image");
         assert!(!incoming.exists());
-        assert!(install.path().join(BACKUP).exists());
+        assert!(backup_path(&installed).exists());
     }
 
     #[test]
@@ -431,14 +441,14 @@ mod tests {
             "unexpected error: {error:#}"
         );
         assert_eq!(std::fs::read(&installed).unwrap(), b"old image");
-        assert!(!install.path().join(BACKUP).exists());
+        assert!(!backup_path(&installed).exists());
     }
 
     #[test]
     fn backup_recovers_a_missing_installation_and_clears_when_intact() {
         let install = tempfile::tempdir().unwrap();
         let installed = install.path().join("zeren.exe");
-        let backup = install.path().join(BACKUP);
+        let backup = backup_path(&installed);
         std::fs::write(&backup, b"survivor").unwrap();
 
         // Installation missing: the backup is promoted back into place.

@@ -172,6 +172,8 @@ jobs:
             test -f "dist/zeren-$ver-$platform" \
               || { echo "missing artifact for tag v$ver: $platform — check builds and Cargo.toml version"; exit 1; }
           done
+          test -f "dist/zeron-$ver-windows-x86_64.exe" \
+            || { echo "missing legacy Windows updater bridge for v$ver"; exit 1; }
           echo "VERSION=$ver" >> "$GITHUB_ENV"
       - name: updater manifest
         run: |
