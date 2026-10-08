@@ -316,9 +316,6 @@ impl Pickers {
     }
 
     pub(super) fn show_compact_models(&mut self, cx: &mut Context<Self>) {
-        // Browse every offered provider, just as the standard picker's rail
-        // allows. rail_descriptors still limits existing chats to their provider.
-        // A foreign-provider row switches the provider before picking its model.
         let rail = if self.harness_locked(cx) {
             ModelRail::Harness
         } else {
@@ -815,7 +812,7 @@ impl Pickers {
     }
 
     /// Tab on the panel: the next provider on offer, wrapping, at its
-    /// last-used model. A chat's fixed provider stays put.
+    /// last-used model.
     fn cycle_compact_provider(&mut self, delta: isize, cx: &mut Context<Self>) {
         if self.harness_locked(cx) {
             return;

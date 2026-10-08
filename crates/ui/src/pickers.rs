@@ -998,12 +998,13 @@ impl Pickers {
     /// Whether picks apply to an existing chat's row (not the new-chat draft
     /// or the thread-naming setting).
     fn editing_chat(&self, cx: &App) -> bool {
-        self.title.is_none() && self.state.read(cx).selected_chat.is_some() && !self.state.read(cx).side_chat_unsaved()
+        let state = self.state.read(cx);
+        self.title.is_none() && state.selected_chat.is_some() && !state.side_chat_unsaved()
     }
 
     fn harness_locked(&self, cx: &App) -> bool {
         let state = self.state.read(cx);
-        self.title.is_none() && state.selected_chat.is_some() && !state.side_chat_harness_editable()
+        state.side_chat_unsaved() && !state.side_chat_harness_editable()
     }
 
     /// Move an existing chat to another agent, on `model` or that agent's
@@ -1411,7 +1412,7 @@ impl Pickers {
         // Prime the model picker's rail BEFORE anchoring the highlight (the
         // visible rows depend on it): the favorites view when stars exist —
         // t3 ModelPickerContent's initial selection — else the effective
-        // harness. Locked chats stay on their own harness.
+        // harness.
         if kind == PickerKind::HarnessModel {
             // Favorites may have been starred from the other picker.
             self.reload_defaults();
@@ -1940,9 +1941,7 @@ impl Pickers {
     }
 
     fn pick_harness(&mut self, harness: HarnessId, cx: &mut Context<Self>) {
-        if self.state.read(cx).side_chat_unsaved()
-            && !self.state.read(cx).side_chat_harness_editable()
-        {
+        if self.harness_locked(cx) {
             return;
         }
         if self.editing_chat(cx) {
@@ -2183,7 +2182,6 @@ impl Pickers {
     /// The harness descriptors the picker rail offers, with the committed
     /// harness force-included even when it's outside the offered set (a
     /// dev session's mock harness, or one disabled after the chat existed).
-    /// Existing chats only offer their own harness.
     fn rail_descriptors(&self, cx: &App) -> Vec<HarnessDescriptor> {
         let Some(list) = self.harnesses.ready() else {
             return Vec::new();
@@ -2350,6 +2348,10 @@ impl Pickers {
             if self.editing_chat(cx) {
                 // One row write: the agent and its model switch together.
                 self.switch_chat_harness(row.harness, Some(row.model.id), cx);
+                if self.compact_model_picker(cx) {
+                    self.compact_model_list = false;
+                    self.focus_on_mount = true;
+                }
                 return;
             }
             self.pick_harness(row.harness, cx);
@@ -4207,7 +4209,6 @@ impl Pickers {
     }
 
     /// Model picker with favorites and harness tabs above a scoped search.
-    /// Existing chats show only their own harness tab and models.
     fn render_harness_model_popover(&mut self, cx: &mut Context<Self>) -> AnyElement {
         let compact = self.compact_model_picker(cx);
         let height = self.menu_geometry().height.min(self.open_model_height);
@@ -6585,7 +6586,7 @@ mod tests {
         cx.update(|cx| {
             let (_, fork) = side_chat_picker(false, cx);
             fork.update(cx, |pickers, cx| {
-                assert!(pickers.harness_locked(cx));
+                assert!(!pickers.harness_locked(cx));
                 assert_eq!(pickers.rail_descriptors(cx).len(), 2);
                 pickers.pick_harness(HarnessId::Codex, cx);
                 assert_eq!(pickers.resolved(cx).harness, Some(HarnessId::Codex));
@@ -6609,7 +6610,7 @@ mod tests {
             );
             state.update(cx, |state, cx| state.side_chat_saved("side", cx));
             pickers.update(cx, |pickers, cx| {
-                assert!(pickers.harness_locked(cx));
+                assert!(!pickers.harness_locked(cx));
                 pickers.pick_harness(HarnessId::Codex, cx);
                 assert_eq!(pickers.resolved(cx).harness, Some(HarnessId::Codex));
             });
@@ -8974,7 +8975,7 @@ mod tests {
     }
 
     #[gpui::test]
-    fn compact_picker_shares_selection_reset_and_thread_restrictions(
+    fn compact_picker_shares_selection_reset_and_cross_agent_rows(
         cx: &mut gpui::TestAppContext,
     ) {
         let dir = tempfile::tempdir().unwrap();
@@ -9042,15 +9043,18 @@ mod tests {
                     cx.notify();
                 });
                 picker.show_compact_models(cx);
-                assert_eq!(picker.model_rows_len(cx), 1);
+                assert_eq!(picker.model_rows_len(cx), 2);
                 assert_eq!(picker.rail_descriptors(cx)[0].id, HarnessId::Codex);
                 picker.search.update(cx, |input, cx| input.set_text("Claude", cx));
-                assert_eq!(picker.model_rows_len(cx), 0);
+                assert_eq!(picker.model_rows_len(cx), 1);
+                assert_eq!(picker.model_rows(cx)[0].harness, HarnessId::ClaudeCode);
                 picker.search.update(cx, |input, cx| input.set_text("", cx));
-                // A chat's provider is fixed: one tab, its own.
                 assert_eq!(
                     picker.compact_groups(cx),
-                    vec![(Some(HarnessId::Codex), 0)]
+                    vec![
+                        (Some(HarnessId::Codex), 0),
+                        (Some(HarnessId::ClaudeCode), 1),
+                    ]
                 );
                 picker.compact_model_list = false;
                 picker.focus_on_mount = true;
@@ -9077,6 +9081,68 @@ mod tests {
             })
             .unwrap();
         cx.update_window(handle.into(), |_, window, cx| window.draw(cx).clear())
+            .unwrap();
+    }
+
+    #[gpui::test]
+    fn compact_saved_chat_can_pick_a_model_from_another_agent(
+        cx: &mut gpui::TestAppContext,
+    ) {
+        let dir = tempfile::tempdir().unwrap();
+        cx.update(|cx| {
+            cx.set_global(Theme::dark());
+            let mut settings = crate::settings::UiSettings::default();
+            settings.compact_model_picker = true;
+            crate::settings::init(settings, dir.path(), cx);
+        });
+        let handle = cx.add_window(|_, cx| {
+            let state = cx.new(|_| {
+                let mut state = AppState::new();
+                state.chats.push(serde_json::from_value(serde_json::json!({
+                    "id": "saved-chat",
+                    "deviceId": "local",
+                    "archived": false,
+                    "createdAt": "2026-10-07T00:00:00Z",
+                    "config": {
+                        "harness": "codex",
+                        "model": "codex-model",
+                        "sandbox": "workspace-write"
+                    }
+                })).unwrap());
+                state.selected_chat = Some("saved-chat".into());
+                state
+            });
+            let mut picker = Pickers::new(state, cx);
+            picker.harnesses = Loadable::Ready(vec![
+                descriptor(HarnessId::Codex, "Codex"),
+                descriptor(HarnessId::ClaudeCode, "Claude Code"),
+            ]);
+            picker.models.insert(
+                HarnessId::Codex,
+                Loadable::Ready(vec![bare_model("codex-model", "Codex model")]),
+            );
+            picker.models.insert(
+                HarnessId::ClaudeCode,
+                Loadable::Ready(vec![bare_model("claude-model", "Claude model")]),
+            );
+            picker
+        });
+        handle
+            .update(cx, |picker, window, cx| {
+                picker.open_model_menu(window, cx);
+                picker.show_compact_models(cx);
+                assert_eq!(picker.model_rail, ModelRail::All);
+                assert_eq!(picker.model_rows_len(cx), 2);
+                picker.search.update(cx, |input, cx| input.set_text("Claude", cx));
+                assert_eq!(picker.model_rows_len(cx), 1);
+                picker.activate_model_index(0, cx);
+                let state = picker.state.read(cx);
+                let chat = state.selected_chat_row().unwrap();
+                let config = chat.config.as_ref().unwrap();
+                assert_eq!(config.harness, HarnessId::ClaudeCode);
+                assert_eq!(config.model.as_deref(), Some("claude-model"));
+                assert!(!picker.compact_model_list);
+            })
             .unwrap();
     }
 
