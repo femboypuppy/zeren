@@ -83,19 +83,25 @@ try {
     Copy-Item -LiteralPath './target/release/zeren.exe' -Destination "$stage.exe"
     $legacy = Join-Path $out "zeron-$version-windows-$arch.exe"
     Copy-Item -LiteralPath "$stage.exe" -Destination $legacy
-    $probe.FileName = $legacy
-    $process = [Diagnostics.Process]::Start($probe)
+    $legacyProbe = Join-Path $out 'zeron.exe'
+    Copy-Item -LiteralPath $legacy -Destination $legacyProbe
     try {
-        $stdout = $process.StandardOutput.ReadToEndAsync()
-        $stderr = $process.StandardError.ReadToEndAsync()
-        if (-not $process.WaitForExit(10000)) {
-            $process.Kill()
-            throw 'Legacy executable version probe timed out'
-        }
-        if ($process.ExitCode -ne 0 -or $stdout.Result.Trim() -ne "zeron $version") {
-            throw "Legacy executable cannot satisfy the old updater: exit=$($process.ExitCode), stdout='$($stdout.Result.Trim())', stderr='$($stderr.Result.Trim())'"
-        }
-    } finally { $process.Dispose() }
+        $probe.FileName = $legacyProbe
+        $process = [Diagnostics.Process]::Start($probe)
+        try {
+            $stdout = $process.StandardOutput.ReadToEndAsync()
+            $stderr = $process.StandardError.ReadToEndAsync()
+            if (-not $process.WaitForExit(10000)) {
+                $process.Kill()
+                throw 'Legacy executable version probe timed out'
+            }
+            if ($process.ExitCode -ne 0 -or $stdout.Result.Trim() -ne "zeron $version") {
+                throw "Legacy executable cannot satisfy the old updater: exit=$($process.ExitCode), stdout='$($stdout.Result.Trim())', stderr='$($stderr.Result.Trim())'"
+            }
+        } finally { $process.Dispose() }
+    } finally {
+        Remove-Item -LiteralPath $legacyProbe -Force
+    }
     # The per-user installer wraps the same staged directory (zeren-update.json
     # included), so installed copies update in place like the portable zip.
     $iscc = Find-InnoSetupCompiler
