@@ -12879,68 +12879,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6df3dc4292935e51816d896edcd52aa30bc297907c26167fec31e2b0c6a32524"
 
 [[package]]
-name = "zerocopy"
-version = "0.8.56"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "556764e583adb45a9f8d413c2a147fa7e8d821e48e12b14fd560b607998b75eb"
-dependencies = [
- "zerocopy-derive",
-]
-
-[[package]]
-name = "zerocopy-derive"
-version = "0.8.56"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2ab42fc20575779bd240faa45f94a74256f755c0fa9e89f0ede20d91d0cdfc1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
-
-[[package]]
-name = "zerofrom"
-version = "0.1.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ec05a11813ea801ff6d75110ad09cd0824ddba17dfe17128ea0d5f68e6c5272"
-dependencies = [
- "zerofrom-derive",
-]
-
-[[package]]
-name = "zerofrom-derive"
-version = "0.1.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11532158c46691caf0f2593ea8358fed6bbf68a0315e80aae9bd41fbade684a1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
- "synstructure",
-]
-
-[[package]]
-name = "zeroize"
-version = "1.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e13c156562582aa81c60cb29407084cdb54c4164760106ab78e6c5b0858cf64e"
-dependencies = [
- "zeroize_derive",
-]
-
-[[package]]
-name = "zeroize_derive"
-version = "1.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c50655cbb0fe3fc43170059e702f1ce5e19b84cec58dc87b037a09935c2f328"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
-
-[[package]]
-name = "zeron"
+name = "zeren"
 version = "0.2.109"
 dependencies = [
  "anyhow",
@@ -12954,11 +12893,11 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "windows-sys 0.61.2",
- "zeron-engine",
- "zeron-mcp",
- "zeron-rpc",
- "zeron-ui",
- "zeron-update",
+ "zeren-engine",
+ "zeren-mcp",
+ "zeren-rpc",
+ "zeren-ui",
+ "zeren-update",
 ]
 
 [[package]]
@@ -12970,7 +12909,7 @@ dependencies = [
  "crossbeam-queue",
  "thiserror 2.0.20",
  "webrtc-audio-processing",
- "zeron-proto",
+ "zeren-proto",
 ]
 
 [[package]]
@@ -12991,11 +12930,11 @@ dependencies = [
  "tokio-util",
  "tracing",
  "uuid",
- "zeron-doc",
- "zeron-proto",
- "zeron-rpc",
- "zeron-sync",
- "zeron-voice-session",
+ "zeren-doc",
+ "zeren-proto",
+ "zeren-rpc",
+ "zeren-sync",
+ "zeren-voice-session",
 ]
 
 [[package]]
@@ -13009,7 +12948,7 @@ dependencies = [
  "similar",
  "thiserror 2.0.20",
  "tracing",
- "zeron-proto",
+ "zeren-proto",
 ]
 
 [[package]]
@@ -13042,14 +12981,14 @@ dependencies = [
  "tracing",
  "uuid",
  "windows-sys 0.61.2",
- "zeron-doc",
- "zeron-harness",
- "zeron-mcp",
- "zeron-preview",
- "zeron-proto",
- "zeron-rpc",
- "zeron-sync",
- "zeron-update",
+ "zeren-doc",
+ "zeren-harness",
+ "zeren-mcp",
+ "zeren-preview",
+ "zeren-proto",
+ "zeren-rpc",
+ "zeren-sync",
+ "zeren-update",
  "zip",
 ]
 
@@ -13076,8 +13015,8 @@ dependencies = [
  "tracing",
  "uuid",
  "windows-sys 0.61.2",
- "zeron-proto",
- "zeron-voice-media",
+ "zeren-proto",
+ "zeren-voice-media",
  "zip",
 ]
 
@@ -13101,9 +13040,9 @@ dependencies = [
  "tokio",
  "tracing",
  "uuid",
- "zeron-doc",
- "zeron-proto",
- "zeron-rpc",
+ "zeren-doc",
+ "zeren-proto",
+ "zeren-rpc",
 ]
 
 [[package]]
@@ -13118,15 +13057,15 @@ dependencies = [
  "tokio",
  "tokio-util",
  "uniffi",
- "zeron-client",
- "zeron-doc",
- "zeron-markdown",
- "zeron-orb",
- "zeron-proto",
- "zeron-syntax",
- "zeron-text",
- "zeron-veil",
- "zeron-voice-session",
+ "zeren-client",
+ "zeren-doc",
+ "zeren-markdown",
+ "zeren-orb",
+ "zeren-proto",
+ "zeren-syntax",
+ "zeren-text",
+ "zeren-veil",
+ "zeren-voice-session",
 ]
 
 [[package]]
@@ -13158,7 +13097,7 @@ dependencies = [
  "tracing-subscriber",
  "uuid",
  "webrtc",
- "zeron-proto",
+ "zeren-proto",
 ]
 
 [[package]]
@@ -13186,9 +13125,9 @@ dependencies = [
  "tokio-tungstenite",
  "tracing",
  "uuid",
- "zeron-doc",
- "zeron-proto",
- "zeron-sync",
+ "zeren-doc",
+ "zeren-proto",
+ "zeren-sync",
 ]
 
 [[package]]
@@ -13210,8 +13149,8 @@ dependencies = [
  "tokio-tungstenite",
  "tracing",
  "uuid",
- "zeron-doc",
- "zeron-proto",
+ "zeren-doc",
+ "zeren-proto",
 ]
 
 [[package]]
@@ -13337,20 +13276,20 @@ dependencies = [
  "windows-sys 0.61.2",
  "wry",
  "x11rb 0.14.0",
- "zeron-doc",
- "zeron-engine",
- "zeron-harness",
- "zeron-markdown",
- "zeron-orb",
- "zeron-proto",
- "zeron-rpc",
- "zeron-syntax",
- "zeron-theme",
- "zeron-update",
- "zeron-veil",
- "zeron-voice",
- "zeron-voice-media",
- "zeron-voice-session",
+ "zeren-doc",
+ "zeren-engine",
+ "zeren-harness",
+ "zeren-markdown",
+ "zeren-orb",
+ "zeren-proto",
+ "zeren-rpc",
+ "zeren-syntax",
+ "zeren-theme",
+ "zeren-update",
+ "zeren-veil",
+ "zeren-voice",
+ "zeren-voice-media",
+ "zeren-voice-session",
 ]
 
 [[package]]
@@ -13401,8 +13340,8 @@ dependencies = [
  "tempfile",
  "tokio",
  "tokio-util",
- "zeron-proto",
- "zeron-voice-session",
+ "zeren-proto",
+ "zeren-voice-session",
 ]
 
 [[package]]
@@ -13416,9 +13355,70 @@ dependencies = [
  "tokio",
  "tokio-util",
  "tracing",
- "zeron-orb",
- "zeron-proto",
- "zeron-rpc",
+ "zeren-orb",
+ "zeren-proto",
+ "zeren-rpc",
+]
+
+[[package]]
+name = "zerocopy"
+version = "0.8.56"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "556764e583adb45a9f8d413c2a147fa7e8d821e48e12b14fd560b607998b75eb"
+dependencies = [
+ "zerocopy-derive",
+]
+
+[[package]]
+name = "zerocopy-derive"
+version = "0.8.56"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2ab42fc20575779bd240faa45f94a74256f755c0fa9e89f0ede20d91d0cdfc1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "zerofrom"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ec05a11813ea801ff6d75110ad09cd0824ddba17dfe17128ea0d5f68e6c5272"
+dependencies = [
+ "zerofrom-derive",
+]
+
+[[package]]
+name = "zerofrom-derive"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "11532158c46691caf0f2593ea8358fed6bbf68a0315e80aae9bd41fbade684a1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+ "synstructure",
+]
+
+[[package]]
+name = "zeroize"
+version = "1.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e13c156562582aa81c60cb29407084cdb54c4164760106ab78e6c5b0858cf64e"
+dependencies = [
+ "zeroize_derive",
+]
+
+[[package]]
+name = "zeroize_derive"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c50655cbb0fe3fc43170059e702f1ce5e19b84cec58dc87b037a09935c2f328"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
 ]
 
 [[package]]
