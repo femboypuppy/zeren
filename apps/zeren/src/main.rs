@@ -152,13 +152,13 @@ fn main() -> anyhow::Result<()> {
     attach_parent_console();
     #[cfg(windows)]
     let cli = {
-        use clap::{CommandFactory, FromArgMatches};
+        use clap::FromArgMatches;
         if std::env::current_exe()
             .ok()
             .and_then(|exe| exe.file_name().map(|name| name == "zeron.exe"))
             .unwrap_or(false)
         {
-            Cli::from_arg_matches(&Cli::command().name("zeron").get_matches())?
+            Cli::from_arg_matches(&legacy_cli_command().get_matches())?
         } else {
             Cli::parse()
         }
@@ -310,6 +310,21 @@ fn main() -> anyhow::Result<()> {
             Ok(())
         }
     }
+}
+
+#[cfg(windows)]
+fn legacy_cli_command() -> clap::Command {
+    use clap::CommandFactory;
+    Cli::command().name("zeron").display_name("zeron")
+}
+
+#[cfg(all(test, windows))]
+#[test]
+fn legacy_cli_reports_expected_version() {
+    assert_eq!(
+        legacy_cli_command().render_version(),
+        format!("zeron {}\n", env!("CARGO_PKG_VERSION"))
+    );
 }
 
 #[cfg(windows)]
