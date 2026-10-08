@@ -93,7 +93,7 @@ try {
             throw 'Legacy executable version probe timed out'
         }
         if ($process.ExitCode -ne 0 -or $stdout.Result.Trim() -ne "zeron $version") {
-            throw "Legacy executable cannot satisfy the old updater: $($stderr.Result)"
+            throw "Legacy executable cannot satisfy the old updater: exit=$($process.ExitCode), stdout='$($stdout.Result.Trim())', stderr='$($stderr.Result.Trim())'"
         }
     } finally { $process.Dispose() }
     # The per-user installer wraps the same staged directory (zeren-update.json

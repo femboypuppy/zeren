@@ -151,15 +151,19 @@ fn main() -> anyhow::Result<()> {
     #[cfg(windows)]
     attach_parent_console();
     #[cfg(windows)]
-    if std::env::args_os().nth(1).as_deref() == Some(std::ffi::OsStr::new("--version"))
-        && std::env::current_exe()
+    let cli = {
+        use clap::{CommandFactory, FromArgMatches};
+        if std::env::current_exe()
             .ok()
             .and_then(|exe| exe.file_name().map(|name| name == "zeron.exe"))
             .unwrap_or(false)
-    {
-        println!("zeron {}", env!("CARGO_PKG_VERSION"));
-        return Ok(());
-    }
+        {
+            Cli::from_arg_matches(&Cli::command().name("zeron").get_matches())?
+        } else {
+            Cli::parse()
+        }
+    };
+    #[cfg(not(windows))]
     let cli = Cli::parse();
     #[cfg(windows)]
     if let Some(pid) = cli.wait_for_exit {
