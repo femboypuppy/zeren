@@ -35,8 +35,21 @@ pub(crate) fn supports_xhigh(model: &str) -> bool {
     contains_any(
         model,
         &[
-            "fable-5", "opus-4-7", "opus-4-8", "opus-4-9", "opus-5", "opus-6", "opus-7", "opus-8",
-            "opus-9", "sonnet-5", "sonnet-6", "sonnet-7", "sonnet-8", "sonnet-9",
+            "fable-5",
+            "opus-4-7",
+            "opus-4-8",
+            "opus-4-9",
+            "opus-5",
+            "opus-6",
+            "opus-7",
+            "opus-8",
+            "opus-9",
+            "sonnet-5",
+            "sonnet-6",
+            "sonnet-7",
+            "sonnet-8",
+            "sonnet-9",
+            "haiku-5-5",
         ],
     )
 }
@@ -144,7 +157,8 @@ fn model(
 /// The curated model list, mirroring claude.ts's `claudeEffortsFor` /
 /// `claudeOptionsFor` ladders: full ladder (through ultracode/ultrathink) on
 /// Fable 5, `max`-topped ladders on Opus/Sonnet, no efforts but a thinking
-/// toggle on Haiku; context-window select on the long-context families and
+/// toggle on Haiku 4.5 and an effort ladder on Haiku 5.5;
+/// context-window select on the long-context families and
 /// fast mode on Opus 4.5+.
 ///
 /// `pub`: besides the discovery-side enrichment here, the UI's display-side
@@ -366,6 +380,13 @@ pub fn static_models() -> Vec<Model> {
             vec![context_window()],
         ),
         model(
+            "claude-haiku-5-5",
+            "Haiku 5.5",
+            "Fastest model for everyday tasks, with adaptive thinking and 1M context",
+            XHIGH_LADDER,
+            vec![],
+        ),
+        model(
             "claude-haiku-4-5",
             "Haiku 4.5",
             "Fastest model for everyday tasks",
@@ -414,6 +435,8 @@ mod tests {
         assert!(supports_xhigh("claude-opus-4-7-20260101"));
         assert!(supports_xhigh("claude-sonnet-5-5"));
         assert!(supports_xhigh("claude-sonnet-5-5[1m]"));
+        assert!(supports_xhigh("claude-haiku-5-5"));
+        assert!(!supports_xhigh("claude-haiku-4-5"));
         assert!(!supports_xhigh("claude-opus-4-5"));
         assert!(!supports_xhigh("claude-sonnet-4-5"));
     }
@@ -427,6 +450,44 @@ mod tests {
             .expect("Sonnet 5.5 in catalog");
         assert_eq!(sonnet.label, "Sonnet 5.5");
         assert!(sonnet.reasoning_levels.contains(&ReasoningLevel::XHigh));
+    }
+
+    #[test]
+    fn haiku_5_5_has_effort_without_legacy_thinking_toggle() {
+        let models = static_models();
+        let haiku = models
+            .iter()
+            .find(|model| model.id == "claude-haiku-5-5")
+            .expect("Haiku 5.5 in catalog");
+        assert_eq!(haiku.label, "Haiku 5.5");
+        assert_eq!(haiku.reasoning_levels, XHIGH_LADDER);
+        assert!(haiku.options.is_empty());
+        assert_eq!(
+            to_effort(Some(ReasoningLevel::XHigh), Some(&haiku.id)),
+            Some("xhigh")
+        );
+        let legacy = models
+            .iter()
+            .find(|model| model.id == "claude-haiku-4-5")
+            .unwrap();
+        assert!(legacy.reasoning_levels.is_empty());
+        assert!(legacy.options.iter().any(|option| option.id == "thinking"));
+    }
+
+    #[test]
+    fn live_catalog_keeps_haiku_5_5_when_cli_only_reports_older_models() {
+        let response = serde_json::json!({"response": {"models": [{
+            "value": "haiku",
+            "resolvedModel": "claude-haiku-4-5",
+            "displayName": "Haiku"
+        }]}});
+        let models = with_discovered_models(static_models(), &response).unwrap();
+        let haiku = models
+            .iter()
+            .find(|model| model.id == "claude-haiku-5-5")
+            .expect("Haiku 5.5 survives live discovery");
+        assert_eq!(haiku.label, "Haiku 5.5");
+        assert_eq!(haiku.reasoning_levels, XHIGH_LADDER);
     }
 
     #[test]
