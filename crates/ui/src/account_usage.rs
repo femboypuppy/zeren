@@ -15,7 +15,7 @@ use zeren_rpc::methods;
 
 use crate::popover;
 use crate::settings::accounts::{
-    self, AccountsSnapshotCache, UsageLevel, render_usage_meter, reports_usage, signs_in,
+    self, AccountsSnapshotCache, UsageLevel, render_account_usage, reports_usage, signs_in,
     usage_color, usage_level,
 };
 use crate::state::AppState;
@@ -396,15 +396,7 @@ impl AccountUsage {
                                 el.child(crate::settings::widgets::meta_line(theme, meta))
                             }),
                     )
-                    .child(
-                        div().flex_none().flex().flex_col().gap(px(2.0)).children(
-                            account
-                                .usage_windows
-                                .iter()
-                                .take(2)
-                                .map(|window| render_usage_meter(window, theme)),
-                        ),
-                    )
+                    .child(render_account_usage(account, theme))
             }))
             .children(self.error.clone().map(|error| {
                 div()

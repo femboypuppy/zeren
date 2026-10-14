@@ -415,6 +415,64 @@ pub(crate) fn render_usage_meter(
         .into_any_element()
 }
 
+fn antigravity_usage_sections(
+    windows: &[zeren_proto::AgentUsageWindow],
+) -> Vec<(&'static str, Vec<zeren_proto::AgentUsageWindow>)> {
+    [
+        ("Gemini", "Gemini Models · "),
+        ("Claude", "Claude and GPT models · "),
+    ]
+    .into_iter()
+    .filter_map(|(heading, prefix)| {
+        let meters: Vec<_> = windows
+            .iter()
+            .filter_map(|window| {
+                let label = window.label.strip_prefix(prefix)?;
+                let mut meter = window.clone();
+                meter.label = label.to_owned();
+                Some(meter)
+            })
+            .collect();
+        (!meters.is_empty()).then_some((heading, meters))
+    })
+    .collect()
+}
+
+pub(crate) fn render_account_usage(account: &AgentAccount, theme: &Theme) -> gpui::Div {
+    let column = div().flex_none().flex().flex_col().gap(px(2.0));
+    if account.harness != HarnessId::Antigravity {
+        return column.children(
+            account
+                .usage_windows
+                .iter()
+                .take(2)
+                .map(|window| render_usage_meter(window, theme)),
+        );
+    }
+    column.gap(px(8.0)).children(
+        antigravity_usage_sections(&account.usage_windows)
+            .into_iter()
+            .map(|(heading, meters)| {
+                div()
+                    .flex()
+                    .flex_col()
+                    .gap(px(2.0))
+                    .child(
+                        div()
+                            .text_size(crate::typography::ui_rems(11.5))
+                            .font_weight(gpui::FontWeight::MEDIUM)
+                            .text_color(theme.text)
+                            .child(heading),
+                    )
+                    .children(
+                        meters
+                            .iter()
+                            .map(|window| render_usage_meter(window, theme)),
+                    )
+            }),
+    )
+}
+
 // ---------------------------------------------------------------------------
 // Entity
 // ---------------------------------------------------------------------------
@@ -1243,13 +1301,7 @@ impl AccountsPage {
                 .flex_col()
                 .gap(px(2.0))
                 .tooltip(widgets::text_tooltip(resets))
-                .children(
-                    account
-                        .usage_windows
-                        .iter()
-                        .take(2)
-                        .map(|window| render_usage_meter(window, theme)),
-                )
+                .child(render_account_usage(account, theme))
                 .into_any_element()
         };
 
@@ -2273,6 +2325,47 @@ impl Render for AccountsPage {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn antigravity_usage_keeps_both_families_and_readable_window_labels() {
+        let windows: Vec<_> = [
+            "Claude and GPT models · Week",
+            "Gemini Models · Week",
+            "Gemini Models · 5 hours",
+            "Claude and GPT models · 5 hours",
+        ]
+        .into_iter()
+        .map(|label| zeren_proto::AgentUsageWindow {
+            label: label.into(),
+            used_fraction: 0.2,
+            resets_at: None,
+        })
+        .collect();
+        let sections = antigravity_usage_sections(&windows);
+        assert_eq!(
+            sections
+                .iter()
+                .map(|(heading, _)| *heading)
+                .collect::<Vec<_>>(),
+            vec!["Gemini", "Claude"]
+        );
+        for (_, meters) in &sections {
+            assert_eq!(
+                meters
+                    .iter()
+                    .map(|meter| meter.label.as_str())
+                    .collect::<Vec<_>>(),
+                vec!["Week", "5 hours"]
+            );
+        }
+        assert_eq!(
+            sections
+                .iter()
+                .map(|(_, meters)| meters.len())
+                .sum::<usize>(),
+            windows.len()
+        );
+    }
+
     #[test]
     fn only_web_and_loopback_login_urls_open() {
         assert!(is_openable_login_url(
