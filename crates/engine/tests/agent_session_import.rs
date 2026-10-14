@@ -21,6 +21,7 @@ fn roots(stores: &Path) -> AgentStoreRoots {
         pi_agent: stores.join("pi"),
         cursor_user: stores.join("cursor"),
         antigravity_user: stores.join("antigravity"),
+        antigravity_cli: stores.join("agy"),
         excluded: Vec::new(),
     }
 }
@@ -45,6 +46,126 @@ fn write_claude_session(stores: &Path, cwd: &str, session_id: &str) {
     ];
     let body: String = lines.iter().map(|l| format!("{l}\n")).collect();
     std::fs::write(dir.join(format!("{session_id}.jsonl")), body).unwrap();
+}
+
+#[tokio::test]
+async fn antigravity_import_lists_previews_and_resumes_native_cli_history() {
+    let dir = tempfile::tempdir().unwrap();
+    let project = dir.path().join("work app");
+    std::fs::create_dir_all(&project).unwrap();
+    let cwd = project.to_string_lossy().into_owned();
+    let stores = dir.path().join("stores");
+    let agy = stores.join("agy");
+    std::fs::create_dir_all(agy.join("cache")).unwrap();
+    std::fs::create_dir_all(agy.join("conversations")).unwrap();
+    let logs = agy.join("brain/native-1/.system_generated/logs");
+    std::fs::create_dir_all(&logs).unwrap();
+    std::fs::write(agy.join("conversations/native-1.db"), b"owned by agy").unwrap();
+    let uri = format!(
+        "file://{}{}",
+        if cwd.starts_with('/') { "" } else { "/" },
+        cwd.replace('\\', "/").replace(' ', "%20")
+    );
+    std::fs::write(agy.join("cache/conversation_metadata.json"), json!({"conversations":{
+        "native-1":{"summary":{"Title":"Native chat","WorkspaceURIs":[uri],"UpdatedAt":"2026-10-14T07:40:52Z","Internal":false}},
+        "../escape":{"summary":{"WorkspaceURIs":["file:///invalid"]}},
+        "internal":{"is_internal":true}
+    }}).to_string()).unwrap();
+    let lines = [
+        json!({"step_index":0,"type":"USER_INPUT","content":"<USER_REQUEST>\nCheck the tests\n</USER_REQUEST>","created_at":"2026-10-14T07:40:34Z"}),
+        json!({"step_index":1,"type":"PLANNER_RESPONSE","content":"Checking.","thinking":"Plan", "tool_calls":[{"name":"run_command","args":{"CommandLine":"\"echo ok\""}}],"created_at":"2026-10-14T07:40:35Z"}),
+        json!({"step_index":2,"type":"GENERIC","status":"ERROR","content":"private tool output","created_at":"2026-10-14T07:40:41Z"}),
+        json!({"step_index":3,"type":"PLANNER_RESPONSE","content":"Command was denied.","created_at":"2026-10-14T07:40:52Z"}),
+    ];
+    let transcript = lines
+        .iter()
+        .map(|line| format!("{line}\n"))
+        .collect::<String>();
+    let transcript_path = logs.join("transcript.jsonl");
+    std::fs::write(&transcript_path, &transcript).unwrap();
+    let source_roots = roots(&stores);
+    assert!(zeren_engine::agent_sessions::supports_sessions(
+        HarnessId::Antigravity
+    ));
+    let projects = zeren_engine::agent_projects::discover(&source_roots);
+    assert!(
+        projects
+            .iter()
+            .any(|source| source.harness == HarnessId::Antigravity && source.projects.len() == 1)
+    );
+    let sessions = zeren_engine::agent_sessions::list_sessions_with(
+        &source_roots,
+        HarnessId::Antigravity,
+        &cwd,
+    )
+    .unwrap();
+    assert_eq!(sessions.len(), 1);
+    assert_eq!(sessions[0].id, "native-1");
+    assert_eq!(sessions[0].prompt_count, 1);
+    assert_eq!(sessions[0].title, "Native chat");
+    let core = EngineCore::assemble_with_profile(
+        EngineProfile::local(&dir.path().join("data")).unwrap(),
+        Arc::new(default_registry()),
+        HarnessId::Mock,
+        None,
+    )
+    .unwrap();
+    let imported = import_session_with(
+        &core.doc_host,
+        &core.workspace,
+        &source_roots,
+        HarnessId::Antigravity,
+        "native-1",
+    )
+    .unwrap();
+    let chat = core.workspace.chat(&imported.chat_id).unwrap().unwrap();
+    assert_eq!(chat.harness_session_id.as_deref(), Some("agy-cli:native-1"));
+    assert_eq!(chat.config.unwrap().harness, HarnessId::Antigravity);
+    let entries = core
+        .doc_host
+        .open(&imported.chat_id)
+        .unwrap()
+        .doc()
+        .read_entries()
+        .unwrap();
+    assert_eq!(entries.len(), 2);
+    assert!(
+        matches!(&entries[0].parts[0], MessagePart::Text {text,..} if text == "Check the tests")
+    );
+    assert!(
+        !serde_json::to_string(&entries)
+            .unwrap()
+            .contains("private tool output")
+    );
+    let again = import_session_with(
+        &core.doc_host,
+        &core.workspace,
+        &source_roots,
+        HarnessId::Antigravity,
+        "native-1",
+    )
+    .unwrap();
+    assert!(again.existing);
+    assert_eq!(again.chat_id, imported.chat_id);
+    assert_eq!(
+        std::fs::read_to_string(transcript_path).unwrap(),
+        transcript
+    );
+    assert_eq!(
+        std::fs::read(agy.join("conversations/native-1.db")).unwrap(),
+        b"owned by agy"
+    );
+    assert!(
+        import_session_with(
+            &core.doc_host,
+            &core.workspace,
+            &source_roots,
+            HarnessId::Antigravity,
+            "../escape"
+        )
+        .is_err()
+    );
+    core.shutdown().await;
 }
 
 /// The RPC's shape: the blocking import runs off the async runtime.

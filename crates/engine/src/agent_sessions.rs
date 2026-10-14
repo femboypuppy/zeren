@@ -40,6 +40,8 @@ use crate::agent_projects::{
 use crate::doc_host::DocHost;
 use crate::repos::disposable_worker;
 use crate::workspace_host::WorkspaceHost;
+mod antigravity;
+pub(crate) use antigravity::project_paths as antigravity_project_paths;
 
 /// Wall-clock ceiling for a listing or preview (disposable worker, like
 /// `ListAgentProjects`).
@@ -62,7 +64,7 @@ const CLAUDE_DIR_NAME_MAX: usize = 200;
 pub fn supports_sessions(harness: HarnessId) -> bool {
     matches!(
         harness,
-        HarnessId::ClaudeCode | HarnessId::Codex | HarnessId::Opencode
+        HarnessId::ClaudeCode | HarnessId::Codex | HarnessId::Opencode | HarnessId::Antigravity
     )
 }
 
@@ -131,6 +133,7 @@ pub fn list_sessions_with(
         HarnessId::ClaudeCode => claude_sessions(roots, project),
         HarnessId::Codex => codex_sessions(roots, project),
         HarnessId::Opencode => opencode_sessions(roots, project),
+        HarnessId::Antigravity => antigravity::sessions(roots, project),
         other => return Err(unsupported(other)),
     };
     sessions.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
@@ -148,9 +151,14 @@ pub fn import_session_with(
     session_id: &str,
 ) -> Result<ImportedAgentSession, EngineError> {
     let device = doc_host.device_id().to_string();
+    let resume_id = if harness == HarnessId::Antigravity {
+        format!("agy-cli:{session_id}")
+    } else {
+        session_id.to_owned()
+    };
     let existing = workspace.read_chats()?.into_iter().find(|chat| {
         chat.device_id == device
-            && chat.harness_session_id.as_deref() == Some(session_id)
+            && chat.harness_session_id.as_deref() == Some(resume_id.as_str())
             && chat.config.as_ref().is_some_and(|c| c.harness == harness)
     });
     if let Some(chat) = existing {
@@ -226,7 +234,7 @@ pub fn import_session_with(
         created_at,
         // Resume is only injected when the run's cwd equals this, and the
         // run launches from the row's `cwd` — so both carry the same string.
-        harness_session_id: Some(session_id.to_string()),
+        harness_session_id: Some(resume_id),
         harness_session_cwd: Some(cwd),
         harness_session_harness: Some(harness),
         space_id: Some(space_id.clone()),
@@ -256,6 +264,7 @@ fn load_transcript(
         HarnessId::ClaudeCode => claude_transcript(&claude_session_file(roots, session_id)?),
         HarnessId::Codex => codex_transcript(&codex_session_file(roots, session_id)?),
         HarnessId::Opencode => opencode_transcript(roots, session_id),
+        HarnessId::Antigravity => antigravity::transcript(roots, session_id),
         other => Err(unsupported(other)),
     }
 }
@@ -1499,6 +1508,7 @@ mod tests {
                 pi_agent: root.join("pi"),
                 cursor_user: root.join("cursor"),
                 antigravity_user: root.join("antigravity"),
+                antigravity_cli: root.join("agy"),
                 excluded: Vec::new(),
             };
             Self {

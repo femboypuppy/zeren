@@ -55,6 +55,7 @@ pub struct AgentStoreRoots {
     pub pi_agent: PathBuf,
     pub cursor_user: PathBuf,
     pub antigravity_user: PathBuf,
+    pub antigravity_cli: PathBuf,
     /// Folders under these roots are never offered (temp and app-data dirs).
     pub excluded: Vec<PathBuf>,
 }
@@ -78,6 +79,7 @@ impl AgentStoreRoots {
                 .unwrap_or_else(|| home.join(".pi").join("agent")),
             cursor_user: editor_user_dir(&home, "Cursor"),
             antigravity_user: editor_user_dir(&home, "Antigravity"),
+            antigravity_cli: home.join(".gemini/antigravity-cli"),
             excluded: excluded_roots(&home),
         }
     }
@@ -105,10 +107,7 @@ pub fn discover(roots: &AgentStoreRoots) -> Vec<AgentProjectSource> {
         (HarnessId::Opencode, opencode_projects(roots)),
         (HarnessId::Cursor, editor_projects(&roots.cursor_user)),
         (HarnessId::Pi, pi_projects(roots)),
-        (
-            HarnessId::Antigravity,
-            editor_projects(&roots.antigravity_user),
-        ),
+        (HarnessId::Antigravity, antigravity_projects(roots)),
     ]
     .into_iter()
     .filter_map(|(harness, found)| {
@@ -133,6 +132,14 @@ fn claude_projects(roots: &AgentStoreRoots) -> Found {
     // real path comes from the `cwd` the transcript lines record.
     for dir in subdirs(&roots.claude_config.join("projects")) {
         newest_transcript_cwd(&dir, &mut found, |line| str_field(line, "cwd"));
+    }
+    found
+}
+
+fn antigravity_projects(roots: &AgentStoreRoots) -> Found {
+    let mut found = editor_projects(&roots.antigravity_user);
+    for (path, updated_at) in crate::agent_sessions::antigravity_project_paths(roots) {
+        found.add(&path, Some(updated_at));
     }
     found
 }
@@ -364,7 +371,7 @@ fn is_agent_worktree(path: &Path) -> bool {
 /// `file:///c%3A/Users/me` → `c:/Users/me`; `file:///home/me` → `/home/me`;
 /// `file://host/share` → `//host/share`. Non-file URIs (remote workspaces)
 /// yield `None`.
-fn file_uri_path(uri: &str) -> Option<String> {
+pub(crate) fn file_uri_path(uri: &str) -> Option<String> {
     let rest = uri.strip_prefix("file://")?;
     let decoded = percent_decode(rest)?;
     let bytes = decoded.as_bytes();
@@ -608,6 +615,7 @@ mod tests {
                 pi_agent: root.join("pi"),
                 cursor_user: root.join("cursor"),
                 antigravity_user: root.join("antigravity"),
+                antigravity_cli: root.join("agy"),
                 excluded: Vec::new(),
             };
             Self {
