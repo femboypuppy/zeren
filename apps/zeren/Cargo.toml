@@ -11,6 +11,7 @@ path = "src/main.rs"
 
 [dependencies]
 zeren-engine.workspace = true
+zeren-harness.workspace = true
 zeren-rpc.workspace = true
 zeren-ui.workspace = true
 zeren-update.workspace = true

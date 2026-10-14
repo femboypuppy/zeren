@@ -3,6 +3,8 @@ use std::{
     path::{Path, PathBuf},
     time::Duration,
 };
+mod approval;
+pub use approval::run_hook as run_permission_hook;
 
 use async_trait::async_trait;
 use futures::{StreamExt, stream::BoxStream};
@@ -370,13 +372,18 @@ impl Harness for AgyCliHarness {
         if request.sandbox != SandboxLevel::DangerFullAccess {
             command.arg("--sandbox");
         }
+        let approval = if skip_permissions(&request) {
+            None
+        } else {
+            Some(approval::Bridge::prepare(&mut command).await?)
+        };
         command
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());
         let child = command.spawn()?;
         let (sender, receiver) = mpsc::channel(256);
-        tokio::spawn(run_child(child, request, controls, sender));
+        tokio::spawn(run_child(child, request, controls, sender, approval));
         Ok(
             futures::stream::unfold(receiver, |mut receiver| async move {
                 receiver.recv().await.map(|event| (event, receiver))
@@ -391,14 +398,16 @@ async fn run_child(
     request: RunRequest,
     controls: RunControls,
     sender: mpsc::Sender<Result<AgentEvent, HarnessError>>,
+    approval: Option<approval::Bridge>,
 ) {
     let RunControls {
         execution_lease: _lease,
         interrupt,
         steering: _steering,
-        request_input: _request_input,
+        request_input,
         realtime: _realtime,
     } = controls;
+    let _approval_task = approval.map(|bridge| bridge.serve(request_input, interrupt.clone()));
     let mut session = request
         .resume
         .as_deref()

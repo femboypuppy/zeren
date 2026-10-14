@@ -145,6 +145,11 @@ fn spawn_malloc_trimmer() {
 }
 
 fn main() -> anyhow::Result<()> {
+    if std::env::args_os().nth(1).as_deref() == Some(std::ffi::OsStr::new("--agy-permission-hook"))
+    {
+        zeren_harness::agy::run_permission_hook()?;
+        return Ok(());
+    }
     if std::env::args_os().nth(1).as_deref() == Some(std::ffi::OsStr::new("--noop-browser")) {
         return Ok(());
     }
