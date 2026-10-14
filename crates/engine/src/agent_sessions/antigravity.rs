@@ -98,7 +98,7 @@ pub(super) fn sessions(roots: &AgentStoreRoots, project: &str) -> Vec<AgentSessi
             Some(AgentSession {
                 id: entry.id,
                 cwd: entry.cwd,
-                updated_at: entry.updated_at,
+                updated_at: Some(entry.updated_at),
                 prompt_count,
                 title: entry
                     .title
