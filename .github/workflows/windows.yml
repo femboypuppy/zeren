@@ -90,6 +90,8 @@ jobs:
         run: cargo test --release --locked -p zeren-engine --test codex_catalog --test codex_login_resolution
       - name: Auth integration tests
         run: cargo test --release --locked -p zeren-engine --test auth
+      - name: Agent conversation import tests
+        run: cargo test --release --locked -p zeren-engine --test agent_session_import
 
   app:
     runs-on: windows-2022
