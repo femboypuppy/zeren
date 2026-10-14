@@ -12,8 +12,8 @@ use tokio::{
     sync::mpsc,
 };
 use zeren_proto::{
-    AgentEvent, DoneStatus, HarnessId, Model, ReasoningLevel, RunRequest, SandboxLevel,
-    SteeringMode, ToolCall,
+    AgentEvent, DoneStatus, HarnessId, Model, ModelOption, ModelOptionChoice, ReasoningLevel,
+    RunRequest, SandboxLevel, SteeringMode, ToolCall,
 };
 
 use crate::{
@@ -148,7 +148,7 @@ fn parse_models(output: &str) -> Vec<Model> {
                 label: label.into(),
                 description: None,
                 reasoning_levels: Vec::new(),
-                options: Vec::new(),
+                options: vec![permission_option()],
             })
         })
         .collect()
@@ -162,6 +162,33 @@ fn effort(level: ReasoningLevel) -> &'static str {
         ReasoningLevel::XHigh | ReasoningLevel::Ultracode => "xhigh",
         ReasoningLevel::Max | ReasoningLevel::Ultra => "max",
     }
+}
+
+fn permission_option() -> ModelOption {
+    ModelOption {
+        id: "skipPermissions".into(),
+        label: "Skip permission checks".into(),
+        choices: vec![
+            ModelOptionChoice {
+                id: "off".into(),
+                label: "Off".into(),
+            },
+            ModelOptionChoice {
+                id: "on".into(),
+                label: "On".into(),
+            },
+        ],
+        default_choice: "off".into(),
+    }
+}
+
+fn skip_permissions(request: &RunRequest) -> bool {
+    request
+        .model_options
+        .get("skipPermissions")
+        .and_then(Value::as_str)
+        == Some("on")
+        || (request.auto_approve && request.sandbox == SandboxLevel::DangerFullAccess)
 }
 
 fn model_base(requested: &str) -> &str {
@@ -337,7 +364,7 @@ impl Harness for AgyCliHarness {
                 command.args(["--mode", "accept-edits"]);
             }
         }
-        if request.auto_approve && request.sandbox == SandboxLevel::DangerFullAccess {
+        if skip_permissions(&request) {
             command.arg("--dangerously-skip-permissions");
         }
         if request.sandbox != SandboxLevel::DangerFullAccess {
@@ -633,6 +660,32 @@ fn cli_tool_call(name: &str, parameters: Option<&Value>) -> ToolCall {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn permission_choice_survives_effort_grouping_and_request_round_trip() {
+        let models = crate::acp::group_effort_variants(parse_models(
+            "gemini-3.8-flash-low\tGemini 3.8 Flash (Low)\ngemini-3.8-flash-high\tGemini 3.8 Flash (High)\n",
+        ));
+        assert_eq!(models.len(), 1);
+        let option = &models[0].options[0];
+        assert_eq!(option.id, "skipPermissions");
+        assert_eq!(option.default_choice, "off");
+        let mut request: RunRequest = serde_json::from_value(json!({
+            "prompt":"hello", "model":null, "reasoning":null,
+            "cwd":".", "sandbox":"workspace-write", "resume":null
+        }))
+        .unwrap();
+        assert!(!skip_permissions(&request));
+        request.model_options.insert(option.id.clone(), json!("on"));
+        let round_trip: RunRequest =
+            serde_json::from_value(serde_json::to_value(&request).unwrap()).unwrap();
+        assert!(skip_permissions(&round_trip));
+        assert_eq!(round_trip.sandbox, SandboxLevel::WorkspaceWrite);
+        request
+            .model_options
+            .insert(option.id.clone(), json!("off"));
+        assert!(!skip_permissions(&request));
+    }
 
     #[test]
     fn empty_turns_have_visible_errors_and_quota_errors_are_preserved() {
