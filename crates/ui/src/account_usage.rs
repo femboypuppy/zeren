@@ -36,6 +36,24 @@ pub fn used_fraction(account: &AgentAccount) -> Option<f32> {
         .reduce(f32::max)
 }
 
+fn used_fraction_for_model(account: &AgentAccount, model: Option<&str>) -> Option<f32> {
+    let group = match (account.harness, model) {
+        (HarnessId::Antigravity, Some(model)) if model.starts_with("gemini-") => "Gemini Models",
+        (HarnessId::Antigravity, Some(model))
+            if model.starts_with("claude-") || model.starts_with("gpt-") =>
+        {
+            "Claude and GPT models"
+        }
+        _ => return used_fraction(account),
+    };
+    account
+        .usage_windows
+        .iter()
+        .filter(|window| window.label.starts_with(group))
+        .map(|window| window.used_fraction.clamp(0.0, 1.0))
+        .reduce(f32::max)
+}
+
 /// The harness's live account, when it reports usage. Pure.
 pub fn active_account(
     snapshot: &AgentAccountsSnapshot,
@@ -53,6 +71,7 @@ pub struct AccountUsage {
     /// `None` = this device, as in [`AccountsSnapshotCache`].
     target: Option<String>,
     harness: Option<HarnessId>,
+    model: Option<String>,
     /// Once any list has been asked for the current target.
     loaded: bool,
     last_forced: Option<Instant>,
@@ -90,6 +109,7 @@ impl AccountUsage {
             loaded: false,
             last_forced: None,
             error: None,
+            model: None,
             load_task: None,
             action_task: None,
             popup: popover::Popup::default(),
@@ -104,11 +124,13 @@ impl AccountUsage {
     pub fn track(
         &mut self,
         harness: Option<HarnessId>,
+        model: Option<String>,
         target: Option<String>,
         cx: &mut Context<Self>,
     ) {
         let harness = harness.filter(|h| signs_in(*h) && reports_usage(*h));
         self.harness = harness;
+        self.model = model;
         if self.target != target {
             self.target = target;
             self.loaded = false;
@@ -237,7 +259,10 @@ impl AccountUsage {
     /// The ring's reading: the live account's most-used window, when the
     /// harness has a live account with usage to show.
     fn fraction(&self, cx: &gpui::App) -> Option<f32> {
-        used_fraction(active_account(self.snapshot(cx)?, self.harness?)?)
+        used_fraction_for_model(
+            active_account(self.snapshot(cx)?, self.harness?)?,
+            self.model.as_deref(),
+        )
     }
 
     /// A trigger click: open this ring's popover, or close it when the
@@ -491,6 +516,21 @@ mod tests {
         );
         assert_eq!(
             used_fraction(&account(HarnessId::Codex, true, &[1.4])),
+            Some(1.0)
+        );
+    }
+
+    #[test]
+    fn antigravity_ring_uses_the_selected_models_quota_group() {
+        let mut account = account(HarnessId::Antigravity, true, &[0.12, 1.0]);
+        account.usage_windows[0].label = "Gemini Models · Week".into();
+        account.usage_windows[1].label = "Claude and GPT models · Week".into();
+        assert_eq!(
+            used_fraction_for_model(&account, Some("gemini-3.8-flash")),
+            Some(0.12)
+        );
+        assert_eq!(
+            used_fraction_for_model(&account, Some("claude-opus-5-5")),
             Some(1.0)
         );
     }

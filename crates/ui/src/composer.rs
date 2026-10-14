@@ -11513,8 +11513,10 @@ impl Render for Composer {
                         .map(|chat| chat.device_id.clone())
                         .filter(|device| state.local_device_id.as_ref() != Some(device))
                 };
-                self.account_usage
-                    .update(cx, |usage, cx| usage.track(harness, target, cx));
+                self.account_usage.update(cx, |usage, cx| {
+                    let model = self.pickers.read(cx).resolved(cx).model;
+                    usage.track(harness, model, target, cx)
+                });
             }
             container.child(
                 div()

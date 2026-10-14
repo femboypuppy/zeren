@@ -94,6 +94,7 @@ use zeren_proto::{
 use crate::repos::home_dir;
 use crate::{EngineError, new_id, now_ms};
 
+mod antigravity;
 mod oauth;
 #[cfg(test)]
 mod provider_tests;
@@ -1056,10 +1057,34 @@ impl AgentAccounts {
                 });
             }
         }
-        // Antigravity keeps exactly one login whose token zeren never reads:
-        // one active, unswitchable row, and no usage (it has no quota view).
+        // Native agy owns one login and exposes its quota through /usage.
         if let Some(login) = antigravity {
-            accounts.push(login.account());
+            let mut account = login.account();
+            if login.method == "cli-oauth" {
+                if force_usage {
+                    self.refresh_antigravity_usage().await;
+                }
+                let usage = lock(&self.inner.usage);
+                if let Some(entry) = usage.get(&usage_key(HarnessId::Antigravity, "cli-oauth")) {
+                    account.usage_windows = entry
+                        .usage
+                        .as_ref()
+                        .map(|usage| usage.windows.clone())
+                        .unwrap_or_default();
+                    account.usage_fetched_at = entry.fetched_at;
+                    account.usage_error = entry.error.as_ref().and_then(|error| {
+                        usage_error_message(
+                            HarnessId::Antigravity,
+                            None,
+                            true,
+                            error,
+                            entry,
+                            now_ms(),
+                        )
+                    });
+                }
+            }
+            accounts.push(account);
         }
         Ok(AgentAccountsSnapshot { accounts, warnings })
     }
@@ -1779,6 +1804,14 @@ impl AgentAccounts {
     /// a valid token answers `authenticate` without any browser at all, which
     /// is success: the poll reports done and the list shows the login.
     fn start_antigravity_login(&self, requester: Option<&str>) -> AgentLoginStart {
+        #[cfg(windows)]
+        if self.inner.config.antigravity_cli_keychain
+            && zeren_harness::AgyCliHarness::new()
+                .resolve_executable()
+                .is_ok()
+        {
+            return self.start_native_antigravity_login(requester);
+        }
         self.reap_spawned_flows(HarnessId::Antigravity);
         let login_id = new_id();
         let state = Arc::new(Mutex::new(TaskLoginState {
@@ -2638,7 +2671,8 @@ impl AgentAccounts {
             .iter()
             .map(|(harness, slot, _)| usage_key(*harness, &slot.account_key))
             .collect();
-        usage.retain(|key, _| live.contains(key));
+        let native_agy = usage_key(HarnessId::Antigravity, "cli-oauth");
+        usage.retain(|key, _| live.contains(key) || key == &native_agy);
         // Persist under the lock: overlapping lists must not interleave
         // writes of the same file.
         let file = UsageCacheFile {

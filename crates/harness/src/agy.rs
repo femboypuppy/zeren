@@ -23,13 +23,17 @@ use crate::{
 
 pub struct AgyCliHarness {
     executable: Option<PathBuf>,
+    models_cache: crate::catalog::Catalog,
 }
 
 const CLI_SESSION_PREFIX: &str = "agy-cli:";
 
 impl AgyCliHarness {
     pub fn new() -> Self {
-        Self { executable: None }
+        Self {
+            executable: None,
+            models_cache: crate::catalog::Catalog::default(),
+        }
     }
 
     pub fn with_executable(mut self, executable: impl Into<PathBuf>) -> Self {
@@ -88,6 +92,38 @@ impl AgyCliHarness {
             ));
         }
         Ok(models)
+    }
+
+    async fn cached_models(&self, force: bool) -> Result<crate::ModelCatalog, HarnessError> {
+        self.models_cache
+            .get_with_timeout(
+                force,
+                Duration::from_secs(30),
+                || self.model_context().map(|context| context.unwrap().key()),
+                || self.available_models(),
+            )
+            .await
+    }
+
+    /// Fetch native account quotas without invoking a model turn.
+    pub async fn usage(&self) -> Result<Value, HarnessError> {
+        let mut command = self.command(&std::env::current_dir()?)?;
+        command.args(["-p", "/usage", "--output-format", "json"]);
+        command.stdin(Stdio::null());
+        let output = tokio::time::timeout(Duration::from_secs(30), command.output())
+            .await
+            .map_err(|_| HarnessError::Protocol("Antigravity usage timed out".into()))??;
+        let frame: Value = serde_json::from_slice(&output.stdout).map_err(|_| {
+            HarnessError::Protocol("Antigravity returned invalid usage data".into())
+        })?;
+        if !output.status.success() || frame["status"] != "SUCCESS" {
+            return Err(HarnessError::Protocol(crate::redact_secrets(
+                frame["error"]
+                    .as_str()
+                    .unwrap_or("Antigravity usage unavailable"),
+            )));
+        }
+        Ok(frame)
     }
 }
 
@@ -202,6 +238,14 @@ impl Harness for AgyCliHarness {
         true
     }
 
+    async fn commands(&self) -> Result<Vec<zeren_proto::SlashCommand>, HarnessError> {
+        Ok(vec![zeren_proto::SlashCommand {
+            name: "usage".into(),
+            description: "Show Antigravity model quotas and reset times".into(),
+            input_hint: None,
+        }])
+    }
+
     fn model_context(&self) -> Result<Option<crate::ModelContext>, HarnessError> {
         let home = crate::executable::home_or_current_dir();
         crate::model_context::context(
@@ -213,9 +257,15 @@ impl Harness for AgyCliHarness {
     }
 
     async fn models(&self) -> Result<Vec<Model>, HarnessError> {
-        self.available_models()
+        self.model_catalog(false)
             .await
-            .map(crate::acp::group_effort_variants)
+            .map(|catalog| catalog.models)
+    }
+
+    async fn model_catalog(&self, force: bool) -> Result<crate::ModelCatalog, HarnessError> {
+        let mut catalog = self.cached_models(force).await?;
+        catalog.models = crate::acp::group_effort_variants(catalog.models);
+        Ok(catalog)
     }
 
     async fn run(
@@ -223,6 +273,21 @@ impl Harness for AgyCliHarness {
         request: RunRequest,
         controls: RunControls,
     ) -> Result<BoxStream<'static, Result<AgentEvent, HarnessError>>, HarnessError> {
+        if matches!(request.prompt.trim(), "/usage" | "/quota") {
+            let frame = self.usage().await?;
+            return Ok(futures::stream::iter(vec![
+                Ok(AgentEvent::TextDelta {
+                    text: frame["response"].as_str().unwrap_or_default().to_owned(),
+                }),
+                Ok(AgentEvent::Done {
+                    status: DoneStatus::Completed,
+                    result: None,
+                    error: None,
+                    session_id: None,
+                }),
+            ])
+            .boxed());
+        }
         if request
             .resume
             .as_deref()
@@ -232,12 +297,13 @@ impl Harness for AgyCliHarness {
                 .run(request, controls)
                 .await;
         }
-        let available = if request
-            .model
-            .as_deref()
-            .is_some_and(|requested| model_base(requested) == requested)
-        {
-            self.available_models().await.unwrap_or_default()
+        let available = if request.model.as_deref().is_some_and(|requested| {
+            model_base(requested) == requested || request.reasoning.is_some()
+        }) {
+            self.cached_models(false)
+                .await
+                .map(|catalog| catalog.models)
+                .unwrap_or_default()
         } else {
             Vec::new()
         };
@@ -404,14 +470,7 @@ async fn run_child(
                         if let Some(remainder) = response.strip_prefix(&streamed).filter(|text| !text.is_empty()) {
                             let _ = sender.send(Ok(AgentEvent::TextDelta { text: remainder.into() })).await;
                         }
-                        let status = match result["status"].as_str() {
-                            Some("SUCCESS") => DoneStatus::Completed,
-                            Some("CANCELED" | "INTERRUPTED") => DoneStatus::Interrupted,
-                            _ => DoneStatus::Errored,
-                        };
-                        let error = (status == DoneStatus::Errored).then(|| {
-                            crate::redact_secrets(result["error"].as_str().unwrap_or("Antigravity CLI failed"))
-                        });
+                        let (status, error) = terminal_outcome(result, &streamed, !tools.is_empty());
                         let _ = sender.send(Ok(AgentEvent::Done {
                             status,
                             result: None,
@@ -461,6 +520,30 @@ fn session_id(id: &str) -> Option<String> {
     (!id.is_empty()).then(|| format!("{CLI_SESSION_PREFIX}{id}"))
 }
 
+fn terminal_outcome(
+    result: &Value,
+    streamed: &str,
+    has_tools: bool,
+) -> (DoneStatus, Option<String>) {
+    let response = result["response"].as_str().unwrap_or_default();
+    let status = match result["status"].as_str() {
+        Some("SUCCESS")
+            if response.trim().is_empty() && streamed.trim().is_empty() && !has_tools =>
+        {
+            DoneStatus::Errored
+        }
+        Some("SUCCESS") => DoneStatus::Completed,
+        Some("CANCELED" | "INTERRUPTED") => DoneStatus::Interrupted,
+        _ => DoneStatus::Errored,
+    };
+    let error = (status == DoneStatus::Errored).then(|| crate::redact_secrets(
+        result["error"].as_str().filter(|error| !error.trim().is_empty()).unwrap_or(
+            "Antigravity ended the turn without a reply. Retry or check /usage for this model's quota."
+        ),
+    ));
+    (status, error)
+}
+
 fn model_name(request: &RunRequest, frame: &Value) -> String {
     frame["init"]["model"]
         .as_str()
@@ -480,18 +563,12 @@ async fn emit_tool(
     };
     let id = format!("agy-step-{index}");
     let info = &step["tool_info"];
-    if info.is_null() {
-        return;
-    }
+    let name = info["name"]
+        .as_str()
+        .or_else(|| step["tool_name"].as_str())
+        .unwrap_or("tool");
     if seen.insert(id.clone()) {
-        let name = info["name"]
-            .as_str()
-            .or_else(|| step["tool_name"].as_str())
-            .unwrap_or("tool");
-        let call = ToolCall::Unknown {
-            name: name.into(),
-            input: info.get("parameters").cloned(),
-        };
+        let call = cli_tool_call(name, info.get("parameters"));
         let _ = sender
             .send(Ok(AgentEvent::ToolCall {
                 id: id.clone(),
@@ -499,14 +576,37 @@ async fn emit_tool(
             }))
             .await;
     }
-    if step["state"] == "DONE" && completed.insert(id.clone()) {
+    let state = step["state"].as_str();
+    if matches!(state, Some("DONE" | "ERROR" | "FAILED" | "CANCELED"))
+        && completed.insert(id.clone())
+    {
+        let error = &info["error"];
+        let is_error = state != Some("DONE") || !error.is_null();
         let output = info["output"]
             .as_str()
-            .map(|output| output.chars().take(16_000).collect());
+            .filter(|output| !output.trim().is_empty())
+            .or_else(|| error["message"].as_str())
+            .or_else(|| error.as_str())
+            .map(|output| {
+                let output = if is_error {
+                    crate::redact_secrets(output)
+                } else {
+                    output.to_owned()
+                };
+                let output = if output.contains("permission check failed") {
+                    format!(
+                        "Antigravity CLI denied this command in headless mode. Configure a scoped command allow rule in agy's /permissions, then retry.\n\n{output}"
+                    )
+                } else {
+                    output
+                };
+                output.chars().take(16_000).collect()
+            })
+            .or_else(|| is_error.then(|| format!("Antigravity tool {name} failed.")));
         let _ = sender
             .send(Ok(AgentEvent::ToolResult {
                 id,
-                is_error: !info["error"].is_null(),
+                is_error,
                 output,
                 diff: None,
             }))
@@ -514,9 +614,55 @@ async fn emit_tool(
     }
 }
 
+fn cli_tool_call(name: &str, parameters: Option<&Value>) -> ToolCall {
+    if name == "run_command"
+        && let Some(command) = parameters
+            .and_then(|parameters| parameters["CommandLine"].as_str())
+            .filter(|command| !command.is_empty())
+    {
+        return ToolCall::Exec {
+            command: command.into(),
+        };
+    }
+    ToolCall::Unknown {
+        name: name.into(),
+        input: parameters.cloned(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn empty_turns_have_visible_errors_and_quota_errors_are_preserved() {
+        let (status, error) = terminal_outcome(
+            &json!({"status":"SUCCESS","response":"","error":""}),
+            "",
+            false,
+        );
+        assert_eq!(status, DoneStatus::Errored);
+        assert!(error.unwrap().contains("without a reply"));
+        let (status, error) = terminal_outcome(
+            &json!({"status":"ERROR","error":"Individual quota reached"}),
+            "",
+            false,
+        );
+        assert_eq!(status, DoneStatus::Errored);
+        assert_eq!(error.as_deref(), Some("Individual quota reached"));
+        assert_eq!(
+            terminal_outcome(&json!({"status":"SUCCESS","response":""}), "OK", false).0,
+            DoneStatus::Completed
+        );
+        assert_eq!(
+            terminal_outcome(&json!({"status":"SUCCESS","response":""}), "", true).0,
+            DoneStatus::Completed
+        );
+        assert_eq!(
+            terminal_outcome(&json!({"status":"CANCELED"}), "", false).0,
+            DoneStatus::Interrupted
+        );
+    }
 
     #[test]
     fn parses_installed_cli_models() {
@@ -614,12 +760,50 @@ mod tests {
         emit_tool(&done, &mut seen, &mut completed, &sender).await;
         assert!(matches!(
             receiver.try_recv().unwrap().unwrap(),
-            AgentEvent::ToolCall { id, .. } if id == "agy-step-4"
+            AgentEvent::ToolCall { id, call: ToolCall::Exec { command } }
+                if id == "agy-step-4" && command == "echo hello"
         ));
         assert!(matches!(
             receiver.try_recv().unwrap().unwrap(),
             AgentEvent::ToolResult { id, output: Some(output), .. }
                 if id == "agy-step-4" && output == "hello"
+        ));
+        assert!(receiver.try_recv().is_err());
+    }
+
+    #[tokio::test]
+    async fn denied_command_finishes_with_a_visible_permission_error() {
+        let (sender, mut receiver) = mpsc::channel(4);
+        let mut seen = HashSet::new();
+        let mut completed = HashSet::new();
+        let active = json!({
+            "step_index": 7,
+            "state": "ACTIVE",
+            "tool_info": {"name": "run_command", "parameters": {"CommandLine": "git status"}}
+        });
+        let denied = json!({
+            "step_index": 7,
+            "state": "ERROR",
+            "tool_name": "run_command",
+            "tool_info": {
+                "name": "run_command",
+                "error": {"type": "TOOL_ERROR", "message": "permission check failed: user denied permission to run command"}
+            }
+        });
+        emit_tool(&active, &mut seen, &mut completed, &sender).await;
+        emit_tool(&denied, &mut seen, &mut completed, &sender).await;
+        emit_tool(&denied, &mut seen, &mut completed, &sender).await;
+        assert!(matches!(
+            receiver.try_recv().unwrap().unwrap(),
+            AgentEvent::ToolCall { id, call: ToolCall::Exec { command } }
+                if id == "agy-step-7" && command == "git status"
+        ));
+        assert!(matches!(
+            receiver.try_recv().unwrap().unwrap(),
+            AgentEvent::ToolResult { id, is_error: true, output: Some(output), .. }
+                if id == "agy-step-7"
+                    && output.contains("headless mode")
+                    && output.contains("/permissions")
         ));
         assert!(receiver.try_recv().is_err());
     }

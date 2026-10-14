@@ -193,7 +193,8 @@ pub(crate) fn provider_name(harness: HarnessId) -> &'static str {
 /// Whether the provider reports plan usage. One that doesn't shows no meters
 /// and no "usage unavailable" note — there is nothing missing. Pure.
 pub fn reports_usage(harness: HarnessId) -> bool {
-    harness != HarnessId::Antigravity
+    let _ = harness;
+    true
 }
 
 /// Providers whose agent holds exactly ONE login (Antigravity): once it is
@@ -297,8 +298,8 @@ fn login_copy(harness: HarnessId, provider: Option<&str>) -> &'static str {
              you can revoke any time from Cursor's dashboard."
         }
         (HarnessId::Antigravity, _) => {
-            "Finish signing in to Google in your browser. Antigravity keeps one login on \
-             this device; if it is already signed in, this just confirms it."
+            "Complete sign-in in the Antigravity terminal that opens. The CLI opens your \
+             browser when Google sign-in is needed; an existing login is confirmed automatically."
         }
         (HarnessId::Grok, _) => {
             "Finish signing in to Grok in your browser — approve the code shown below. The \
@@ -2146,16 +2147,11 @@ impl Render for AccountsPage {
                                                         })
                                                         .on_click(cx.listener(
                                                             move |this, _, _, cx| {
-                                                                if harness == HarnessId::Antigravity
-                                                                {
-                                                                    this.open_antigravity_cli(cx);
-                                                                } else {
-                                                                    this.start_login(
-                                                                        harness,
-                                                                        option.provider,
-                                                                        cx,
-                                                                    );
-                                                                }
+                                                                this.start_login(
+                                                                    harness,
+                                                                    option.provider,
+                                                                    cx,
+                                                                );
                                                             },
                                                         ))
                                                         .child(
@@ -2405,8 +2401,8 @@ mod tests {
             }
         }
         assert!(!signs_in(HarnessId::Mock));
-        // Antigravity has no quota to show and keeps a single login.
-        assert!(!reports_usage(HarnessId::Antigravity) && reports_usage(HarnessId::Codex));
+        // Antigravity reports native quota and keeps a single login.
+        assert!(reports_usage(HarnessId::Antigravity) && reports_usage(HarnessId::Codex));
         assert!(keeps_one_login(HarnessId::Antigravity) && !keeps_one_login(HarnessId::Cursor));
         // Hermes rotates its own pool; zeren never switches it, and says so.
         assert!(!switches_accounts(HarnessId::Hermes) && switches_accounts(HarnessId::Grok));
