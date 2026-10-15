@@ -84,19 +84,9 @@ fn install_hook(path: &Path, executable: &Path) -> Result<(), HarnessError> {
     let object = hooks
         .as_object_mut()
         .ok_or_else(|| HarnessError::Protocol("Antigravity hooks.json must be an object".into()))?;
-    let exe = executable.to_string_lossy();
-    let quoted = if cfg!(windows) {
-        if exe.contains(['"', '%', '\r', '\n']) {
-            return Err(HarnessError::Protocol(
-                "Cannot quote the Zeren hook executable path".into(),
-            ));
-        }
-        format!("\"{exe}\"")
-    } else {
-        format!("'{}'", exe.replace('\'', "'\\''"))
-    };
+    let command = hook_command(executable)?;
     let hook = json!({"PreToolUse":[{"matcher":"^run_command$","hooks":[{
-        "type":"command", "command":format!("{quoted} --agy-permission-hook"), "timeout":610
+        "type":"command", "command":command, "timeout":610
     }]}]});
     if object.get("zeren-command-approval") == Some(&hook) {
         return Ok(());
@@ -125,6 +115,33 @@ fn install_hook(path: &Path, executable: &Path) -> Result<(), HarnessError> {
         let _ = std::fs::remove_file(&temporary);
     }
     result
+}
+
+pub fn hook_command(executable: &Path) -> Result<String, HarnessError> {
+    let exe = executable.to_string_lossy();
+    let command = if cfg!(windows) {
+        if exe.contains(['"', '%', '\r', '\n']) {
+            return Err(HarnessError::Protocol(
+                "Cannot quote the Zeren hook executable path".into(),
+            ));
+        }
+        // agy runs hook strings through cmd.exe. Starting with a quoted
+        // executable makes its shell wrapper escape the quotes literally.
+        // Encode the script so the wrapper cannot turn its quotes into literals.
+        let path = exe.replace('\\', "/").replace('\'', "''");
+        let script = format!("& '{path}' --agy-permission-hook");
+        use base64::Engine as _;
+        let encoded = base64::engine::general_purpose::STANDARD.encode(
+            script
+                .encode_utf16()
+                .flat_map(u16::to_le_bytes)
+                .collect::<Vec<_>>(),
+        );
+        format!("powershell.exe -NoLogo -NoProfile -NonInteractive -EncodedCommand {encoded}")
+    } else {
+        format!("'{}' --agy-permission-hook", exe.replace('\'', "'\\''"))
+    };
+    Ok(command)
 }
 
 fn question(payload: &Value) -> Option<UserInputQuestion> {

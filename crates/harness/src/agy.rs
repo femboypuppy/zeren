@@ -4,6 +4,7 @@ use std::{
     time::Duration,
 };
 mod approval;
+pub use approval::hook_command as permission_hook_command;
 pub use approval::run_hook as run_permission_hook;
 
 use async_trait::async_trait;

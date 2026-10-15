@@ -107,6 +107,8 @@ jobs:
         run: ./scripts/test-windows-installer.ps1
       - name: GUI subsystem and redirected CLI output
         run: ./scripts/test-windows-startup.ps1
+      - name: Antigravity approval hook through Windows shell
+        run: cargo test --release --locked -p zeren --test agy_hook_shell
       - name: CLI startup without HOME
         run: |
           # Exercise real path resolution without touching the runner's account.
