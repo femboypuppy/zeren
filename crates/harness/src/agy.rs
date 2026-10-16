@@ -112,22 +112,53 @@ impl AgyCliHarness {
     pub async fn usage(&self) -> Result<Value, HarnessError> {
         let mut command = self.command(&std::env::current_dir()?)?;
         command.args(["-p", "/usage", "--output-format", "json"]);
+        // Print mode can still attempt interactive OAuth, including opening a
+        // browser through cmd.exe on Windows. Quota polling must never log in.
+        // Override both switches so an inherited interactive override cannot
+        // turn a background refresh into a sign-in flow.
+        command
+            .env("AGY_CLI_NONINTERACTIVE_HEADLESS", "true")
+            .env("AGY_CLI_INTERACTIVE_HEADLESS", "false");
         command.stdin(Stdio::null());
         let output = tokio::time::timeout(Duration::from_secs(30), command.output())
             .await
             .map_err(|_| HarnessError::Protocol("Antigravity usage timed out".into()))??;
-        let frame: Value = serde_json::from_slice(&output.stdout).map_err(|_| {
-            HarnessError::Protocol("Antigravity returned invalid usage data".into())
-        })?;
-        if !output.status.success() || frame["status"] != "SUCCESS" {
-            return Err(HarnessError::Protocol(crate::redact_secrets(
-                frame["error"]
-                    .as_str()
-                    .unwrap_or("Antigravity usage unavailable"),
-            )));
-        }
-        Ok(frame)
+        parse_usage_output(output)
     }
+}
+
+fn parse_usage_output(output: std::process::Output) -> Result<Value, HarnessError> {
+    let frame: Value = serde_json::from_slice(&output.stdout).unwrap_or(Value::Null);
+    let error = frame["error"]
+        .as_str()
+        .unwrap_or_else(|| std::str::from_utf8(&output.stderr).unwrap_or(""));
+    let lower = error.to_ascii_lowercase();
+    if [
+        "authentication required",
+        "not logged",
+        "not signed in",
+        "unauthenticated",
+    ]
+    .iter()
+    .any(|message| lower.contains(message))
+    {
+        return Err(HarnessError::Protocol(
+            "Antigravity authentication required. Sign in from Accounts to refresh usage.".into(),
+        ));
+    }
+    if frame.is_null() {
+        return Err(HarnessError::Protocol(
+            "Antigravity returned invalid usage data".into(),
+        ));
+    }
+    if !output.status.success() || frame["status"] != "SUCCESS" {
+        return Err(HarnessError::Protocol(crate::redact_secrets(
+            frame["error"]
+                .as_str()
+                .unwrap_or("Antigravity usage unavailable"),
+        )));
+    }
+    Ok(frame)
 }
 
 impl Default for AgyCliHarness {
@@ -735,6 +766,35 @@ mod tests {
         assert_eq!(models[1].id, "claude-sonnet-5-5-low");
         assert_eq!(models[1].label, "Claude Sonnet 5.5 (Low)");
         assert_eq!(models[2].id, "team/model_1");
+    }
+
+    #[test]
+    fn usage_reports_sign_out_from_stderr_and_json() {
+        for json in [false, true] {
+            let error = "Error: authentication required. Run agy to log in, then retry.";
+            let output = std::process::Output {
+                status: {
+                    #[cfg(unix)]
+                    use std::os::unix::process::ExitStatusExt;
+                    #[cfg(windows)]
+                    use std::os::windows::process::ExitStatusExt;
+                    std::process::ExitStatus::from_raw(1)
+                },
+                stdout: if json {
+                    serde_json::to_vec(&json!({"status":"ERROR","error":error})).unwrap()
+                } else {
+                    Vec::new()
+                },
+                stderr: if json {
+                    Vec::new()
+                } else {
+                    error.as_bytes().to_vec()
+                },
+            };
+            let error = parse_usage_output(output).unwrap_err().to_string();
+            assert!(error.contains("authentication required"));
+            assert!(error.contains("Sign in from Accounts"));
+        }
     }
 
     #[test]

@@ -10,6 +10,22 @@ use tokio::sync::{mpsc, oneshot};
 use zeren_harness::{AcpHarness, CancellationToken, Harness, RunControls};
 use zeren_proto::{AgentEvent, DoneStatus, HarnessId, RunRequest, SandboxLevel};
 
+#[tokio::test]
+async fn antigravity_usage_has_no_console_or_interactive_login() {
+    let dir = tempfile::tempdir().unwrap();
+    let exe = fixture(dir.path());
+    let agy = zeren_harness::AgyCliHarness::new().with_executable(&exe);
+    let usage = agy.usage().await.unwrap();
+    assert_eq!(usage["command"]["name"], "usage");
+    std::fs::write(exe.with_extension("signed-out"), "").unwrap();
+    // Repeat the periodic poll with expired/missing credentials. Each check
+    // must exit without a console or browser login and report sign-in required.
+    for _ in 0..2 {
+        let error = agy.usage().await.unwrap_err().to_string();
+        assert!(error.contains("authentication required"), "{error}");
+    }
+}
+
 #[test]
 fn managed_process_protocol_progresses_with_one_blocking_worker() {
     let runtime = tokio::runtime::Builder::new_current_thread()

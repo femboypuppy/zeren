@@ -23,6 +23,32 @@ fn main() {
         std::process::exit(99);
     });
     let args: Vec<_> = std::env::args().collect();
+    if args.get(1).is_some_and(|arg| arg == "-p") {
+        assert_eq!(&args[1..], ["-p", "/usage", "--output-format", "json"]);
+        assert_eq!(
+            std::env::var("AGY_CLI_NONINTERACTIVE_HEADLESS").as_deref(),
+            Ok("true")
+        );
+        assert_eq!(
+            std::env::var("AGY_CLI_INTERACTIVE_HEADLESS").as_deref(),
+            Ok("false")
+        );
+        #[cfg(windows)]
+        assert!(
+            unsafe { windows_sys::Win32::System::Console::GetConsoleWindow() }.is_null(),
+            "Usage polling must not allocate a console"
+        );
+        if std::env::current_exe()
+            .unwrap()
+            .with_extension("signed-out")
+            .exists()
+        {
+            eprintln!("Error: authentication required. Run agy to log in, then retry.");
+            std::process::exit(1);
+        }
+        emit(json!({"status":"SUCCESS", "command":{"name":"usage","data":{"groups":[]}}}));
+        return;
+    }
     if args.get(1).is_some_and(|arg| arg == "--launch-report") {
         println!(
             "{}",
