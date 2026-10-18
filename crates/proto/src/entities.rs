@@ -324,6 +324,16 @@ pub struct Session {
     pub updated_at: DateTime<Utc>,
 }
 
+/// Opt-in, one-shot continuation of a quota-blocked conversation on its host.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CooldownResumeState {
+    pub available: bool,
+    pub enabled: bool,
+    pub resumes_at: Option<DateTime<Utc>>,
+    pub message: Option<String>,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Repo {

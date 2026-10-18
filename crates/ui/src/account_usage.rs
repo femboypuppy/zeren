@@ -10,7 +10,7 @@ use gpui::{
     Context, Entity, IntoElement, Render, SharedString, Subscription, Task, Window, div,
     prelude::*, px,
 };
-use zeren_proto::{AgentAccount, AgentAccountsSnapshot, HarnessId};
+use zeren_proto::{AgentAccount, AgentAccountsSnapshot, CooldownResumeState, HarnessId};
 use zeren_rpc::methods;
 
 use crate::popover;
@@ -67,6 +67,11 @@ pub fn active_account(
 
 /// Loads (and switches) the accounts of the composer's target device.
 pub struct AccountUsage {
+    cooldown_chat: Option<String>,
+    cooldown: CooldownResumeState,
+    cooldown_busy: bool,
+    cooldown_task: Option<Task<()>>,
+    _cooldown_poll: Task<()>,
     state: Entity<AppState>,
     /// `None` = this device, as in [`AccountsSnapshotCache`].
     target: Option<String>,
@@ -86,6 +91,17 @@ pub struct AccountUsage {
 
 impl AccountUsage {
     pub fn new(state: Entity<AppState>, cx: &mut Context<Self>) -> Self {
+        let cooldown_poll = cx.spawn(async move |this, cx| {
+            loop {
+                cx.background_executor().timer(Duration::from_secs(5)).await;
+                if this
+                    .update(cx, |usage, cx| usage.refresh_cooldown(None, cx))
+                    .is_err()
+                {
+                    break;
+                }
+            }
+        });
         let poll = cx.spawn(async move |this, cx| {
             loop {
                 cx.background_executor().timer(POLL_INTERVAL).await;
@@ -102,6 +118,11 @@ impl AccountUsage {
             }
         });
         Self {
+            cooldown_chat: None,
+            cooldown: Default::default(),
+            cooldown_busy: false,
+            cooldown_task: None,
+            _cooldown_poll: cooldown_poll,
             _state: cx.observe(&state, |_, _, cx| cx.notify()),
             state,
             target: None,
@@ -131,6 +152,15 @@ impl AccountUsage {
         let harness = harness.filter(|h| signs_in(*h) && reports_usage(*h));
         self.harness = harness;
         self.model = model;
+        let chat = matches!(harness, Some(HarnessId::ClaudeCode | HarnessId::Codex))
+            .then(|| self.state.read(cx).selected_chat.clone())
+            .flatten();
+        if self.cooldown_chat != chat || self.target != target {
+            self.cooldown_chat = chat;
+            self.cooldown = Default::default();
+            self.cooldown_task = None;
+            self.cooldown_busy = false;
+        }
         if self.target != target {
             self.target = target;
             self.loaded = false;
@@ -141,6 +171,46 @@ impl AccountUsage {
             self.loaded = true;
             self.load(true, cx);
         }
+        if self.cooldown_chat.is_some() && self.cooldown_task.is_none() {
+            self.refresh_cooldown(None, cx);
+        }
+    }
+
+    fn refresh_cooldown(&mut self, enabled: Option<bool>, cx: &mut Context<Self>) {
+        if self.cooldown_busy {
+            return;
+        }
+        let Some(chat_id) = self.cooldown_chat.clone() else {
+            return;
+        };
+        let Some(engine) = self.state.read(cx).engine().cloned() else {
+            return;
+        };
+        let target = self.target.clone();
+        let params = self.params(serde_json::json!({"chatId":chat_id,"enabled":enabled}));
+        self.cooldown_busy = true;
+        self.cooldown_task = Some(cx.spawn(async move |this, cx| {
+            let result = engine.client().call(methods::COOLDOWN_RESUME, params).await;
+            this.update(cx, |usage, cx| {
+                if usage.cooldown_chat.as_ref() != Some(&chat_id) || usage.target != target {
+                    return;
+                }
+                usage.cooldown_busy = false;
+                match result {
+                    Ok(value) => {
+                        if let Ok(state) = serde_json::from_value(value) {
+                            usage.cooldown = state;
+                        }
+                    }
+                    Err(error) if enabled.is_some() => {
+                        usage.error = Some(error.to_string().into());
+                    }
+                    Err(_) => {}
+                }
+                cx.notify();
+            })
+            .ok();
+        }));
     }
 
     fn snapshot<'a>(&self, cx: &'a gpui::App) -> Option<&'a AgentAccountsSnapshot> {
@@ -469,6 +539,29 @@ impl Render for AccountUsage {
             .flex()
             .items_center()
             .gap(px(4.0))
+            .when(self.cooldown.available, |row| {
+                let enabled = self.cooldown.enabled;
+                let label = if enabled {
+                    self.cooldown
+                        .resumes_at
+                        .map(|at| {
+                            format!(
+                                "Resumes at {} · Cancel",
+                                at.with_timezone(&chrono::Local).format("%H:%M")
+                            )
+                        })
+                        .unwrap_or_else(|| "Waiting for quota · Cancel".into())
+                } else {
+                    "Auto-resume when available".into()
+                };
+                row.child(
+                    popover::btn_ghost(&theme, &label, "cooldown-resume-button")
+                        .id("cooldown-resume-button")
+                        .on_click(cx.listener(move |usage, _, _, cx| {
+                            usage.refresh_cooldown(Some(!enabled), cx)
+                        })),
+                )
+            })
             .children(account)
             .children(context)
     }

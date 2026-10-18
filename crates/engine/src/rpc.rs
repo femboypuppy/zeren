@@ -97,6 +97,13 @@ struct ChatParams {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+struct CooldownResumeParams {
+    chat_id: String,
+    enabled: Option<bool>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct ListModelsParams {
     harness: HarnessId,
     #[serde(default)]
@@ -1503,6 +1510,7 @@ fn forwardable(method: &str) -> bool {
             // Agent accounts are per-device CLI logins (the device switcher
             // retargets which device's logins are shown).
             | methods::LIST_AGENT_ACCOUNTS
+            | methods::COOLDOWN_RESUME
             | methods::ACTIVATE_AGENT_ACCOUNT
             | methods::FORGET_AGENT_ACCOUNT
             | methods::START_AGENT_LOGIN
@@ -3450,6 +3458,15 @@ impl RpcService for EngineRpc {
                     .await
                     .map_err(|e| RpcError::Failed(e.to_string()))?;
                 RpcReply::value(&snapshot)
+            }
+            methods::COOLDOWN_RESUME => {
+                let p: CooldownResumeParams = parse_params(params)?;
+                let state = self
+                    .sessions
+                    .cooldown_resume(&p.chat_id, p.enabled, self.agent_accounts.clone())
+                    .await
+                    .map_err(|error| RpcError::Failed(error.to_string()))?;
+                RpcReply::value(&state)
             }
             methods::ACTIVATE_AGENT_ACCOUNT => {
                 self.voice.retire();
