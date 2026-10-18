@@ -24,7 +24,7 @@ struct BlockedTurn {
 
 fn quota_error(message: &str) -> bool {
     let text = message.to_ascii_lowercase();
-    if text.contains("image generation") || text.contains("billing") {
+    if text.contains("image generation") || text.contains("billing") || text.contains("context") {
         return false;
     }
     [
@@ -96,6 +96,14 @@ impl SessionsEngine {
             return None;
         }
         let mut request = self.last_request(chat_id).unwrap_or_else(|| config.clone());
+        if request.harness.is_some_and(|previous| previous != harness)
+            || request.model != config.model
+            || request.reasoning != config.reasoning
+            || request.model_options != config.model_options
+            || request.sandbox != config.sandbox
+        {
+            return None;
+        }
         request.prompt = "Continue where you stopped when the usage limit was reached. Finish the previous request.".into();
         request.attachments.clear();
         request.resume = None;
@@ -275,6 +283,7 @@ mod tests {
         assert!(quota_error("You've hit your usage limit. Try again later"));
         assert!(!quota_error("Image generation usage limit exceeded"));
         assert!(!quota_error("Billing limit reached"));
+        assert!(!quota_error("Context limit reached"));
         assert!(!quota_error("Network connection failed"));
     }
     #[test]
