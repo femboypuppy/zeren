@@ -800,7 +800,7 @@ impl Theme {
     } else {
         1.0
     };
-    /// Light-mode frost alpha — glass-forward, like dark mode.
+    /// Light-mode frost keeps a mostly solid canvas, with a subtle backdrop.
     ///
     /// A light tint controls the blur less than a dark one: the desktop's
     /// colour bleeds through more readily, so light frost runs *heavier* than
@@ -810,7 +810,7 @@ impl Theme {
     /// see [`Self::glass_overlay`], where light coverage steps up to keep menu
     /// text legible over an unknown backdrop.
     pub const GLASS_ALPHA_LIGHT: f32 = if cfg!(any(target_os = "macos", target_os = "windows")) {
-        0.80
+        0.96
     } else {
         1.0
     };
@@ -859,6 +859,13 @@ impl Theme {
         // An explicit strength is the user's trade: a visibly frosted window
         // over guaranteed contrast on the brightest wallpaper.
         if let Some(alpha) = self.glass_alpha_override {
+            // The same strength was too transparent on white surfaces. Keep
+            // the saved setting, but use a gentler range in light appearance.
+            let alpha = if self.appearance == Appearance::Light {
+                0.80 + 0.20 * alpha.clamp(0.0, 1.0)
+            } else {
+                alpha
+            };
             return self.surface.opacity(alpha);
         }
         let base = match self.appearance {
@@ -2221,6 +2228,29 @@ mod tests {
         // Opaque surfaces ignore the strength entirely.
         theme.surface_treatment = SurfaceTreatment::Opaque;
         assert_eq!(theme.glass(), theme.surface);
+    }
+
+    #[test]
+    fn light_frost_is_subtle_at_every_strength_and_still_adjustable() {
+        use crate::settings::FrostStrength;
+        let mut light = Theme::light();
+        light.surface_treatment = SurfaceTreatment::Frosted;
+        let mut dark = Theme::dark();
+        let mut previous = 1.01;
+        for strength in FrostStrength::ALL {
+            light.glass_alpha_override = strength.glass_alpha();
+            dark.glass_alpha_override = strength.glass_alpha();
+            let alpha = light.glass().a;
+            assert!(
+                alpha >= 0.85,
+                "light chrome must keep the wallpaper subdued"
+            );
+            assert!(alpha < previous, "strength levels must remain distinct");
+            assert!(alpha >= dark.glass().a, "light mode needs denser coverage");
+            previous = alpha;
+        }
+        light.surface_treatment = SurfaceTreatment::Opaque;
+        assert_eq!(light.glass(), light.surface);
     }
 
     #[test]

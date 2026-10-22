@@ -84,7 +84,13 @@ impl Element for Frosted {
                 window.paint_backdrop_blur(
                     bounds,
                     Corners::all(px(self.corner_radius)),
-                    px(self.blur_radius),
+                    px(
+                        if Theme::of(cx).appearance == crate::theme::Appearance::Light {
+                            self.blur_radius * 0.5
+                        } else {
+                            self.blur_radius
+                        },
+                    ),
                 );
                 self.child.paint(window, cx);
             });

@@ -1057,7 +1057,7 @@ pub(crate) fn chat_title_editor(
 const SIDEBAR_GLASS_FADE_BAND: f32 = 24.0;
 
 /// Target of the sidebar's "Star on GitHub" banner (same as the landing page).
-const GITHUB_REPO_URL: &str = "https://github.com/zeronsh/comet";
+const GITHUB_REPO_URL: &str = "https://github.com/femboypuppy/zeren";
 
 /// New-thread controls float over the tail of a top-anchored image hero. The
 /// hero reaches below the composer, giving its lower mask room to dissolve
@@ -13350,8 +13350,7 @@ impl Render for Shell {
         // scheduling `with_animation` would have requested). Hover color fades
         // ride the same clock; their once-per-frame tick lives here (this is
         // the window's root render — it runs exactly once per frame).
-        if self.motion_active.get() | motion::hover_fades_active() | motion::state_morphs_active()
-        {
+        if self.motion_active.get() | motion::hover_fades_active() | motion::state_morphs_active() {
             window.request_animation_frame();
         }
 
@@ -15745,7 +15744,10 @@ mod exit_regressions {
                 });
                 shell.settings.space_filter = None;
                 shell.open_chat("elsewhere".into(), cx);
-                assert_eq!(shell.state.read(cx).selected_space.as_deref(), Some("other"));
+                assert_eq!(
+                    shell.state.read(cx).selected_space.as_deref(),
+                    Some("other")
+                );
                 shell.open_new_session(None, cx);
                 let state = shell.state.read(cx);
                 assert!(state.selected_chat.is_none());

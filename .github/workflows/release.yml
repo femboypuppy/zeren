@@ -140,6 +140,8 @@ jobs:
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
       - name: package installer and portable app
         run: ./scripts/package-windows.ps1 -ReleasesUrl "https://github.com/$env:GITHUB_REPOSITORY/releases/latest/download"
+      - name: Verify Windows setup installs and uninstalls
+        run: ./scripts/test-windows-installer.ps1
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: windows-${{ runner.arch }}
@@ -186,10 +188,34 @@ jobs:
           printf '%s' "$manifest" > manifest.json
       - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
+          body: |
+            **Windows: [Download the Setup installer](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/zeren-${{ env.VERSION }}-windows-x86_64-setup.exe)**
+
+            Run the Setup installer to install Zeren on your computer, choose the install folder, and add it to the Start menu.
+
+            [Windows portable ZIP](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/zeren-${{ env.VERSION }}-windows-x86_64.zip) — extract and run without installing.
+
+            The bare `zeren-…exe` and legacy `zeron-…exe` files are automatic-updater payloads, not installers. Choose **Setup installer** for a normal Windows installation.
           files: |
             dist/*
             manifest.json
           generate_release_notes: true
+      - name: Label Windows downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$GITHUB_REF_NAME" \
+            --jq '.assets[] | [.id, .name] | @tsv' > /tmp/zeren-release-assets.tsv
+          while IFS=$'\t' read -r asset_id name; do
+            case "$name" in
+              *-windows-*-setup.exe) label='Windows Setup installer (recommended)' ;;
+              *-windows-*.zip) label='Windows portable ZIP (no installation)' ;;
+              zeren-*-windows-*.exe) label='Automatic updater payload (not an installer)' ;;
+              zeron-*-windows-*.exe) label='Legacy updater payload (not an installer)' ;;
+              *) continue ;;
+            esac
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/assets/$asset_id" -f label="$label" > /dev/null
+          done < /tmp/zeren-release-assets.tsv
       - name: upload to R2 (zeron.sh/releases/*)
         if: env.CLOUDFLARE_API_TOKEN != ''
         run: |
