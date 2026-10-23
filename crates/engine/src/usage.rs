@@ -353,6 +353,105 @@ fn streaks(dates: &BTreeSet<NaiveDate>, today: NaiveDate) -> (usize, usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[tokio::test]
+    async fn usage_snapshots_and_late_billing_update_one_turn_without_reopening_it() {
+        use std::sync::Arc;
+        use zeren_proto::{AgentEvent, DoneStatus, RunRequest, SandboxLevel, SessionStatus};
+        let dir = tempfile::tempdir().unwrap();
+        let registry = crate::HarnessRegistry::new();
+        registry.register(Arc::new(zeren_harness::mock::MockHarness {
+            script: vec![
+                AgentEvent::SessionStarted {
+                    harness: HarnessId::Mock,
+                    model: "measured-model".into(),
+                    tools: vec![],
+                    cwd: dir.path().to_string_lossy().into_owned(),
+                    session_id: "usage-session".into(),
+                    assistant_message_id: "usage-assistant".into(),
+                },
+                AgentEvent::TextDelta {
+                    text: "Finished".into(),
+                },
+                AgentEvent::Usage {
+                    input_tokens: 100,
+                    output_tokens: 20,
+                },
+                AgentEvent::Usage {
+                    input_tokens: 100,
+                    output_tokens: 25,
+                },
+                AgentEvent::UsageDetails {
+                    cost_session_id: None,
+                    cached_tokens: 64,
+                    cache_write_tokens: 0,
+                    cost_usd: Some(0.03),
+                },
+                AgentEvent::Done {
+                    status: DoneStatus::Completed,
+                    result: None,
+                    error: None,
+                    session_id: Some("usage-session".into()),
+                },
+                AgentEvent::Usage {
+                    input_tokens: 100,
+                    output_tokens: 30,
+                },
+            ],
+        }));
+        let core =
+            crate::EngineCore::assemble(dir.path(), Arc::new(registry), HarnessId::Mock, None)
+                .unwrap();
+        let _doc = core.doc_host.open("usage-chat").unwrap();
+        core.sessions
+            .dispatch(
+                "usage-chat",
+                HarnessId::Mock,
+                RunRequest {
+                    prompt: "measure usage".into(),
+                    harness: None,
+                    model: None,
+                    reasoning: None,
+                    model_options: Default::default(),
+                    cwd: dir.path().to_string_lossy().into_owned(),
+                    sandbox: SandboxLevel::WorkspaceWrite,
+                    auto_approve: true,
+                    resume: None,
+                    attachments: vec![],
+                    worktree: None,
+                    mcp: None,
+                },
+                Some("usage-user".into()),
+            )
+            .await
+            .unwrap();
+        tokio::time::timeout(std::time::Duration::from_secs(10), async {
+            loop {
+                let report = core
+                    .sessions
+                    .usage_report(None, None, Some("usage-chat"))
+                    .unwrap();
+                if report.totals.output_tokens == 30 {
+                    break;
+                }
+                tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+            }
+        })
+        .await
+        .unwrap();
+        let report = core
+            .sessions
+            .usage_report(None, None, Some("usage-chat"))
+            .unwrap();
+        assert_eq!(report.totals.tokens(), 130);
+        assert_eq!(report.totals.turns, 1);
+        assert_eq!(report.totals.cached_tokens, 64);
+        assert_eq!(report.totals.cost_usd, Some(0.03));
+        assert_eq!(report.recent[0].model, "measured-model");
+        assert_eq!(
+            core.sessions.session_status("usage-chat").unwrap().status,
+            SessionStatus::Idle
+        );
+    }
     #[test]
     fn running_cost_totals_are_differenced_and_survive_restarts() {
         let dir = tempfile::tempdir().unwrap();
