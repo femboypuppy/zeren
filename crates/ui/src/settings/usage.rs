@@ -40,6 +40,7 @@ fn metric(theme: &Theme, label: &str, value: String) -> gpui::Div {
         .child(
             div()
                 .text_size(px(20.0))
+                .line_height(px(26.0))
                 .text_color(theme.text)
                 .child(SharedString::from(value)),
         )
@@ -47,6 +48,7 @@ fn metric(theme: &Theme, label: &str, value: String) -> gpui::Div {
             div()
                 .mt(px(4.0))
                 .text_size(px(11.5))
+                .line_height(px(17.0))
                 .text_color(theme.text_muted)
                 .child(SharedString::from(label.to_string())),
         )
@@ -62,7 +64,7 @@ pub(crate) fn session_summary(report: &UsageReport, theme: &Theme) -> gpui::Div 
         .child(summary_line(theme,"Turn time",duration(totals.active_ms)))
         .child(summary_line(theme,"Turns",totals.turns.to_string()))
         .child(summary_line(theme,"Estimated cost",totals.cost_usd.map(|cost| format!("${cost:.4}")).unwrap_or_else(|| "Not reported".into())))
-        .child(div().mt(px(6.0)).text_size(px(11.0)).text_color(theme.text_muted)
+        .child(div().mt(px(6.0)).text_size(px(11.0)).line_height(px(16.0)).text_color(theme.text_muted)
             .child(format!("Usage reported for {} of {} turns. Cost is a CLI-reported estimate; subscription charges differ.",totals.reported_turns,totals.turns)))
 }
 fn summary_line(theme: &Theme, label: &str, value: String) -> gpui::Div {
@@ -71,6 +73,7 @@ fn summary_line(theme: &Theme, label: &str, value: String) -> gpui::Div {
         .justify_between()
         .gap(px(12.0))
         .text_size(px(12.0))
+        .line_height(px(18.0))
         .child(
             div()
                 .text_color(theme.text_muted)
@@ -265,12 +268,11 @@ impl UsagePage {
                     .unwrap_or_else(|| "Not reported".into()),
             ),
         ];
-        let mut body = div().flex().flex_col()
-            .child(div().mt(px(18.0)).flex().flex_wrap().gap(px(8.0)).children(metrics.into_iter().map(|(label,value)| metric(theme,label,value))))
-            .child(widgets::page_subtitle(theme,format!("Provider-reported usage from {}/{} turns. Missing measurements are not estimates. Dates use UTC; cost estimates cover providers that report them.",t.reported_turns,t.turns)))
-            .when(report.totals.turns == 0,|body| body.child(widgets::page_subtitle(theme,"No recorded activity in this window. Usage is saved as you chat in Zeren.")))
-            .child(widgets::section_label(theme,"Token activity"))
-            .child(activity(report,theme));
+        let mut body = div().flex().flex_col().flex_none()
+            .child(div().mt(px(20.0)).flex().flex_wrap().gap(px(12.0)).children(metrics.into_iter().map(|(label,value)| metric(theme,label,value))))
+            .child(widgets::page_subtitle(theme,format!("Measured usage from {} of {} turns. Dates use UTC. Costs are CLI-reported estimates.",t.reported_turns,t.turns)).mt(px(14.0)).line_height(px(20.0)))
+            .when(report.totals.turns == 0,|body| body.child(widgets::page_subtitle(theme,"No activity recorded yet. Your history grows as you chat in Zeren.").mt(px(10.0)).line_height(px(20.0))))
+            .child(widgets::section(theme,"Token activity",activity(report,theme)));
         if let Some(accounts) = &self.accounts {
             let active: Vec<_> = accounts
                 .accounts
@@ -282,86 +284,123 @@ impl UsagePage {
                             .is_none_or(|harness| harness == account.harness)
                 })
                 .collect();
-            body = body
-                .child(widgets::section_label(theme, "Account limits"))
-                .children(active.into_iter().map(|account| {
-                    widgets::section_card(theme)
-                        .mt(px(8.0))
-                        .p(px(12.0))
-                        .child(div().mb(px(8.0)).text_size(px(12.0)).child(format!(
-                                "{} · {}",
-                                provider_label(account.harness),
-                                account
-                                    .email
-                                    .as_deref()
-                                    .or(account.display_name.as_deref())
-                                    .unwrap_or("Current account")
-                            )))
-                        .child(accounts::render_account_usage(account, theme))
-                }));
+            if !active.is_empty() {
+                body = body.child(widgets::section(
+                    theme,
+                    "Account limits",
+                    div()
+                        .flex()
+                        .flex_col()
+                        .gap(px(12.0))
+                        .children(active.into_iter().map(|account| {
+                            widgets::section_card(theme)
+                                .mt_0()
+                                .p(px(16.0))
+                                .child(
+                                    div()
+                                        .mb(px(12.0))
+                                        .text_size(px(12.0))
+                                        .line_height(px(18.0))
+                                        .child(format!(
+                                            "{} · {}",
+                                            provider_label(account.harness),
+                                            account
+                                                .email
+                                                .as_deref()
+                                                .or(account.display_name.as_deref())
+                                                .unwrap_or("Current account")
+                                        )),
+                                )
+                                .child(accounts::render_account_usage(account, theme))
+                        })),
+                ));
+            }
         }
         for (label, groups) in [
             ("By provider", &report.by_provider),
             ("By session model", &report.by_model),
         ] {
-            body = body.child(widgets::section_label(theme, label)).child(
+            if groups.is_empty() {
+                continue;
+            }
+            body =
+                body.child(widgets::section(
+                    theme,
+                    label,
+                    widgets::section_card(theme)
+                        .mt_0()
+                        .children(groups.iter().enumerate().map(|(ix, group)| {
+                            widgets::card_row(theme, ix == 0)
+                                .child(
+                                    div()
+                                        .flex_1()
+                                        .min_w_0()
+                                        .text_size(px(12.0))
+                                        .line_height(px(18.0))
+                                        .child(SharedString::from(group.label.clone())),
+                                )
+                                .child(div().text_size(px(12.0)).line_height(px(18.0)).child(
+                                    format!(
+                                        "{} tokens · {}",
+                                        number(group.totals.tokens()),
+                                        duration(group.totals.active_ms)
+                                    ),
+                                ))
+                        })),
+                ));
+        }
+        body.when(!report.recent.is_empty(), |body| {
+            body.child(widgets::section(
+                theme,
+                "Recent turns",
                 widgets::section_card(theme)
-                    .mt(px(8.0))
-                    .children(groups.iter().enumerate().map(|(ix, group)| {
+                    .mt_0()
+                    .children(report.recent.iter().enumerate().map(|(ix, record)| {
+                        let title = self
+                            .state
+                            .read(cx)
+                            .chats
+                            .iter()
+                            .find(|chat| chat.id == record.chat_id)
+                            .and_then(|chat| chat.title.clone())
+                            .unwrap_or_else(|| "Conversation".into());
+                        let at = chrono::DateTime::from_timestamp_millis(record.started_at)
+                            .map(|date| date.format("%b %d %H:%M UTC").to_string())
+                            .unwrap_or_default();
                         widgets::card_row(theme, ix == 0)
                             .child(
                                 div()
                                     .flex_1()
                                     .min_w_0()
-                                    .text_size(px(12.0))
-                                    .child(SharedString::from(group.label.clone())),
+                                    .child(div().text_size(px(12.0)).line_height(px(18.0)).child(
+                                        format!(
+                                            "{} · {}",
+                                            provider_label(record.harness),
+                                            record.model
+                                        ),
+                                    ))
+                                    .child(
+                                        div()
+                                            .text_size(px(11.0))
+                                            .line_height(px(17.0))
+                                            .mt(px(4.0))
+                                            .text_color(theme.text_muted)
+                                            .child(format!("{title} · {at}")),
+                                    ),
                             )
-                            .child(div().text_size(px(12.0)).child(format!(
-                                "{} tokens · {}",
-                                number(group.totals.tokens()),
-                                duration(group.totals.active_ms)
-                            )))
+                            .child(
+                                div()
+                                    .text_size(px(12.0))
+                                    .line_height(px(18.0))
+                                    .child(format!(
+                                        "{} tokens · {}",
+                                        number(record.totals.tokens()),
+                                        duration(record.totals.active_ms)
+                                    )),
+                            )
                     })),
-            );
-        }
-        body.child(widgets::section_label(theme, "Recent turns"))
-            .child(widgets::section_card(theme).mt(px(8.0)).children(
-                report.recent.iter().enumerate().map(|(ix, record)| {
-                    let title = self
-                        .state
-                        .read(cx)
-                        .chats
-                        .iter()
-                        .find(|chat| chat.id == record.chat_id)
-                        .and_then(|chat| chat.title.clone())
-                        .unwrap_or_else(|| "Conversation".into());
-                    let at = chrono::DateTime::from_timestamp_millis(record.started_at)
-                        .map(|date| date.format("%b %d %H:%M UTC").to_string())
-                        .unwrap_or_default();
-                    widgets::card_row(theme, ix == 0)
-                        .child(
-                            div()
-                                .flex_1()
-                                .min_w_0()
-                                .child(div().text_size(px(12.0)).child(format!(
-                                    "{} · {}",
-                                    provider_label(record.harness),
-                                    record.model
-                                )))
-                                .child(
-                                    div()
-                                        .text_size(px(11.0))
-                                        .text_color(theme.text_muted)
-                                        .child(format!("{title} · {at}")),
-                                ),
-                        )
-                        .child(div().text_size(px(12.0)).child(format!(
-                            "{} tokens · {}",
-                            number(record.totals.tokens()),
-                            duration(record.totals.active_ms)
-                        )))
-                }),
             ))
+        })
     }
 }
 
@@ -376,6 +415,8 @@ fn activity(report: &UsageReport, theme: &Theme) -> gpui::Div {
         .unwrap_or(0)
         .max(1) as f64;
     div()
+        .mx(px(8.0))
+        .flex_none()
         .flex()
         .flex_wrap()
         .gap(px(2.0))

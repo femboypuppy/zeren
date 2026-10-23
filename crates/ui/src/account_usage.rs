@@ -166,7 +166,7 @@ impl AccountUsage {
             self.session_error = None;
             self.session_task = None;
             self.session_busy = false;
-            if self.popup.get() == Some(&FooterCard::Session) {
+            if self.popup.get() == Some(&FooterCard::Accounts) {
                 self.dismiss(cx);
             }
         }
@@ -199,7 +199,7 @@ impl AccountUsage {
 
     fn refresh_cooldown(&mut self, enabled: Option<bool>, cx: &mut Context<Self>) {
         if enabled.is_none()
-            && self.popup.as_open() == Some(&FooterCard::Session)
+            && self.popup.as_open() == Some(&FooterCard::Accounts)
             && !self.session_busy
         {
             self.load_session(cx);
@@ -373,8 +373,6 @@ impl AccountUsage {
         if card == FooterCard::Accounts {
             // Opening the card is the moment someone cares: re-probe.
             self.load(true, cx);
-        }
-        if card == FooterCard::Session {
             self.load_session(cx);
         }
         self.popup.open(card);
@@ -419,14 +417,18 @@ impl AccountUsage {
         }));
     }
 
-    fn session_card(&self, cx: &mut Context<Self>) -> gpui::Div {
+    fn session_section(&self, cx: &mut Context<Self>) -> gpui::Div {
         let theme = Theme::of(cx).for_popup();
-        let mut card = popover::popover_card(&theme)
-            .w(px(370.0))
+        let mut card = div()
+            .debug_selector(|| "usage-session-details".into())
             .flex()
             .flex_col()
             .gap(px(10.0))
-            .p(px(12.0))
+            .mt(px(12.0))
+            .pt(px(12.0))
+            .px(px(8.0))
+            .border_t_1()
+            .border_color(theme.border)
             .child(popover::menu_heading(&theme, "This session"));
         if let Some(report) = &self.session_report {
             card = card.child(crate::settings::usage::session_summary(report, &theme));
@@ -452,11 +454,6 @@ impl AccountUsage {
                     .text_color(theme.danger)
                     .child(SharedString::from(error.clone())),
             );
-        }
-        if let (Some(snapshot), Some(harness)) = (self.snapshot(cx), self.harness) {
-            if let Some(account) = active_account(snapshot, harness) {
-                card = card.child(render_account_usage(account, &theme));
-            }
         }
         card.child(
             crate::settings::widgets::text_action(
@@ -526,10 +523,9 @@ impl AccountUsage {
                 .collect(),
             _ => Vec::new(),
         };
-        let title = format!(
-            "{} accounts",
-            harness.map_or("Agent", accounts::provider_name)
-        );
+        let title = harness
+            .map(|harness| format!("{} usage", accounts::provider_name(harness)))
+            .unwrap_or_else(|| "Usage".into());
         popover::popover_card(theme)
             .w(px(400.0))
             .flex()
@@ -600,6 +596,9 @@ impl AccountUsage {
                     .text_color(theme.danger)
                     .child(error)
             }))
+            .when(self.session_chat.is_some(), |card| {
+                card.child(self.session_section(cx))
+            })
     }
 }
 
@@ -608,7 +607,6 @@ impl AccountUsage {
 enum FooterCard {
     Accounts,
     Context,
-    Session,
 }
 
 impl FooterCard {
@@ -616,7 +614,6 @@ impl FooterCard {
         match self {
             FooterCard::Accounts => "account-usage-menu",
             FooterCard::Context => "context-usage-menu",
-            FooterCard::Session => "session-usage-menu",
         }
     }
 }
@@ -627,7 +624,9 @@ impl Render for AccountUsage {
     fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let theme = Theme::of(cx).clone();
         let context = self.state.read(cx).context_usage;
-        let account = self.fraction(cx).map(|fraction| {
+        let account = (self.harness.is_some() || self.session_chat.is_some()).then(|| {
+            let measured = self.fraction(cx);
+            let fraction = measured.unwrap_or(0.0);
             let level = usage_level(fraction);
             let chip = crate::context_usage::ring_chip(
                 "account-usage",
@@ -637,10 +636,13 @@ impl Render for AccountUsage {
                     UsageLevel::Normal => theme.text_muted,
                     _ => usage_color(level, &theme),
                 },
-                format!("{}%", (fraction * 100.0).round() as u32),
+                measured
+                    .map(|fraction| format!("{}%", (fraction * 100.0).round() as u32))
+                    .unwrap_or_else(|| "Usage".into()),
                 self.popup.get() == Some(&FooterCard::Accounts),
                 &theme,
-            );
+            )
+            .debug_selector(|| "account-usage-trigger".into());
             self.trigger(
                 chip,
                 FooterCard::Accounts,
@@ -658,16 +660,6 @@ impl Render for AccountUsage {
                 chip,
                 FooterCard::Context,
                 move |_, cx| crate::context_usage::card(context, &Theme::of(cx).for_popup()),
-                cx,
-            )
-        });
-        let session = self.session_chat.is_some().then(|| {
-            let chip = popover::btn_ghost(&theme, "This session", "session-usage-button")
-                .id("session-usage-button");
-            self.trigger(
-                chip,
-                FooterCard::Session,
-                |usage, cx| usage.session_card(cx),
                 cx,
             )
         });
@@ -700,7 +692,6 @@ impl Render for AccountUsage {
             })
             .children(account)
             .children(context)
-            .children(session)
     }
 }
 
@@ -708,6 +699,41 @@ impl Render for AccountUsage {
 mod tests {
     use super::*;
     use zeren_proto::AgentUsageWindow;
+
+    #[gpui::test]
+    fn usage_indicator_opens_session_details_without_a_quota_measurement(
+        cx: &mut gpui::TestAppContext,
+    ) {
+        cx.update(|cx| {
+            gpui_base::init(cx);
+            cx.set_global(Theme::default());
+            cx.set_reduce_motion(true);
+            cx.default_global::<AccountsSnapshotCache>();
+        });
+        let (usage, cx) = cx.add_window_view(|_, cx| {
+            let state = cx.new(|_| {
+                let mut state = AppState::new();
+                state.selected_chat = Some("chat".into());
+                state
+            });
+            let mut usage = AccountUsage::new(state, cx);
+            usage.track(None, None, None, cx);
+            usage
+        });
+        cx.update(|window, cx| window.draw(cx).clear());
+        let trigger = cx
+            .debug_bounds("account-usage-trigger")
+            .expect("Usage remains accessible without plan quotas");
+        cx.simulate_click(trigger.center(), gpui::Modifiers::default());
+        cx.update(|window, cx| window.draw(cx).clear());
+        usage.update(cx, |usage, _| {
+            assert_eq!(usage.popup.as_open(), Some(&FooterCard::Accounts))
+        });
+        assert!(
+            cx.debug_bounds("usage-session-details").is_some(),
+            "The usage popup must contain session details"
+        );
+    }
 
     fn account(harness: HarnessId, active: bool, used: &[f32]) -> AgentAccount {
         serde_json::from_value(serde_json::json!({
