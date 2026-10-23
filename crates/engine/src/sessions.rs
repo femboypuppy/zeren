@@ -189,6 +189,7 @@ struct RoutedSteer {
 }
 
 struct Inner {
+    usage: OnceLock<Arc<crate::usage::UsageStore>>,
     voice: crate::voice::VoiceManager,
     device_id: String,
     /// Loopback IPC port this engine serves, once known (0 = not serving):
@@ -237,6 +238,25 @@ pub struct SessionsEngine {
 }
 
 impl SessionsEngine {
+    pub fn set_usage_store(&self, store: Arc<crate::usage::UsageStore>) {
+        let _ = self.inner.usage.set(store);
+    }
+    pub fn usage_report(
+        &self,
+        days: Option<u32>,
+        harness: Option<HarnessId>,
+        chat_id: Option<&str>,
+    ) -> Result<crate::usage::UsageReport, String> {
+        self.inner
+            .usage
+            .get()
+            .map(|store| {
+                store
+                    .report(days, harness, chat_id)
+                    .map_err(|error| error.to_string())
+            })
+            .unwrap_or_else(|| Ok(Default::default()))
+    }
     pub fn new(
         device_id: String,
         journal: Arc<RunJournal>,
@@ -245,6 +265,7 @@ impl SessionsEngine {
         let (sessions_tx, _) = watch::channel(Vec::new());
         Self {
             inner: Arc::new(Inner {
+                usage: OnceLock::new(),
                 voice: crate::voice::VoiceManager::default(),
                 device_id,
                 ipc_port: std::sync::atomic::AtomicU16::new(0),
@@ -2018,6 +2039,8 @@ async fn drive_run(
     let run_harness = harness.id();
     // Captured for post-run auto-titling (the request moves into the harness).
     let harness_id = harness.id();
+    let mut usage_turn =
+        crate::usage::TurnUsage::new(chat_id.clone(), harness_id, request.model.clone());
     let user_prompt = request.prompt.clone();
     let run_cwd = request.cwd.clone();
     if request.resume.is_none() {
@@ -2711,10 +2734,46 @@ async fn drive_run(
             }
         }
         // Capacity/occupancy can settle after Done; updating it must not reopen a turn.
+        if let AgentEvent::SessionStarted { model, .. } = &event {
+            usage_turn.set_model(model);
+        }
         if let AgentEvent::ContextUsage { tokens, window } = &event {
             if let Err(err) = doc_ref.update_context_usage(*tokens, *window) {
                 tracing::warn!(%chat_id, error = %err, "context usage write failed");
             }
+            continue;
+        }
+        if matches!(
+            &event,
+            AgentEvent::Usage { .. } | AgentEvent::UsageDetails { .. }
+        ) {
+            // Some adapters deliver the final usage just after Done. Attribute
+            // that snapshot to the completed turn without reopening the chat.
+            let id = if idle_since.is_some() {
+                usage_turn.record.as_ref().map(|record| record.id.clone())
+            } else {
+                Some(entry_id.clone())
+            };
+            if let (Some(id), Some(store)) = (id, inner.usage.get()) {
+                let at = if idle_since.is_some() {
+                    usage_turn
+                        .record
+                        .as_ref()
+                        .map(|record| {
+                            record
+                                .started_at
+                                .saturating_add(record.totals.active_ms as i64)
+                        })
+                        .unwrap_or_else(now_ms)
+                } else {
+                    now_ms()
+                };
+                let record = usage_turn.observe(&id, segment_started, at, &event);
+                if let Err(error) = store.record(record) {
+                    tracing::warn!(%error,"usage snapshot write failed");
+                }
+            }
+            inner.publish(&chat_id, &event);
             continue;
         }
         // PARKED: a steer boundary, a terminal Done, or SELF-CONTINUED OUTPUT
@@ -2971,6 +3030,15 @@ async fn drive_run(
         }
 
         inner.publish(&chat_id, &event);
+
+        if matches!(&event, AgentEvent::Done { .. }) && turn_was_active {
+            if let Some(store) = inner.usage.get() {
+                let record = usage_turn.observe(&entry_id, segment_started, now_ms(), &event);
+                if let Err(error) = store.record(record) {
+                    tracing::warn!(%error,"turn usage write failed");
+                }
+            }
+        }
 
         // Defensive rule from zeren: a mid-run SessionStarted re-emission (Claude SDK
         // background re-invocations) must not wipe the segment being written.

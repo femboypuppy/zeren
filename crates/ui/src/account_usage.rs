@@ -67,6 +67,11 @@ pub fn active_account(
 
 /// Loads (and switches) the accounts of the composer's target device.
 pub struct AccountUsage {
+    session_chat: Option<String>,
+    session_report: Option<zeren_engine::usage::UsageReport>,
+    session_error: Option<String>,
+    session_busy: bool,
+    session_task: Option<Task<()>>,
     cooldown_chat: Option<String>,
     cooldown: CooldownResumeState,
     cooldown_busy: bool,
@@ -118,6 +123,11 @@ impl AccountUsage {
             }
         });
         Self {
+            session_chat: None,
+            session_report: None,
+            session_error: None,
+            session_busy: false,
+            session_task: None,
             cooldown_chat: None,
             cooldown: Default::default(),
             cooldown_busy: false,
@@ -149,6 +159,17 @@ impl AccountUsage {
         target: Option<String>,
         cx: &mut Context<Self>,
     ) {
+        let session_chat = self.state.read(cx).selected_chat.clone();
+        if self.session_chat != session_chat || self.target != target {
+            self.session_chat = session_chat;
+            self.session_report = None;
+            self.session_error = None;
+            self.session_task = None;
+            self.session_busy = false;
+            if self.popup.get() == Some(&FooterCard::Session) {
+                self.dismiss(cx);
+            }
+        }
         let harness = harness.filter(|h| signs_in(*h) && reports_usage(*h));
         self.harness = harness;
         self.model = model;
@@ -177,6 +198,12 @@ impl AccountUsage {
     }
 
     fn refresh_cooldown(&mut self, enabled: Option<bool>, cx: &mut Context<Self>) {
+        if enabled.is_none()
+            && self.popup.as_open() == Some(&FooterCard::Session)
+            && !self.session_busy
+        {
+            self.load_session(cx);
+        }
         if self.cooldown_busy {
             return;
         }
@@ -347,8 +374,105 @@ impl AccountUsage {
             // Opening the card is the moment someone cares: re-probe.
             self.load(true, cx);
         }
+        if card == FooterCard::Session {
+            self.load_session(cx);
+        }
         self.popup.open(card);
         cx.notify();
+    }
+
+    fn load_session(&mut self, cx: &mut Context<Self>) {
+        let Some(chat_id) = self.session_chat.clone() else {
+            return;
+        };
+        let Some(engine) = self.state.read(cx).engine().cloned() else {
+            return;
+        };
+        let target = self.target.clone();
+        let params = self.params(serde_json::json!({"chatId":chat_id}));
+        self.session_busy = true;
+        self.session_task = Some(cx.spawn(async move |this, cx| {
+            let result = engine
+                .client()
+                .call(methods::GET_USAGE_REPORT, params)
+                .await
+                .map_err(|error| error.to_string())
+                .and_then(|value| {
+                    serde_json::from_value::<zeren_engine::usage::UsageReport>(value)
+                        .map_err(|error| error.to_string())
+                });
+            this.update(cx, |usage, cx| {
+                if usage.session_chat.as_ref() != Some(&chat_id) || usage.target != target {
+                    return;
+                }
+                usage.session_busy = false;
+                match result {
+                    Ok(report) => {
+                        usage.session_report = Some(report);
+                        usage.session_error = None;
+                    }
+                    Err(error) => usage.session_error = Some(error),
+                }
+                cx.notify();
+            })
+            .ok();
+        }));
+    }
+
+    fn session_card(&self, cx: &mut Context<Self>) -> gpui::Div {
+        let theme = Theme::of(cx).for_popup();
+        let mut card = popover::popover_card(&theme)
+            .w(px(370.0))
+            .flex()
+            .flex_col()
+            .gap(px(10.0))
+            .p(px(12.0))
+            .child(popover::menu_heading(&theme, "This session"));
+        if let Some(report) = &self.session_report {
+            card = card.child(crate::settings::usage::session_summary(report, &theme));
+            for group in &report.by_provider {
+                card = card.child(
+                    div()
+                        .text_size(px(11.5))
+                        .text_color(theme.text_muted)
+                        .child(format!(
+                            "{} · {} tokens",
+                            group.label,
+                            crate::settings::usage::number(group.totals.tokens())
+                        )),
+                );
+            }
+        } else if self.session_error.is_none() {
+            card = card.child("Loading session usage…");
+        }
+        if let Some(error) = &self.session_error {
+            card = card.child(
+                div()
+                    .text_size(px(12.0))
+                    .text_color(theme.danger)
+                    .child(SharedString::from(error.clone())),
+            );
+        }
+        if let (Some(snapshot), Some(harness)) = (self.snapshot(cx), self.harness) {
+            if let Some(account) = active_account(snapshot, harness) {
+                card = card.child(render_account_usage(account, &theme));
+            }
+        }
+        card.child(
+            crate::settings::widgets::text_action(
+                &theme,
+                crate::settings::widgets::ActionTone::Quiet,
+                "Refresh",
+            )
+            .id("session-usage-refresh")
+            .on_click(cx.listener(|usage, _, _, cx| usage.load_session(cx))),
+        )
+        .child(
+            div()
+                .text_size(px(11.0))
+                .text_color(theme.text_muted)
+                .child("Full history: Settings → Usage"),
+        )
     }
 
     fn dismiss(&mut self, cx: &mut Context<Self>) {
@@ -484,6 +608,7 @@ impl AccountUsage {
 enum FooterCard {
     Accounts,
     Context,
+    Session,
 }
 
 impl FooterCard {
@@ -491,6 +616,7 @@ impl FooterCard {
         match self {
             FooterCard::Accounts => "account-usage-menu",
             FooterCard::Context => "context-usage-menu",
+            FooterCard::Session => "session-usage-menu",
         }
     }
 }
@@ -535,6 +661,16 @@ impl Render for AccountUsage {
                 cx,
             )
         });
+        let session = self.session_chat.is_some().then(|| {
+            let chip = popover::btn_ghost(&theme, "This session", "session-usage-button")
+                .id("session-usage-button");
+            self.trigger(
+                chip,
+                FooterCard::Session,
+                |usage, cx| usage.session_card(cx),
+                cx,
+            )
+        });
         div()
             .flex()
             .items_center()
@@ -564,6 +700,7 @@ impl Render for AccountUsage {
             })
             .children(account)
             .children(context)
+            .children(session)
     }
 }
 

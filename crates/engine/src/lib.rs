@@ -38,12 +38,14 @@ pub mod rewind;
 pub mod rpc;
 pub mod run_journal;
 pub mod sessions;
+pub mod skill_library;
 pub mod source_control;
 pub mod spaces;
 pub mod terminals;
 pub mod titles;
 mod transcript_history;
 pub mod uploads;
+pub mod usage;
 pub mod voice;
 pub mod workspace_files;
 pub mod workspace_host;
@@ -229,6 +231,10 @@ impl EngineCore {
         let store_for_import = store.clone();
         let journal = Arc::new(RunJournal::open(profile.store_root().join("journals"))?);
         let sessions = SessionsEngine::new(device_id.clone(), journal, registry.clone());
+        sessions.set_usage_store(Arc::new(
+            usage::UsageStore::open(&profile.store_root().join("usage.sqlite"))
+                .map_err(|error| EngineError::Other(error.to_string()))?,
+        ));
         let doc_host = DocHost::new(
             store.clone(),
             DocHostConfig {

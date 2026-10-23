@@ -146,6 +146,8 @@ pub(crate) struct RateLimitInfo {
 
 #[derive(Debug, Default, Deserialize)]
 pub(crate) struct ResultFrame {
+    #[serde(default)]
+    pub total_cost_usd: Option<f64>,
     #[serde(default, rename = "modelUsage")]
     pub model_usage: std::collections::BTreeMap<String, Value>,
     #[serde(default)]
@@ -162,6 +164,10 @@ pub(crate) struct ResultFrame {
 
 #[derive(Debug, Default, Deserialize)]
 pub(crate) struct UsageBody {
+    #[serde(default)]
+    pub cache_read_input_tokens: u64,
+    #[serde(default)]
+    pub cache_creation_input_tokens: u64,
     #[serde(default)]
     pub input_tokens: u64,
     #[serde(default)]

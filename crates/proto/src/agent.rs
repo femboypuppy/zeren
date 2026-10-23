@@ -608,6 +608,13 @@ pub enum AgentEvent {
         input_tokens: u64,
         output_tokens: u64,
     },
+    /// Optional billing details for the same turn as the latest Usage snapshot.
+    #[serde(rename_all = "camelCase")]
+    UsageDetails {
+        cached_tokens: u64,
+        cache_write_tokens: u64,
+        cost_usd: Option<f64>,
+    },
     /// The agent advertised (or changed) its slash-command set — ACP
     /// `available_commands_update`. The engine caches the latest list per
     /// harness for the composer's `/` popup; never persisted to docs.

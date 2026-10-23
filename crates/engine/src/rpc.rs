@@ -1414,6 +1414,7 @@ fn forward_deadline(method: &str) -> std::time::Duration {
         methods::CREATE_WORKTREE => Duration::from_secs(120),
         // Allow the adapter discovery budget plus relay and shutdown overhead.
         methods::LIST_MODELS | methods::LIST_COMMANDS => Duration::from_secs(100),
+        methods::INSTALL_SKILLS => Duration::from_secs(120),
         _ => Duration::from_secs(30),
     }
 }
@@ -1440,6 +1441,10 @@ fn forwardable(method: &str) -> bool {
             | methods::SET_HARNESS_ENABLED
             | methods::LIST_MODELS
             | methods::LIST_SKILLS
+            | methods::LIST_INSTALLED_SKILLS
+            | methods::INSTALL_SKILLS
+            | methods::CHANGE_INSTALLED_SKILL
+            | methods::GET_USAGE_REPORT
             | methods::LIST_COMMANDS
             | methods::QUEUE_COMMAND
             | methods::TAKE_PROJECT_ACTION_SETUP
@@ -1907,6 +1912,67 @@ impl RpcService for EngineRpc {
                     .await
                     .map_err(|e| RpcError::Failed(e.to_string()))?;
                 RpcReply::value(&skills)
+            }
+            methods::LIST_INSTALLED_SKILLS => {
+                let skills = tokio::task::spawn_blocking(|| {
+                    crate::skill_library::list_at(&crate::skill_library::root())
+                })
+                .await
+                .map_err(|error| RpcError::Failed(error.to_string()))?
+                .map_err(|error| RpcError::Failed(error.to_string()))?;
+                RpcReply::value(&skills)
+            }
+            methods::INSTALL_SKILLS => {
+                #[derive(Deserialize)]
+                struct Params {
+                    source: String,
+                }
+                let p: Params = parse_params(params)?;
+                let skills = crate::skill_library::install(&p.source)
+                    .await
+                    .map_err(|error| RpcError::Failed(error.to_string()))?;
+                RpcReply::value(&skills)
+            }
+            methods::CHANGE_INSTALLED_SKILL => {
+                #[derive(Deserialize)]
+                struct Params {
+                    name: String,
+                    #[serde(default)]
+                    enabled: Option<bool>,
+                }
+                let p: Params = parse_params(params)?;
+                let skills = tokio::task::spawn_blocking(move || {
+                    crate::skill_library::change_at(
+                        &crate::skill_library::root(),
+                        &p.name,
+                        p.enabled,
+                    )
+                })
+                .await
+                .map_err(|error| RpcError::Failed(error.to_string()))?
+                .map_err(|error| RpcError::Failed(error.to_string()))?;
+                RpcReply::value(&skills)
+            }
+            methods::GET_USAGE_REPORT => {
+                #[derive(Deserialize)]
+                #[serde(rename_all = "camelCase")]
+                struct Params {
+                    #[serde(default)]
+                    days: Option<u32>,
+                    #[serde(default)]
+                    harness: Option<HarnessId>,
+                    #[serde(default)]
+                    chat_id: Option<String>,
+                }
+                let p: Params = parse_params(params)?;
+                let sessions = self.sessions.clone();
+                let report = tokio::task::spawn_blocking(move || {
+                    sessions.usage_report(p.days, p.harness, p.chat_id.as_deref())
+                })
+                .await
+                .map_err(|error| RpcError::Failed(error.to_string()))?
+                .map_err(RpcError::Failed)?;
+                RpcReply::value(&report)
             }
             methods::LIST_COMMANDS => {
                 #[derive(Deserialize)]

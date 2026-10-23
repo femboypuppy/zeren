@@ -532,6 +532,8 @@ pub enum SettingsSection {
     Harnesses,
     /// Per-provider CLI accounts (login, usage) — labeled "Accounts".
     Agents,
+    Skills,
+    Usage,
     Appearance,
     Files,
     Notifications,
@@ -546,13 +548,15 @@ pub enum SettingsSection {
 
 impl SettingsSection {
     /// Sections shown in Settings. `Agents` is a legacy Accounts route alias.
-    pub const ALL: [SettingsSection; 10] = [
+    pub const ALL: [SettingsSection; 12] = [
         SettingsSection::General,
         SettingsSection::Appearance,
         SettingsSection::Notifications,
         SettingsSection::Voice,
         SettingsSection::Shortcuts,
         SettingsSection::Harnesses,
+        SettingsSection::Skills,
+        SettingsSection::Usage,
         SettingsSection::Devices,
         SettingsSection::Files,
         SettingsSection::Appshots,
@@ -591,6 +595,8 @@ impl SettingsSection {
             SettingsSection::Devices => "devices",
             SettingsSection::Harnesses => "providers",
             SettingsSection::Agents => "agents",
+            SettingsSection::Skills => "skills",
+            SettingsSection::Usage => "usage",
             SettingsSection::Appearance => "appearance",
             SettingsSection::Files => "files",
             SettingsSection::Notifications => "notifications",
@@ -608,6 +614,8 @@ impl SettingsSection {
             "devices" => SettingsSection::Devices,
             "providers" | "harnesses" => SettingsSection::Harnesses,
             "agents" => SettingsSection::Agents,
+            "skills" => SettingsSection::Skills,
+            "usage" => SettingsSection::Usage,
             "appearance" => SettingsSection::Appearance,
             "files" => SettingsSection::Files,
             "notifications" => SettingsSection::Notifications,
@@ -633,6 +641,8 @@ impl SettingsSection {
             SettingsSection::Devices => "Devices",
             SettingsSection::Harnesses => "Providers",
             SettingsSection::Agents => "Accounts",
+            SettingsSection::Skills => "Skills",
+            SettingsSection::Usage => "Usage",
             SettingsSection::Appearance => "Appearance",
             SettingsSection::Files => "Files",
             SettingsSection::Notifications => "Notifications",
@@ -1942,6 +1952,8 @@ pub struct Shell {
     notifications_page: Option<Entity<NotificationsPage>>,
     shortcuts_page: Option<Entity<ShortcutsPage>>,
     accounts_page: Option<Entity<AccountsPage>>,
+    skills_page: Option<Entity<crate::settings::skills::SkillsPage>>,
+    usage_page: Option<Entity<crate::settings::usage::UsagePage>>,
     harnesses_page: Option<Entity<HarnessesPage>>,
     shortcuts_sub: Option<Subscription>,
     notifications_sub: Option<Subscription>,
@@ -2431,6 +2443,8 @@ impl Shell {
             notifications_page: None,
             shortcuts_page: None,
             accounts_page: None,
+            skills_page: None,
+            usage_page: None,
             harnesses_page: None,
             shortcuts_sub: None,
             notifications_sub: None,
@@ -4943,6 +4957,28 @@ impl Shell {
         cx: &mut Context<Self>,
     ) -> AnyElement {
         match section {
+            SettingsSection::Skills => {
+                if self.skills_page.is_none() {
+                    let state = self.state.clone();
+                    self.skills_page =
+                        Some(cx.new(|cx| crate::settings::skills::SkillsPage::new(state, cx)));
+                }
+                self.skills_page
+                    .as_ref()
+                    .map(|page| page.clone().into_any_element())
+                    .unwrap_or_else(|| Empty.into_any_element())
+            }
+            SettingsSection::Usage => {
+                if self.usage_page.is_none() {
+                    let state = self.state.clone();
+                    self.usage_page =
+                        Some(cx.new(|cx| crate::settings::usage::UsagePage::new(state, cx)));
+                }
+                self.usage_page
+                    .as_ref()
+                    .map(|page| page.clone().into_any_element())
+                    .unwrap_or_else(|| Empty.into_any_element())
+            }
             SettingsSection::Devices => {
                 if self.devices_page.is_none() {
                     let state = self.state.clone();
@@ -7207,6 +7243,8 @@ impl Shell {
             SettingsSection::Devices => icons::MONITOR,
             SettingsSection::Harnesses => icons::WIDGET,
             SettingsSection::Agents => icons::KEY_MINIMALISTIC,
+            SettingsSection::Skills => icons::WIDGET,
+            SettingsSection::Usage => icons::TUNING,
             SettingsSection::Appearance => icons::TUNING,
             SettingsSection::Files => icons::FOLDER,
             SettingsSection::Notifications => icons::BELL,

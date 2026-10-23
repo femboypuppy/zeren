@@ -694,8 +694,19 @@ impl Normalizer {
                     self.session_id = Some(id.clone());
                 }
                 let usage = AgentEvent::Usage {
-                    input_tokens: f.usage.input_tokens,
+                    input_tokens: f
+                        .usage
+                        .input_tokens
+                        .saturating_add(f.usage.cache_read_input_tokens)
+                        .saturating_add(f.usage.cache_creation_input_tokens),
                     output_tokens: f.usage.output_tokens,
+                };
+                let usage_details = AgentEvent::UsageDetails {
+                    cached_tokens: f.usage.cache_read_input_tokens,
+                    cache_write_tokens: f.usage.cache_creation_input_tokens,
+                    cost_usd: f
+                        .total_cost_usd
+                        .filter(|cost| cost.is_finite() && *cost >= 0.0),
                 };
                 let done = if f.subtype == "success" {
                     AgentEvent::Done {
@@ -765,7 +776,7 @@ impl Normalizer {
                         window: Some(window),
                     });
                 }
-                out.extend([usage, done]);
+                out.extend([usage, usage_details, done]);
                 out
             }
 
@@ -849,8 +860,8 @@ mod tests {
 
     fn result_done(raw: &str) -> AgentEvent {
         let events = normalize_one(raw);
-        assert_eq!(events.len(), 2, "usage + done");
-        events.into_iter().nth(1).expect("done event")
+        assert_eq!(events.len(), 3, "usage + billing details + done");
+        events.into_iter().last().expect("done event")
     }
 
     #[test]
