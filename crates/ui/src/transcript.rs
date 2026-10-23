@@ -685,28 +685,11 @@ fn thought_block_lines(block: &Block, indent: usize, out: &mut Vec<Vec<InlineRun
 
 /// A reasoning part as a tool-group chip: "Thought process" header over the
 /// thought's markdown flattened into styled detail lines (analytic height —
-/// the group's fold tween needs it; see [`thought_lines`]). Capped like tool
-/// outputs, with the counted tail. `live` = the part is still streaming
+/// the group's fold tween needs it; see [`thought_lines`]). Full text lives
+/// inside a bounded, virtualized scroll area. `live` = the part is still streaming
 /// (chip defaults open).
 fn thought_item(part_id: &str, tree: &BlockTree, live: bool) -> ToolItem {
-    let mut lines = thought_lines(tree);
-    let truncated_by = lines.len().saturating_sub(OUTPUT_DETAIL_MAX_LINES);
-    if truncated_by > 0 {
-        // Keep the TAIL while streaming (the fresh thinking is the signal);
-        // settled thoughts keep the head like tool outputs do.
-        if live {
-            lines.drain(..truncated_by);
-            // The cut can land on a block separator — drop the orphan blank.
-            while lines
-                .first()
-                .is_some_and(|l| l.iter().all(|r| r.text.trim().is_empty()))
-            {
-                lines.remove(0);
-            }
-        } else {
-            lines.truncate(OUTPUT_DETAIL_MAX_LINES);
-        }
-    }
+    let lines = thought_lines(tree);
     ToolItem {
         part_id: part_id.into(),
         call: ToolCall::Unknown {
@@ -718,7 +701,7 @@ fn thought_item(part_id: &str, tree: &BlockTree, live: bool) -> ToolItem {
         detail: (!lines.is_empty()).then(|| {
             Arc::new(ToolDetail::Thought {
                 lines,
-                truncated_by,
+                truncated_by: 0,
             })
         }),
         invocation: None,
@@ -793,6 +776,13 @@ pub const OUTPUT_LINE_HEIGHT: f32 = 18.0;
 
 /// Vertical padding of an output detail body (py(6) × 2).
 const OUTPUT_BODY_PAD: f32 = 12.0;
+
+/// Keep long thoughts inside the chat viewport instead of growing one list row.
+const THOUGHT_VIEWPORT_HEIGHT: f32 = 288.0;
+
+fn thought_body_height(line_count: usize) -> f32 {
+    (line_count as f32 * OUTPUT_LINE_HEIGHT).min(THOUGHT_VIEWPORT_HEIGHT) + OUTPUT_BODY_PAD
+}
 
 /// The hairline between an expanded chip's header row and its detail body.
 const DETAIL_SEPARATOR: f32 = 1.0;
@@ -2150,7 +2140,7 @@ pub fn detail_height(detail: &ToolDetail) -> f32 {
             truncated_by,
         } => {
             let rows = lines.len() + usize::from(*truncated_by > 0);
-            rows as f32 * OUTPUT_LINE_HEIGHT + OUTPUT_BODY_PAD
+            thought_body_height(rows)
         }
         ToolDetail::Diff { file, .. } => crate::changes::body_height(file),
         ToolDetail::Stats { stats } => stats.len() as f32 * OUTPUT_LINE_HEIGHT + OUTPUT_BODY_PAD,
@@ -3137,6 +3127,7 @@ pub struct Transcript {
     /// group fold. Render-local like `folds` — never part of the row
     /// fingerprint.
     tool_details: HashMap<SharedString, FoldState>,
+    thought_scrolls: HashMap<SharedString, ThoughtScroll>,
     /// Expand/collapse state for user bubbles past [`USER_COLLAPSED_LINES`],
     /// keyed by row id. Render-local like `folds` — never part of the row
     /// fingerprint, so toggling one costs a repaint, not a rebuild.
@@ -3323,6 +3314,12 @@ enum BlobFetch {
     Ready(Arc<ToolDetail>),
 }
 
+#[derive(Default)]
+struct ThoughtScroll {
+    handle: gpui::UniformListScrollHandle,
+    line_count: usize,
+}
+
 /// Shell-facing events (the transcript itself hosts no surfaces).
 #[derive(Debug, Clone)]
 pub enum TranscriptEvent {
@@ -3344,6 +3341,75 @@ pub enum TranscriptEvent {
 impl gpui::EventEmitter<TranscriptEvent> for Transcript {}
 
 impl Transcript {
+    fn scrolling_thought(
+        &mut self,
+        key: SharedString,
+        detail: Arc<ToolDetail>,
+        live: bool,
+        theme: &Theme,
+    ) -> AnyElement {
+        let ToolDetail::Thought { lines, .. } = detail.as_ref() else {
+            unreachable!()
+        };
+        let count = lines.len();
+        let state = self.thought_scrolls.entry(key.clone()).or_default();
+        if state.line_count != count {
+            // Follow fresh thinking only if the reader was already at the end.
+            // Scrolling up must remain stable while the next lines arrive.
+            if live && state.handle.is_scrolled_to_end() != Some(false) {
+                state.handle.scroll_to_bottom();
+            }
+            state.line_count = count;
+        }
+        let scroll = state.handle.clone();
+        let theme = theme.clone();
+        let height = thought_body_height(count);
+        let rows = gpui::uniform_list(
+            SharedString::from(format!("{key}-thought-scroll")),
+            count,
+            move |range, _, _| {
+                let ToolDetail::Thought { lines, .. } = detail.as_ref() else {
+                    unreachable!()
+                };
+                range
+                    .map(|ix| {
+                        let row = div()
+                            .h(px(OUTPUT_LINE_HEIGHT))
+                            .w_full()
+                            .min_w_0()
+                            .flex_none()
+                            .flex()
+                            .items_center();
+                        if let Some((text, runs)) = thought_line_text(&lines[ix], &theme) {
+                            row.child(
+                                div()
+                                    .w_full()
+                                    .min_w_0()
+                                    .truncate()
+                                    .child(StyledText::new(text).with_runs(runs)),
+                            )
+                        } else {
+                            row
+                        }
+                    })
+                    .collect::<Vec<_>>()
+            },
+        )
+        .w_full()
+        .h(px(height - OUTPUT_BODY_PAD))
+        .track_scroll(&scroll);
+        div()
+            .w_full()
+            .min_w_0()
+            .h(px(height))
+            .flex_none()
+            .py(px(6.0))
+            .text_size(px(TOOL_TEXT_SIZE))
+            .overflow_hidden()
+            .child(rows)
+            .into_any_element()
+    }
+
     pub(crate) fn set_workspace_link_handler(&mut self, handler: render::LinkUi) {
         self.workspace_link = Some(handler);
     }
@@ -3526,6 +3592,7 @@ impl Transcript {
             last_replay_baseline: None,
             historical_markdown: HashMap::new(),
             tool_details: HashMap::new(),
+            thought_scrolls: HashMap::new(),
             user_folds: HashMap::new(),
             user_heights: HashMap::new(),
             user_hold_task: None,
@@ -4651,6 +4718,7 @@ impl Transcript {
             self.live_parsers.clear();
             self.tree_cache.clear();
             self.folds.clear();
+            self.thought_scrolls.clear();
             self.tool_group_reveals.clear();
             self.last_replay_baseline = None;
             self.historical_markdown.clear();
@@ -7958,7 +8026,16 @@ impl Transcript {
                                     .flex_none()
                                     .when(!collapses, |line| line.bg(crate::theme::hairline(0.06))),
                             )
-                            .child(detail_body(detail, detail_highlights[ix].clone(), theme));
+                            .child(if matches!(detail, ToolDetail::Thought { .. }) {
+                                self.scrolling_thought(
+                                    tool.part_id.clone(),
+                                    details[ix].as_ref().unwrap().clone(),
+                                    !tool.resolved,
+                                    theme,
+                                )
+                            } else {
+                                detail_body(detail, detail_highlights[ix].clone(), theme)
+                            });
                     }
                     if let Some(ChipAffordance { blob_ref, label }) = affordance {
                         let loading = matches!(
@@ -11946,6 +12023,35 @@ mod tests {
     }
 
     #[test]
+    fn long_thought_keeps_both_ends_inside_a_bounded_viewport() {
+        let text = (0..300)
+            .map(|ix| format!("Thought line {ix}"))
+            .collect::<Vec<_>>()
+            .join("\n\n");
+        let tree = parse_full(&text);
+        for live in [false, true] {
+            let item = thought_item("reason", &tree, live);
+            let detail = item.detail.unwrap();
+            let ToolDetail::Thought {
+                lines,
+                truncated_by,
+            } = detail.as_ref()
+            else {
+                panic!()
+            };
+            assert!(lines.len() > OUTPUT_DETAIL_MAX_LINES);
+            assert_eq!(*truncated_by, 0);
+            assert_eq!(line_string(lines.first().unwrap()), "Thought line 0");
+            assert_eq!(line_string(lines.last().unwrap()), "Thought line 299");
+            assert_eq!(
+                detail_height(&detail),
+                DETAIL_SEPARATOR + THOUGHT_VIEWPORT_HEIGHT + OUTPUT_BODY_PAD
+            );
+        }
+        assert_eq!(thought_body_height(1), OUTPUT_LINE_HEIGHT + OUTPUT_BODY_PAD);
+    }
+
+    #[test]
     fn thought_wrap_is_word_aware_and_bounded() {
         let lines = thought_of("one two three");
         assert_eq!(lines.len(), 1);
@@ -12431,6 +12537,79 @@ mod tests {
                 let _ = window.draw(cx);
             })
             .unwrap();
+        }
+
+        #[test]
+        fn long_thought_scrolls_independently_and_streaming_preserves_the_readers_position() {
+            with_window(|transcript, window, cx| {
+                cx.set_reduce_motion(true);
+                let mut text = (0..300)
+                    .map(|ix| format!("Thought line {ix}"))
+                    .collect::<Vec<_>>()
+                    .join("\n\n");
+                let entries = |text: &str| {
+                    let mut entries = (0..15)
+                        .map(|ix| prompt(&format!("ask-{ix}")))
+                        .collect::<Vec<_>>();
+                    entries.push(assistant(
+                        "reply",
+                        MessageStatus::Streaming,
+                        vec![reasoning_part("reason", text)],
+                    ));
+                    entries
+                };
+                transcript.update(cx, |this, cx| {
+                    this.compact_mode = false;
+                    feed(this, entries(&text), cx);
+                });
+                for _ in 0..3 {
+                    draw(window, cx);
+                }
+                let handle = transcript.read(cx).thought_scrolls[&SharedString::from("reason")]
+                    .handle
+                    .clone();
+                let base = handle.0.borrow().base_handle.clone();
+                assert!(
+                    base.max_offset().y > px(1000.0),
+                    "Full thought must remain reachable"
+                );
+                let before = base.offset().y;
+                let outer = transcript.read(cx).list.logical_scroll_top();
+                let bounds = base.bounds();
+                cx.update_window(window.into(), |_, window, cx| {
+                    window.dispatch_event(
+                        gpui::PlatformInput::ScrollWheel(gpui::ScrollWheelEvent {
+                            position: bounds.origin
+                                + gpui::point(bounds.size.width / 2.0, bounds.size.height / 2.0),
+                            delta: gpui::ScrollDelta::Pixels(gpui::point(px(0.0), px(120.0))),
+                            ..Default::default()
+                        }),
+                        cx,
+                    );
+                })
+                .unwrap();
+                draw(window, cx);
+                let reading_at = base.offset().y;
+                assert!(
+                    reading_at > before + px(1.0),
+                    "Wheel should scroll earlier thought lines"
+                );
+                let after = transcript.read(cx).list.logical_scroll_top();
+                assert_eq!(
+                    after.item_ix, outer.item_ix,
+                    "Thought scrolling moved the conversation"
+                );
+                assert!((after.offset_in_item - outer.offset_in_item).abs() <= px(1.0));
+                text.push_str("\n\nFresh thinking after the reader scrolled up");
+                transcript.update(cx, |this, cx| feed(this, entries(&text), cx));
+                for _ in 0..3 {
+                    draw(window, cx);
+                }
+                assert!(
+                    (base.offset().y - reading_at).abs() <= px(1.0),
+                    "Streaming jumped away from the reader"
+                );
+            });
         }
 
         #[test]
