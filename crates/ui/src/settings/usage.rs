@@ -244,7 +244,7 @@ impl UsagePage {
             ),
         )
     }
-    fn body(&self, report: &UsageReport, theme: &Theme) -> gpui::Div {
+    fn body(&self, report: &UsageReport, theme: &Theme, cx: &gpui::App) -> gpui::Div {
         let t = &report.totals;
         let metrics = [
             ("Total tokens", number(t.tokens())),
@@ -288,8 +288,7 @@ impl UsagePage {
                     widgets::section_card(theme)
                         .mt(px(8.0))
                         .p(px(12.0))
-                        .child(
-                            div().mb(px(8.0)).text_size(px(12.0)).child(format!(
+                        .child(div().mb(px(8.0)).text_size(px(12.0)).child(format!(
                                 "{} · {}",
                                 provider_label(account.harness),
                                 account
@@ -297,8 +296,7 @@ impl UsagePage {
                                     .as_deref()
                                     .or(account.display_name.as_deref())
                                     .unwrap_or("Current account")
-                            )),
-                        )
+                            )))
                         .child(accounts::render_account_usage(account, theme))
                 }));
         }
@@ -329,6 +327,17 @@ impl UsagePage {
         body.child(widgets::section_label(theme, "Recent turns"))
             .child(widgets::section_card(theme).mt(px(8.0)).children(
                 report.recent.iter().enumerate().map(|(ix, record)| {
+                    let title = self
+                        .state
+                        .read(cx)
+                        .chats
+                        .iter()
+                        .find(|chat| chat.id == record.chat_id)
+                        .and_then(|chat| chat.title.clone())
+                        .unwrap_or_else(|| "Conversation".into());
+                    let at = chrono::DateTime::from_timestamp_millis(record.started_at)
+                        .map(|date| date.format("%b %d %H:%M UTC").to_string())
+                        .unwrap_or_default();
                     widgets::card_row(theme, ix == 0)
                         .child(
                             div()
@@ -343,7 +352,7 @@ impl UsagePage {
                                     div()
                                         .text_size(px(11.0))
                                         .text_color(theme.text_muted)
-                                        .child(SharedString::from(record.chat_id.clone())),
+                                        .child(format!("{title} · {at}")),
                                 ),
                         )
                         .child(div().text_size(px(12.0)).child(format!(
@@ -429,7 +438,7 @@ impl Render for UsagePage {
             content = content.child(widgets::error_strip(&theme, error.clone()));
         }
         if let Some(report) = &self.report {
-            content = content.child(self.body(report, &theme));
+            content = content.child(self.body(report, &theme, cx));
         }
         let rail = popover::rail(self, "usage-page-rail", &theme, cx);
         div()

@@ -1259,6 +1259,7 @@ async fn run_session(session: Session) {
     let mut reasoning_streams: HashMap<String, ReasoningStream> = HashMap::new();
     // Token usage is held until the turn ends, emitted just before Done.
     let mut pending_usage: Option<AgentEvent> = None;
+    let mut pending_usage_details: Option<AgentEvent> = None;
     // Steers whose `turn/steer` lost the turn-completed race; delivered as the
     // next `turn/start` when the expected turn's end notification arrives.
     let mut queued_steers: VecDeque<String> = VecDeque::new();
@@ -1414,6 +1415,7 @@ async fn run_session(session: Session) {
                             && !send(&event_tx, usage).await { break 'main; }
                         if let Some(usage) = usage_event(&params) {
                             pending_usage = Some(usage);
+                            pending_usage_details = normalize::usage_details_event(&params);
                         }
                     }
 
@@ -1436,6 +1438,8 @@ async fn run_session(session: Session) {
                         {
                             break 'main;
                         }
+                        if let Some(details) = pending_usage_details.take()
+                            && !send(&event_tx, details).await { break 'main; }
                         let error = turn_error_message(&params).or_else(|| {
                             (params
                                 .pointer("/turn/status")
@@ -1498,6 +1502,8 @@ async fn run_session(session: Session) {
                         {
                             break 'main;
                         }
+                        if let Some(details) = pending_usage_details.take()
+                            && !send(&event_tx, details).await { break 'main; }
                         done_current = true;
                         if interrupted {
                             done_after_interrupt = true;

@@ -2958,6 +2958,12 @@ async fn drive_run(
             ..
         } = &event
         {
+            if turn_was_active && let Some(store) = inner.usage.get() {
+                let record = usage_turn.observe(&entry_id, segment_started, now_ms(), &event);
+                if let Err(error) = store.record(record) {
+                    tracing::warn!(%error,"steered turn usage write failed");
+                }
+            }
             inner.publish(&chat_id, &event);
             // A steer boundary means a real prompt owns the turn again — its
             // Done will come; the short self-continued window stands down.

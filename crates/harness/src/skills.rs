@@ -310,7 +310,8 @@ fn scan_root(
     Ok(())
 }
 
-fn read_skill(path: &Path) -> Result<Option<Skill>, HarnessError> {
+/// Parse bounded Agent Skills metadata for discovery and library imports.
+pub fn read_skill(path: &Path) -> Result<Option<Skill>, HarnessError> {
     use std::io::Read;
     // Keep regular-file symlinks working, but never open known devices/pipes.
     if !std::fs::metadata(path)?.is_file() {

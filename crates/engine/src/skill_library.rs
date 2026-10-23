@@ -149,12 +149,11 @@ pub async fn install(value: &str) -> anyhow::Result<Vec<InstalledSkill>> {
     let root = root();
     tokio::task::spawn_blocking(move || {
         let _temp = temp;
-        install_checkout(
-            &checkout.join(&source.subdir),
-            &root,
-            &source.repository,
-            &revision,
-        )
+        let selected = checkout.join(&source.subdir).canonicalize()?;
+        if !selected.starts_with(checkout.canonicalize()?) {
+            bail!("Skill source must stay inside the downloaded repository.");
+        }
+        install_checkout(&selected, &root, &source.repository, &revision)
     })
     .await?
 }
@@ -201,19 +200,6 @@ fn discover(
         }
     }
     Ok(())
-}
-fn metadata_field(text: &str, key: &str) -> String {
-    if !text.starts_with("---") {
-        return String::new();
-    }
-    text.lines()
-        .skip(1)
-        .take_while(|line| line.trim() != "---")
-        .find_map(|line| line.strip_prefix(&format!("{key}:")))
-        .unwrap_or("")
-        .trim()
-        .trim_matches(['\'', '"'])
-        .to_string()
 }
 fn copy_tree(
     source: &Path,
@@ -268,6 +254,12 @@ fn install_checkout(
     } else {
         checkout.to_owned()
     };
+    if !library
+        .canonicalize()?
+        .starts_with(checkout.canonicalize()?)
+    {
+        bail!("Skill library points outside the downloaded repository.");
+    }
     discover(&library, 0, &mut 0, &mut found)?;
     if found.is_empty() {
         bail!("No SKILL.md files found. Choose a repository containing Agent Skills.");
@@ -282,15 +274,10 @@ fn install_checkout(
         if std::fs::symlink_metadata(&path)?.file_type().is_symlink() {
             bail!("SKILL.md cannot be a symbolic link.");
         }
-        let text = std::fs::read_to_string(&path)?;
-        let mut name = metadata_field(&text, "name");
-        if name.is_empty() {
-            name = directory
-                .file_name()
-                .unwrap_or_default()
-                .to_string_lossy()
-                .into_owned();
-        }
+        let metadata = zeren_harness::read_skill_metadata(&path)?.context(
+            "Invalid skill metadata. SKILL.md must contain valid Agent Skills frontmatter.",
+        )?;
+        let name = metadata.name;
         if !valid_name(&name) {
             bail!("Unsupported skill name: {name}");
         }
@@ -308,7 +295,7 @@ fn install_checkout(
         copy_tree(&directory, &target, &mut files, &mut bytes)?;
         let skill = InstalledSkill {
             name,
-            description: metadata_field(&text, "description"),
+            description: metadata.description,
             repository: repository.into(),
             revision: revision.into(),
             enabled: true,
@@ -394,7 +381,7 @@ mod tests {
         std::fs::create_dir_all(skill.join("references")).unwrap();
         std::fs::write(
             skill.join("SKILL.md"),
-            "---\nname: ponytail\ndescription: Read before editing\n---\nInstructions",
+            "---\nname: ponytail\ndescription: >-\n  Read before\n  editing\n---\nInstructions",
         )
         .unwrap();
         std::fs::write(skill.join("references/notes.md"), "resource").unwrap();
@@ -406,6 +393,7 @@ mod tests {
         )
         .unwrap();
         assert_eq!(installed.len(), 1);
+        assert_eq!(installed[0].description, "Read before editing");
         assert!(target.path().join("ponytail/references/notes.md").is_file());
         assert!(install_checkout(repo.path(), target.path(), "repo", "revision").is_err());
         assert!(!change_at(target.path(), "ponytail", Some(false)).unwrap()[0].enabled);
@@ -418,5 +406,16 @@ mod tests {
         assert!(change_at(target.path(), "../escape", None).is_err());
         std::fs::create_dir(target.path().join("unmanaged")).unwrap();
         assert!(change_at(target.path(), "unmanaged", None).is_err());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn rejects_a_library_symlink_outside_the_repository() {
+        let repo = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let target = tempfile::tempdir().unwrap();
+        std::os::unix::fs::symlink(outside.path(), repo.path().join("skills")).unwrap();
+        assert!(install_checkout(repo.path(), target.path(), "repo", "revision").is_err());
+        assert_eq!(std::fs::read_dir(target.path()).unwrap().count(), 0);
     }
 }

@@ -137,6 +137,16 @@ pub(crate) fn usage_event(params: &Value) -> Option<AgentEvent> {
     })
 }
 
+pub(crate) fn usage_details_event(params: &Value) -> Option<AgentEvent> {
+    let last = field(params, &["tokenUsage", "token_usage"])?.get("last")?;
+    let cached = field(last, &["cachedInputTokens", "cached_input_tokens"])?.as_u64()?;
+    Some(AgentEvent::UsageDetails {
+        cached_tokens: cached,
+        cache_write_tokens: 0,
+        cost_usd: None,
+    })
+}
+
 pub(crate) fn context_usage_event(params: &Value) -> Option<AgentEvent> {
     let usage = field(params, &["tokenUsage", "token_usage"])?;
     let last = usage.get("last");
@@ -909,6 +919,18 @@ mod tests {
 
     #[test]
     fn usage_reads_last_snapshot_under_both_spellings() {
+        assert_eq!(
+            usage_details_event(&json!({"tokenUsage":{"last":{"cachedInputTokens":64}}})),
+            Some(AgentEvent::UsageDetails {
+                cached_tokens: 64,
+                cache_write_tokens: 0,
+                cost_usd: None
+            })
+        );
+        assert_eq!(
+            usage_details_event(&json!({"tokenUsage":{"last":{"inputTokens":64}}})),
+            None
+        );
         assert_eq!(
             usage_event(&json!({"tokenUsage": {"last": {"inputTokens": 42, "outputTokens": 7}}})),
             Some(AgentEvent::Usage {

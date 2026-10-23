@@ -865,6 +865,23 @@ mod tests {
     }
 
     #[test]
+    fn result_usage_includes_cache_tokens_and_provider_reported_cost() {
+        let events = normalize_one(
+            r#"{"type":"result","subtype":"success","total_cost_usd":0.125,"usage":{"input_tokens":10,"output_tokens":20,"cache_read_input_tokens":60,"cache_creation_input_tokens":30}}"#,
+        );
+        assert!(events.contains(&AgentEvent::Usage {
+            input_tokens: 100,
+            output_tokens: 20
+        }));
+        assert!(events.contains(&AgentEvent::UsageDetails {
+            cached_tokens: 60,
+            cache_write_tokens: 30,
+            cost_usd: Some(0.125)
+        }));
+        assert!(matches!(events.last(), Some(AgentEvent::Done { .. })));
+    }
+
+    #[test]
     fn stream_deltas_map_to_text_reasoning_and_heartbeats() {
         // Real thinking text streams as a reasoning delta.
         let ev = normalize_one(
