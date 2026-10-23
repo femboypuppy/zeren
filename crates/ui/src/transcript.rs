@@ -3406,6 +3406,7 @@ impl Transcript {
             .py(px(6.0))
             .text_size(px(TOOL_TEXT_SIZE))
             .overflow_hidden()
+            .on_scroll_wheel(|_, _, cx| cx.stop_propagation())
             .child(rows)
             .into_any_element()
     }
