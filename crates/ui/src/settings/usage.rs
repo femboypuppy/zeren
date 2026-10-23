@@ -404,6 +404,19 @@ impl UsagePage {
     }
 }
 
+fn activity_fill(theme: &Theme, tokens: u64, peak: u64) -> gpui::Hsla {
+    if tokens == 0 {
+        return theme.text_muted.opacity(0.12);
+    }
+    let intensity = (tokens as f64 / peak.max(1) as f64).min(1.0).sqrt() as f32;
+    gpui::hsla(
+        theme.accent.h,
+        theme.accent.s.max(0.45),
+        0.84 - 0.42 * intensity,
+        1.0,
+    )
+}
+
 fn activity(report: &UsageReport, theme: &Theme) -> gpui::Div {
     let today = chrono::Utc::now().date_naive();
     let start = today - chrono::Days::new(370);
@@ -412,43 +425,65 @@ fn activity(report: &UsageReport, theme: &Theme) -> gpui::Div {
         .iter()
         .map(|day| day.totals.tokens())
         .max()
-        .unwrap_or(0)
-        .max(1) as f64;
+        .unwrap_or(0);
     div()
         .mx(px(8.0))
         .flex_none()
         .flex()
-        .flex_wrap()
-        .gap(px(2.0))
-        .children((0..53).map(|week| {
+        .flex_col()
+        .gap(px(8.0))
+        .child(
             div()
                 .flex()
-                .flex_col()
+                .flex_wrap()
                 .gap(px(2.0))
-                .children((0..7).map(|day| {
-                    let date = start + chrono::Days::new(week * 7 + day);
-                    let key = date.format("%Y-%m-%d").to_string();
-                    let tokens = report
-                        .days
-                        .iter()
-                        .find(|group| group.label == key)
-                        .map(|group| group.totals.tokens())
-                        .unwrap_or(0);
-                    let fill = if tokens == 0 {
-                        theme.text_muted.opacity(0.12)
-                    } else {
-                        theme
-                            .accent
-                            .opacity(0.25 + 0.75 * (tokens as f64 / peak).sqrt() as f32)
-                    };
+                .children((0..53).map(|week| {
                     div()
-                        .id(SharedString::from(format!("usage-day-{key}")))
+                        .flex()
+                        .flex_col()
+                        .gap(px(2.0))
+                        .children((0..7).map(|day| {
+                            let date = start + chrono::Days::new(week * 7 + day);
+                            let key = date.format("%Y-%m-%d").to_string();
+                            let tokens = report
+                                .days
+                                .iter()
+                                .find(|group| group.label == key)
+                                .map(|group| group.totals.tokens())
+                                .unwrap_or(0);
+                            let fill = activity_fill(theme, tokens, peak);
+                            div()
+                                .id(SharedString::from(format!("usage-day-{key}")))
+                                .size(px(8.0))
+                                .rounded(px(2.0))
+                                .bg(fill)
+                                .cursor_default()
+                                .hover(|cell| cell.border_1().border_color(theme.text))
+                                .tooltip(widgets::text_tooltip_above(format!(
+                                    "{} (UTC): {tokens} tokens",
+                                    date.format("%b %d, %Y")
+                                )))
+                        }))
+                })),
+        )
+        .child(
+            div()
+                .flex()
+                .items_center()
+                .justify_end()
+                .gap(px(4.0))
+                .text_size(px(10.5))
+                .line_height(px(16.0))
+                .text_color(theme.text_muted)
+                .child("Fewer tokens")
+                .children([0, 1, 25, 50, 100].into_iter().map(|tokens| {
+                    div()
                         .size(px(8.0))
                         .rounded(px(2.0))
-                        .bg(fill)
-                        .tooltip(widgets::text_tooltip(format!("{key} · {tokens} tokens")))
+                        .bg(activity_fill(theme, tokens, 100))
                 }))
-        }))
+                .child("More tokens"),
+        )
 }
 
 impl Render for UsagePage {
@@ -506,6 +541,20 @@ impl Render for UsagePage {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn activity_gets_darker_as_daily_tokens_increase() {
+        for theme in [Theme::dark(), Theme::light()] {
+            let low = activity_fill(&theme, 1, 100);
+            let medium = activity_fill(&theme, 25, 100);
+            let high = activity_fill(&theme, 100, 100);
+            assert!(low.l > medium.l && medium.l > high.l);
+            assert_eq!(high.a, 1.0);
+            assert_eq!(high.h, theme.accent.h);
+            assert_eq!(activity_fill(&theme, 0, 0), theme.text_muted.opacity(0.12));
+            assert_eq!(activity_fill(&theme, 100, 0), high);
+        }
+    }
+
     #[test]
     fn formats_tokens_and_agent_time() {
         assert_eq!(number(779_700_000), "779.70M");
