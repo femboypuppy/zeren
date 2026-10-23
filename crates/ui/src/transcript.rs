@@ -8028,7 +8028,7 @@ impl Transcript {
                             )
                             .child(if matches!(detail, ToolDetail::Thought { .. }) {
                                 self.scrolling_thought(
-                                    tool.part_id.clone(),
+                                    tool.part_id.clone().into(),
                                     details[ix].as_ref().unwrap().clone(),
                                     !tool.resolved,
                                     theme,
