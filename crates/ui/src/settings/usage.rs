@@ -59,11 +59,11 @@ pub(crate) fn session_summary(report: &UsageReport, theme: &Theme) -> gpui::Div 
         .child(summary_line(theme,"Output",number(totals.output_tokens)))
         .child(summary_line(theme,"Cached input",number(totals.cached_tokens)))
         .child(summary_line(theme,"Cache creation",number(totals.cache_write_tokens)))
-        .child(summary_line(theme,"Agent time",duration(totals.active_ms)))
+        .child(summary_line(theme,"Turn time",duration(totals.active_ms)))
         .child(summary_line(theme,"Turns",totals.turns.to_string()))
-        .child(summary_line(theme,"Reported cost",totals.cost_usd.map(|cost| format!("${cost:.4}")).unwrap_or_else(|| "Not reported".into())))
+        .child(summary_line(theme,"Estimated cost",totals.cost_usd.map(|cost| format!("${cost:.4}")).unwrap_or_else(|| "Not reported".into())))
         .child(div().mt(px(6.0)).text_size(px(11.0)).text_color(theme.text_muted)
-            .child(format!("Usage reported for {} of {} turns. Cost is provider-reported, not your subscription bill.",totals.reported_turns,totals.turns)))
+            .child(format!("Usage reported for {} of {} turns. Cost is a CLI-reported estimate; subscription charges differ.",totals.reported_turns,totals.turns)))
 }
 fn summary_line(theme: &Theme, label: &str, value: String) -> gpui::Div {
     div()
@@ -253,13 +253,13 @@ impl UsagePage {
             ("Cached input", number(t.cached_tokens)),
             ("Conversations", report.sessions.to_string()),
             ("Turns", t.turns.to_string()),
-            ("Agent time", duration(t.active_ms)),
+            ("Turn time", duration(t.active_ms)),
             ("Peak daily tokens", number(report.peak_day_tokens)),
             ("Longest task", duration(report.longest_task_ms)),
             ("Longest streak", format!("{} days", report.longest_streak)),
             ("Current streak", format!("{} days", report.current_streak)),
             (
-                "Reported cost",
+                "Estimated cost",
                 t.cost_usd
                     .map(|cost| format!("${cost:.2}"))
                     .unwrap_or_else(|| "Not reported".into()),
@@ -267,7 +267,7 @@ impl UsagePage {
         ];
         let mut body = div().flex().flex_col()
             .child(div().mt(px(18.0)).flex().flex_wrap().gap(px(8.0)).children(metrics.into_iter().map(|(label,value)| metric(theme,label,value))))
-            .child(widgets::page_subtitle(theme,format!("Provider-reported usage from {}/{} turns. Missing measurements are not estimates. Dates use UTC; costs may cover only providers that report them.",t.reported_turns,t.turns)))
+            .child(widgets::page_subtitle(theme,format!("Provider-reported usage from {}/{} turns. Missing measurements are not estimates. Dates use UTC; cost estimates cover providers that report them.",t.reported_turns,t.turns)))
             .when(report.totals.turns == 0,|body| body.child(widgets::page_subtitle(theme,"No recorded activity in this window. Usage is saved as you chat in Zeren.")))
             .child(widgets::section_label(theme,"Token activity"))
             .child(activity(report,theme));
@@ -302,7 +302,7 @@ impl UsagePage {
         }
         for (label, groups) in [
             ("By provider", &report.by_provider),
-            ("By model", &report.by_model),
+            ("By session model", &report.by_model),
         ] {
             body = body.child(widgets::section_label(theme, label)).child(
                 widgets::section_card(theme)

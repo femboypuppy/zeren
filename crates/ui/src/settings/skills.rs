@@ -159,7 +159,7 @@ impl Render for SkillsPage {
                     .child(widgets::text_action(&theme,widgets::ActionTone::Solid,if self.busy {"Working…"} else {"Install skills"})
                         .id("skills-install").on_click(cx.listener(|this,_,_,cx|this.install(cx))))
                     .child(widgets::text_action(&theme,widgets::ActionTone::Quiet,"Try Ponytail")
-                        .id("skills-ponytail").on_click(cx.listener(|this,_,_,cx| {this.source.update(cx,|input,cx|input.set_text("https://github.com/DietrichGebert/ponytail".into(),cx));cx.notify();}))))
+                        .id("skills-ponytail").on_click(cx.listener(|this,_,_,cx| {this.source.update(cx,|input,cx|input.set_text("https://github.com/DietrichGebert/ponytail",cx));cx.notify();}))))
                 .child(div().mt(px(10.0)).text_size(px(11.5)).text_color(theme.text_muted)
                     .child("Imports SKILL.md and supporting files into your shared skill library. Repository setup scripts and plugin hooks are not installed.")))
             .child(widgets::text_action(&theme,widgets::ActionTone::Quiet,"Refresh library").id("skills-refresh").mt(px(12.0))

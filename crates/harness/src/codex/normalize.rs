@@ -141,6 +141,7 @@ pub(crate) fn usage_details_event(params: &Value) -> Option<AgentEvent> {
     let last = field(params, &["tokenUsage", "token_usage"])?.get("last")?;
     let cached = field(last, &["cachedInputTokens", "cached_input_tokens"])?.as_u64()?;
     Some(AgentEvent::UsageDetails {
+        cost_session_id: None,
         cached_tokens: cached,
         cache_write_tokens: 0,
         cost_usd: None,
@@ -924,7 +925,8 @@ mod tests {
             Some(AgentEvent::UsageDetails {
                 cached_tokens: 64,
                 cache_write_tokens: 0,
-                cost_usd: None
+                cost_usd: None,
+                cost_session_id: None,
             })
         );
         assert_eq!(

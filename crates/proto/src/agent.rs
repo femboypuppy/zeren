@@ -614,6 +614,9 @@ pub enum AgentEvent {
         cached_tokens: u64,
         cache_write_tokens: u64,
         cost_usd: Option<f64>,
+        /// Present when cost is a running native-session total, not a turn delta.
+        #[serde(default)]
+        cost_session_id: Option<String>,
     },
     /// The agent advertised (or changed) its slash-command set — ACP
     /// `available_commands_update`. The engine caches the latest list per

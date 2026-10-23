@@ -702,6 +702,7 @@ impl Normalizer {
                     output_tokens: f.usage.output_tokens,
                 };
                 let usage_details = AgentEvent::UsageDetails {
+                    cost_session_id: self.session_id.clone(),
                     cached_tokens: f.usage.cache_read_input_tokens,
                     cache_write_tokens: f.usage.cache_creation_input_tokens,
                     cost_usd: f
@@ -876,7 +877,8 @@ mod tests {
         assert!(events.contains(&AgentEvent::UsageDetails {
             cached_tokens: 60,
             cache_write_tokens: 30,
-            cost_usd: Some(0.125)
+            cost_usd: Some(0.125),
+            cost_session_id: None,
         }));
         assert!(matches!(events.last(), Some(AgentEvent::Done { .. })));
     }

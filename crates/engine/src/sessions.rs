@@ -2041,6 +2041,7 @@ async fn drive_run(
     let harness_id = harness.id();
     let mut usage_turn =
         crate::usage::TurnUsage::new(chat_id.clone(), harness_id, request.model.clone());
+    let resumed_cost_session = request.resume.clone();
     let user_prompt = request.prompt.clone();
     let run_cwd = request.cwd.clone();
     if request.resume.is_none() {
@@ -2769,7 +2770,22 @@ async fn drive_run(
                     now_ms()
                 };
                 let record = usage_turn.observe(&id, segment_started, at, &event);
-                if let Err(error) = store.record(record) {
+                let saved = if let AgentEvent::UsageDetails {
+                    cost_session_id: Some(session),
+                    cost_usd: Some(total),
+                    ..
+                } = &event
+                {
+                    store.record_session_cost(
+                        record,
+                        session,
+                        *total,
+                        resumed_cost_session.as_deref() == Some(session),
+                    )
+                } else {
+                    store.record(record)
+                };
+                if let Err(error) = saved {
                     tracing::warn!(%error,"usage snapshot write failed");
                 }
             }

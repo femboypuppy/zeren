@@ -2919,6 +2919,7 @@ async fn usage_snapshots_and_late_billing_update_one_turn_without_reopening_it()
                     output_tokens: 25,
                 },
                 AgentEvent::UsageDetails {
+                    cost_session_id: None,
                     cached_tokens: 64,
                     cache_write_tokens: 0,
                     cost_usd: Some(0.03),

@@ -1,7 +1,7 @@
 //! Private, device-local usage ledger. Provider snapshots replace a turn's
 //! previous snapshot; reconnects and repeated usage notifications never add it twice.
 use chrono::{Days, NaiveDate, Utc};
-use rusqlite::{Connection, params};
+use rusqlite::{Connection, OptionalExtension, params};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -107,7 +107,7 @@ impl TurnUsage {
         started_at: i64,
         now: i64,
         event: &zeren_proto::AgentEvent,
-    ) -> &UsageRecord {
+    ) -> &mut UsageRecord {
         if self.record.as_ref().is_none_or(|record| record.id != id) {
             self.record = Some(UsageRecord {
                 id: id.into(),
@@ -136,10 +136,14 @@ impl TurnUsage {
                 cached_tokens,
                 cache_write_tokens,
                 cost_usd,
+                cost_session_id,
             } => {
                 record.totals.cached_tokens = *cached_tokens;
                 record.totals.cache_write_tokens = *cache_write_tokens;
-                record.totals.cost_usd = cost_usd.filter(|cost| cost.is_finite() && *cost >= 0.0);
+                if cost_session_id.is_none() {
+                    record.totals.cost_usd =
+                        cost_usd.filter(|cost| cost.is_finite() && *cost >= 0.0);
+                }
             }
             _ => {}
         }
@@ -152,7 +156,8 @@ impl UsageStore {
         connection.busy_timeout(std::time::Duration::from_secs(3))?;
         connection.execute_batch("PRAGMA journal_mode=WAL;
             CREATE TABLE IF NOT EXISTS usage_turns (id TEXT PRIMARY KEY, started_at INTEGER NOT NULL, record TEXT NOT NULL);
-            CREATE INDEX IF NOT EXISTS usage_started ON usage_turns(started_at);")?;
+            CREATE INDEX IF NOT EXISTS usage_started ON usage_turns(started_at);
+            CREATE TABLE IF NOT EXISTS usage_cost_baselines (session_id TEXT PRIMARY KEY, latest REAL NOT NULL, base REAL NOT NULL, turn_id TEXT NOT NULL, known INTEGER NOT NULL);")?;
         Ok(Self {
             connection: Mutex::new(connection),
         })
@@ -167,6 +172,53 @@ impl UsageStore {
             ON CONFLICT(id) DO UPDATE SET record=excluded.record",
             params![record.id, record.started_at, serde_json::to_string(record)?],
         )?;
+        Ok(())
+    }
+    /// Atomically convert a native running total into a per-turn estimate.
+    /// An unobserved resumed session establishes a baseline without attributing
+    /// its old spend to today's activity. Repeated snapshots retain one base.
+    pub(crate) fn record_session_cost(
+        &self,
+        record: &mut UsageRecord,
+        session_id: &str,
+        total: f64,
+        restored: bool,
+    ) -> anyhow::Result<()> {
+        if !total.is_finite() || total < 0.0 {
+            return self.record(record);
+        }
+        let mut connection = self
+            .connection
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner);
+        let tx = connection.transaction()?;
+        let previous: Option<(f64, f64, String, bool)> = tx
+            .query_row(
+                "SELECT latest,base,turn_id,known FROM usage_cost_baselines WHERE session_id=?1",
+                [session_id],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+            )
+            .optional()?;
+        let (base, known) = match previous {
+            Some((latest, _, _, _)) if total < latest => {
+                // Crash results may zero the whole snapshot; retain the last
+                // valid baseline instead of charging the session twice later.
+                return Ok(());
+            }
+            Some((_, base, turn, known)) if turn == record.id => (base, known),
+            Some((latest, _, _, _)) => (latest, true),
+            None => (if restored { total } else { 0.0 }, !restored),
+        };
+        record.totals.cost_usd = known.then_some((total - base).max(0.0));
+        tx.execute("INSERT INTO usage_cost_baselines(session_id,latest,base,turn_id,known) VALUES(?1,?2,?3,?4,?5)
+            ON CONFLICT(session_id) DO UPDATE SET latest=excluded.latest,base=excluded.base,turn_id=excluded.turn_id,known=excluded.known",
+            params![session_id,total,base,record.id,known])?;
+        tx.execute(
+            "INSERT INTO usage_turns(id,started_at,record) VALUES(?1,?2,?3)
+            ON CONFLICT(id) DO UPDATE SET record=excluded.record",
+            params![record.id, record.started_at, serde_json::to_string(record)?],
+        )?;
+        tx.commit()?;
         Ok(())
     }
     pub fn report(
@@ -301,6 +353,67 @@ fn streaks(dates: &BTreeSet<NaiveDate>, today: NaiveDate) -> (usize, usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn running_cost_totals_are_differenced_and_survive_restarts() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("usage.sqlite");
+        let store = UsageStore::open(&path).unwrap();
+        let mut turn = TurnUsage::new("chat".into(), HarnessId::ClaudeCode, None);
+        let usage = zeren_proto::AgentEvent::Usage {
+            input_tokens: 100,
+            output_tokens: 20,
+        };
+        let first = turn.observe("first", 1000, 2000, &usage);
+        store
+            .record_session_cost(first, "native", 1.0, false)
+            .unwrap();
+        let second = turn.observe("second", 2000, 3000, &usage);
+        store
+            .record_session_cost(second, "native", 1.5, true)
+            .unwrap();
+        store
+            .record_session_cost(second, "native", 1.7, true)
+            .unwrap();
+        assert!(
+            (store
+                .report(None, None, None)
+                .unwrap()
+                .totals
+                .cost_usd
+                .unwrap()
+                - 1.7)
+                .abs()
+                < 1e-12
+        );
+        drop(store);
+        let store = UsageStore::open(&path).unwrap();
+        let third = turn.observe("third", 3000, 4000, &usage);
+        store
+            .record_session_cost(third, "native", 2.0, true)
+            .unwrap();
+        assert!((third.totals.cost_usd.unwrap() - 0.3).abs() < 1e-12);
+        assert!(
+            (store
+                .report(None, None, None)
+                .unwrap()
+                .totals
+                .cost_usd
+                .unwrap()
+                - 2.0)
+                .abs()
+                < 1e-12
+        );
+        let unknown = turn.observe("old-session-first", 5000, 6000, &usage);
+        store
+            .record_session_cost(unknown, "unobserved", 9.0, true)
+            .unwrap();
+        assert_eq!(unknown.totals.cost_usd, None);
+        let known = turn.observe("old-session-next", 6000, 7000, &usage);
+        store
+            .record_session_cost(known, "unobserved", 9.2, true)
+            .unwrap();
+        assert!((known.totals.cost_usd.unwrap() - 0.2).abs() < 1e-12);
+    }
     #[test]
     fn snapshots_replace_and_reports_filter_without_double_counting() {
         let dir = tempfile::tempdir().unwrap();
