@@ -567,6 +567,12 @@ pub fn sidecar_payload(event: &AgentEvent) -> Option<SidecarPayload> {
 /// Drops: WriteFile content, EditFile old/new strings, WebFetch prompt, Mcp/Unknown input.
 /// Full inputs remain only in the host's local run journal. Idempotent.
 pub fn sanitize_tool_call(call: &ToolCall) -> ToolCall {
+    // Providers use several names and argument shapes for shell execution.
+    // Recognize these before dropping unknown inputs, otherwise the transcript
+    // permanently loses the command and can only display "Tool shell".
+    if let Some(command) = shell_command(call) {
+        return ToolCall::Exec { command };
+    }
     match call {
         ToolCall::WriteFile { path, .. } => ToolCall::WriteFile {
             path: path.clone(),
@@ -592,6 +598,102 @@ pub fn sanitize_tool_call(call: &ToolCall) -> ToolCall {
         },
         other => other.clone(),
     }
+}
+
+fn shell_command(call: &ToolCall) -> Option<String> {
+    let (name, input) = match call {
+        ToolCall::Unknown { name, input } => (name.as_str(), input.as_ref()?),
+        ToolCall::Mcp { tool, input, .. } => (tool.as_str(), input.as_ref()?),
+        _ => return None,
+    };
+    let name = name
+        .rsplit("__")
+        .next()?
+        .rsplit('.')
+        .next()?
+        .to_ascii_lowercase();
+    if !matches!(
+        name.as_str(),
+        "shell"
+            | "powershell"
+            | "pwsh"
+            | "bash"
+            | "terminal"
+            | "exec_command"
+            | "shell_command"
+            | "run_command"
+            | "run_terminal_cmd"
+            | "run_shell_command"
+            | "execute_command"
+            | "bash_tool"
+            | "powershell_tool"
+    ) {
+        return None;
+    }
+    shell_input_command(input, 0)
+}
+
+fn shell_input_command(input: &serde_json::Value, depth: usize) -> Option<String> {
+    if depth > 3 {
+        return None;
+    }
+    if let Some(text) = input.as_str().filter(|text| !text.trim().is_empty()) {
+        if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(text)
+            && parsed.is_object()
+        {
+            return shell_input_command(&parsed, depth + 1);
+        }
+        return Some(text.to_owned());
+    }
+    for key in [
+        "command",
+        "cmd",
+        "script",
+        "CommandLine",
+        "command_line",
+        "commandLine",
+        "commands",
+        "argv",
+    ] {
+        let Some(value) = input.get(key) else {
+            continue;
+        };
+        if let Some(text) = value.as_str().filter(|text| !text.trim().is_empty()) {
+            return Some(text.to_owned());
+        }
+        if let Some(values) = value.as_array().filter(|values| !values.is_empty()) {
+            let args: Option<Vec<&str>> = values.iter().map(serde_json::Value::as_str).collect();
+            let Some(args) = args else {
+                continue;
+            };
+            let command = if key == "commands" {
+                args.join("\n")
+            } else {
+                args.iter()
+                    .map(|arg| {
+                        if arg.is_empty() || arg.chars().any(|ch| ch.is_whitespace() || ch == '"') {
+                            serde_json::to_string(arg).unwrap_or_default()
+                        } else {
+                            (*arg).to_owned()
+                        }
+                    })
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            };
+            if !command.trim().is_empty() {
+                return Some(command);
+            }
+        }
+    }
+    for key in ["arguments", "parameters", "input"] {
+        if let Some(command) = input
+            .get(key)
+            .and_then(|value| shell_input_command(value, depth + 1))
+        {
+            return Some(command);
+        }
+    }
+    None
 }
 
 /// The only slice of a tool input allowed into the doc: a subagent spawn's
@@ -940,6 +1042,95 @@ mod tests {
                 input: None,
             }
         );
+    }
+
+    #[test]
+    fn shell_aliases_keep_the_command_before_unknown_inputs_are_stripped() {
+        for (name, input, expected) in [
+            (
+                "shell",
+                serde_json::json!({"command":"git status --short","token":"private"}),
+                "git status --short",
+            ),
+            (
+                "PowerShell",
+                serde_json::json!({"script":"Get-ChildItem\nGet-Location"}),
+                "Get-ChildItem\nGet-Location",
+            ),
+            (
+                "functions.shell_command",
+                serde_json::json!({"cmd":"git diff"}),
+                "git diff",
+            ),
+            (
+                "mcp__terminal__powershell",
+                serde_json::json!({"arguments":"{\"command\":\"Get-Location\"}"}),
+                "Get-Location",
+            ),
+            (
+                "run_command",
+                serde_json::json!({"parameters":{"CommandLine":"echo hello"}}),
+                "echo hello",
+            ),
+            (
+                "pwsh",
+                serde_json::json!({"commands":["Get-Location","Get-Date"]}),
+                "Get-Location\nGet-Date",
+            ),
+            (
+                "shell",
+                serde_json::json!({"command":["git","log","--format=%s %h"]}),
+                "git log \"--format=%s %h\"",
+            ),
+        ] {
+            let call = ToolCall::Unknown {
+                name: name.into(),
+                input: Some(input),
+            };
+            let clean = sanitize_tool_call(&call);
+            assert_eq!(
+                clean,
+                ToolCall::Exec {
+                    command: expected.into()
+                }
+            );
+            assert_eq!(sanitize_tool_call(&clean), clean);
+        }
+        let call = ToolCall::Mcp {
+            server: "terminal".into(),
+            tool: "powershell".into(),
+            input: Some(serde_json::json!({"command":"Get-Process"})),
+        };
+        assert_eq!(
+            sanitize_tool_call(&call),
+            ToolCall::Exec {
+                command: "Get-Process".into()
+            }
+        );
+    }
+
+    #[test]
+    fn unrelated_and_missing_shell_inputs_stay_stripped() {
+        for (name, input) in [
+            ("SomeTool", serde_json::json!({"command":"private"})),
+            (
+                "shell",
+                serde_json::json!({"prompt":"private","token":"private"}),
+            ),
+            ("powershell", serde_json::json!({"command":"   "})),
+            ("shell", serde_json::json!({"argv":[1,2]})),
+        ] {
+            assert_eq!(
+                sanitize_tool_call(&ToolCall::Unknown {
+                    name: name.into(),
+                    input: Some(input)
+                }),
+                ToolCall::Unknown {
+                    name: name.into(),
+                    input: None
+                }
+            );
+        }
     }
 
     /// A spawn that named no model keeps no input at all — `None`, not an

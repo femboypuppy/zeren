@@ -14982,6 +14982,31 @@ mod tests {
     }
 
     #[test]
+    fn shell_aliases_show_the_command_in_the_chip_and_expanded_invocation() {
+        let command = "Get-ChildItem -Force\nGet-Location";
+        for name in ["shell", "powershell"] {
+            let call = zeren_doc::sanitize_tool_call(&ToolCall::Unknown {
+                name: name.into(),
+                input: Some(serde_json::json!({"command":command})),
+            });
+            let (label, detail) = tool_chip_content(&call);
+            assert_eq!(label, "Run");
+            assert_eq!(detail, "Get-ChildItem -Force Get-Location");
+            let Some(ToolDetail::Output { lines, .. }) = call_block(&call) else {
+                panic!("Shell call has no expanded invocation");
+            };
+            assert_eq!(
+                lines
+                    .iter()
+                    .map(|line| line.as_ref())
+                    .collect::<Vec<&str>>()
+                    .join("\n"),
+                command
+            );
+        }
+    }
+
+    #[test]
     fn multiline_command_flattens_to_one_chip_line() {
         // The user's breaker: a multi-line script in a Run chip. The detail
         // must come out as ONE sanitized line — the chip's fixed 30px card
