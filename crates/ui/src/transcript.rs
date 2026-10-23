@@ -3406,6 +3406,9 @@ impl Transcript {
             .py(px(6.0))
             .text_size(px(TOOL_TEXT_SIZE))
             .overflow_hidden()
+            // The outer GPUI list also handles wheel events. Exclude its
+            // hitbox while the pointer is inside this independent scroll area.
+            .occlude()
             .on_scroll_wheel(|_, _, cx| cx.stop_propagation())
             .child(rows)
             .into_any_element()
