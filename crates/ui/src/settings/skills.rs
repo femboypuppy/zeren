@@ -108,7 +108,7 @@ impl SkillsPage {
                 match result {
                     Ok(installed) => {
                         message = Some(format!(
-                            "Installed {}. Type $ in a chat to choose a skill.",
+                            "Installed {}. Type / in a chat to choose a skill, or /skills to manage your library.",
                             installed
                                 .iter()
                                 .map(|skill| skill.name.as_str())

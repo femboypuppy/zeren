@@ -764,12 +764,12 @@ pub struct SkillCompletionSettings {
 }
 
 impl SkillCompletionSettings {
-    /// Every harness defaults to `$` skills kept out of the `/` menu; an
-    /// explicit per-harness choice (or the legacy slash-menu flag) wins.
+    /// Skills appear under both `/` and `$` unless a per-harness choice
+    /// explicitly separates them from slash commands.
     pub fn for_harness(_harness: zeren_proto::HarnessId) -> Self {
         Self {
             dollar: true,
-            separate_from_slash: true,
+            separate_from_slash: false,
         }
     }
 }
@@ -2153,7 +2153,7 @@ mod tests {
         for (harness, _) in SKILL_COMPLETION_HARNESSES {
             let preferences = settings.skill_completion(harness);
             assert!(preferences.dollar);
-            assert!(preferences.separate_from_slash);
+            assert!(!preferences.separate_from_slash);
         }
         settings.skill_completion_by_harness.insert(
             HarnessId::ClaudeCode,
@@ -2176,6 +2176,11 @@ mod tests {
             loaded.skill_completion_by_harness
         );
         assert!(!loaded.skill_completion(HarnessId::ClaudeCode).dollar);
+        assert!(
+            loaded
+                .skill_completion(HarnessId::ClaudeCode)
+                .separate_from_slash
+        );
         assert!(loaded.skill_completion(HarnessId::Cursor).dollar);
         let legacy: UiSettings = serde_json::from_str(r#"{"skillsInSlashMenu":true}"#).unwrap();
         assert!(
@@ -2187,9 +2192,13 @@ mod tests {
     }
 
     #[test]
-    fn slash_skills_are_opt_in_and_persist() {
+    fn legacy_slash_skill_flag_round_trips_with_skills_available_by_default() {
         let old: UiSettings = serde_json::from_str("{}").unwrap();
         assert!(!old.skills_in_slash_menu);
+        assert!(
+            !old.skill_completion(zeren_proto::HarnessId::ClaudeCode)
+                .separate_from_slash
+        );
         let dir = tempfile::tempdir().unwrap();
         let mut settings = old;
         settings.skills_in_slash_menu = true;

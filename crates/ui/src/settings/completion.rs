@@ -116,17 +116,17 @@ mod completion_tests {
             page.toggle_completion(HarnessId::ClaudeCode, false, cx);
             page.toggle_completion(HarnessId::Opencode, true, cx);
         });
-        // Both default on, so each flip turns its own preference off.
+        // Dollar completion defaults on; separation from slash commands defaults off.
         let loaded = settings::UiSettings::load(dir.path());
         assert!(!loaded.skill_completion(HarnessId::ClaudeCode).dollar);
         assert!(
-            !loaded
+            loaded
                 .skill_completion(HarnessId::ClaudeCode)
                 .separate_from_slash
         );
         assert!(!loaded.skill_completion(HarnessId::Opencode).dollar);
         assert!(
-            loaded
+            !loaded
                 .skill_completion(HarnessId::Opencode)
                 .separate_from_slash
         );

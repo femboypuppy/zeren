@@ -5668,6 +5668,7 @@ pub enum WorkspaceCommand {
     New,
     Resume,
     Settings,
+    Skills,
     Diff,
     Files,
     Terminal,
@@ -5692,6 +5693,12 @@ impl WorkspaceCommand {
                 false,
             ),
             (Self::Settings, "settings", "Zeren: open settings", false),
+            (
+                Self::Skills,
+                "skills",
+                "Zeren: manage installed skills",
+                false,
+            ),
             (Self::Diff, "diff", "Zeren: open changes", true),
             (Self::Files, "files", "Zeren: open project files", true),
             (Self::Terminal, "terminal", "Zeren: open a terminal", true),
@@ -8288,12 +8295,13 @@ impl Composer {
                     continue;
                 };
                 let selected = self.slash.active == Some(row_ix);
-                let name: SharedString = if command.invocation.prefix() == '$' {
-                    skill_display_name(&command.name)
-                } else {
-                    format!("/{}", command.name)
-                }
-                .into();
+                let name: SharedString =
+                    if self.slash.skill && command.invocation.prefix() == '$' {
+                        skill_display_name(&command.name)
+                    } else {
+                        format!("/{}", command.name)
+                    }
+                    .into();
                 let mut description = command.description.clone();
                 if let Some(hint) = &command.input_hint {
                     if description.is_empty() {
@@ -12266,7 +12274,7 @@ mod tests {
             vec![],
         );
         let rows = with_workspace_commands(native, true);
-        assert_eq!(rows.len(), 11);
+        assert_eq!(rows.len(), 12);
         assert!(rows[0].workspace_command.is_none());
         assert_eq!(rows[0].input_hint.as_deref(), Some("model id"));
         assert_eq!(workspace_command_for_text("/model", &rows), None);
@@ -12275,9 +12283,13 @@ mod tests {
             workspace_command_for_text("/zeren:zeren:model", &rows),
             Some(WorkspaceCommand::Model)
         );
-        assert_eq!(with_workspace_commands(rows, true).len(), 11);
+        assert_eq!(with_workspace_commands(rows, true).len(), 12);
         let draft_rows = with_workspace_commands(vec![], false);
-        assert_eq!(draft_rows.len(), 4);
+        assert_eq!(draft_rows.len(), 5);
+        assert_eq!(
+            workspace_command_for_text("/skills", &draft_rows),
+            Some(WorkspaceCommand::Skills)
+        );
         assert_eq!(workspace_command_for_text("/diff", &draft_rows), None);
         assert_eq!(
             workspace_command_for_text("/model  ", &draft_rows),
@@ -12335,6 +12347,16 @@ mod tests {
             assert!(composer.failure.is_none());
         });
         assert_eq!(actions.borrow().len(), 2);
+        composer.update(cx, |composer, cx| {
+            composer
+                .input
+                .update(cx, |input, cx| input.set_text("/skills", cx));
+            composer.update_slash("/skills", 7, cx);
+            composer.on_submit(cx);
+            assert!(composer.input.read(cx).text().is_empty());
+            assert!(composer.failure.is_none());
+        });
+        assert_eq!(actions.borrow().last(), Some(&WorkspaceCommand::Skills));
     }
 
     #[gpui::test]
@@ -13152,6 +13174,12 @@ mod tests {
                             composer.slash_cache[&composer.slash.context]
                                 .iter()
                                 .any(|row| row.name == expected)
+                        );
+                        assert!(
+                            composer.slash_cache[&composer.slash.context]
+                                .iter()
+                                .any(|row| row.name == "review"),
+                            "Skills must appear under both / and $ by default"
                         );
                     }
                 });
@@ -14219,7 +14247,13 @@ mod tests {
             .unwrap();
         cx.update(|cx| {
             crate::settings::update(crate::settings::SavePolicy::Immediate, cx, |s| {
-                s.skills_in_slash_menu = true
+                s.skill_completion_by_harness.insert(
+                    HarnessId::Codex,
+                    crate::settings::SkillCompletionSettings {
+                        dollar: true,
+                        separate_from_slash: true,
+                    },
+                );
             });
         });
         cx.run_until_parked();

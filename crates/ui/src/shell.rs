@@ -12681,6 +12681,7 @@ impl Render for Shell {
                 WorkspaceCommand::New => self.open_new_session(None, cx),
                 WorkspaceCommand::Resume => self.toggle_command_palette(window, cx),
                 WorkspaceCommand::Settings => self.open_last_settings(cx),
+                WorkspaceCommand::Skills => self.open_settings(SettingsSection::Skills, cx),
                 WorkspaceCommand::Diff if !self.active_chat.is_empty() => {
                     self.add_diff_surface(window, cx)
                 }
@@ -15248,6 +15249,7 @@ mod exit_regressions {
         });
         for command in [
             WorkspaceCommand::Settings,
+            WorkspaceCommand::Skills,
             WorkspaceCommand::New,
             WorkspaceCommand::Resume,
             WorkspaceCommand::Model,
@@ -15271,6 +15273,12 @@ mod exit_regressions {
                     match command {
                         WorkspaceCommand::Settings => {
                             assert!(matches!(shell.route, Route::Settings(_)));
+                        }
+                        WorkspaceCommand::Skills => {
+                            assert!(matches!(
+                                shell.route,
+                                Route::Settings(SettingsSection::Skills)
+                            ));
                         }
                         WorkspaceCommand::New => {
                             assert!(matches!(shell.route, Route::Chat));
