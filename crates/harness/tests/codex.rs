@@ -696,9 +696,15 @@ async fn models_discovers_visible_catalog_with_pagination() {
         .models()
         .await
         .expect("fallback models");
-    assert_eq!(fallback.len(), 10);
+    assert_eq!(fallback.len(), 11);
     assert_eq!(fallback[0].id, "gpt-6-astra");
     assert_eq!(fallback[1].id, "gpt-6.1-sol");
+    assert_eq!(fallback[2].id, "gpt-6.1-terra");
+    assert!(
+        fallback[2]
+            .reasoning_levels
+            .contains(&ReasoningLevel::Ultra)
+    );
 
     let missing = CodexHarness::new().with_executable("/nonexistent/codex-nowhere");
     // models() requires a resolvable binary… but with_executable trusts the
@@ -1417,9 +1423,11 @@ async fn native_commands_use_rpc_operations_and_render_results() {
         assert_eq!(completions, 1, "{prompt}");
         assert_eq!(
             text,
-            format!("{expected}
+            format!(
+                "{expected}
 
-"),
+"
+            ),
             "{prompt}: a paragraph of its own"
         );
     }
