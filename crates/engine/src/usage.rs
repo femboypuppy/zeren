@@ -324,6 +324,7 @@ pub fn provider_label(harness: HarnessId) -> &'static str {
         HarnessId::Muse => "Muse Code",
         HarnessId::Fx => "fx",
         HarnessId::Mock => "Mock",
+        HarnessId::Registry(_) => harness.as_str(),
     }
 }
 fn streaks(dates: &BTreeSet<NaiveDate>, today: NaiveDate) -> (usize, usize) {

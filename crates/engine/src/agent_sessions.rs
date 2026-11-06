@@ -512,6 +512,9 @@ fn turn_parts(turn: &Turn) -> Vec<MessagePart> {
                     // History is settled: an unresolved chip would spin forever.
                     resolved: true,
                     output: None,
+                    exit_code: None,
+                    output_truncated: false,
+                    output_lines: None,
                     diff: None,
                     output_ref: None,
                     output_bytes: None,
