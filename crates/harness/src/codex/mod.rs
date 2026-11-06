@@ -1980,7 +1980,8 @@ async fn run_session(session: Session) {
                         if phase == Phase::Completed {
                             let output = match item_type(item) {
                                 "exitedReviewMode" => {
-                                    item.get("review").and_then(Value::as_str).map(str::to_owned)
+                                    item.get("review").and_then(Value::as_str)
+                                        .map(|text| format!("{}\n\n", text.trim_end()))
                                 }
                                 "contextCompaction" => Some("Context compacted.\n\n".to_owned()),
                                 // Plan mode's proposed plan: Codex lifts it
