@@ -63,6 +63,9 @@ icon_assets![
     (MOON, "moon"),
     // Browser globe, drawn in the same linear weight as the toolbar family.
     (GLOBE, "globe"),
+    (CURSOR_SQUARE, "cursor-square"),
+    // The pointer alone: an annotation chip's glyph inside its well.
+    (CURSOR, "cursor"),
     (LAPTOP, "laptop"),
     (PEN_NEW_SQUARE, "pen-new-square"),
     (SORT, "sort"),
@@ -85,6 +88,7 @@ icon_assets![
     (FOLDER_WITH_FILES, "folder-with-files"),
     // Original tree glyph with compact nodes for the independent Files panel.
     (FILE_TREE, "file-tree"),
+    (FOLDER_TREE, "folder-tree"),
     // Hand-drawn floppy disk in the Solar Linear style. Workspace editor save.
     (FLOPPY_DISK, "floppy-disk"),
     // Zeren Icons (icons.zeron.sh): 24px canvas, 1.75px round strokes. The
@@ -96,12 +100,14 @@ icon_assets![
     (PULL_REQUEST, "pull-request"),
     (WORKTREE, "worktree"),
     (PLUS, "plus"),
+    (MINUS, "minus"),
     (ARROW_LEFT, "arrow-left"),
     (ARROW_RIGHT, "arrow-right"),
     (ALT_ARROW_DOWN, "alt-arrow-down"),
     (ALT_ARROW_UP, "alt-arrow-up"),
     (ALT_ARROW_LEFT, "alt-arrow-left"),
     (ALT_ARROW_RIGHT, "alt-arrow-right"),
+    (PULL_REQUEST_DRAFT, "pull-request-draft"),
     // Compact history-ref glyphs, drawn in the same linear style.
     (CLOUD, "cloud"),
     (TAG, "tag"),
@@ -223,9 +229,17 @@ icon_assets![
     (DEVIN_MARK, "devin-mark"),
     (GROK_MARK, "grok-mark"),
     (HERMES_MARK, "hermes-mark"),
+    (FX_MARK, "fx-mark"),
     (PI_MARK, "pi-mark"),
     (OPENCODE_MARK, "opencode-mark"),
+    // GitHub's mark (Octicons `mark-github`, MIT) for the Cloud page's
+    // GitHub connection.
+    (GITHUB_MARK, "github-mark"),
+    // Settings → Billing (drawn to the Solar linear set's 1.5 stroke).
+    (WALLET, "wallet"),
     (ANTIGRAVITY_MARK, "antigravity-mark"),
+    // Muse Code's mark (Meta's infinity), tinted its brand blue at call sites.
+    (MUSE_MARK, "muse-mark"),
 ];
 
 /// Serves both the compact control-icon set and the complete file-identity
@@ -253,9 +267,16 @@ pub fn claude_brand() -> Hsla {
     gpui::rgb(0xD97757).into()
 }
 
+/// The Muse Code mark's brand blue (`#0081FB`), kept like Claude's orange.
+pub fn muse_brand() -> Hsla {
+    gpui::rgb(0x0081FB).into()
+}
+
 /// An icon element for an embedded asset path. Size and colour are set by the
 /// caller (`.size(..)`, `.text_color(..)`), matching the web app's
 /// `[&_svg]:size-4` idiom.
+/// GPUI's SVG painter reads the SVG's own text color; a color on its parent
+/// does not provide the paint input. Always set `.text_color(..)` on the icon.
 pub fn icon(path: &'static str) -> Svg {
     svg().path(path).flex_none()
 }
@@ -301,9 +322,86 @@ pub fn sidebar_glyph(open: f32, right: bool, size: f32, color: Hsla) -> Div {
         .child(panel)
 }
 
+/// The frame every panel toggle shares (`<rect x=3 y=4 w=18 h=16 rx=4
+/// stroke-width=1.75>`), from quads so the strokes stay crisp at 16px.
+fn panel_frame(s: f32, color: Hsla) -> Div {
+    let stroke = 1.75;
+    div()
+        .absolute()
+        .left(px((3.0 - stroke / 2.0) * s))
+        .top(px((4.0 - stroke / 2.0) * s))
+        .w(px((18.0 + stroke) * s))
+        .h(px((16.0 + stroke) * s))
+        .rounded(px((4.0 + stroke / 2.0) * s))
+        .border(px(stroke * s))
+        .border_color(color)
+}
+
+/// The session card toggle: [`sidebar_glyph`]'s frame with a panel in only
+/// its top-right corner, drawn from the same quads so the strokes match the
+/// sidebar toggles beside it.
+pub fn corner_card_glyph(size: f32, color: Hsla) -> Div {
+    let s = size / 24.0;
+    let frame = panel_frame(s, color);
+    // The open sidebar panel's footprint (x 12..17.5 from the right inset),
+    // cut to its top half.
+    let panel = div()
+        .absolute()
+        .top(px(7.5 * s))
+        .right(px(6.5 * s))
+        .w(px(5.5 * s))
+        .h(px(4.5 * s))
+        .rounded(px(0.875 * s))
+        .bg(color);
+    div()
+        .relative()
+        .flex_none()
+        .size(px(size))
+        .child(frame)
+        .child(panel)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pull_request_icons_produce_visible_pixels() {
+        let renderer = gpui::SvgRenderer::new(std::sync::Arc::new(Assets));
+        for path in [
+            PULL_REQUEST,
+            DOCUMENT,
+            FILE_CODE,
+            FOLDER_WITH_FILES,
+            CHECK,
+            CHECKLIST,
+            DANGER_TRIANGLE,
+            CLOCK_CIRCLE,
+            GLOBAL,
+            COPY,
+            REFRESH,
+            ALT_ARROW_LEFT,
+            ALT_ARROW_DOWN,
+            ARROW_UP_RIGHT,
+            EXPAND_ARROWS,
+            COLLAPSE_ARROWS,
+            CHAT_ROUND_LINE,
+            GIT_BRANCH,
+            CLOSE_CIRCLE,
+            FOLDER_TREE,
+        ] {
+            let bytes = Assets.load(path).unwrap().unwrap();
+            let image = renderer.render_single_frame(&bytes, 1.0).unwrap();
+            assert!(
+                image
+                    .as_bytes(0)
+                    .unwrap()
+                    .chunks_exact(4)
+                    .any(|pixel| pixel[3] != 0),
+                "{path} rasterizes to an empty image"
+            );
+        }
+    }
 
     #[test]
     fn every_registered_icon_loads_and_parses() {

@@ -13,7 +13,7 @@ use zeren_doc::{
     MessagePart, MessageRole, MessageStatus, SegmentWriter, SessionCommandEntry,
     SessionCommandPayload, SessionCommandStatus, SessionDoc, SessionMessageEntry, SubagentStatus,
 };
-use zeren_engine::{EngineCore, HarnessRegistry, RunJournal};
+use zeren_engine::{EngineCore, EngineRpc, HarnessRegistry, RunJournal};
 use zeren_harness::mock::MockHarness;
 use zeren_harness::{Harness, HarnessError, RunControls};
 use zeren_proto::{
@@ -36,9 +36,13 @@ fn run_request(prompt: &str) -> RunRequest {
         cwd: "/tmp".into(),
         sandbox: SandboxLevel::WorkspaceWrite,
         auto_approve: true,
+        access: Default::default(),
+        plan: false,
         attachments: Vec::new(),
         worktree: None,
         resume: None,
+        env: Default::default(),
+        extra_mcp: Vec::new(),
     }
 }
 
@@ -75,6 +79,7 @@ fn mock_script() -> Vec<AgentEvent> {
             is_error: false,
             output: None,
             diff: None,
+            exit_code: None,
         },
         done(DoneStatus::Completed),
     ]
@@ -765,6 +770,39 @@ async fn interrupt_stamps_streaming_entry_aborted() {
         core.sessions.session_status(CHAT).map(|s| s.status),
         Some(SessionStatus::Idle)
     );
+    assert_eq!(
+        core.sessions
+            .session_status(CHAT)
+            .unwrap()
+            .last_turn_outcome
+            .map(|o| o.status),
+        Some(DoneStatus::Interrupted)
+    );
+    wait_for(
+        || {
+            core.sessions.watch_sessions().borrow().iter().any(|s| {
+                s.chat_id == CHAT
+                    && s.last_turn_outcome
+                        .is_some_and(|o| o.status == DoneStatus::Interrupted)
+            })
+        },
+        "interrupted activity projection",
+    )
+    .await;
+    let tools = zeren_mcp::Tools::new(Arc::new(zeren_mcp::Zeren::with_client(
+        zeren_rpc::memory_client(core.rpc_service()),
+        zeren_mcp::Origin::default(),
+    )));
+    let waited = tools
+        .call(
+            "wait_for_turn",
+            serde_json::json!({"chat":CHAT,"timeout_secs":1}),
+        )
+        .await
+        .unwrap();
+    assert_eq!(waited["turn"]["outcome"], "interrupted");
+    assert_eq!(waited["turn"]["status"], "idle");
+    core.shutdown().await;
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -1299,6 +1337,9 @@ fn spawn_chip(id: &str, status: SubagentStatus) -> MessagePart {
         subagent_ref: Some(format!("{CHAT}--sub--{id}")),
         subagent_status: Some(status),
         subagent_tail: None,
+        exit_code: None,
+        output_truncated: false,
+        output_lines: None,
     }
 }
 
@@ -1541,38 +1582,175 @@ async fn rpc_surface_over_in_memory_transport() {
     }
 }
 
+/// Harness that asks one question through RunControls and echoes the answer —
+/// "picked none" when the question closed without one.
+struct EchoAnswerHarness;
+#[async_trait]
+impl Harness for EchoAnswerHarness {
+    fn id(&self) -> HarnessId {
+        HarnessId::Mock
+    }
+    fn display_name(&self) -> &str {
+        "Asking"
+    }
+    fn supports_steering(&self) -> bool {
+        false
+    }
+    fn steering_mode(&self) -> SteeringMode {
+        SteeringMode::TurnBoundary
+    }
+    fn reasoning_levels(&self) -> &[ReasoningLevel] {
+        &[]
+    }
+    async fn models(&self) -> Result<Vec<Model>, HarnessError> {
+        Ok(vec![])
+    }
+    async fn run(
+        &self,
+        _request: RunRequest,
+        controls: RunControls,
+    ) -> Result<BoxStream<'static, Result<AgentEvent, HarnessError>>, HarnessError> {
+        let (tx, rx) = tokio::sync::mpsc::channel::<Result<AgentEvent, HarnessError>>(16);
+        tokio::spawn(async move {
+            let answers = (controls.request_input)(vec![zeren_proto::UserInputQuestion {
+                id: "q1".into(),
+                header: "Pick".into(),
+                question: "Which one?".into(),
+                options: vec!["a".into(), "b".into()],
+                prefill: None,
+                multiline: false,
+                multi_select: false,
+            }])
+            .await
+            .unwrap_or_default();
+            let picked = answers
+                .first()
+                .and_then(|a| a.labels.first().cloned())
+                .unwrap_or_else(|| "none".into());
+            let _ = tx
+                .send(Ok(AgentEvent::TextDelta {
+                    text: format!("picked {picked}"),
+                }))
+                .await;
+            let _ = tx.send(Ok(done(DoneStatus::Completed))).await;
+        });
+        Ok(futures::stream::unfold(rx, |mut rx| async move {
+            rx.recv().await.map(|event| (event, rx))
+        })
+        .boxed())
+    }
+}
+
+/// The input part a settled transcript records for [`EchoAnswerHarness`]'s
+/// question.
+fn recorded_answers(core: &EngineCore) -> Option<Vec<zeren_proto::UserInputAnswer>> {
+    entries(core).iter().find_map(|e| {
+        e.parts.iter().find_map(|p| match p {
+            MessagePart::Input {
+                resolved: true,
+                answers,
+                ..
+            } => answers.clone(),
+            _ => None,
+        })
+    })
+}
+
 #[tokio::test]
-async fn respond_input_resolves_pending_question() {
-    // Harness that asks a question through RunControls and echoes the answer.
-    struct AskingHarness;
-    #[async_trait]
-    impl Harness for AskingHarness {
-        fn id(&self) -> HarnessId {
-            HarnessId::Mock
+async fn closing_a_question_unanswered_declines_and_records_it() {
+    let dir = tempfile::tempdir().unwrap();
+    let core = assemble(dir.path(), Arc::new(EchoAnswerHarness));
+    let handle = core.doc_host.open(CHAT).unwrap();
+    queue_as_viewer(
+        handle.doc(),
+        "cmd-run-close",
+        SessionCommandPayload::Run {
+            request: run_request("ask me"),
+            message_id: "m-1".into(),
+        },
+    );
+    wait_for(
+        || {
+            core.sessions.session_status(CHAT).map(|s| s.status)
+                == Some(SessionStatus::AwaitingInput)
+        },
+        "awaiting input",
+    )
+    .await;
+    let request_id = loop {
+        let open = entries_now(&core).iter().find_map(|e| {
+            e.parts.iter().find_map(|p| match p {
+                MessagePart::Input {
+                    request_id,
+                    resolved: false,
+                    ..
+                } => Some(request_id.clone()),
+                _ => None,
+            })
+        });
+        if let Some(id) = open {
+            break id;
         }
-        fn display_name(&self) -> &str {
-            "Asking"
-        }
-        fn supports_steering(&self) -> bool {
-            false
-        }
-        fn steering_mode(&self) -> SteeringMode {
-            SteeringMode::TurnBoundary
-        }
-        fn reasoning_levels(&self) -> &[ReasoningLevel] {
-            &[]
-        }
-        async fn models(&self) -> Result<Vec<Model>, HarnessError> {
-            Ok(vec![])
-        }
-        async fn run(
-            &self,
-            _request: RunRequest,
-            controls: RunControls,
-        ) -> Result<BoxStream<'static, Result<AgentEvent, HarnessError>>, HarnessError> {
-            let (tx, rx) = tokio::sync::mpsc::channel::<Result<AgentEvent, HarnessError>>(16);
-            tokio::spawn(async move {
-                let answers = (controls.request_input)(vec![zeren_proto::UserInputQuestion {
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    };
+
+    // Closing the panel sends no answers: the run unblocks with nothing
+    // picked, and the chip records the question closed, not pending.
+    queue_as_viewer(
+        handle.doc(),
+        "cmd-close",
+        SessionCommandPayload::RespondInput {
+            request_id,
+            answers: vec![],
+        },
+    );
+    wait_for(
+        || {
+            entries_now(&core).iter().any(|e| {
+                e.status == Some(MessageStatus::Complete)
+                    && e.parts.iter().any(
+                        |p| matches!(p, MessagePart::Text { text, .. } if text == "picked none"),
+                    )
+            })
+        },
+        "turn to continue without an answer",
+    )
+    .await;
+    assert_eq!(
+        command_status(&core, "cmd-close"),
+        Some((SessionCommandStatus::Applied, None))
+    );
+    assert_eq!(recorded_answers(&core), Some(vec![]));
+    wait_for(
+        || core.sessions.session_status(CHAT).map(|s| s.status) == Some(SessionStatus::Idle),
+        "session to settle idle",
+    )
+    .await;
+}
+
+/// A question whose run already died, closed without an answer: the chip
+/// records it closed, and no turn starts just to say so.
+#[tokio::test]
+async fn closing_a_dead_runs_question_records_it_without_a_new_turn() {
+    let dir = tempfile::tempdir().unwrap();
+    let core = assemble(
+        dir.path(),
+        Arc::new(MockHarness {
+            script: mock_script(),
+        }),
+    );
+    let handle = core.doc_host.open(CHAT).unwrap();
+    // The orphan: a settled entry still holding an open question, with no
+    // live resolver behind it.
+    handle
+        .doc()
+        .push_message(&SessionMessageEntry {
+            id: "old-assistant".into(),
+            role: MessageRole::Assistant,
+            parts: vec![MessagePart::Input {
+                id: "req-dead".into(),
+                request_id: "req-dead".into(),
+                questions: vec![zeren_proto::UserInputQuestion {
                     id: "q1".into(),
                     header: "Pick".into(),
                     question: "Which one?".into(),
@@ -1580,29 +1758,51 @@ async fn respond_input_resolves_pending_question() {
                     prefill: None,
                     multiline: false,
                     multi_select: false,
-                }])
-                .await
-                .unwrap_or_default();
-                let picked = answers
-                    .first()
-                    .and_then(|a| a.labels.first().cloned())
-                    .unwrap_or_else(|| "none".into());
-                let _ = tx
-                    .send(Ok(AgentEvent::TextDelta {
-                        text: format!("picked {picked}"),
-                    }))
-                    .await;
-                let _ = tx.send(Ok(done(DoneStatus::Completed))).await;
-            });
-            Ok(futures::stream::unfold(rx, |mut rx| async move {
-                rx.recv().await.map(|event| (event, rx))
-            })
-            .boxed())
-        }
-    }
+                }],
+                resolved: false,
+                answers: None,
+            }],
+            created_at: 1,
+            device_id: core.device_id.clone(),
+            status: Some(MessageStatus::Complete),
+            continuation_of: None,
+            duration_ms: None,
+        })
+        .unwrap();
+    queue_as_viewer(
+        handle.doc(),
+        "cmd-close-dead",
+        SessionCommandPayload::RespondInput {
+            request_id: "req-dead".into(),
+            answers: vec![],
+        },
+    );
+    wait_for(
+        || {
+            command_status(&core, "cmd-close-dead")
+                .is_some_and(|(status, _)| status != SessionCommandStatus::Pending)
+        },
+        "the close to apply",
+    )
+    .await;
+    assert_eq!(
+        command_status(&core, "cmd-close-dead"),
+        Some((
+            SessionCommandStatus::Applied,
+            Some("closed unanswered".into())
+        ))
+    );
+    assert_eq!(recorded_answers(&core), Some(vec![]));
+    // Nothing was dispatched: no turn follows the old entry.
+    tokio::time::sleep(Duration::from_millis(200)).await;
+    assert_eq!(entries(&core).len(), 1);
+    core.shutdown().await;
+}
 
+#[tokio::test]
+async fn respond_input_resolves_pending_question() {
     let dir = tempfile::tempdir().unwrap();
-    let core = assemble(dir.path(), Arc::new(AskingHarness));
+    let core = assemble(dir.path(), Arc::new(EchoAnswerHarness));
     let handle = core.doc_host.open(CHAT).unwrap();
     queue_as_viewer(
         handle.doc(),
@@ -1678,12 +1878,14 @@ async fn respond_input_resolves_pending_question() {
         command_status(&core, "cmd-answer-1"),
         Some((SessionCommandStatus::Applied, None))
     );
-    // The input part is marked resolved in the doc.
-    assert!(entries(&core).iter().any(|e| {
-        e.parts
-            .iter()
-            .any(|p| matches!(p, MessagePart::Input { resolved: true, .. }))
-    }));
+    // The input part is marked resolved and records what the run received.
+    assert_eq!(
+        recorded_answers(&core),
+        Some(vec![zeren_proto::UserInputAnswer {
+            question_id: "q1".into(),
+            labels: vec!["b".into()],
+        }])
+    );
     // The run task writes the Complete entry BEFORE settling the status row —
     // wait for the transition instead of asserting the instant in between.
     wait_for(
@@ -2438,9 +2640,13 @@ async fn real_claude_sees_uploaded_image_inline() {
         cwd: cwd.to_string_lossy().to_string(),
         sandbox: SandboxLevel::WorkspaceWrite,
         auto_approve: false,
+        access: Default::default(),
+        plan: false,
         attachments: vec![path],
         resume: None,
         worktree: None,
+        env: Default::default(),
+        extra_mcp: Vec::new(),
     };
     core.doc_host
         .queue_command(
@@ -2584,6 +2790,8 @@ async fn parked_session_ignores_trailing_frames_and_stays_idle() {
     script.push(AgentEvent::TextDelta {
         text: "trailing flush".into(),
     });
+    // Retiring the parked runtime does not cancel the already completed turn.
+    script.push(done(DoneStatus::Interrupted));
     let dir = tempfile::tempdir().unwrap();
     let core = assemble(dir.path(), Arc::new(MockHarness { script }));
     let handle = core.doc_host.open(CHAT).unwrap();
@@ -2610,6 +2818,15 @@ async fn parked_session_ignores_trailing_frames_and_stays_idle() {
             core.sessions.session_status(CHAT).map(|s| s.status),
             Some(SessionStatus::Idle),
             "trailing frames must not re-arm Working"
+        );
+        assert_eq!(
+            core.sessions
+                .session_status(CHAT)
+                .unwrap()
+                .last_turn_outcome
+                .map(|o| o.status),
+            Some(DoneStatus::Completed),
+            "parked teardown must preserve the real turn outcome"
         );
         let all = entries_now(&core);
         assert!(
@@ -2667,6 +2884,7 @@ async fn stale_tool_echo_after_steer_boundary_does_not_split_text() {
             is_error: false,
             output: None,
             diff: None,
+            exit_code: None,
         },
         AgentEvent::TextDelta { text: "two".into() },
         done(DoneStatus::Completed),
@@ -3070,6 +3288,7 @@ async fn generated_image_is_materialized_before_publication_and_survives_reopen(
             is_error: false,
             output: None,
             diff: None,
+            exit_code: None,
         },
         image.clone(),
         image.clone(),
@@ -3117,7 +3336,9 @@ async fn generated_image_is_materialized_before_publication_and_survives_reopen(
         })
         .collect();
     assert_eq!(images.len(), 1);
-    assert!(std::path::Path::new(&images[0]).starts_with(uploads.dir()));
+    // Materialization canonicalizes the uploads dir; macOS temp dirs sit
+    // behind the /var -> /private/var symlink.
+    assert!(std::path::Path::new(&images[0]).starts_with(uploads.dir().canonicalize().unwrap()));
     let serialized = serde_json::to_string(&journal.replay(CHAT, 0).unwrap()).unwrap();
     assert!(!serialized.contains(source.to_str().unwrap()));
     assert!(!serialized.contains("BASE64_SENTINEL"));
@@ -3286,4 +3507,542 @@ async fn start_failure_lands_in_the_transcript() {
         [MessagePart::Error { message, .. }] if message.contains("server never booted")
     ));
     core.sessions.shutdown().await;
+}
+
+/// The session row carries how many subagents are streaming, so sidebars on
+/// every device can badge a chat they have not opened.
+#[tokio::test(flavor = "multi_thread")]
+async fn session_row_counts_running_subagents_until_the_run_ends() {
+    fn spawn(id: &str) -> AgentEvent {
+        AgentEvent::ToolCall {
+            id: id.into(),
+            call: ToolCall::Unknown {
+                name: "Agent: probe".into(),
+                input: None,
+            },
+        }
+    }
+    fn chatter(parent: &str) -> AgentEvent {
+        AgentEvent::Subagent {
+            parent_tool_use_id: parent.into(),
+            event: Box::new(AgentEvent::TextDelta {
+                text: "working".into(),
+            }),
+        }
+    }
+    let dir = tempfile::tempdir().unwrap();
+    let core = assemble(
+        dir.path(),
+        Arc::new(ScriptedHarness {
+            script: vec![
+                spawn("sub-1"),
+                spawn("sub-2"),
+                chatter("sub-1"),
+                chatter("sub-2"),
+                AgentEvent::Subagent {
+                    parent_tool_use_id: "sub-1".into(),
+                    event: Box::new(done(DoneStatus::Completed)),
+                },
+            ],
+            step_delay: Duration::from_millis(400),
+            hang_until_interrupt: true,
+        }),
+    );
+    let running = || {
+        core.sessions
+            .session_status(CHAT)
+            .map(|s| s.running_subagents)
+    };
+    let handle = core.doc_host.open(CHAT).unwrap();
+    queue_as_viewer(
+        handle.doc(),
+        "subagents-run",
+        SessionCommandPayload::Run {
+            request: run_request("fan out"),
+            message_id: "subagents-user".into(),
+        },
+    );
+
+    wait_for(|| running() == Some(2), "both subagents counted").await;
+    wait_for(|| running() == Some(1), "one subagent settled").await;
+
+    queue_as_viewer(
+        handle.doc(),
+        "subagents-interrupt",
+        SessionCommandPayload::Interrupt {},
+    );
+    wait_for(
+        || core.sessions.session_status(CHAT).map(|s| s.status) == Some(SessionStatus::Idle),
+        "run to end",
+    )
+    .await;
+    assert_eq!(
+        running(),
+        Some(0),
+        "an ended run leaves no subagents counted"
+    );
+}
+
+/// A harness whose first turn streams whatever the test sends, so the turn
+/// stays live while the test publishes into it; later turns run the mock.
+struct HoldsTurn {
+    events: std::sync::Mutex<Option<tokio::sync::mpsc::UnboundedReceiver<AgentEvent>>>,
+}
+
+#[async_trait]
+impl Harness for HoldsTurn {
+    fn id(&self) -> HarnessId {
+        HarnessId::Mock
+    }
+    fn display_name(&self) -> &str {
+        "Held turn"
+    }
+    fn supports_steering(&self) -> bool {
+        true
+    }
+    fn steering_mode(&self) -> SteeringMode {
+        SteeringMode::StepBoundary
+    }
+    fn reasoning_levels(&self) -> &[ReasoningLevel] {
+        &[]
+    }
+    async fn models(&self) -> Result<Vec<Model>, HarnessError> {
+        Ok(vec![])
+    }
+    async fn run(
+        &self,
+        request: RunRequest,
+        controls: RunControls,
+    ) -> Result<BoxStream<'static, Result<AgentEvent, HarnessError>>, HarnessError> {
+        let events = self.events.lock().unwrap().take();
+        match events {
+            Some(events) => Ok(futures::stream::unfold(events, |mut rx| async move {
+                rx.recv().await.map(|event| (Ok(event), rx))
+            })
+            .boxed()),
+            None => {
+                MockHarness {
+                    script: mock_script(),
+                }
+                .run(request, controls)
+                .await
+            }
+        }
+    }
+}
+
+/// `show_visual` end to end below the MCP server: the RPC checks the script,
+/// stores it, and folds a visual part into the chat's live turn, after what
+/// the harness streamed; a broken script or no live turn is refused and
+/// stores nothing.
+#[tokio::test]
+async fn publish_visual_lands_in_the_live_turn() {
+    let (tx, rx) = tokio::sync::mpsc::unbounded_channel();
+    let dir = tempfile::tempdir().unwrap();
+    let core = assemble(
+        dir.path(),
+        Arc::new(HoldsTurn {
+            events: std::sync::Mutex::new(Some(rx)),
+        }),
+    );
+    let client = zeren_rpc::memory_client(core.rpc_service());
+    const SCRIPT: &str = r#"return ui.text { "chart", size = "lg" }"#;
+    let publish = |chat: &str, script: &str| {
+        client.call(
+            zeren_rpc::methods::PUBLISH_VISUAL,
+            serde_json::json!({
+                "chatId": chat,
+                "title": "  Latency  ",
+                "script": script,
+            }),
+        )
+    };
+    assert!(publish(CHAT, SCRIPT).await.is_err(), "no live turn yet");
+
+    core.sessions
+        .dispatch(CHAT, HarnessId::Mock, run_request("chart please"), None)
+        .await
+        .unwrap();
+    tx.send(mock_script()[0].clone()).unwrap();
+    tx.send(AgentEvent::TextDelta {
+        text: "Building it.".into(),
+    })
+    .unwrap();
+    wait_for(|| core.sessions.turn_in_flight(CHAT), "turn starts").await;
+    let broken = publish(CHAT, "return ui.text { 'x', color = '#f00' }")
+        .await
+        .unwrap_err()
+        .to_string();
+    assert!(broken.contains("theme tokens"), "{broken}");
+    let shown = publish(CHAT, SCRIPT).await.expect("PublishVisual");
+    assert_eq!(shown["title"], "Latency");
+    tx.send(AgentEvent::TextDelta {
+        text: "Uploads dominate.".into(),
+    })
+    .unwrap();
+    tx.send(done(DoneStatus::Completed)).unwrap();
+    wait_for(
+        || {
+            entries(&core).iter().any(|e| {
+                e.parts
+                    .iter()
+                    .any(|p| matches!(p, MessagePart::Visual { .. }))
+            }) && !core.sessions.turn_in_flight(CHAT)
+        },
+        "visual folded",
+    )
+    .await;
+    let parts: Vec<MessagePart> = entries(&core)
+        .into_iter()
+        .filter(|e| e.role == MessageRole::Assistant)
+        .flat_map(|e| e.parts)
+        .collect();
+    let at = parts
+        .iter()
+        .position(|p| matches!(p, MessagePart::Visual { .. }))
+        .unwrap();
+    let MessagePart::Visual { path, title, .. } = &parts[at] else {
+        unreachable!()
+    };
+    assert_eq!(title, "Latency");
+    assert_eq!(std::fs::read_to_string(path).unwrap(), SCRIPT);
+    assert_eq!(
+        parts
+            .iter()
+            .filter(|p| matches!(p, MessagePart::Visual { .. }))
+            .count(),
+        1,
+        "the broken script left no part"
+    );
+    assert!(
+        matches!(&parts[at - 1], MessagePart::Text { text, .. } if text.ends_with("Building it.")),
+        "the page follows what streamed before it: {parts:?}"
+    );
+    assert!(
+        matches!(&parts[at + 1], MessagePart::Text { text, .. } if text == "Uploads dominate."),
+        "{parts:?}"
+    );
+    core.shutdown().await;
+}
+
+/// `show_image` end to end below the MCP server: the RPC checks the bytes are
+/// an image, stores them in uploads, and folds an image part into the chat's
+/// live turn, after what the harness streamed (not through the generated-image
+/// intake, whose root the stored copy is outside); a non-image or no live turn
+/// is refused and stores nothing.
+#[tokio::test]
+async fn publish_image_lands_in_the_live_turn() {
+    use base64::Engine as _;
+    let (tx, rx) = tokio::sync::mpsc::unbounded_channel();
+    let dir = tempfile::tempdir().unwrap();
+    let core = assemble(
+        dir.path(),
+        Arc::new(HoldsTurn {
+            events: std::sync::Mutex::new(Some(rx)),
+        }),
+    );
+    let client = zeren_rpc::memory_client(core.rpc_service());
+    let png = {
+        let mut bytes = std::io::Cursor::new(Vec::new());
+        image::DynamicImage::new_rgb8(3, 2)
+            .write_to(&mut bytes, image::ImageFormat::Png)
+            .unwrap();
+        bytes.into_inner()
+    };
+    let publish = |bytes: &[u8]| {
+        client.call(
+            zeren_rpc::methods::PUBLISH_IMAGE,
+            serde_json::json!({
+                "chatId": CHAT,
+                "name": "before.png",
+                "data": base64::engine::general_purpose::STANDARD.encode(bytes),
+            }),
+        )
+    };
+    assert!(publish(&png).await.is_err(), "no live turn yet");
+
+    core.sessions
+        .dispatch(CHAT, HarnessId::Mock, run_request("show me"), None)
+        .await
+        .unwrap();
+    tx.send(mock_script()[0].clone()).unwrap();
+    tx.send(AgentEvent::TextDelta {
+        text: "Here it is.".into(),
+    })
+    .unwrap();
+    wait_for(|| core.sessions.turn_in_flight(CHAT), "turn starts").await;
+    let refused = publish(b"plain text").await.unwrap_err().to_string();
+    assert!(refused.contains("not a PNG"), "{refused}");
+    let shown = publish(&png).await.expect("PublishImage");
+    assert_eq!(shown["name"], "before.png");
+    assert_eq!(shown["mimeType"], "image/png");
+    tx.send(AgentEvent::TextDelta {
+        text: "Card 4 is clipped.".into(),
+    })
+    .unwrap();
+    tx.send(done(DoneStatus::Completed)).unwrap();
+    wait_for(
+        || {
+            entries(&core).iter().any(|e| {
+                e.parts
+                    .iter()
+                    .any(|p| matches!(p, MessagePart::Image { .. }))
+            }) && !core.sessions.turn_in_flight(CHAT)
+        },
+        "image folded",
+    )
+    .await;
+    let parts: Vec<MessagePart> = entries(&core)
+        .into_iter()
+        .filter(|e| e.role == MessageRole::Assistant)
+        .flat_map(|e| e.parts)
+        .collect();
+    let at = parts
+        .iter()
+        .position(|p| matches!(p, MessagePart::Image { .. }))
+        .unwrap();
+    let MessagePart::Image {
+        path,
+        name,
+        mime_type,
+        ..
+    } = &parts[at]
+    else {
+        unreachable!()
+    };
+    assert_eq!(
+        (name.as_str(), mime_type.as_str()),
+        ("before.png", "image/png")
+    );
+    assert!(
+        std::path::Path::new(path).starts_with(core.uploads.dir()),
+        "stored in uploads: {path}"
+    );
+    assert_eq!(std::fs::read(path).unwrap(), png);
+    assert_eq!(
+        parts
+            .iter()
+            .filter(|p| matches!(p, MessagePart::Image { .. }))
+            .count(),
+        1,
+        "the refused file left no part"
+    );
+    assert!(
+        matches!(&parts[at - 1], MessagePart::Text { text, .. } if text.ends_with("Here it is.")),
+        "the image follows what streamed before it: {parts:?}"
+    );
+    assert!(
+        matches!(&parts[at + 1], MessagePart::Text { text, .. } if text == "Card 4 is clipped."),
+        "{parts:?}"
+    );
+    assert!(
+        !parts.iter().any(|p| matches!(p, MessagePart::Error { .. })),
+        "no intake error: {parts:?}"
+    );
+    core.shutdown().await;
+}
+
+/// An image a reply names in Markdown reads only from inside that one chat's
+/// working folder, and never through a folder that would open too much:
+/// home or above, Zeren's own data, a chat another device runs.
+#[tokio::test]
+async fn chat_images_come_only_from_their_chats_own_folder() {
+    use base64::Engine as _;
+    let dir = tempfile::tempdir().unwrap();
+    let core = assemble(
+        dir.path(),
+        Arc::new(HoldsTurn {
+            events: std::sync::Mutex::new(None),
+        }),
+    );
+    let client = zeren_rpc::memory_client(core.rpc_service());
+    let png = {
+        let mut bytes = std::io::Cursor::new(Vec::new());
+        image::DynamicImage::new_rgb8(3, 2)
+            .write_to(&mut bytes, image::ImageFormat::Png)
+            .unwrap();
+        bytes.into_inner()
+    };
+    let (ours, theirs) = (tempfile::tempdir().unwrap(), tempfile::tempdir().unwrap());
+    let before = ours.path().join("before.png");
+    let after = theirs.path().join("after.png");
+    std::fs::write(&before, &png).unwrap();
+    std::fs::write(&after, &png).unwrap();
+    let here = core.device_id.clone();
+    let folder = |path: &std::path::Path| Some(path.to_string_lossy().into_owned());
+    for (chat, device, cwd) in [
+        ("ours", here.as_str(), folder(ours.path())),
+        ("theirs", here.as_str(), folder(theirs.path())),
+        // `/`, or a drive (`C:\`) on Windows, where `/` isn't absolute.
+        (
+            "root",
+            here.as_str(),
+            folder(dir.path().ancestors().last().unwrap()),
+        ),
+        ("data", here.as_str(), folder(dir.path())),
+        ("remote", "another-device", folder(ours.path())),
+        (
+            "scratch",
+            here.as_str(),
+            Some("~/.zeren/scratch/2026-10-25-a1b2c3d4".into()),
+        ),
+    ] {
+        core.workspace
+            .create_chat(chat, None, Some(device), None, cwd)
+            .unwrap();
+    }
+    let read = |chat: &str, path: &std::path::Path| {
+        client.call(
+            zeren_rpc::methods::READ_CHAT_IMAGE_CHUNK,
+            serde_json::json!({ "chatId": chat, "path": path, "offset": 0 }),
+        )
+    };
+    let chunk = read("ours", &before).await.expect("its own folder");
+    let data = chunk["data"].as_str().unwrap();
+    assert_eq!(
+        base64::engine::general_purpose::STANDARD
+            .decode(data)
+            .unwrap(),
+        png
+    );
+    assert_eq!(chunk["mimeType"], "image/png");
+    assert!(read("theirs", &after).await.is_ok());
+    // A projectless chat's scratch folder is named, never created, by a read.
+    let scratch = dir.path().join("scratch").join("2026-10-25-a1b2c3d4");
+    let refused = read("scratch", &scratch.join("x.png")).await.unwrap_err();
+    assert!(refused.to_string().contains("doesn't exist"), "{refused}");
+    assert!(!scratch.exists());
+    std::fs::create_dir_all(&scratch).unwrap();
+    std::fs::write(scratch.join("x.png"), &png).unwrap();
+    assert!(read("scratch", &scratch.join("x.png")).await.is_ok());
+    for (chat, path, why) in [
+        ("ours", after.as_path(), "outside the chat's folder"),
+        ("theirs", before.as_path(), "outside the chat's folder"),
+        ("root", before.as_path(), "home folder, above it"),
+        ("data", before.as_path(), "around Zeren's data"),
+        ("remote", before.as_path(), "another device"),
+        ("missing", before.as_path(), "chat not found"),
+    ] {
+        let error = read(chat, path).await.expect_err(chat).to_string();
+        assert!(error.contains(why), "{chat}: {error}");
+    }
+    core.shutdown().await;
+}
+
+/// A command's whole output comes from the host's run journal on request
+/// (`ReadToolOutput`), redacted as the doc's ten-line tail is; the doc says
+/// how many lines there are. Only the chat's host answers, and only for a
+/// command.
+#[tokio::test]
+async fn a_commands_whole_output_is_read_from_its_hosts_journal() {
+    let dir = tempfile::tempdir().unwrap();
+    let output: String = (1..=300)
+        .map(|i| format!("test case_{i} ... ok\n"))
+        .collect::<String>()
+        + "export GITHUB_TOKEN=ghp_abcdefghijklmnopqrstuvwxyz0123456789\n";
+    let core = assemble(
+        dir.path(),
+        Arc::new(ScriptedHarness {
+            script: vec![
+                AgentEvent::ToolCall {
+                    id: "t1".into(),
+                    call: ToolCall::Exec {
+                        command: "cargo test".into(),
+                    },
+                },
+                AgentEvent::ToolResult {
+                    id: "t1".into(),
+                    is_error: false,
+                    output: Some(output.clone()),
+                    diff: None,
+                    exit_code: Some(0),
+                },
+                AgentEvent::ToolCall {
+                    id: "r1".into(),
+                    call: ToolCall::ReadFile {
+                        path: "/w/a.rs".into(),
+                    },
+                },
+                AgentEvent::ToolResult {
+                    id: "r1".into(),
+                    is_error: false,
+                    output: Some("fn main() {}".into()),
+                    diff: None,
+                    exit_code: None,
+                },
+                done(DoneStatus::Completed),
+            ],
+            step_delay: Duration::from_millis(5),
+            hang_until_interrupt: false,
+        }),
+    );
+    let here = core.device_id.clone();
+    core.workspace
+        .create_chat(CHAT, None, Some(&here), None, None)
+        .unwrap();
+    core.workspace
+        .create_chat("remote", None, Some("another-device"), None, None)
+        .unwrap();
+    let handle = core.doc_host.open(CHAT).unwrap();
+    queue_as_viewer(
+        handle.doc(),
+        "cmd-run-output",
+        SessionCommandPayload::Run {
+            request: run_request("test"),
+            message_id: "m-1".into(),
+        },
+    );
+    wait_for(
+        || {
+            entries(&core).iter().any(|e| {
+                e.role == MessageRole::Assistant && e.status == Some(MessageStatus::Complete)
+            })
+        },
+        "complete reply",
+    )
+    .await;
+    let all = entries(&core);
+    let tool = all
+        .iter()
+        .flat_map(|e| &e.parts)
+        .find(|p| p.id() == "t1")
+        .unwrap_or_else(|| panic!("the command's part: {all:#?}"));
+    let MessagePart::Tool {
+        output: Some(tail),
+        output_truncated: true,
+        output_lines: Some(lines),
+        ..
+    } = tool
+    else {
+        panic!("no tail: {tool:?}");
+    };
+    assert_eq!(tail.lines().count(), zeren_doc::COMMAND_TAIL_MAX_LINES);
+    assert_eq!(*lines, 301);
+
+    let client = zeren_rpc::memory_client(core.rpc_service());
+    let read = |chat: &str, tool: &str| {
+        client.call(
+            zeren_rpc::methods::READ_TOOL_OUTPUT,
+            serde_json::json!({ "chatId": chat, "toolId": tool, "offset": 0 }),
+        )
+    };
+    let chunk: zeren_proto::ToolOutputChunk =
+        serde_json::from_value(read(CHAT, "t1").await.expect("the whole output")).unwrap();
+    assert!(chunk.done && !chunk.trimmed);
+    assert_eq!((chunk.lines, chunk.exit_code), (301, Some(0)));
+    assert!(chunk.text.starts_with("test case_1 ... ok\n"));
+    assert!(chunk.text.contains("test case_300 ... ok"));
+    assert!(!chunk.text.contains("ghp_abcdef"), "{}", chunk.text);
+    // Its last lines are the doc's tail, word for word.
+    assert!(chunk.text.ends_with(tail.as_str()));
+    for (chat, tool, why) in [
+        (CHAT, "r1", "Only a command's output"),
+        (CHAT, "nope", "tool_output.unavailable"),
+        ("remote", "t1", "another device"),
+        ("missing", "t1", "chat not found"),
+    ] {
+        let error = read(chat, tool).await.expect_err(tool).to_string();
+        assert!(error.contains(why), "{chat}/{tool}: {error}");
+    }
+    core.shutdown().await;
 }

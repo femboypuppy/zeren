@@ -41,6 +41,7 @@ async fn main() {
         }),
         steering,
         interrupt: CancellationToken::new(),
+        turn: Default::default(),
     };
     // Optional second arg overrides the prompt (e.g. the mock rig's
     // "TWO subagents" variant exercising concurrent binding).
@@ -60,9 +61,13 @@ async fn main() {
         cwd,
         sandbox: SandboxLevel::WorkspaceWrite,
         auto_approve: true,
+        access: Default::default(),
+        plan: false,
         attachments: Vec::new(),
         resume: None,
         worktree: None,
+        env: Default::default(),
+        extra_mcp: Vec::new(),
     };
     let mut stream = OpencodeHarness::new()
         .run(request, controls)

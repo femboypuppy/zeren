@@ -50,6 +50,7 @@ Useful knobs for exercising the UI without a real agent or account:
 | `ZEREN_MOCK_SUBAGENT=1` | Mock turns spawn subagents |
 | `ZEREN_MOCK_THINKING=1` | Mock turns include markdown-heavy thinking |
 | `ZEREN_MOCK_TODO=1` | Mock turns work through an 8-item checklist (pair with `ZEREN_MOCK_DELAY_MS=900` to watch the todo panel) |
+| `ZEREN_MOCK_BACKGROUND=1` | Mock turns leave three background processes running (printing output, stoppable from the composer's background tray) |
 
 ## Tests
 

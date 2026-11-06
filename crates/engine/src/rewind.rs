@@ -8,7 +8,7 @@
 //! An agent's native session can't be cut back to a mid-point, so the fork
 //! starts with the "do not resume" tombstone. Its first run opens a fresh
 //! session, and the engine hands it the forked transcript
-//! ([`crate::handoff`]).
+//! (the provider-history replay in [`crate::sessions`]).
 
 use chrono::Utc;
 use zeren_doc::{MessagePart, MessageRole, MessageStatus, SessionDoc};
@@ -91,11 +91,15 @@ pub fn fork_chat(
         // over.
         harness_session_id: Some(String::new()),
         harness_session_cwd: source.cwd.clone(),
-        harness_session_harness: source.config.as_ref().map(|c| c.harness),
+        harness_session_harness: source
+            .config
+            .as_ref()
+            .map(|c| c.harness.as_str().to_owned()),
         space_id: source.space_id.clone(),
         last_seen_at: Some(now),
         room_gen: Some(2),
         parent_chat_id: None,
+        child_kind: None,
     })?;
     Ok(ForkedChat {
         chat_id: fork_id,

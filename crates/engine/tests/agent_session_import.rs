@@ -223,11 +223,11 @@ async fn claude_conversation_imports_as_a_resumable_chat() {
     assert_eq!(chat.cwd.as_deref(), Some(cwd.as_str()));
     assert_eq!(
         core.workspace.chat_harness_session(&imported.chat_id),
-        Some((
-            "sess-1".to_string(),
-            Some(cwd.clone()),
-            Some(HarnessId::ClaudeCode)
-        )),
+        Some(zeren_engine::workspace_host::StoredHarnessSession {
+            session_id: "sess-1".to_string(),
+            cwd: Some(cwd.clone()),
+            harness: Some(HarnessId::ClaudeCode),
+        }),
         "the next run resumes the native session from the same cwd"
     );
 

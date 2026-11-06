@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# macOS packaging: build the release binary for the host arch and produce
+# macOS packaging: build for the host or CARGO_BUILD_TARGET and produce
 #   target/package/zeren-<version>-macos-<arch>.dmg          (user download)
 #   target/package/zeren-<version>-macos-<arch>-app.tar.gz   (auto-updater)
 # containing Zeren.app (unsigned unless CODESIGN_IDENTITY is set).
@@ -15,18 +15,27 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 command -v cargo >/dev/null 2>&1 || PATH="$HOME/.cargo/bin:$PATH"
 VERSION="$(grep -m1 '^version' "$ROOT/Cargo.toml" | sed 's/.*"\(.*\)".*/\1/')"
-ARCH="$(uname -m)" # arm64 on Apple silicon runners
 OUT_DIR="$ROOT/target/package"
+BIN_DIR="$ROOT/target/${CARGO_BUILD_TARGET:+$CARGO_BUILD_TARGET/}release"
+
+cd "$ROOT"
+cargo build --release --locked -p zeren
+ARCH="$(lipo -archs "$BIN_DIR/zeren")"
+case "$ARCH" in
+  arm64|x86_64) ;;
+  *) echo "unsupported macOS binary architecture: $ARCH" >&2; exit 1 ;;
+esac
+lipo "$BIN_DIR/zeren-engine" -verify_arch "$ARCH"
 APP="$OUT_DIR/Zeren.app"
 DMG="$OUT_DIR/zeren-$VERSION-macos-$ARCH.dmg"
 APP_TARBALL="$OUT_DIR/zeren-$VERSION-macos-$ARCH-app.tar.gz"
 
-cd "$ROOT"
-cargo build --release -p zeren
-
 rm -rf "$APP" "$DMG" "$APP_TARBALL"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-install -m 755 "$ROOT/target/release/zeren" "$APP/Contents/MacOS/zeren"
+install -m 755 "$BIN_DIR/zeren" "$APP/Contents/MacOS/zeren"
+# The background engine the app starts (sessions keep running with the app
+# closed); its own process, named for Activity Monitor.
+install -m 755 "$BIN_DIR/zeren-engine" "$APP/Contents/MacOS/Zeren Engine"
 sed "s/__VERSION__/$VERSION/" "$ROOT/dist/macos/Info.plist" >"$APP/Contents/Info.plist"
 mkdir -p "$APP/Contents/Resources/licenses/fonts"
 cp "$ROOT/crates/ui/assets/fonts/licenses/"* "$APP/Contents/Resources/licenses/fonts/"
@@ -35,27 +44,18 @@ cp "$ROOT/THIRD_PARTY_NOTICES.md" "$ROOT/LICENSE" "$APP/Contents/Resources/licen
 mkdir -p "$APP/Contents/Resources/licenses"
 cp "$ROOT/crates/voice/NOTICE.md" "$APP/Contents/Resources/licenses"/parakeet-v3.txt
 
-# Icon: iconset from the pre-masked macOS icon (squircle + margins + shadow
-# baked into dist/macos/icon-1024.png — sips can't alpha-mask, so the mask is
-# applied ahead of time; dist/zeren.png stays the full-bleed shared artwork).
-ICONSET="$OUT_DIR/zeren.iconset"
-rm -rf "$ICONSET" && mkdir -p "$ICONSET"
-for size in 16 32 128 256 512; do
-  sips -z "$size" "$size" "$ROOT/dist/macos/icon-1024.png" --out "$ICONSET/icon_${size}x${size}.png" >/dev/null
-  retina=$((size * 2))
-  sips -z "$retina" "$retina" "$ROOT/dist/macos/icon-1024.png" --out "$ICONSET/icon_${size}x${size}@2x.png" >/dev/null
-done
-iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/zeren.icns"
-rm -rf "$ICONSET"
+"$ROOT/scripts/macos-app-icon.sh" "$APP/Contents/Resources"
 
 if [[ -n "${CODESIGN_IDENTITY:-}" ]]; then
   # Hardened runtime + secure timestamp are both notarization requirements.
-  # (No --deep: Apple deprecated it; the bundle is a single Mach-O anyway.)
-  codesign --entitlements "$ROOT/dist/macos/Dictation.entitlements" --force --options runtime --timestamp --sign "$CODESIGN_IDENTITY" "$APP"
+  # (No --deep: Apple deprecated it. Nested code is signed first, inside out:
+  # the engine, then the bundle that seals it.)
+  codesign --entitlements "$ROOT/dist/macos/Zeren.entitlements" --force --options runtime --timestamp --sign "$CODESIGN_IDENTITY" --identifier sh.zeron.app.engine "$APP/Contents/MacOS/Zeren Engine"
+  codesign --entitlements "$ROOT/dist/macos/Zeren.entitlements" --force --options runtime --timestamp --sign "$CODESIGN_IDENTITY" "$APP"
 else
   # Ad-hoc signature so the app launches on Apple silicon (Gatekeeper still
   # requires right-click → Open on first launch without notarization).
-  codesign --deep --force --entitlements "$ROOT/dist/macos/voice.entitlements" --sign - "$APP"
+  codesign --deep --force --entitlements "$ROOT/dist/macos/Zeren.entitlements" --sign - "$APP"
 fi
 
 # notarize <path>: submit to Apple and wait for the verdict. A rejection may

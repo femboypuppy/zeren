@@ -1,8 +1,9 @@
 # Windows icon
 
-`zeren.ico` contains 16, 24, 32, 48, 64, 128, and 256 pixel PNG frames
-converted from the existing `../macos/icon-1024.png` artwork with bicubic
-resampling. It preserves the artwork's transparency.
+`zeren.ico` contains 16, 24, 32, 48, 64, 128, and 256 pixel PNG frames made from
+`../icon/zeren-solid-macos-Dark.png` by `scripts/make-app-icons.py`. An `.exe`'s
+icon can't follow the system's light or dark setting, and this one reads on
+either.
 
 `apps/zeren/build.rs` compiles `zeren.rc` into the Windows executable for
 both debug and release builds. Resource ID 1 is required by GPUI's Windows

@@ -321,7 +321,10 @@ pub fn provider_label(harness: HarnessId) -> &'static str {
         HarnessId::Devin => "Devin",
         HarnessId::Pi => "Pi",
         HarnessId::Hermes => "Hermes",
+        HarnessId::Muse => "Muse Code",
+        HarnessId::Fx => "fx",
         HarnessId::Mock => "Mock",
+        HarnessId::Registry(_) => harness.as_str(),
     }
 }
 fn streaks(dates: &BTreeSet<NaiveDate>, today: NaiveDate) -> (usize, usize) {
@@ -415,6 +418,10 @@ mod tests {
                     cwd: dir.path().to_string_lossy().into_owned(),
                     sandbox: SandboxLevel::WorkspaceWrite,
                     auto_approve: true,
+                    access: Default::default(),
+                    plan: false,
+                    env: Default::default(),
+                    extra_mcp: Vec::new(),
                     resume: None,
                     attachments: vec![],
                     worktree: None,

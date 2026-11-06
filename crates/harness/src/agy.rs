@@ -15,8 +15,8 @@ use tokio::{
     sync::mpsc,
 };
 use zeren_proto::{
-    AgentEvent, DoneStatus, HarnessId, Model, ModelOption, ModelOptionChoice, ReasoningLevel,
-    RunRequest, SandboxLevel, SteeringMode, ToolCall,
+    AccessMode, AgentEvent, DoneStatus, HarnessId, Model, ModelOption, ModelOptionChoice,
+    ReasoningLevel, RunRequest, SandboxLevel, SteeringMode, ToolCall,
 };
 
 use crate::{
@@ -217,12 +217,17 @@ fn permission_option() -> ModelOption {
 }
 
 fn skip_permissions(request: &RunRequest) -> bool {
+    if request.plan || request.sandbox == SandboxLevel::ReadOnly {
+        return false;
+    }
     request
         .model_options
         .get("skipPermissions")
         .and_then(Value::as_str)
         == Some("on")
-        || (request.auto_approve && request.sandbox == SandboxLevel::DangerFullAccess)
+        || (request.auto_approve
+            && request.access.is_full_access()
+            && request.sandbox == SandboxLevel::DangerFullAccess)
 }
 
 fn model_base(requested: &str) -> &str {
@@ -285,6 +290,14 @@ impl Harness for AgyCliHarness {
 
     fn reasoning_levels(&self) -> &[ReasoningLevel] {
         &[]
+    }
+
+    fn access_modes(&self) -> &[AccessMode] {
+        &AccessMode::ALL
+    }
+
+    fn supports_plan(&self) -> bool {
+        true
     }
 
     fn installed(&self) -> bool {
@@ -370,6 +383,7 @@ impl Harness for AgyCliHarness {
         };
         let model = selected_model(request.model.as_deref(), request.reasoning, &available);
         let mut command = self.command(Path::new(&request.cwd))?;
+        crate::apply_run_env(&mut command, &request.env);
         command.args([
             "--input-format",
             "stream-json",
@@ -390,13 +404,10 @@ impl Harness for AgyCliHarness {
         {
             command.arg("--conversation").arg(resume);
         }
-        match request.sandbox {
-            SandboxLevel::ReadOnly => {
-                command.args(["--mode", "plan"]);
-            }
-            SandboxLevel::WorkspaceWrite | SandboxLevel::DangerFullAccess => {
-                command.args(["--mode", "accept-edits"]);
-            }
+        if request.plan || request.sandbox == SandboxLevel::ReadOnly {
+            command.args(["--mode", "plan"]);
+        } else if request.access != AccessMode::Supervised {
+            command.args(["--mode", "accept-edits"]);
         }
         if skip_permissions(&request) {
             command.arg("--dangerously-skip-permissions");
@@ -438,6 +449,7 @@ async fn run_child(
         steering: _steering,
         request_input,
         realtime: _realtime,
+        turn: _turn,
     } = controls;
     let _approval_task = approval.map(|bridge| bridge.serve(request_input, interrupt.clone()));
     let mut session = request
@@ -677,6 +689,7 @@ async fn emit_tool(
                 is_error,
                 output,
                 diff: None,
+                exit_code: None,
             }))
             .await;
     }
@@ -701,6 +714,26 @@ fn cli_tool_call(name: &str, parameters: Option<&Value>) -> ToolCall {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn access_and_plan_modes_preserve_permission_checks() {
+        let mut request: RunRequest = serde_json::from_value(json!({
+            "prompt":"hello", "cwd":".", "sandbox":"danger-full-access",
+            "autoApprove":true, "access":"supervised"
+        }))
+        .unwrap();
+        assert!(!skip_permissions(&request));
+        request.access = AccessMode::FullAccess;
+        assert!(skip_permissions(&request));
+        request
+            .model_options
+            .insert("skipPermissions".into(), json!("on"));
+        request.plan = true;
+        assert!(!skip_permissions(&request));
+        request.plan = false;
+        request.sandbox = SandboxLevel::ReadOnly;
+        assert!(!skip_permissions(&request));
+    }
 
     #[test]
     fn permission_choice_survives_effort_grouping_and_request_round_trip() {

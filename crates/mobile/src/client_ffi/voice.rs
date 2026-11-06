@@ -402,6 +402,8 @@ impl CoreClient {
                     reasoning: None,
                     model_options: Default::default(),
                     sandbox: zeren_proto::SandboxLevel::WorkspaceWrite,
+                    access: Default::default(),
+                    plan: false,
                 };
                 zeren_voice_session::run(
                     control,

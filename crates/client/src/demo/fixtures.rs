@@ -175,6 +175,16 @@ pub(crate) fn chats() -> Vec<DemoChat> {
             )
         },
         DemoChat {
+            last_ago_ms: 2 * MIN,
+            ..chat(
+                "chat-visuals",
+                None,
+                MAC,
+                "Agent visuals",
+                "A dashboard, a canvas, a scene and a shader.",
+            )
+        },
+        DemoChat {
             last_ago_ms: 10 * MIN,
             ..chat(
                 "chat-cjk",
@@ -187,6 +197,8 @@ pub(crate) fn chats() -> Vec<DemoChat> {
         DemoChat {
             last_ago_ms: 5 * DAY,
             created_ago_ms: 6 * DAY,
+            // Started without picking a model: it runs the default.
+            model: "",
             ..chat(
                 "chat-blog",
                 Some("space-blog"),
@@ -204,6 +216,20 @@ pub(crate) fn chats() -> Vec<DemoChat> {
                 MAC,
                 "Side chat: veil timing",
                 "α = 0.2 over inter-append gaps",
+            )
+        },
+        DemoChat {
+            parent: Some("chat-veil"),
+            harness: Codex,
+            model: "gpt-5.6-terra",
+            reasoning: High,
+            last_ago_ms: 6 * MIN,
+            ..chat(
+                "chat-side-easing",
+                Some("space-zeren"),
+                MAC,
+                "Spring vs. power curve for the veil",
+                "Keep the curve; use the spring only for the follow scroll.",
             )
         },
         DemoChat {
@@ -247,10 +273,14 @@ pub(crate) fn spaces(now: i64) -> Vec<Space> {
             git_checked_at: git.then(|| ms(now)),
             checkout_id: git.then(|| format!("co-{id}")),
             repository_id: None,
+            github_repo: None,
+            icon: None,
             created_at: ms(now - ago),
         };
     let zeren = |mut space: Space| {
-        space.repository_id = Some("github.com/zeronsh/zeron".into());
+        space.repository_id = Some("github.com/femboypuppy/zeren".into());
+        // Cloud reaches it in the demo (its fixture repositories).
+        space.github_repo = Some("acme/web".into());
         space
     };
     vec![
@@ -304,6 +334,7 @@ pub(crate) fn devices(self_id: &str, self_name: &str, now: i64) -> Vec<Device> {
             capabilities: if caps {
                 capability::ALL_QUEUE
                     .iter()
+                    .chain([&capability::PROVIDER_SWITCH_V1])
                     .map(|c| (*c).to_owned())
                     .collect()
             } else {
@@ -353,8 +384,8 @@ pub(crate) struct Seeded {
     pub change_requests: Vec<CheckoutChangeRequestStatus>,
 }
 
-/// Write the whole dataset into the replica (as local writes; the demo
-/// server settles them).
+/// Write the whole dataset into the replica (as local writes, which the
+/// local-only demo replica folds straight into its rows).
 pub(crate) fn seed(
     doc: &mut RegistryDoc,
     fixture: DemoFixture,
@@ -416,10 +447,12 @@ pub(crate) fn seed(
             source_context: source_context.clone(),
             config: Some(ChatConfig {
                 harness: demo.harness,
-                model: Some(demo.model.into()),
+                model: (!demo.model.is_empty()).then(|| demo.model.into()),
                 reasoning: Some(demo.reasoning),
                 model_options: Default::default(),
                 sandbox: SandboxLevel::WorkspaceWrite,
+                access: Default::default(),
+                plan: false,
             }),
             last_message_preview: Some(demo.preview.into()),
             last_message_at: Some(ms(last)),
@@ -431,11 +464,16 @@ pub(crate) fn seed(
             last_seen_at: Some(ms(if demo.seen { last } else { last - MIN })),
             room_gen: Some(2),
             parent_chat_id: demo.parent.map(str::to_owned),
+            child_kind: None,
         };
         doc.upsert_chat(&chat)?;
         if let Some(status) = demo.status {
             doc.upsert_session(&Session {
                 last_completed_turn: None,
+                last_turn_outcome: None,
+                terminal_activity: None,
+                running_subagents: 0,
+                background_tasks: Vec::new(),
                 chat_id: demo.id.into(),
                 device_id: demo.device.into(),
                 status,
@@ -457,6 +495,7 @@ pub(crate) fn seed(
                     state,
                     base_ref: "main".into(),
                     head_ref: source.branch.clone(),
+                    signals: None,
                 }),
                 updated_at: Utc::now(),
             });
@@ -491,6 +530,8 @@ pub(crate) fn seed(
                 change: SidebarSectionChange::Assign {
                     session_id: (*member).into(),
                     section_id: Some(section.into()),
+                    after: None,
+                    before: None,
                 },
             })?;
         }
