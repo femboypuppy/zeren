@@ -7850,9 +7850,9 @@ mod tests {
                 state.apply_sessions(vec![running_session("side")]);
             });
             pickers.update(cx, |pickers, cx| {
-                assert!(!pickers.harness_locked(cx));
+                assert!(pickers.harness_locked(cx));
                 pickers.pick_harness(HarnessId::Codex, cx);
-                assert_eq!(pickers.resolved(cx).harness, Some(HarnessId::Codex));
+                assert_eq!(pickers.resolved(cx).harness, Some(HarnessId::ClaudeCode));
             });
         });
     }

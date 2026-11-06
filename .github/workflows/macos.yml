@@ -45,7 +45,8 @@ jobs:
   # compiled once (one cargo invocation, so dependencies are built once) and then run.
   macos-native:
     if: inputs.native
-    runs-on: macos-latest
+    # shortcut: test natively on Intel while hosted ARM capacity is limited; restore ARM coverage when capacity recovers.
+    runs-on: macos-26-intel
     # A cold cache (first run, eviction, toolchain bump) takes about 32 minutes; warm is about 10.
     timeout-minutes: 45
     steps:
@@ -56,7 +57,7 @@ jobs:
           rustup show active-toolchain || rustup toolchain install
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
-          save-if: ${{ github.ref == 'refs/heads/main' }}
+          save-if: ${{ github.ref == 'refs/heads/main' || github.event.pull_request.head.repo.full_name == github.repository }}
           cache-on-failure: true
       - name: Install cargo-nextest
         run: |
@@ -147,7 +148,7 @@ jobs:
   # gpui_macos lives in the pinned GPUI checkout, a separate workspace with its own cache.
   macos-frame-source:
     if: inputs.frame-source
-    runs-on: macos-latest
+    runs-on: macos-26-intel
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -165,7 +166,7 @@ jobs:
           git -C frame-source-tests checkout --detach FETCH_HEAD
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
-          save-if: ${{ github.ref == 'refs/heads/main' }}
+          save-if: ${{ github.ref == 'refs/heads/main' || github.event.pull_request.head.repo.full_name == github.repository }}
           cache-on-failure: true
           workspaces: frame-source-tests
       - name: Native frame-source recovery regression
@@ -191,7 +192,7 @@ jobs:
         run: rustup show active-toolchain || rustup toolchain install
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
-          save-if: ${{ github.ref == 'refs/heads/main' }}
+          save-if: ${{ github.ref == 'refs/heads/main' || github.event.pull_request.head.repo.full_name == github.repository }}
           cache-on-failure: true
       - name: Rust mobile core tests
         run: cargo test --locked -p zeren-text -p zeren-markdown -p zeren-client -p zeren-mobile
@@ -225,7 +226,7 @@ jobs:
   # VM and slow every other step down by minutes. xcodebuild boots it when needed.
   ios-tests:
     if: ${{ inputs.ios && !contains(fromJSON(inputs.skip), 'ios-tests') }}
-    runs-on: macos-latest
+    runs-on: macos-26-intel
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -250,18 +251,25 @@ jobs:
         run: |
           rustup update stable --no-self-update
           rustup show active-toolchain || rustup toolchain install
-          rustup target add aarch64-apple-ios-sim
+          case "$(uname -m)" in
+            x86_64) sim_target=x86_64-apple-ios ;;
+            arm64) sim_target=aarch64-apple-ios-sim ;;
+            *) echo "Unsupported simulator host" >&2; exit 1 ;;
+          esac
+          rustup target add "$sim_target"
+          echo "IOS_RUST_TARGET=$sim_target" >> "$GITHUB_ENV"
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
-          save-if: ${{ github.ref == 'refs/heads/main' }}
+          save-if: ${{ github.ref == 'refs/heads/main' || github.event.pull_request.head.repo.full_name == github.repository }}
           cache-on-failure: true
       # The dev profile (workspace crates unoptimized, dependencies at opt-level 2): the
       # unit tests don't need the optimized core the app ships, and it builds in about half the time.
       - name: Build the Rust core for the simulator
         run: |
-          IPHONEOS_DEPLOYMENT_TARGET=26.0 cargo build --locked -p zeren-mobile --lib --target aarch64-apple-ios-sim
+          IPHONEOS_DEPLOYMENT_TARGET=26.0 cargo build --locked -p zeren-mobile --lib --target "$IOS_RUST_TARGET"
           mkdir -p target/ios-core/iphonesimulator/include
-          cp target/aarch64-apple-ios-sim/debug/libzeren_mobile.a target/ios-core/iphonesimulator/
+          cp "target/$IOS_RUST_TARGET/debug/libzeren_mobile.a" target/ios-core/iphonesimulator/
+          lipo -verify_arch "$(uname -m)" target/ios-core/iphonesimulator/libzeren_mobile.a
           cp apps/ios/CoreFFI/zeren_coreFFI.h target/ios-core/iphonesimulator/include/zeren_coreFFI.h
           cp apps/ios/CoreFFI/module.modulemap target/ios-core/iphonesimulator/include/module.modulemap
       - name: Run iOS unit tests

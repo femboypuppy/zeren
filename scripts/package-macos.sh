@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# macOS packaging: build the release binaries for the host arch and produce
+# macOS packaging: build for the host or CARGO_BUILD_TARGET and produce
 #   target/package/zeren-<version>-macos-<arch>.dmg          (user download)
 #   target/package/zeren-<version>-macos-<arch>-app.tar.gz   (auto-updater)
 # containing Zeren.app (unsigned unless CODESIGN_IDENTITY is set).
@@ -15,21 +15,27 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 command -v cargo >/dev/null 2>&1 || PATH="$HOME/.cargo/bin:$PATH"
 VERSION="$(grep -m1 '^version' "$ROOT/Cargo.toml" | sed 's/.*"\(.*\)".*/\1/')"
-ARCH="$(uname -m)" # arm64 on Apple silicon runners
 OUT_DIR="$ROOT/target/package"
+BIN_DIR="$ROOT/target/${CARGO_BUILD_TARGET:+$CARGO_BUILD_TARGET/}release"
+
+cd "$ROOT"
+cargo build --release --locked -p zeren
+ARCH="$(lipo -archs "$BIN_DIR/zeren")"
+case "$ARCH" in
+  arm64|x86_64) ;;
+  *) echo "unsupported macOS binary architecture: $ARCH" >&2; exit 1 ;;
+esac
+lipo -verify_arch "$ARCH" "$BIN_DIR/zeren-engine"
 APP="$OUT_DIR/Zeren.app"
 DMG="$OUT_DIR/zeren-$VERSION-macos-$ARCH.dmg"
 APP_TARBALL="$OUT_DIR/zeren-$VERSION-macos-$ARCH-app.tar.gz"
 
-cd "$ROOT"
-cargo build --release -p zeren
-
 rm -rf "$APP" "$DMG" "$APP_TARBALL"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-install -m 755 "$ROOT/target/release/zeren" "$APP/Contents/MacOS/zeren"
+install -m 755 "$BIN_DIR/zeren" "$APP/Contents/MacOS/zeren"
 # The background engine the app starts (sessions keep running with the app
 # closed); its own process, named for Activity Monitor.
-install -m 755 "$ROOT/target/release/zeren-engine" "$APP/Contents/MacOS/Zeren Engine"
+install -m 755 "$BIN_DIR/zeren-engine" "$APP/Contents/MacOS/Zeren Engine"
 sed "s/__VERSION__/$VERSION/" "$ROOT/dist/macos/Info.plist" >"$APP/Contents/Info.plist"
 mkdir -p "$APP/Contents/Resources/licenses/fonts"
 cp "$ROOT/crates/ui/assets/fonts/licenses/"* "$APP/Contents/Resources/licenses/fonts/"

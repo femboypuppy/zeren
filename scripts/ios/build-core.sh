@@ -18,7 +18,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 PLATFORM="${1:-${PLATFORM_NAME:-iphonesimulator}}"
 case "$PLATFORM" in
-  iphonesimulator) TARGET=aarch64-apple-ios-sim ;;
+  iphonesimulator)
+    case "$(uname -m)" in
+      x86_64) TARGET=x86_64-apple-ios ;;
+      arm64) TARGET=aarch64-apple-ios-sim ;;
+      *) echo "error: unsupported simulator host architecture" >&2; exit 1 ;;
+    esac
+    ;;
   iphoneos) TARGET=aarch64-apple-ios ;;
   *) echo "error: unsupported platform $PLATFORM" >&2; exit 1 ;;
 esac

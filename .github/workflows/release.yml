@@ -73,9 +73,10 @@ jobs:
   # main may use: a run from any other branch gets no environment, so no
   # credentials, and builds ad-hoc-signed.
   macos:
-    runs-on: macos-latest # Apple silicon
+    runs-on: macos-26-intel # Cross-build Apple silicon while hosted ARM capacity is limited.
     environment: ${{ (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main') && 'apple-release' || '' }}
     env:
+      CARGO_BUILD_TARGET: aarch64-apple-darwin
       MACOS_CERT_P12: ${{ secrets.MACOS_CERT_P12 }}
       MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
       AC_API_KEY_P8: ${{ secrets.AC_API_KEY_P8 }}
@@ -85,7 +86,11 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: rust toolchain (rust-toolchain.toml)
         run: rustup show active-toolchain || rustup toolchain install
+      - name: Apple silicon target
+        run: rustup target add aarch64-apple-darwin
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          cache-on-failure: true
       - name: import Developer ID certificate
         if: env.MACOS_CERT_P12 != ''
         run: |
@@ -119,7 +124,7 @@ jobs:
         run: scripts/package-macos.sh
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: macos-${{ runner.arch }}
+          name: macos-ARM64
           path: |
             target/package/*.dmg
             target/package/*.tar.gz
