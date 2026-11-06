@@ -12,6 +12,11 @@ use zeren_app::{edge_url_from_env, paths, workos_client_id_from_env};
 use zeren_cli::{Engines, Launch};
 
 fn main() -> anyhow::Result<()> {
+    if std::env::args_os().nth(1).as_deref() == Some(std::ffi::OsStr::new("--agy-permission-hook"))
+    {
+        zeren_harness::agy::run_permission_hook()?;
+        return Ok(());
+    }
     match zeren_cli::run(zeren_update::current_version(), Engines::InProcess) {
         Launch::Done(result) => result,
         Launch::Engine(command) => zeren_app::run_engine_command(command),

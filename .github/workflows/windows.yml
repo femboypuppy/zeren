@@ -76,7 +76,7 @@ jobs:
           --features zeren-harness/native-fixture
           --lib --bins
           --test codex_availability --test windows_native --test opencode --test cursor_shim --test pi_rpc
-          --test agent_session_import --test background_engine --test noop_browser
+          --test agent_session_import --test background_engine --test noop_browser --test agy_hook_shell
           --test worktree_on_run --test codex_catalog --test codex_login_resolution --test auth
           -E "(package(zeren-ui) & kind(lib)) | package(zeren-harness) | package(zeren) | package(zeren-update) | (package(zeren-voice-media) & kind(lib)) | (package(zeren-proto) & test(device_paths)) | (package(zeren-engine) & (kind(lib) | binary_id(zeren-engine::codex_catalog) | binary_id(zeren-engine::codex_login_resolution) | binary_id(zeren-engine::auth) | binary_id(zeren-engine::agent_session_import) | (binary_id(zeren-engine::worktree_on_run) & test(worktree_location_)))) | (not package(zeren-ui) & not package(zeren-harness) & not package(zeren) & not package(zeren-update) & not package(zeren-proto) & not package(zeren-engine) & not package(zeren-voice-media) & test(layout))"
       - name: Record the pass (CI skips this job while its inputs stay the same)

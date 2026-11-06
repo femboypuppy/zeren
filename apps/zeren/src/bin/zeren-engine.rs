@@ -16,6 +16,10 @@ use zeren_cli::{Engines, Launch};
 
 fn main() -> anyhow::Result<()> {
     match std::env::args().nth(1).as_deref() {
+        Some("--agy-permission-hook") => {
+            zeren_harness::agy::run_permission_hook()?;
+            Ok(())
+        }
         Some("--noop-browser") => Ok(()),
         Some("--version" | "-V") => {
             println!("zeren-engine {}", zeren_update::current_version());

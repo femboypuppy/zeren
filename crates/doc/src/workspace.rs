@@ -754,10 +754,6 @@ pub(crate) struct RawChat {
     harness_session_id: Option<String>,
     #[serde(default)]
     harness_session_cwd: Option<String>,
-    /// LENIENT like `config`: an agent id this build doesn't know decodes as
-    /// unknown instead of failing the row.
-    #[serde(default, deserialize_with = "lenient_harness")]
-    harness_session_harness: Option<zeren_proto::HarnessId>,
     #[serde(default)]
     harness_session_harness: Option<String>,
     #[serde(default)]
@@ -789,14 +785,6 @@ where
             None
         }
     }))
-}
-
-fn lenient_harness<'de, D>(deserializer: D) -> Result<Option<zeren_proto::HarnessId>, D::Error>
-where
-    D: serde::Deserializer<'de>,
-{
-    let value = Option::<serde_json::Value>::deserialize(deserializer)?;
-    Ok(value.and_then(|value| serde_json::from_value(value).ok()))
 }
 
 impl From<RawChat> for Chat {

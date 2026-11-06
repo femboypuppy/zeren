@@ -41,7 +41,7 @@ const RESERVED = new Set([
 ]);
 
 /** Taken wherever they appear in a name: `github-team`, `the-openai`, `zerenhq`. */
-const RESERVED_ANYWHERE = ["zeren", "anthropic", "openai", "github", "gitlab", "microsoft", "claude", "cloudflare"];
+const RESERVED_ANYWHERE = ["zeren", "zeron", "anthropic", "openai", "github", "gitlab", "microsoft", "claude", "cloudflare"];
 
 /** Taken at the start of a name: `google-dev`, `apple1`, `admin-bob`,
  * `support2`, `security-team`. Short or common words stay prefix-only so

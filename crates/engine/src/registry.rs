@@ -1085,7 +1085,7 @@ fn full_registry() -> HarnessRegistry {
             can_install: false,
             enabled: None,
             access_modes: AccessMode::ALL.to_vec(),
-            supports_plan: false,
+            supports_plan: zeren_harness::AgyCliHarness::new().installed(),
         },
         Box::new(|| {
             zeren_harness::AgyCliHarness::new().installed()

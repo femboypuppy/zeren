@@ -217,6 +217,9 @@ fn permission_option() -> ModelOption {
 }
 
 fn skip_permissions(request: &RunRequest) -> bool {
+    if request.plan || request.sandbox == SandboxLevel::ReadOnly {
+        return false;
+    }
     request
         .model_options
         .get("skipPermissions")
@@ -224,7 +227,6 @@ fn skip_permissions(request: &RunRequest) -> bool {
         == Some("on")
         || (request.auto_approve
             && request.access.is_full_access()
-            && !request.plan
             && request.sandbox == SandboxLevel::DangerFullAccess)
 }
 
@@ -712,6 +714,26 @@ fn cli_tool_call(name: &str, parameters: Option<&Value>) -> ToolCall {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn access_and_plan_modes_preserve_permission_checks() {
+        let mut request: RunRequest = serde_json::from_value(json!({
+            "prompt":"hello", "cwd":".", "sandbox":"danger-full-access",
+            "autoApprove":true, "access":"supervised"
+        }))
+        .unwrap();
+        assert!(!skip_permissions(&request));
+        request.access = AccessMode::FullAccess;
+        assert!(skip_permissions(&request));
+        request
+            .model_options
+            .insert("skipPermissions".into(), json!("on"));
+        request.plan = true;
+        assert!(!skip_permissions(&request));
+        request.plan = false;
+        request.sandbox = SandboxLevel::ReadOnly;
+        assert!(!skip_permissions(&request));
+    }
 
     #[test]
     fn permission_choice_survives_effort_grouping_and_request_round_trip() {
