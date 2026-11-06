@@ -138,13 +138,7 @@ fn main() -> anyhow::Result<()> {
                 cx,
             );
             theme_library::init(data, cx);
-            appearance::init(
-                appearance::AppearanceMode::Dark,
-                prefs.theme_selection,
-                prefs.accent,
-                prefs.surface,
-                cx,
-            );
+            appearance::init(appearance::AppearanceMode::Dark, prefs.theme_selection, prefs.accent, prefs.surface, prefs.frost_strength, cx);
             composer::init(cx, prefs.composer_send_behavior);
 
             let state = cx.new(|_| state::AppState::new());

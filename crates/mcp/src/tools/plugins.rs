@@ -700,7 +700,7 @@ async fn scaffold_files(dir: &str) -> Vec<String> {
         }
     }
     if files.is_empty() {
-        files = ["init.luau", "zeron-plugin.json", "zeren.luau"]
+        files = ["init.luau", "zeren.luau", "zeron-plugin.json"]
             .map(str::to_owned)
             .to_vec();
     }
@@ -1234,7 +1234,7 @@ mod tests {
         assert_eq!(created["dir"], "/nowhere/plugins/focus");
         assert_eq!(
             created["files"],
-            json!(["init.luau", "zeron-plugin.json", "zeren.luau"])
+            json!(["init.luau", "zeren.luau", "zeron-plugin.json"])
         );
         assert_eq!(
             created["hint"],
@@ -1388,7 +1388,7 @@ mod tests {
         std::fs::create_dir(dir.path().join("lib")).unwrap();
         assert_eq!(
             scaffold_files(dir.path().to_str().unwrap()).await,
-            vec!["init.luau", "zeron-plugin.json", "zeren.luau"]
+            vec!["init.luau", "zeren.luau", "zeron-plugin.json"]
         );
     }
 

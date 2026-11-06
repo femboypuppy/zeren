@@ -191,7 +191,7 @@ pub fn apply(staged: &Path, directory: &Path, relaunch: bool) -> anyhow::Result<
 pub(super) fn commit_trial(incoming: &Path, directory: &Path, version: &str) -> anyhow::Result<()> {
     let installed = directory.join("zeren.exe");
     recover_from_backup(&installed)?;
-    let backup = directory.join(BACKUP);
+    let backup = backup_path(&installed);
     std::fs::rename(&installed, &backup).context("moving the old executable aside")?;
     if let Err(err) = std::fs::rename(incoming, &installed) {
         std::fs::rename(&backup, &installed)

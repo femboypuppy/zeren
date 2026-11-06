@@ -12209,6 +12209,9 @@ fn import_source_label(harness: HarnessId) -> &'static str {
         HarnessId::Opencode => "OpenCode",
         HarnessId::Antigravity => "Antigravity",
         HarnessId::Mock => "Mock",
+        HarnessId::Fx => "fx",
+        HarnessId::Muse => "Muse Code",
+        HarnessId::Registry(_) => harness.as_str(),
     }
 }
 

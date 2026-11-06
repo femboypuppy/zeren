@@ -93,6 +93,10 @@ settings_index! {
         "tint accent surface desktop"),
     (Glass, Appearance, Some("Material and background"), "Glass",
         "frosted translucent opaque transparency blur vibrancy surface"),
+    (FrostStrength, Appearance, Some("Material and background"), "Frost strength",
+        "glass blur translucent opacity"),
+    (FrostBackdrop, Appearance, Some("Material and background"), "Frost backdrop",
+        "glass wallpaper acrylic system windows"),
     (NewThreadBackground, Appearance, Some("Material and background"), "New thread background",
         "image picture wallpaper composer"),
     (WallpaperFolder, Appearance, Some("Material and background"), "Wallpaper folder",
@@ -188,6 +192,7 @@ impl SettingId {
     /// only once its parent is on (or, for a background effect, set).
     pub fn parent(self) -> Option<SettingId> {
         match self {
+            SettingId::FrostStrength | SettingId::FrostBackdrop => Some(SettingId::Glass),
             SettingId::BackgroundEffect => Some(SettingId::NewThreadBackground),
             SettingId::Microphone | SettingId::SpeechModel => Some(SettingId::Dictation),
             SettingId::AutosaveDelay => Some(SettingId::Autosave),
@@ -367,6 +372,8 @@ fn page_terms(section: SettingsSection) -> &'static str {
         SettingsSection::Notifications => "alerts sounds banners",
         SettingsSection::Voice => "speech dictation microphone codex",
         SettingsSection::Shortcuts => "keyboard keybindings hotkeys keys",
+        SettingsSection::Skills => "skills commands slash github import library install",
+        SettingsSection::Usage => "tokens session activity history models cost dashboard",
         SettingsSection::Harnesses | SettingsSection::Agents => {
             "harnesses agents cli claude code codex cursor devin grok hermes pi opencode \
              antigravity muse install enable disable update policy accounts sign in login"

@@ -116,6 +116,7 @@ fn main() -> anyhow::Result<()> {
                 settings.theme_selection,
                 settings.accent,
                 settings.surface,
+                settings.frost_strength,
                 cx,
             );
             history::init(

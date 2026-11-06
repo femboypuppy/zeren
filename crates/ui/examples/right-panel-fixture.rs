@@ -422,7 +422,7 @@ fn main() -> anyhow::Result<()> {
             } else {
                 appearance::AppearanceMode::Dark
             };
-            appearance::init(mode, settings.theme_selection, settings.accent, settings.surface, cx);
+            appearance::init(mode, settings.theme_selection, settings.accent, settings.surface, settings.frost_strength, cx);
             history::init(
                 settings.git_history_columns,
                 settings.git_history_column_widths,

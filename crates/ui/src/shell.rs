@@ -647,7 +647,7 @@ pub enum SettingsSection {
 
 impl SettingsSection {
     /// Sections shown in Settings. `Agents` is a legacy Accounts route alias.
-    pub const ALL: [SettingsSection; 12] = [
+    pub const ALL: [SettingsSection; 14] = [
         SettingsSection::General,
         SettingsSection::Appearance,
         SettingsSection::Notifications,
@@ -780,6 +780,8 @@ impl SettingsSection {
             SettingsSection::Billing => icons::WALLET,
             SettingsSection::Harnesses => icons::WIDGET,
             SettingsSection::Agents => icons::KEY_MINIMALISTIC,
+            SettingsSection::Skills => icons::WIDGET,
+            SettingsSection::Usage => icons::WALLET,
             SettingsSection::Appearance => icons::TUNING,
             SettingsSection::Files => icons::FOLDER,
             SettingsSection::Notifications => icons::BELL,

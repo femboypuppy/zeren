@@ -1982,7 +1982,7 @@ async fn run_session(session: Session) {
                                 "exitedReviewMode" => {
                                     item.get("review").and_then(Value::as_str).map(str::to_owned)
                                 }
-                                "contextCompaction" => Some("Context compacted.".to_owned()),
+                                "contextCompaction" => Some("Context compacted.\n\n".to_owned()),
                                 // Plan mode's proposed plan: Codex lifts it
                                 // out of the agent message into its own item
                                 // (the completed one is authoritative, its
@@ -1992,13 +1992,8 @@ async fn run_session(session: Session) {
                                     .map(|text| format!("{}\n\n", text.trim_end())),
                                 _ => None,
                             };
-                            // A paragraph of its own: the turn's reply
-                            // streams right after it ("Context
-                            // compacted.Hi!…" read as one sentence).
                             if let Some(text) = output
-                                && !send(&event_tx, AgentEvent::TextDelta { text: format!("{text}
-
-") }).await
+                                && !send(&event_tx, AgentEvent::TextDelta { text }).await
                             { break 'main; }
                         }
                         if matches!(item_type(item), "agentMessage" | "agent_message") {

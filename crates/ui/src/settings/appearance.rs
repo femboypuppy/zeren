@@ -3801,6 +3801,7 @@ impl Render for AppearancePage {
                             )),
                     )
                     .child(frost_control)
+                    .search_anchor(SettingId::FrostStrength)
                     .into_any_element(),
             );
         }
@@ -3828,6 +3829,7 @@ impl Render for AppearancePage {
                             )),
                     )
                     .child(backdrop_control)
+                    .search_anchor(SettingId::FrostBackdrop)
                     .into_any_element(),
             );
         }

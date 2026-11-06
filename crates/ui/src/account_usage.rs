@@ -179,7 +179,6 @@ impl AccountUsage {
             loaded: false,
             last_forced: None,
             error: None,
-            model: None,
             load_task: None,
             action_task: None,
             popup: popover::Popup::default(),

@@ -222,6 +222,7 @@ And shorten the feature lists."}]}]}
                 settings.theme_selection,
                 settings.accent,
                 settings.surface,
+                settings.frost_strength,
                 cx,
             );
             history::init(

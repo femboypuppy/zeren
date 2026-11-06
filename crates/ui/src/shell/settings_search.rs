@@ -409,6 +409,7 @@ mod tests {
                 ThemeSelection::default(),
                 AccentSelection::default(),
                 SurfacePreference::Opaque,
+                Default::default(),
                 cx,
             );
         });
