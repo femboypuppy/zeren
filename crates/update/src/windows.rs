@@ -47,6 +47,16 @@ fn backup_path(installed: &Path) -> PathBuf {
     installed.with_extension("exe.old")
 }
 
+pub(super) fn installed_path(directory: &Path) -> PathBuf {
+    let current = directory.join("zeren.exe");
+    let legacy = directory.join("zeron.exe");
+    if !current.exists() && (legacy.exists() || backup_path(&legacy).exists()) {
+        legacy
+    } else {
+        current
+    }
+}
+
 pub(super) fn release_url() -> anyhow::Result<Option<String>> {
     // A new version on trial runs from beside the installation.
     let exe = match std::env::var_os(super::INSTALLED_AT_ENV) {
@@ -189,7 +199,7 @@ pub fn apply(staged: &Path, directory: &Path, relaunch: bool) -> anyhow::Result<
 /// running as. A running image can be renamed, so it simply moves into place; the
 /// old one moves aside first and goes on running until it exits.
 pub(super) fn commit_trial(incoming: &Path, directory: &Path, version: &str) -> anyhow::Result<()> {
-    let installed = directory.join("zeren.exe");
+    let installed = installed_path(directory);
     recover_from_backup(&installed)?;
     let backup = backup_path(&installed);
     std::fs::rename(&installed, &backup).context("moving the old executable aside")?;
@@ -409,6 +419,22 @@ mod tests {
         assert!(is_managed(&legacy));
         assert!(!is_managed(&dir.path().join("another.exe")));
         assert_eq!(backup_path(&legacy), dir.path().join("zeron.exe.old"));
+    }
+
+    #[test]
+    fn update_trial_preserves_a_legacy_installation_and_its_backup() {
+        let dir = tempfile::tempdir().unwrap();
+        let installed = dir.path().join("zeron.exe");
+        std::fs::write(&installed, b"old").unwrap();
+        assert_eq!(installed_path(dir.path()), installed);
+        std::fs::rename(&installed, backup_path(&installed)).unwrap();
+        assert_eq!(installed_path(dir.path()), installed);
+        let staged = dir.path().join("incoming.exe");
+        std::fs::write(&staged, b"new").unwrap();
+        commit_trial(&staged, dir.path(), "0.2.138").unwrap();
+        assert_eq!(std::fs::read(&installed).unwrap(), b"new");
+        assert_eq!(std::fs::read(backup_path(&installed)).unwrap(), b"old");
+        assert!(!dir.path().join("zeren.exe").exists());
     }
 
     #[test]

@@ -165,7 +165,16 @@ impl Layout {
         match self {
             Self::Versioned { app_root } => app_root.join("current").join(name),
             Self::MacBundle { bundle, .. } => bundle.join("Contents/MacOS").join(name),
-            Self::WindowsFolder { directory, .. } => directory.join("zeren.exe"),
+            Self::WindowsFolder { directory, .. } => {
+                #[cfg(windows)]
+                {
+                    crate::windows::installed_path(directory)
+                }
+                #[cfg(not(windows))]
+                {
+                    directory.join("zeren.exe")
+                }
+            }
         }
     }
 
