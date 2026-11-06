@@ -33,7 +33,7 @@ async fn fixture() -> Fixture {
     let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../apps/zgx/plugins-builtin/git");
     let to = plugins.plugins_dir().join("git");
     std::fs::create_dir_all(to.join("locales")).unwrap();
-    for file in ["zeren-plugin.json", "init.luau", "service.luau", "icon.svg"] {
+    for file in ["zeron-plugin.json", "init.luau", "service.luau", "icon.svg"] {
         if src.join(file).exists() {
             std::fs::copy(src.join(file), to.join(file)).unwrap();
         }

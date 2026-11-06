@@ -55,7 +55,7 @@ describe("runner signatures", () => {
     const pair = (await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"])) as CryptoKeyPair;
     const publicKey = b64urlEncode(new Uint8Array((await crypto.subtle.exportKey("raw", pair.publicKey)) as ArrayBuffer));
     const message = runnerTokenMessage("org_1", "user_1", "cloud-abc", 1_800_000_000_000);
-    expect(message).toBe("zeren-runner-token\norg_1\nuser_1\ncloud-abc\n1800000000000");
+    expect(message).toBe("zeron-runner-token\norg_1\nuser_1\ncloud-abc\n1800000000000");
     const sig = b64urlEncode(new Uint8Array(await crypto.subtle.sign({ name: "Ed25519" }, pair.privateKey, new TextEncoder().encode(message))));
     expect(await verifyEd25519(publicKey, message, sig)).toBe(true);
     expect(await verifyEd25519(publicKey, `${message}1`, sig)).toBe(false);

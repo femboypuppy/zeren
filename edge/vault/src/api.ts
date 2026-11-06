@@ -177,7 +177,7 @@ export interface EnrollDeviceRequest {
 
 /**
  * `sig` = base64url Ed25519 signature by the device key over the UTF-8 bytes of
- * `zeren-vault-grant\n{userId}\n{deviceId}\n{provider}\n{ts}`. `ts` is Unix ms,
+ * `zeron-vault-grant\n{userId}\n{deviceId}\n{provider}\n{ts}`. `ts` is Unix ms,
  * accepted within ±120 s and strictly greater than the device's last accepted
  * grant `ts` (replay fence).
  */

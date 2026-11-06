@@ -830,7 +830,7 @@ return function(zeren: any, pulls: any): (props: { tab: any }) -> Node
 		return true
 	end
 	-- Its menus: Open, where Zeren opens links ("links.open"), the only
-	-- place it may. Copy link needs "clipboard" in zeren-plugin.json, which
+	-- place it may. Copy link needs "clipboard" in zeron-plugin.json, which
 	-- it doesn't ask for: left out until it does.
 	Links.system = false
 	Links.can_copy = false

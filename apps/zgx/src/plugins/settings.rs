@@ -541,7 +541,7 @@ impl Book {
 
 /// A plugin's manifest, from its snapshot (what the engine checked).
 pub fn manifest_in(snapshot: &Path) -> Option<Json> {
-    let text = std::fs::read_to_string(snapshot.join("zeren-plugin.json")).ok()?;
+    let text = std::fs::read_to_string(snapshot.join("zeron-plugin.json")).ok()?;
     serde_json::from_str(&text).ok()
 }
 

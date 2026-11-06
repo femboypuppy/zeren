@@ -153,7 +153,7 @@ ui.command {
 		local p = open_install
 		open_install = nil
 		if p then
-			p.err({ message = "That release has no .zeren-plugin file" })
+			p.err({ message = "That release has no .zeron-plugin file" })
 		end
 	end,
 }

@@ -21,7 +21,7 @@ pub(super) fn builtin(id: &str) -> Item {
 }
 
 fn from(dir: PathBuf, id: &str) -> Item {
-    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(dir.join("zeren-plugin.json")).unwrap()).unwrap();
+    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(dir.join("zeron-plugin.json")).unwrap()).unwrap();
     Item {
         json: json!({
             "id": id, "name": manifest["name"], "status": "on", "entry": manifest["entry"],
@@ -764,7 +764,7 @@ fn counting_watch() -> Item {
         }
     }
     let dir = At(dir);
-    for f in ["pulls.luau", "gh.luau", "zeren-plugin.json"] {
+    for f in ["pulls.luau", "gh.luau", "zeron-plugin.json"] {
         std::fs::copy(src.join(f), dir.path().join(f)).unwrap();
     }
     std::fs::create_dir_all(dir.path().join("locales")).unwrap();
@@ -1928,7 +1928,7 @@ fn wallpaper_gpu_memory() {
     let items = vec![builtin("parallax-scenes")];
     let mut app = shell(items.clone());
     assert_eq!(app.error(), None);
-    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(Path::new(items[0].json["snapshot"].as_str().unwrap()).join("zeren-plugin.json")).unwrap()).unwrap();
+    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(Path::new(items[0].json["snapshot"].as_str().unwrap()).join("zeron-plugin.json")).unwrap()).unwrap();
     app.host.shared("plugins", zgx_script::Value::Nil).set(json_value(&json!({
         "state": "ready",
         "list": [{ "id": "parallax-scenes", "name": manifest["name"], "status": "on", "ui": manifest["ui"], "permissions": manifest["permissions"], "allowed": manifest["permissions"], "ask": [] }],
@@ -2058,7 +2058,7 @@ fn parallax_scenes_draws_a_new_chat_s_background_as_its_settings_say() {
     let mut app = shell(items.clone());
     assert_eq!(app.error(), None, "the shell with Parallax scenes failed");
     // On, and replacing the place (as the host lists it).
-    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(Path::new(items[0].json["snapshot"].as_str().unwrap()).join("zeren-plugin.json")).unwrap()).unwrap();
+    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(Path::new(items[0].json["snapshot"].as_str().unwrap()).join("zeron-plugin.json")).unwrap()).unwrap();
     // Its settings page: a scene and how far it moves, as Zeren checks them.
     let declared = super::settings::declared("parallax-scenes", &manifest, true);
     assert_eq!(declared.iter().map(|s| s.id.clone()).collect::<Vec<_>>(), ["wallpaper", "scene", "parallax"]);
@@ -2149,7 +2149,7 @@ fn a_plugin_s_icon_is_the_svg_in_its_folder_and_nothing_outside_it() {
     std::fs::create_dir_all(&dir).unwrap();
     std::fs::write(dir.join("icon.png"), "png").unwrap();
     for icon in ["../secret.svg", "/etc/x.svg", "icon.png", ""] {
-        std::fs::write(dir.join("zeren-plugin.json"), json!({ "id": "p", "icon": icon }).to_string()).unwrap();
+        std::fs::write(dir.join("zeron-plugin.json"), json!({ "id": "p", "icon": icon }).to_string()).unwrap();
         assert!(super::icon_svg(&json!({ "snapshot": dir })).is_none(), "{icon} isn't an icon");
     }
     let _ = std::fs::remove_dir_all(&dir);
@@ -2448,7 +2448,7 @@ fn the_design_system_lent_to_a_plugin_has_zeren_s_words_from_the_first_load() {
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).unwrap();
     std::fs::write(
-        dir.join("zeren-plugin.json"),
+        dir.join("zeron-plugin.json"),
         r#"{ "id": "lent-words", "name": "Lent words", "entry": "init.luau", "permissions": ["ui.add"] }"#,
     )
     .unwrap();

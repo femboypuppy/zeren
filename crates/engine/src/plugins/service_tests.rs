@@ -348,7 +348,7 @@ async fn the_checkout_status_example_answers_from_git() {
         Path::new(env!("CARGO_MANIFEST_DIR")).join("../../apps/zgx/plugins-dev/checkout-status");
     let dir = f.plugins.plugins_dir().join("checkout-status");
     std::fs::create_dir_all(&dir).unwrap();
-    for file in ["zeren-plugin.json", "init.luau", "service.luau"] {
+    for file in ["zeron-plugin.json", "init.luau", "service.luau"] {
         std::fs::copy(example.join(file), dir.join(file)).unwrap();
     }
     std::fs::write(dir.join("zeren.luau"), scaffold::SDK).unwrap();

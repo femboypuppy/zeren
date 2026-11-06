@@ -10,11 +10,12 @@ use sha2::Digest as _;
 
 use super::manifest::Manifest;
 
-pub const PAYLOAD_PREFIX: &str = "zeren-plugin:v1\n";
+// Published packages and service proofs keep upstream's signing domains.
+pub const PAYLOAD_PREFIX: &str = "zeron-plugin:v1\n";
 /// A template package's (plugins/template_packages.rs): its own domain, so a
 /// plugin's signature never verifies as a template's, or the reverse.
-pub const TEMPLATE_PAYLOAD_PREFIX: &str = "zeren-template:v1\n";
-pub const KEY_PROOF_PREFIX: &str = "zeren-plugin-key:v1:";
+pub const TEMPLATE_PAYLOAD_PREFIX: &str = "zeron-template:v1\n";
+pub const KEY_PROOF_PREFIX: &str = "zeron-plugin-key:v1:";
 pub const KEY_FILE: &str = "plugin-signing-key";
 
 pub type FileHashes = BTreeMap<String, String>;
@@ -222,7 +223,7 @@ impl SigningKey {
         B64URL.encode(self.pair.sign(message).as_ref())
     }
 
-    /// `b64url(sig("zeren-plugin-key:v1:" + key))` for `POST /plugin-keys`.
+    /// `b64url(sig("zeron-plugin-key:v1:" + key))` for `POST /plugin-keys`.
     pub fn proof(&self) -> String {
         self.sign(format!("{KEY_PROOF_PREFIX}{}", self.public()).as_bytes())
     }
@@ -414,7 +415,7 @@ mod tests {
         let raw = serde_json::json!({ "name": "Pin", "id": "pin" });
         let bytes = payload(&raw, "KEY", &files());
         let expected = format!(
-            "zeren-plugin:v1\n{{\"id\":\"pin\",\"name\":\"Pin\",\"signature\":{{\"files\":{{\"init.luau\":\"{}\"}},\"key\":\"KEY\"}}}}",
+            "zeron-plugin:v1\n{{\"id\":\"pin\",\"name\":\"Pin\",\"signature\":{{\"files\":{{\"init.luau\":\"{}\"}},\"key\":\"KEY\"}}}}",
             sha256_hex(b"print(1)")
         );
         assert_eq!(String::from_utf8(bytes).unwrap(), expected);

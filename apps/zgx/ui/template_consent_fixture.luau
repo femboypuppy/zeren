@@ -23,7 +23,7 @@ local PACKAGES: { [string]: any } = {
 		files = 42,
 		ignored = { "screens/plugins/page.luau", "account/sessions.luau" },
 		hash = "ledger-hash-1",
-		source = "ledger.zeren-template",
+		source = "ledger.zeron-template",
 		author = { kind = "verified", username = "ada" },
 	},
 	mystery = {

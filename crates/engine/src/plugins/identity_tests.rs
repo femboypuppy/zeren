@@ -183,7 +183,7 @@ async fn r3_a_same_key_update_that_changes_programs_and_mcp_waits() {
             "tools": [{ "name": "prs", "description": "Lists your pull requests" }],
         }),
     );
-    let path = package_file(&f, "focus.zeren-plugin", &v1);
+    let path = package_file(&f, "focus.zeron-plugin", &v1);
     call(
         &f.plugins,
         methods::INSTALL_PLUGIN,
@@ -253,7 +253,7 @@ async fn r3_an_update_inside_its_powers_does_not_ask() {
     let extra = serde_json::json!({ "permissions": ["commands", "ui.change"], "commands": ["gh", "git"], "ui": { "change": ["#composer"] } });
     let path = package_file(
         &f,
-        "focus.zeren-plugin",
+        "focus.zeron-plugin",
         &package(&ada, "focus", "1.0.0", extra.clone()),
     );
     call(
@@ -295,7 +295,7 @@ async fn r3_an_unknown_authors_update_waits_for_you() {
     let (zed, _) = SigningKey::generate().unwrap();
     let path = package_file(
         &f,
-        "z.zeren-plugin",
+        "z.zeron-plugin",
         &package(
             &zed,
             "zed",
@@ -385,7 +385,7 @@ async fn r4_an_own_key_package_never_turns_on_native_without_consent() {
             "tools": [{ "name": "run" }],
         }),
     );
-    let installed = install(&f, "mine.zeren-plugin", &raw).await.unwrap();
+    let installed = install(&f, "mine.zeron-plugin", &raw).await.unwrap();
     let plugin = &installed["plugin"];
     assert_eq!(plugin["author"]["kind"], "you");
     assert_eq!(installed["waiting"], true, "{installed}");
@@ -410,7 +410,7 @@ async fn r4_an_own_key_package_never_turns_on_native_without_consent() {
         serde_json::json!({ "permissions": ["ui.add"] }),
     );
     assert_eq!(
-        install(&f, "tame.zeren-plugin", &tame).await.unwrap()["plugin"]["status"],
+        install(&f, "tame.zeron-plugin", &tame).await.unwrap()["plugin"]["status"],
         "on"
     );
 }
@@ -428,7 +428,7 @@ async fn r4_another_devices_key_is_verified_and_asked() {
         "1.0.0",
         serde_json::json!({ "permissions": ["ui.add"] }),
     );
-    let installed = install(&f, "theirs.zeren-plugin", &raw).await.unwrap();
+    let installed = install(&f, "theirs.zeron-plugin", &raw).await.unwrap();
     assert_eq!(
         installed["plugin"]["author"],
         serde_json::json!({ "kind": "verified", "username": "me", "mine": true })
@@ -470,7 +470,7 @@ async fn r4_sign_plugin_signs_only_here_and_never_takes_over() {
     let ada = known(&f, &fake, Some("ada"), false);
     install(
         &f,
-        "focus.zeren-plugin",
+        "focus.zeron-plugin",
         &package(
             &ada,
             "focus",
@@ -673,7 +673,7 @@ async fn r17_a_key_without_a_username_is_unknown() {
     let nobody = known(&f, &fake, None, false);
     let installed = install(
         &f,
-        "x.zeren-plugin",
+        "x.zeron-plugin",
         &package(&nobody, "anon", "1", serde_json::json!({})),
     )
     .await
@@ -707,7 +707,7 @@ async fn r19_a_stale_own_id_never_makes_a_strangers_package_yours() {
     let eve = known(&f, &fake, Some("eve"), false);
     let installed = install(
         &f,
-        "focus.zeren-plugin",
+        "focus.zeron-plugin",
         &package(&eve, "focus", "1.0.0", serde_json::json!({})),
     )
     .await
@@ -726,7 +726,7 @@ async fn r23_a_signed_downgrade_is_refused() {
     let ada = known(&f, &fake, Some("ada"), false);
     let path = package_file(
         &f,
-        "focus.zeren-plugin",
+        "focus.zeron-plugin",
         &package(&ada, "focus", "2.0.0", serde_json::json!({})),
     );
     call(
@@ -848,7 +848,7 @@ async fn r13_a_key_revoked_elsewhere_stops_counting_within_the_ttl() {
     let ada = known(&f, &fake, Some("ada"), false);
     install(
         &f,
-        "focus.zeren-plugin",
+        "focus.zeron-plugin",
         &package(
             &ada,
             "focus",
@@ -998,7 +998,7 @@ async fn r13_this_devices_key_revoked_elsewhere_stops_being_yours() {
     assert_eq!(allow(&f.plugins, "mine").await["status"], "on");
     install(
         &f,
-        "signed.zeren-plugin",
+        "signed.zeron-plugin",
         &package(
             &old,
             "signed",

@@ -1526,7 +1526,7 @@ apps/zgx/plugins-builtin/git/repo.luau	18698	modified
 apps/zgx/plugins-builtin/git/service.luau	34547	modified
 apps/zgx/plugins-builtin/git/view.luau	16698	modified
 apps/zgx/plugins-builtin/git/words.luau	3201	modified
-apps/zgx/plugins-builtin/git/zeren-plugin.json	467	
+apps/zgx/plugins-builtin/git/zeron-plugin.json	467	
 apps/zgx/plugins-builtin/git/zeren.luau	44894	
 apps/zgx/plugins-builtin/github/badge.luau	1968	
 apps/zgx/plugins-builtin/github/board.luau	19307	
@@ -1544,7 +1544,7 @@ apps/zgx/plugins-builtin/github/panel_row.luau	3954
 apps/zgx/plugins-builtin/github/pulls.luau	18474	
 apps/zgx/plugins-builtin/github/viewer.luau	77627	modified
 apps/zgx/plugins-builtin/github/watch.luau	9652	
-apps/zgx/plugins-builtin/github/zeren-plugin.json	500	
+apps/zgx/plugins-builtin/github/zeron-plugin.json	500	
 apps/zgx/plugins-builtin/github/zeren.luau	44894	
 apps/zgx/plugins-builtin/parallax-scenes/art/aurora/far.webp	24276	
 apps/zgx/plugins-builtin/parallax-scenes/art/aurora/near.webp	26242	
@@ -1596,29 +1596,29 @@ apps/zgx/plugins-builtin/parallax-scenes/init.luau	3844
 apps/zgx/plugins-builtin/parallax-scenes/locales/en.json	383	
 apps/zgx/plugins-builtin/parallax-scenes/locales/zh-Hans.json	373	
 apps/zgx/plugins-builtin/parallax-scenes/scenes.luau	1809	
-apps/zgx/plugins-builtin/parallax-scenes/zeren-plugin.json	2694	modified
+apps/zgx/plugins-builtin/parallax-scenes/zeron-plugin.json	2694	modified
 apps/zgx/plugins-builtin/parallax-scenes/zeren.luau	40511	
 apps/zgx/plugins-dev/README.md	11850	
 apps/zgx/plugins-dev/checkout-status/init.luau	1668	
 apps/zgx/plugins-dev/checkout-status/service.luau	1494	
-apps/zgx/plugins-dev/checkout-status/zeren-plugin.json	664	
+apps/zgx/plugins-dev/checkout-status/zeron-plugin.json	664	
 apps/zgx/plugins-dev/checkout-status/zeren.luau	40511	
 apps/zgx/plugins-dev/compact-sidebar/init.luau	287	
 apps/zgx/plugins-dev/compact-sidebar/sidebar.luau	2518	
-apps/zgx/plugins-dev/compact-sidebar/zeren-plugin.json	260	
+apps/zgx/plugins-dev/compact-sidebar/zeron-plugin.json	260	
 apps/zgx/plugins-dev/compact-sidebar/zeren.luau	28306	
 apps/zgx/plugins-dev/focus/init.luau	1521	
-apps/zgx/plugins-dev/focus/zeren-plugin.json	283	
+apps/zgx/plugins-dev/focus/zeron-plugin.json	283	
 apps/zgx/plugins-dev/focus/zeren.luau	28306	
 apps/zgx/plugins-dev/install.sh	1551	
 apps/zgx/plugins-dev/md-hello/init.luau	1036	
-apps/zgx/plugins-dev/md-hello/zeren-plugin.json	315	
+apps/zgx/plugins-dev/md-hello/zeron-plugin.json	315	
 apps/zgx/plugins-dev/md-hello/zeren.luau	28306	
 apps/zgx/plugins-dev/notes-tool/init.luau	993	
-apps/zgx/plugins-dev/notes-tool/zeren-plugin.json	704	
+apps/zgx/plugins-dev/notes-tool/zeron-plugin.json	704	
 apps/zgx/plugins-dev/notes-tool/zeren.luau	28306	
 apps/zgx/plugins-dev/ping/init.luau	1812	
-apps/zgx/plugins-dev/ping/zeren-plugin.json	238	
+apps/zgx/plugins-dev/ping/zeron-plugin.json	238	
 apps/zgx/plugins-dev/ping/zeren.luau	28306	
 apps/zgx/plugins-dev/rig/down.sh	187	
 apps/zgx/plugins-dev/rig/ipc.mjs	2409	
@@ -1627,15 +1627,15 @@ apps/zgx/plugins-dev/rig/rig.mjs	19764
 apps/zgx/plugins-dev/rig/up.sh	338	
 apps/zgx/plugins-dev/rig/username.mjs	1111	
 apps/zgx/plugins-dev/session-status/init.luau	1056	
-apps/zgx/plugins-dev/session-status/zeren-plugin.json	246	
+apps/zgx/plugins-dev/session-status/zeron-plugin.json	246	
 apps/zgx/plugins-dev/session-status/zeren.luau	28306	
 apps/zgx/plugins-dev/session-words/init.luau	917	
 apps/zgx/plugins-dev/session-words/locales/en.json	225	
 apps/zgx/plugins-dev/session-words/locales/zh-Hans.json	211	
-apps/zgx/plugins-dev/session-words/zeren-plugin.json	276	
+apps/zgx/plugins-dev/session-words/zeron-plugin.json	276	
 apps/zgx/plugins-dev/session-words/zeren.luau	36986	
 apps/zgx/plugins-dev/settings-demo/init.luau	1435	
-apps/zgx/plugins-dev/settings-demo/zeren-plugin.json	1852	
+apps/zgx/plugins-dev/settings-demo/zeron-plugin.json	1852	
 apps/zgx/plugins-dev/settings-demo/zeren.luau	32606	
 apps/zgx/plugins-sdk/zeren.luau	44894	
 apps/zgx/scripts/smoke.sh	6651	
@@ -6799,7 +6799,7 @@ it opened on. From a fullscreen app it is covered and waits; zgx's
 
 ## Plugins and templates
 
-**A plugin is a folder in the engine's data dir:** `<data>/plugins/<id>/`, with its `zeren-plugin.json`, `init.luau` and files. Dropping one in installs it.
+**A plugin is a folder in the engine's data dir:** `<data>/plugins/<id>/`, with its `zeron-plugin.json`, `init.luau` and files. Dropping one in installs it.
 
 **The engine decides what loads** (`crates/engine/src/plugins`):
 - It checks each plugin's signature against the account that owns the key. Every device has its own ed25519 key, registered to the account on the edge.
@@ -10708,7 +10708,7 @@ use super::{Item, expose_own, expose_surface};
 
 fn md_hello(status: &str) -> Item {
     let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("plugins-dev").join("md-hello");
-    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(dir.join("zeren-plugin.json")).unwrap()).unwrap();
+    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(dir.join("zeron-plugin.json")).unwrap()).unwrap();
     Item {
         json: json!({
             "id": "md-hello", "name": manifest["name"], "status": status, "entry": manifest["entry"],
@@ -30510,7 +30510,7 @@ return M
 --   state.open_folder(id?)    its folder (or the plugins folder) in Finder
 --   state.install({ path? , url?, device? })  a promise of `{ plugin, update,
 --                             added, removed, waiting }`: someone else's plugin
---                             from a .zeren-plugin file (this device only) or a
+--                             from a .zeron-plugin file (this device only) or a
 --                             link; it waits for the consent window unless it's
 --                             signed as yours
 --   state.update(id, device?)  a promise of the same: the update found for it
@@ -34031,7 +34031,7 @@ end
 --   state.open_folder(id)    its folder in Finder
 --   state.yours(t)           whether you (or your agents) made it
 --   state.export(id, path)   a promise of `{ path, files }`: it, signed as
---                            yours, as one .zeren-template file
+--                            yours, as one .zeron-template file
 --   state.import(path)       a promise of `{ installed = id }` (yours), or
 --                            `{ pending = name }` (someone else's: the host
 --                            opens Zeren's consent window for it)
@@ -34868,7 +34868,7 @@ ui.command {
 	id = "waiting",
 	title = "Someone's template waits for you",
 	run = function()
-		table.insert(waiting, { pending = "ledger-1700000000", name = "Ledger", source = "ledger.zeren-template" })
+		table.insert(waiting, { pending = "ledger-1700000000", name = "Ledger", source = "ledger.zeron-template" })
 		publish()
 	end,
 }

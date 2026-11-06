@@ -1,4 +1,4 @@
-//! `zeren-plugin.json`: parsing and validation (contract "Manifest").
+//! `zeron-plugin.json`: parsing and validation (contract "Manifest").
 //!
 //! The raw JSON [`serde_json::Value`] is kept beside the typed view: the
 //! signature and the content hash cover the manifest exactly as written
@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 
 use serde::Serialize;
 
-pub const MANIFEST_FILE: &str = "zeren-plugin.json";
+pub const MANIFEST_FILE: &str = "zeron-plugin.json";
 
 /// Every permission a manifest may ask for.
 pub const KNOWN_PERMISSIONS: &[&str] = &[
@@ -254,16 +254,16 @@ fn parse_signature(value: &serde_json::Value) -> Result<SignatureSpec, ()> {
 }
 
 impl Manifest {
-    /// Parse `zeren-plugin.json`'s bytes. `Err` = not a JSON object.
+    /// Parse `zeron-plugin.json`'s bytes. `Err` = not a JSON object.
     pub fn parse(bytes: &[u8]) -> Result<Self, String> {
         let raw: serde_json::Value = serde_json::from_slice(bytes)
-            .map_err(|_| "Its zeren-plugin.json isn't valid JSON".to_string())?;
+            .map_err(|_| "Its zeron-plugin.json isn't valid JSON".to_string())?;
         Self::from_value(raw)
     }
 
     pub fn from_value(raw: serde_json::Value) -> Result<Self, String> {
         let Some(object) = raw.as_object() else {
-            return Err("Its zeren-plugin.json isn't a JSON object".into());
+            return Err("Its zeron-plugin.json isn't a JSON object".into());
         };
         let mut problems: Vec<String> = Vec::new();
         let text = |key: &str, problems: &mut Vec<String>, required: bool| -> String {

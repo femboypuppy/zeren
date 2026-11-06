@@ -14,9 +14,9 @@
 --   state.open_folder(id)    its folder in Finder
 --   state.yours(t)           whether you (or your agents) made it
 --   state.export(id, path)   a promise of `{ path, files }`: it, signed as
---                            yours, as one .zeren-template file
+--                            yours, as one .zeron-template file
 --   state.import(from)       from a file (`path`, or `{ path }`) or a link
---                            (`{ url }`: a .zeren-template's, or a GitHub
+--                            (`{ url }`: a .zeron-template's, or a GitHub
 --                            repository or release with one): a promise of
 --                            `{ installed = id, name }` (yours), or
 --                            `{ pending = name }` (someone else's: the host

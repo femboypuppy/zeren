@@ -152,7 +152,7 @@ Save it with the template in use, and the next new chat shows it. If it fails, Z
 
 ## Sharing
 
-`export_template { id, path }` saves a template as one `.zeren-template` file, signed with this device's key (the person's Zeren account vouches for it, as for their plugins). It holds the template's own files and its `preview.png`; the files no template may replace (`screens/plugins/`, `screens/templates/`, `account/`, `.luaurc`) are left out.
+`export_template { id, path }` saves a template as one `.zeron-template` file, signed with this device's key (the person's Zeren account vouches for it, as for their plugins). It holds the template's own files and its `preview.png`; the files no template may replace (`screens/plugins/`, `screens/templates/`, `account/`, `.luaurc`) are left out.
 
 `import_template { path }` checks the signature over every file before anything is written; an unsigned or changed package is refused. One signed on this device installs at once, as a preview until the person keeps it. Anyone else's waits for the person: a template runs as Zeren's own code with all its powers, so they allow it in Zeren's own consent window, which shows who signed it. No tool can allow it for them; the reply says `needs_consent`. Protected files in a package are never installed (`ignored` names them). Once installed, `list_templates` shows it with `imported.author`.
 

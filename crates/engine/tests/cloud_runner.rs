@@ -233,7 +233,7 @@ fn edge_handler(state: Arc<Mutex<Edge>>) -> impl FnMut(&Req) -> (u16, Value) + S
                 let device = b["deviceId"].as_str().unwrap();
                 let ts = b["ts"].as_i64().unwrap();
                 let message = format!(
-                    "zeren-runner-token\n{}\n{}\n{device}\n{ts}",
+                    "zeron-runner-token\n{}\n{}\n{device}\n{ts}",
                     b["orgId"].as_str().unwrap(),
                     b["userId"].as_str().unwrap()
                 );
@@ -270,7 +270,7 @@ fn edge_handler(state: Arc<Mutex<Edge>>) -> impl FnMut(&Req) -> (u16, Value) + S
                 let device = b["deviceId"].as_str().unwrap();
                 let provider = b["provider"].as_str().unwrap();
                 let ts = b["ts"].as_i64().unwrap();
-                let message = format!("zeren-vault-grant\n{USER}\n{device}\n{provider}\n{ts}");
+                let message = format!("zeron-vault-grant\n{USER}\n{device}\n{provider}\n{ts}");
                 let key = edge.public_keys.get(device).cloned().unwrap_or_default();
                 if !verify(&key, &message, b["sig"].as_str().unwrap()) {
                     return (401, json!({"error": "bad_signature"}));
@@ -620,7 +620,7 @@ async fn runner_auth_is_signed_in_and_mints_signed_monotonic_tokens() {
     for req in rig.edge.requests("/runner/token") {
         let b = &req.body;
         let message = format!(
-            "zeren-runner-token\n{ORG}\n{USER}\ncloud-a\n{}",
+            "zeron-runner-token\n{ORG}\n{USER}\ncloud-a\n{}",
             b["ts"].as_i64().unwrap()
         );
         assert!(verify(

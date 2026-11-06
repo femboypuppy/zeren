@@ -1,5 +1,5 @@
 -- Greeter: a greeting in the title bar ("ui.add", at #titlebar-actions),
--- set up on its own page in Settings (zeren-plugin.json's "settings":
+-- set up on its own page in Settings (zeron-plugin.json's "settings":
 -- Zeren draws the page and keeps what you set, for this plugin alone).
 -- It reads its settings as they change (`zeren.setting(id):get()`), and
 -- hears each change (`zeren.on_setting`), here said in a toast.

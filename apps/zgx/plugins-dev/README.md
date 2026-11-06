@@ -12,12 +12,12 @@ Seven plugins, each proving one thing Zeren's plugins can do. They are **not bui
 | `session-status` | A node placed in each chat's header that reads its session (`zeren.need("session")`); placed where there's none, Settings says why | `ui.add`, `sessions.read` | you |
 | `settings-demo` | Settings declared in its manifest, drawn by Zeren as its own page (Settings → Greeter), read with `zeren.setting(id)` and heard with `zeren.on_setting` | `ui.add` | you |
 
-Each folder has its manifest (`zeren-plugin.json`), its `init.luau`, and a copy of Zeren's helpers (`zeren.luau`, from `apps/zgx/plugins-sdk/`), which `zeren plugin new` puts in every new plugin.
+Each folder has its manifest (`zeron-plugin.json`), its `init.luau`, and a copy of Zeren's helpers (`zeren.luau`, from `apps/zgx/plugins-sdk/`), which `zeren plugin new` puts in every new plugin.
 
 ## What a plugin is
 
 A plugin is a folder in `<data>/plugins/<id>/`:
-- `zeren-plugin.json` holds its id, name, version, description, entry, the permissions it needs, its tools and its signature.
+- `zeron-plugin.json` holds its id, name, version, description, entry, the permissions it needs, its tools and its signature.
 - Dropping a folder in installs it.
 
 **Who made it.** The engine checks every plugin's signature against the account that owns the signing key.
@@ -29,7 +29,7 @@ A plugin is a folder in `<data>/plugins/<id>/`:
 **Signing your own.** Use `zeren plugin new <id>` (or New plugin in Settings → Plugins, or an agent's `create_plugin` tool), or `zeren plugin sign <id>`. Either way, your plugins stay yours as you and your agents edit them.
 
 **Installing someone else's.**
-- **The person:** Settings → Plugins → Install… takes a `.zeren-plugin` file or a link. The link can point to a package, a GitHub release that carries one, or a git repository (`owner/repo`, or `…/tree/<branch>/<folder>`).
+- **The person:** Settings → Plugins → Install… takes a `.zeron-plugin` file or a link. The link can point to a package, a GitHub release that carries one, or a git repository (`owner/repo`, or `…/tree/<branch>/<folder>`).
 - **An agent:** uses `install_plugin`.
 - **Before it runs:** the signature is checked over every file first. Anyone else's waits until you allow what it asks; one signed by your own key turns on at once.
 - **Where it came from** is kept in its folder's `.source.json`. Zeren checks there for updates, when Settings → Plugins opens and every few hours.

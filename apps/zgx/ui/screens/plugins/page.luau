@@ -21,7 +21,7 @@
 -- must not be able to allow anything themselves.
 --
 -- Someone else's plugins come in by Install… (a link: a package, a GitHub
--- release, a git repository; or, on this device, a .zeren-plugin file):
+-- release, a git repository; or, on this device, a .zeron-plugin file):
 -- the engine checks the signature, then it waits for the consent window
 -- like any other. Each one's source is checked for a newer version as the
 -- page opens on a device (the engine checks every few hours too); a row
@@ -109,7 +109,7 @@ end
 
 -- (Its name read as the dialog opens, in the locale then.)
 local function package_filter(): { any }
-	return { { ui.t("plugins.page.package_filter"):get(), { "zeren-plugin" } } }
+	return { { ui.t("plugins.page.package_filter"):get(), { "zeron-plugin" } } }
 end
 
 -- What went wrong asking the host, said once: a device that couldn't be
@@ -164,7 +164,7 @@ local function install(from: { path: string?, url: string?, device: string? })
 	end)
 end
 
--- Install's file: a .zeren-plugin (this device's alone), installed with
+-- Install's file: a .zeron-plugin (this device's alone), installed with
 -- the dialog open as a link is.
 local function choose_file()
 	if install_busy:peek() then

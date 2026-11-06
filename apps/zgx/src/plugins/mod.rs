@@ -870,8 +870,8 @@ pub fn dev_plugins(host: &ScriptHost) {
     let mut hosts = Vec::new();
     let mut plugins = Vec::new();
     for dir in std::env::split_paths(&dirs) {
-        let Ok(text) = std::fs::read_to_string(dir.join("zeren-plugin.json")) else {
-            eprintln!("zeren-zgx: dev plugin {}: no zeren-plugin.json", dir.display());
+        let Ok(text) = std::fs::read_to_string(dir.join("zeron-plugin.json")) else {
+            eprintln!("zeren-zgx: dev plugin {}: no zeron-plugin.json", dir.display());
             continue;
         };
         let Ok(manifest) = serde_json::from_str::<Json>(&text) else { continue };
@@ -2868,7 +2868,7 @@ impl Bridge {
                 }
             }
         });
-        // Someone else's plugin, from a .zeren-plugin file or a link (a
+        // Someone else's plugin, from a .zeron-plugin file or a link (a
         // package, a GitHub release, a git repository). The engine verifies
         // it first; anyone else's waits for the consent window. Another
         // device installs from a link only: a file here isn't there.
@@ -3040,8 +3040,8 @@ impl Bridge {
             let id = arg.field("id").map(text).unwrap_or_default();
             let mut path = arg.field("path").map(text).unwrap_or_default();
             // (A save dialog's name, its extension taken off.)
-            if !path.is_empty() && !path.ends_with(".zeren-template") {
-                path.push_str(".zeren-template");
+            if !path.is_empty() && !path.ends_with(".zeron-template") {
+                path.push_str(".zeron-template");
             }
             template_call("ExportTemplate", json!({ "id": id, "path": path })).await.map(|v| json_value(&v))
         });

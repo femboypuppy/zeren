@@ -7,9 +7,9 @@
 -- preview is drawn from its template's colours (src/plugins/looks.rs): a
 -- swatch of each appearance it changes, or the default's.
 --
--- Templates are shared as signed .zeren-template files: Export… (a row's
+-- Templates are shared as signed .zeron-template files: Export… (a row's
 -- ⋯) signs one as yours; Install brings one in, as Plugins' does: from a
--- link (a .zeren-template's, or a GitHub repository or release with one)
+-- link (a .zeron-template's, or a GitHub repository or release with one)
 -- or a file, the dialog open and its Install spinning until it's done.
 -- Someone else's waits, named above the rows, until you allow it in
 -- Zeren's consent window (its own window: nothing here can allow it). One
@@ -153,13 +153,13 @@ end
 
 -- (Its name read as the dialog opens, in the locale then.)
 local function package_filter(): { any }
-	return { { ui.t("templates.page.package_filter"):get(), { "zeren-template" } } }
+	return { { ui.t("templates.page.package_filter"):get(), { "zeron-template" } } }
 end
 
 -- Export…: where to save it, then it, signed as yours.
 local function export_file(id: string, name: string)
 	ui.task(function()
-		local file = ui.save_file({ title = ui.t("templates.page.export_title"):get(), name = `{id}.zeren-template`, filters = package_filter() }):await()
+		local file = ui.save_file({ title = ui.t("templates.page.export_title"):get(), name = `{id}.zeron-template`, filters = package_filter() }):await()
 		if not file then
 			return
 		end
@@ -173,7 +173,7 @@ local function export_file(id: string, name: string)
 	end)
 end
 
--- Install: a link or a .zeren-template file. Yours installs; someone
+-- Install: a link or a .zeron-template file. Yours installs; someone
 -- else's opens Zeren's consent window (the host's), and waits above the
 -- rows. The dialog closes once it's done; failing, it stays, to try again.
 local function install(from: { path: string?, url: string? })

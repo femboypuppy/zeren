@@ -137,28 +137,28 @@ export const apnsConfig = (env: Env) =>
 /** Header the Worker stamps on requests it forwards into DOs after verifying
  * the caller's JWT. DOs trust it blindly — they are only reachable through
  * the Worker (design §2: "DO never sees an unauthenticated frame"). */
-export const AUTH_USER_HEADER = "x-zeren-auth-user";
+export const AUTH_USER_HEADER = "x-zeron-auth-user";
 
 /** Header the Worker stamps on requests forwarded into workspace-doc rooms
  * (`ws/{orgId}`). Membership (JWT org claim == orgId) is enforced at the
  * Worker; the SessionRoom DO sees this and skips its per-chat
  * claim-on-first-join ownership discipline for the room. */
-export const ROOM_KIND_HEADER = "x-zeren-room-kind";
+export const ROOM_KIND_HEADER = "x-zeron-room-kind";
 
 /** Header the Worker stamps on every DO forward made with a RUNNER bearer
  * (the Cloud device): the verified device id from the runner JWT's `dev`
  * claim. Always stripped from inbound requests first, so only the Worker can
  * assert it. RegistryRoom restricts such callers to rows their device owns
  * (registry-runner.ts). */
-export const RUNNER_DEVICE_HEADER = "x-zeren-runner-device";
+export const RUNNER_DEVICE_HEADER = "x-zeron-runner-device";
 
 /** Companion of RUNNER_DEVICE_HEADER: the runner's account (logical Cloud
  * device, JWT `cld`). A session runner may read its account's project
  * spaces. Same strip-then-stamp discipline. */
-export const RUNNER_ACCOUNT_HEADER = "x-zeren-runner-account";
+export const RUNNER_ACCOUNT_HEADER = "x-zeron-runner-account";
 
 /** Header the Worker stamps on a device-room client dial whose calling device
  * it verified (device-link.ts): a runner's own device, or a device that
  * proved possession of its registered plugin key. DeviceRoom puts it on every
  * frame that client relays (`fromDevice`). Same strip-then-stamp discipline. */
-export const CALLER_DEVICE_HEADER = "x-zeren-caller-device";
+export const CALLER_DEVICE_HEADER = "x-zeron-caller-device";

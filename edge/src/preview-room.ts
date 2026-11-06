@@ -17,9 +17,9 @@ type Attachment = {
 };
 
 /** Set by the Worker for runner bearers (stripped from every request first). */
-export const PREVIEW_PUBLISHER_HEADER = "x-zeren-preview-publisher";
+export const PREVIEW_PUBLISHER_HEADER = "x-zeron-preview-publisher";
 /** Set by the Worker when a user's device joins to finish a provider sign-in. */
-export const PREVIEW_SIGN_IN_HEADER = "x-zeren-preview-sign-in";
+export const PREVIEW_SIGN_IN_HEADER = "x-zeron-preview-sign-in";
 /** Devices one user keeps in the room at once. */
 const DEVICE_LIMIT = 16;
 /** A sign-in's callback rides this room, so it gets in past

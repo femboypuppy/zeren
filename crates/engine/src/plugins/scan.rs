@@ -89,10 +89,10 @@ pub fn inspect(dir: &Path, under_plugins: bool) -> Inspected {
             return fail(inspected, super::files::LINK_ERROR.into());
         }
         Ok(meta) if meta.is_file() => {}
-        _ => return fail(inspected, "It has no zeren-plugin.json".into()),
+        _ => return fail(inspected, "It has no zeron-plugin.json".into()),
     }
     let Ok(bytes) = std::fs::read(&manifest_path) else {
-        return fail(inspected, "Its zeren-plugin.json can't be read".into());
+        return fail(inspected, "Its zeron-plugin.json can't be read".into());
     };
     inspected.manifest_bytes = bytes;
     let manifest = match Manifest::parse(&inspected.manifest_bytes) {

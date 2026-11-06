@@ -13,7 +13,7 @@ use super::{Item, expose_own, expose_surface, json_value, records};
 
 fn md_hello(status: &str) -> Item {
     let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("plugins-dev").join("md-hello");
-    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(dir.join("zeren-plugin.json")).unwrap()).unwrap();
+    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(dir.join("zeron-plugin.json")).unwrap()).unwrap();
     Item {
         json: json!({
             "id": "md-hello", "name": manifest["name"], "status": status, "entry": manifest["entry"],

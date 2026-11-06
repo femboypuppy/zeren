@@ -17,7 +17,7 @@
 //!   (0600) and `{data_dir}/device-id` = the edge-minted device id. Network
 //!   failures retry with backoff; a 4xx is fatal (the one-time code is spent).
 //! - **Tokens**: `POST {edge}/runner/token` signed over
-//!   `zeren-runner-token\n{orgId}\n{userId}\n{deviceId}\n{ts}` — driven by
+//!   `zeron-runner-token\n{orgId}\n{userId}\n{deviceId}\n{ts}` — driven by
 //!   [`crate::Auth`]'s runner mode, so every room/relay/RPC bearer consumer
 //!   works unchanged.
 //! - **Heartbeat**: `POST {edge}/runner/heartbeat {activeRuns, clients}` every
@@ -494,8 +494,8 @@ pub const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(60);
 const HTTP_TIMEOUT: Duration = Duration::from_secs(15);
 const ENROLL_RETRY_BASE: Duration = Duration::from_secs(1);
 const ENROLL_RETRY_CAP: Duration = Duration::from_secs(60);
-const TOKEN_DOMAIN: &str = "zeren-runner-token";
-const GRANT_DOMAIN: &str = "zeren-vault-grant";
+const TOKEN_DOMAIN: &str = "zeron-runner-token";
+const GRANT_DOMAIN: &str = "zeron-vault-grant";
 
 /// This engine's `Device::platform`: `ZEREN_DEVICE_PLATFORM` when set, else
 /// the OS (`macos` / `linux` / `windows`).
@@ -1504,17 +1504,17 @@ mod tests {
         let key = UnparsedPublicKey::new(&ED25519, public);
 
         let token = id.token_request();
-        let message = format!("zeren-runner-token\norg_1\nuser_1\ncloud-1\n{}", token.ts);
+        let message = format!("zeron-runner-token\norg_1\nuser_1\ncloud-1\n{}", token.ts);
         key.verify(message.as_bytes(), &B64URL.decode(&token.sig).unwrap())
             .expect("token signature verifies");
 
         let grant = id.grant_request("codex", None);
         assert!(grant.ts > token.ts);
-        let message = format!("zeren-vault-grant\nuser_1\ncloud-1\ncodex\n{}", grant.ts);
+        let message = format!("zeron-vault-grant\nuser_1\ncloud-1\ncodex\n{}", grant.ts);
         key.verify(message.as_bytes(), &B64URL.decode(&grant.sig).unwrap())
             .expect("grant signature verifies");
         // A different domain never verifies (no cross-protocol replay).
-        let forged = format!("zeren-runner-token\nuser_1\ncloud-1\ncodex\n{}", grant.ts);
+        let forged = format!("zeron-runner-token\nuser_1\ncloud-1\ncodex\n{}", grant.ts);
         assert!(
             key.verify(forged.as_bytes(), &B64URL.decode(&grant.sig).unwrap())
                 .is_err()

@@ -436,7 +436,7 @@ fn sign_folder(dir: &Path, key: &SigningKey) -> Result<Option<Vec<u8>>, String> 
     }
     let bytes = signing::pretty(&key.sign_manifest(&manifest.raw, &inspected.files));
     write_replace(&dir.join(MANIFEST_FILE), &bytes)
-        .map_err(|_| "Couldn't write its zeren-plugin.json".to_string())?;
+        .map_err(|_| "Couldn't write its zeron-plugin.json".to_string())?;
     Ok(Some(bytes))
 }
 
@@ -2251,7 +2251,7 @@ impl Plugins {
                         }
                         methods::IMPORT_TEMPLATE => {
                             let path = path.ok_or(
-                                "Say which file to import (`path`, a .zeren-template file).",
+                                "Say which file to import (`path`, a .zeron-template file).",
                             )?;
                             template_packages::import(&dir, &path, author_of)
                         }

@@ -1239,7 +1239,7 @@ async fn plugins_install_from_a_package_waits_for_consent_unless_yours() {
     let ada = someone(&f, &fake, "ada");
     let path = package_file(
         &f,
-        "focus.zeren-plugin",
+        "focus.zeron-plugin",
         &signed_package(&ada, "focus", "1.0.0", &["ui.add"], "return 1"),
     );
     let installed = call(
@@ -1277,7 +1277,7 @@ async fn plugins_install_from_a_package_waits_for_consent_unless_yours() {
     let own = signing::load_or_create_key(&f.data).unwrap();
     let path = package_file(
         &f,
-        "mine.zeren-plugin",
+        "mine.zeron-plugin",
         &signed_package(&own, "mine", "1.0.0", &["ui.add", "links.open"], "return 1"),
     );
     let mine = call(
@@ -1310,7 +1310,7 @@ async fn plugins_install_from_a_package_waits_for_consent_unless_yours() {
     ));
     let path = package_file(
         &f,
-        "evil.zeren-plugin",
+        "evil.zeron-plugin",
         &serde_json::to_vec(&value).unwrap(),
     );
     let refused = call(
@@ -1323,7 +1323,7 @@ async fn plugins_install_from_a_package_waits_for_consent_unless_yours() {
     assert_eq!(refused, install::WORDS.tampered);
     assert!(!f.plugins.plugins_dir().join("evil").exists());
     // Not a package at all.
-    let path = package_file(&f, "x.zeren-plugin", b"{}");
+    let path = package_file(&f, "x.zeron-plugin", b"{}");
     assert_eq!(
         call(
             &f.plugins,
@@ -1343,7 +1343,7 @@ async fn plugins_updates_keep_consent_ask_for_new_permissions_and_refuse_tamperi
     let ada = someone(&f, &fake, "ada");
     let path = package_file(
         &f,
-        "focus.zeren-plugin",
+        "focus.zeron-plugin",
         &signed_package(&ada, "focus", "1.0.0", &["ui.add"], "return 1"),
     );
     let installed = call(
@@ -1537,7 +1537,7 @@ async fn plugins_an_unknown_authors_update_keeps_consent_by_key() {
     let (zed, _) = SigningKey::generate().unwrap();
     let path = package_file(
         &f,
-        "z.zeren-plugin",
+        "z.zeron-plugin",
         &signed_package(&zed, "zed", "1", &["ui.add"], "return 1"),
     );
     let installed = call(
@@ -1718,7 +1718,7 @@ async fn plugins_install_from_git_and_update_from_its_branch() {
     )
     .await
     .unwrap_err();
-    assert!(err.contains("no zeren-plugin.json"), "{err}");
+    assert!(err.contains("no zeron-plugin.json"), "{err}");
 }
 
 #[tokio::test]
@@ -1728,7 +1728,7 @@ async fn plugins_uninstall_removes_its_folder_decision_storage_and_update() {
     let ada = someone(&f, &fake, "ada");
     let path = package_file(
         &f,
-        "focus.zeren-plugin",
+        "focus.zeron-plugin",
         &signed_package(&ada, "focus", "1.0.0", &["ui.add"], "return 1"),
     );
     let installed = call(
@@ -1817,7 +1817,7 @@ async fn plugins_export_packs_a_plugin_that_installs_elsewhere() {
     .await
     .unwrap();
     let path = PathBuf::from(exported["path"].as_str().unwrap());
-    assert_eq!(path, out.join("hello-0.1.0.zeren-plugin"));
+    assert_eq!(path, out.join("hello-0.1.0.zeron-plugin"));
     let package = install::parse(std::fs::read(&path).unwrap()).unwrap();
     assert_eq!(package.key, signing::load_key(&f.data).unwrap().public());
     // On another device of someone else's.

@@ -1,9 +1,9 @@
 //! Plugins from someone else: installed from a package file
-//! (`.zeren-plugin`), a link to one, a GitHub release carrying one, or a
+//! (`.zeron-plugin`), a link to one, a GitHub release carrying one, or a
 //! git repository; updated from where each came from.
 //!
 //! A package is the shared signed package (`package.rs`, the format
-//! templates use too) with the plugin's own signed `zeren-plugin.json` as
+//! templates use too) with the plugin's own signed `zeron-plugin.json` as
 //! its manifest and the files that signature covers. A git repository is
 //! read the same way: its folder packed, then verified like any package. So
 //! every way in checks the signature over every file before anything is
@@ -17,7 +17,7 @@
 //!
 //! Where each came from is kept beside its files in `.source.json` (a dot
 //! file, so never part of what's signed). An update found is kept in
-//! `<plugins>/.updates/<id>.zeren-plugin`, with what it changes in
+//! `<plugins>/.updates/<id>.zeron-plugin`, with what it changes in
 //! `<id>.json`, until it's installed or the plugin changes.
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -33,8 +33,8 @@ use super::package::{self, MAX_PACKAGE_BYTES, Words};
 use super::scan;
 use super::signing::{self, SigCheck};
 
-pub const FORMAT: &str = "zeren-plugin:v1";
-pub const EXTENSION: &str = "zeren-plugin";
+pub const FORMAT: &str = "zeron-plugin:v1";
+pub const EXTENSION: &str = "zeron-plugin";
 pub const SOURCE_FILE: &str = ".source.json";
 /// Where a plugin is put together before it takes its folder.
 pub const INCOMING_DIR: &str = ".incoming";
@@ -379,7 +379,7 @@ pub fn https_link(link: &str) -> Option<String> {
 }
 
 /// What `link` names, if it's something a plugin can come from: a package
-/// link (`….zeren-plugin`), a GitHub release (`…/releases/latest`,
+/// link (`….zeron-plugin`), a GitHub release (`…/releases/latest`,
 /// `…/releases/tag/<tag>`), a GitHub repository (`owner/repo`, its page,
 /// `…/tree/<branch>/<folder>`), or any `https` git repository.
 pub fn origin(link: &str, git_ref: Option<&str>, path: Option<&str>) -> Result<Origin, String> {
@@ -502,7 +502,7 @@ pub async fn download(url: &str) -> Result<Vec<u8>, String> {
     Ok(bytes)
 }
 
-/// The `.zeren-plugin` asset of `repo`'s release `tag` (the latest when none).
+/// The `.zeron-plugin` asset of `repo`'s release `tag` (the latest when none).
 pub async fn release_asset(repo: &str, tag: Option<&str>) -> Result<String, String> {
     release_asset_of(repo, tag, EXTENSION).await
 }
@@ -611,8 +611,8 @@ pub async fn from_git(
         };
         if !folder.join(MANIFEST_FILE).is_file() {
             return Err(match path {
-                Some(path) => format!("There's no zeren-plugin.json in {path}"),
-                None => "There's no zeren-plugin.json at the top of that repository".into(),
+                Some(path) => format!("There's no zeron-plugin.json in {path}"),
+                None => "There's no zeron-plugin.json at the top of that repository".into(),
             });
         }
         let raw = tokio::task::spawn_blocking(move || pack_folder(&folder))
@@ -915,7 +915,7 @@ pub(crate) mod tests {
         let source = Source {
             kind: "file".into(),
             url: None,
-            path: Some("/x.zeren-plugin".into()),
+            path: Some("/x.zeron-plugin".into()),
             git_ref: None,
             commit: None,
             version: "1.0.0".into(),
@@ -973,7 +973,7 @@ pub(crate) mod tests {
             newer.hash
         );
 
-        // A package carrying its own zeren-plugin.json as a file, refused.
+        // A package carrying its own zeron-plugin.json as a file, refused.
         let mut files = BTreeMap::new();
         files.insert("init.luau".to_string(), b"return 1".to_vec());
         files.insert(MANIFEST_FILE.to_string(), b"{}".to_vec());
@@ -1010,8 +1010,8 @@ pub(crate) mod tests {
             git("https://github.com/ada/focus.git", None, None)
         );
         assert_eq!(
-            origin("example.com/x/focus.zeren-plugin", None, None).unwrap(),
-            Origin::Link("https://example.com/x/focus.zeren-plugin".into())
+            origin("example.com/x/focus.zeron-plugin", None, None).unwrap(),
+            Origin::Link("https://example.com/x/focus.zeron-plugin".into())
         );
         assert_eq!(
             origin(
@@ -1041,15 +1041,15 @@ pub(crate) mod tests {
             }
         );
         assert_eq!(
-            origin("https://example.com/focus.zeren-plugin", None, None).unwrap(),
-            Origin::Link("https://example.com/focus.zeren-plugin".into())
+            origin("https://example.com/focus.zeron-plugin", None, None).unwrap(),
+            Origin::Link("https://example.com/focus.zeron-plugin".into())
         );
         assert_eq!(
             origin("https://git.example.com/focus.git", None, None).unwrap(),
             git("https://git.example.com/focus.git", None, None)
         );
         for bad in [
-            "http://example.com/x.zeren-plugin",
+            "http://example.com/x.zeron-plugin",
             "ssh://git@github.com/a/b",
             "ext::sh -c x",
             "",
@@ -1077,7 +1077,7 @@ pub(crate) mod tests {
         .unwrap();
         let source = Source {
             kind: "link".into(),
-            url: Some("https://e/x.zeren-plugin".into()),
+            url: Some("https://e/x.zeron-plugin".into()),
             path: None,
             git_ref: None,
             commit: None,

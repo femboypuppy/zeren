@@ -15,7 +15,7 @@ pub fn init_luau(id: &str, name: &str) -> String {
 --
 -- Zeren loads this file when the plugin is on, and reloads it as you save.
 -- zeren.luau's header (next to this file) lists what each helper does and
--- which permission in zeren-plugin.json it needs. This plugin asks for none
+-- which permission in zeron-plugin.json it needs. This plugin asks for none
 -- yet: add the ones you use there.
 --
 -- For example, with "ui.add":

@@ -300,7 +300,7 @@ it opened on. From a fullscreen app it is covered and waits; zgx's
 
 ## Plugins and templates
 
-**A plugin is a folder in the engine's data dir:** `<data>/plugins/<id>/`, with its `zeren-plugin.json`, `init.luau` and files. Dropping one in installs it.
+**A plugin is a folder in the engine's data dir:** `<data>/plugins/<id>/`, with its `zeron-plugin.json`, `init.luau` and files. Dropping one in installs it.
 
 **The engine decides what loads** (`crates/engine/src/plugins`):
 - It checks each plugin's signature against the account that owns the key. Every device has its own ed25519 key, registered to the account on the edge.

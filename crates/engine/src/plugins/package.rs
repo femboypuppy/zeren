@@ -1,6 +1,6 @@
 //! Signed packages: one JSON file carrying a signed manifest and the files
 //! it covers, `{format, manifest, files: {rel: base64}}`. Plugins
-//! (`.zeren-plugin`, the plugin domain) and templates (`.zeren-template`,
+//! (`.zeron-plugin`, the plugin domain) and templates (`.zeron-template`,
 //! the template domain) share it. Each kind brings its format, its signing
 //! prefix, which paths it keeps, and its words for a refusal.
 //!
@@ -164,7 +164,7 @@ mod tests {
         files.insert("init.luau".to_string(), b"return 1".to_vec());
         let manifest = key.sign_manifest(&json!({ "id": "p", "name": "P" }), &hashes(&files));
         (
-            pack("zeren-plugin:v1", &manifest, &files).unwrap(),
+            pack("zeron-plugin:v1", &manifest, &files).unwrap(),
             key.public(),
         )
     }
@@ -174,7 +174,7 @@ mod tests {
         let (raw, key) = signed();
         let v = parse(
             raw.clone(),
-            "zeren-plugin:v1",
+            "zeron-plugin:v1",
             PAYLOAD_PREFIX,
             plain_path,
             &WORDS,
@@ -188,7 +188,7 @@ mod tests {
         assert_eq!(
             parse(
                 raw.clone(),
-                "zeren-template:v1",
+                "zeron-template:v1",
                 PAYLOAD_PREFIX,
                 plain_path,
                 &WORDS
@@ -201,7 +201,7 @@ mod tests {
         assert_eq!(
             parse(
                 serde_json::to_vec(&value).unwrap(),
-                "zeren-plugin:v1",
+                "zeron-plugin:v1",
                 PAYLOAD_PREFIX,
                 plain_path,
                 &WORDS
@@ -214,7 +214,7 @@ mod tests {
         assert!(
             parse(
                 serde_json::to_vec(&value).unwrap(),
-                "zeren-plugin:v1",
+                "zeron-plugin:v1",
                 PAYLOAD_PREFIX,
                 plain_path,
                 &WORDS
@@ -230,7 +230,7 @@ mod tests {
         assert_eq!(
             parse(
                 serde_json::to_vec(&value).unwrap(),
-                "zeren-plugin:v1",
+                "zeron-plugin:v1",
                 PAYLOAD_PREFIX,
                 plain_path,
                 &WORDS
@@ -258,8 +258,8 @@ mod tests {
             files.insert("init.luau".to_string(), b"return 1".to_vec());
             files.insert(bad.to_string(), b"evil".to_vec());
             let manifest = key.sign_manifest(&json!({ "id": "p", "name": "P" }), &hashes(&files));
-            let raw = pack("zeren-plugin:v1", &manifest, &files).unwrap();
-            let refused = parse(raw, "zeren-plugin:v1", PAYLOAD_PREFIX, plain_path, &WORDS);
+            let raw = pack("zeron-plugin:v1", &manifest, &files).unwrap();
+            let refused = parse(raw, "zeron-plugin:v1", PAYLOAD_PREFIX, plain_path, &WORDS);
             assert!(
                 refused.is_err_and(|e| e.starts_with("won't write")),
                 "{bad}"

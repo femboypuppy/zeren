@@ -47,7 +47,7 @@
 --   file      { id }  + path, name with "files.read" (else an id of its own)
 --   appearance "light" | "dark";  route { name, session?, page? }
 --
--- What else each part needs, in zeren-plugin.json's `permissions`:
+-- What else each part needs, in zeron-plugin.json's `permissions`:
 --
 --   zeren.place                  "ui.add" (adding), "ui.change" (replacing)
 --   zeren.tool { name, run }
@@ -99,7 +99,7 @@
 --   zeren.run(program, args, { cwd, stdin, timeout, env })  a program its
 --       manifest's "commands" names, as you: { status, stdout, stderr } ("commands")
 --   zeren.settings()           its settings' values by id (declared in
---       zeren-plugin.json's "settings"; Zeren draws their page in Settings,
+--       zeron-plugin.json's "settings"; Zeren draws their page in Settings,
 --       under Plugins, while the plugin is on), followed where read
 --   zeren.setting(id)          one of them: :get() (followed), :peek()
 --   zeren.on_setting(function(id, value, was) end)  told as one changes
@@ -765,7 +765,7 @@ return function(id: string): any
 	end
 
 	-- Its own words, in the language Zeren shows (Settings → General →
-	-- Language): `locales/<locale>.json` beside zeren-plugin.json, `en.json`
+	-- Language): `locales/<locale>.json` beside zeron-plugin.json, `en.json`
 	-- the source, nested keys, ICU messages (`{name}`, `{n, plural, one {#
 	-- item} other {# items}}`, `{x, select, … other {…}}`):
 	--   ui.text { zeren.t("timer.start") }          follows the language
@@ -815,7 +815,7 @@ return function(id: string): any
 		end
 	end
 
-	-- Its settings: declared in zeren-plugin.json's "settings", each
+	-- Its settings: declared in zeron-plugin.json's "settings", each
 	-- `{ id, kind, label, description?, default? }` (kinds: switch, choice,
 	-- text, number, shortcut, folder). Zeren draws their page and keeps
 	-- what the person sets, for this plugin alone; a setting never touched

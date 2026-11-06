@@ -163,7 +163,7 @@ pub(super) fn catalog() -> Vec<ToolDef> {
     vec![
         ToolDef {
             name: CREATE_PLUGIN,
-            description: "Create a Zeren plugin on this device: a folder with a manifest (zeren-plugin.json), init.luau to edit, and zeren.luau, the SDK. Zeren signs it as yours and loads it, and re-signs and reloads it as you save; the person allows once, in Zeren, any permissions it asks for. `id` is lowercase letters, digits and dashes (2-40). `permissions` are what the plugin may do (ui.add, ui.change, ui.replace, profile.read, sessions.read, messages.read, account.email, files.read, panel.tabs, pages.add, github, github.write, navigate, compose, network, clipboard, files, web, windows, tools, devices, native, commands: with a manifest `commands` list of programs it runs, as you). The reply links the authoring guide (`guide`): read it before writing.",
+            description: "Create a Zeren plugin on this device: a folder with a manifest (zeron-plugin.json), init.luau to edit, and zeren.luau, the SDK. Zeren signs it as yours and loads it, and re-signs and reloads it as you save; the person allows once, in Zeren, any permissions it asks for. `id` is lowercase letters, digits and dashes (2-40). `permissions` are what the plugin may do (ui.add, ui.change, ui.replace, profile.read, sessions.read, messages.read, account.email, files.read, panel.tabs, pages.add, github, github.write, navigate, compose, network, clipboard, files, web, windows, tools, devices, native, commands: with a manifest `commands` list of programs it runs, as you). The reply links the authoring guide (`guide`): read it before writing.",
             input_schema: json!({
                 "type": "object",
                 "properties": {
@@ -194,11 +194,11 @@ pub(super) fn catalog() -> Vec<ToolDef> {
         },
         ToolDef {
             name: INSTALL_PLUGIN,
-            description: "Install someone's Zeren plugin from a .zeren-plugin file (`path`) or a link (`url`): a link to a .zeren-plugin file, a GitHub release (…/releases/latest or …/releases/tag/<tag>, its .zeren-plugin asset), or a git repository (owner/repo, its GitHub page, …/tree/<branch>/<folder>, or any https git URL; `ref` a branch or tag, `folder` where the plugin is in it). Zeren checks the signature over every file first: an unsigned or changed plugin is refused. Whatever you install waits for the person to allow it in Zeren's window, which shows who signed it and what it asks: you can't allow it for them (`waiting` says so). Installing over a plugin already installed is an update, and only when the same key signed both.",
+            description: "Install someone's Zeren plugin from a .zeron-plugin file (`path`) or a link (`url`): a link to a .zeron-plugin file, a GitHub release (…/releases/latest or …/releases/tag/<tag>, its .zeron-plugin asset), or a git repository (owner/repo, its GitHub page, …/tree/<branch>/<folder>, or any https git URL; `ref` a branch or tag, `folder` where the plugin is in it). Zeren checks the signature over every file first: an unsigned or changed plugin is refused. Whatever you install waits for the person to allow it in Zeren's window, which shows who signed it and what it asks: you can't allow it for them (`waiting` says so). Installing over a plugin already installed is an update, and only when the same key signed both.",
             input_schema: json!({
                 "type": "object",
                 "properties": {
-                    "path": { "type": "string", "description": "A .zeren-plugin file's full path." },
+                    "path": { "type": "string", "description": "A .zeron-plugin file's full path." },
                     "url": { "type": "string", "description": "A package link, a GitHub release, or a git repository (https)." },
                     "ref": { "type": "string", "description": "With a git repository: the branch or tag (default its default branch)." },
                     "folder": { "type": "string", "description": "With a git repository: the plugin's folder in it (default the top)." }
@@ -279,7 +279,7 @@ pub(super) fn catalog() -> Vec<ToolDef> {
         },
         ToolDef {
             name: EXPORT_TEMPLATE,
-            description: "Share a template: save it as one signed .zeren-template file, signed with this device's key (the person's Zeren account vouches for it, as for their plugins). It holds the template's own files and its preview; the files no template may replace (screens/plugins, screens/templates, account/, .luaurc) are left out. Zeren's own can't be exported. It's saved in Zeren's exports folder (an earlier export of it there is replaced). Returns the file's path, how many files it holds and the key that signed it.",
+            description: "Share a template: save it as one signed .zeron-template file, signed with this device's key (the person's Zeren account vouches for it, as for their plugins). It holds the template's own files and its preview; the files no template may replace (screens/plugins, screens/templates, account/, .luaurc) are left out. Zeren's own can't be exported. It's saved in Zeren's exports folder (an earlier export of it there is replaced). Returns the file's path, how many files it holds and the key that signed it.",
             input_schema: json!({
                 "type": "object",
                 "properties": {
@@ -290,12 +290,12 @@ pub(super) fn catalog() -> Vec<ToolDef> {
         },
         ToolDef {
             name: IMPORT_TEMPLATE,
-            description: "Install a template from a .zeren-template file (`path`) or a link (`url`: to a .zeren-template file, or a GitHub repository or release with one; a template from a link is checked there for updates). Zeren checks its signature over every file first: an unsigned or changed package is refused. One signed on this device installs at once (using it still runs as a preview until the person keeps it). Anyone else's waits for the person: a template runs as Zeren's own code with all its powers, so they must allow it in Zeren's window (Templates shows it waiting, with who signed it); you can't allow it for them. The reply says which: `installed` (its id), or `pending` with `needs_consent`. Files no template may replace are never installed (`ignored` names them). list_templates shows it once installed.",
+            description: "Install a template from a .zeron-template file (`path`) or a link (`url`: to a .zeron-template file, or a GitHub repository or release with one; a template from a link is checked there for updates). Zeren checks its signature over every file first: an unsigned or changed package is refused. One signed on this device installs at once (using it still runs as a preview until the person keeps it). Anyone else's waits for the person: a template runs as Zeren's own code with all its powers, so they must allow it in Zeren's window (Templates shows it waiting, with who signed it); you can't allow it for them. The reply says which: `installed` (its id), or `pending` with `needs_consent`. Files no template may replace are never installed (`ignored` names them). list_templates shows it once installed.",
             input_schema: json!({
                 "type": "object",
                 "properties": {
-                    "path": { "type": "string", "description": "The .zeren-template file's full path." },
-                    "url": { "type": "string", "description": "Or a link: a .zeren-template file's, or a GitHub repository or release (e.g. owner/repo) with one." }
+                    "path": { "type": "string", "description": "The .zeron-template file's full path." },
+                    "url": { "type": "string", "description": "Or a link: a .zeron-template file's, or a GitHub repository or release (e.g. owner/repo) with one." }
                 }
             }),
         },
@@ -526,7 +526,7 @@ impl Tools {
                 (Some(path), None) => (methods::IMPORT_TEMPLATE, json!({ "path": path })),
                 (None, Some(url)) => (methods::IMPORT_TEMPLATE, json!({ "url": url })),
                 _ => return Err(
-                    "Say what to import: `path`, a .zeren-template file, or `url`, a link to one."
+                    "Say what to import: `path`, a .zeron-template file, or `url`, a link to one."
                         .into(),
                 ),
             }
@@ -610,7 +610,7 @@ impl Tools {
                     json!({ "url": url, "ref": given(args.git_ref), "folder": given(args.folder) })
                 }
                 _ => return Err(
-                    "Give one of `path` (a .zeren-plugin file) or `url` (a link or repository)."
+                    "Give one of `path` (a .zeron-plugin file) or `url` (a link or repository)."
                         .into(),
                 ),
             };
@@ -700,7 +700,7 @@ async fn scaffold_files(dir: &str) -> Vec<String> {
         }
     }
     if files.is_empty() {
-        files = ["init.luau", "zeren-plugin.json", "zeren.luau"]
+        files = ["init.luau", "zeron-plugin.json", "zeren.luau"]
             .map(str::to_owned)
             .to_vec();
     }
@@ -808,10 +808,10 @@ mod tests {
                     "id": params["id"], "path": params["path"], "files": 12, "key": "k1",
                 })),
                 methods::IMPORT_TEMPLATE => match params["path"].as_str() {
-                    Some("/x/mine.zeren-template") => RpcReply::Value(json!({
+                    Some("/x/mine.zeron-template") => RpcReply::Value(json!({
                         "installed": "midnight", "name": "Midnight", "author": { "kind": "you" }, "ignored": [],
                     })),
-                    Some("/x/bad.zeren-template") => {
+                    Some("/x/bad.zeron-template") => {
                         return Err(RpcError::Failed(
                             "This template was changed after it was signed, so Zeren won't install it.".into(),
                         ));
@@ -960,7 +960,7 @@ mod tests {
         let exported = tools
             .call(
                 EXPORT_TEMPLATE,
-                json!({ "id": "midnight", "path": "/Users/x/.ssh/x.zeren-template" }),
+                json!({ "id": "midnight", "path": "/Users/x/.ssh/x.zeron-template" }),
             )
             .await
             .unwrap();
@@ -976,7 +976,7 @@ mod tests {
 
         // Yours: installed.
         let mine = tools
-            .call(IMPORT_TEMPLATE, json!({ "path": "/x/mine.zeren-template" }))
+            .call(IMPORT_TEMPLATE, json!({ "path": "/x/mine.zeron-template" }))
             .await
             .unwrap();
         assert_eq!(mine["installed"], "midnight");
@@ -985,14 +985,14 @@ mod tests {
             last_call(&engine),
             (
                 methods::IMPORT_TEMPLATE.to_owned(),
-                json!({ "path": "/x/mine.zeren-template" })
+                json!({ "path": "/x/mine.zeron-template" })
             )
         );
         // Someone else's: waiting for the person, and the reply says so.
         let theirs = tools
             .call(
                 IMPORT_TEMPLATE,
-                json!({ "path": "/x/theirs.zeren-template" }),
+                json!({ "path": "/x/theirs.zeron-template" }),
             )
             .await
             .unwrap();
@@ -1006,7 +1006,7 @@ mod tests {
         // Refused, in the engine's words.
         assert!(
             tools
-                .call(IMPORT_TEMPLATE, json!({ "path": "/x/bad.zeren-template" }))
+                .call(IMPORT_TEMPLATE, json!({ "path": "/x/bad.zeron-template" }))
                 .await
                 .unwrap_err()
                 .contains("changed after it was signed")
@@ -1016,7 +1016,7 @@ mod tests {
         let before = engine.calls.lock().unwrap().len();
         assert!(
             tools
-                .call(EXPORT_TEMPLATE, json!({ "path": "/x/a.zeren-template" }))
+                .call(EXPORT_TEMPLATE, json!({ "path": "/x/a.zeron-template" }))
                 .await
                 .unwrap_err()
                 .contains("`id`")
@@ -1051,7 +1051,7 @@ mod tests {
             tools
                 .call(
                     IMPORT_TEMPLATE,
-                    json!({ "path": "/x/a.zeren-template", "url": "ada/midnight" })
+                    json!({ "path": "/x/a.zeron-template", "url": "ada/midnight" })
                 )
                 .await
                 .is_err()
@@ -1234,7 +1234,7 @@ mod tests {
         assert_eq!(created["dir"], "/nowhere/plugins/focus");
         assert_eq!(
             created["files"],
-            json!(["init.luau", "zeren-plugin.json", "zeren.luau"])
+            json!(["init.luau", "zeron-plugin.json", "zeren.luau"])
         );
         assert_eq!(
             created["hint"],
@@ -1311,14 +1311,14 @@ mod tests {
                 .contains("can't allow it for them")
         );
         tools
-            .call(INSTALL_PLUGIN, json!({ "path": "/x/focus.zeren-plugin" }))
+            .call(INSTALL_PLUGIN, json!({ "path": "/x/focus.zeron-plugin" }))
             .await
             .unwrap();
         assert_eq!(
             last_call(&engine),
             (
                 methods::INSTALL_PLUGIN.to_owned(),
-                json!({ "path": "/x/focus.zeren-plugin" })
+                json!({ "path": "/x/focus.zeron-plugin" })
             )
         );
         assert!(
@@ -1382,13 +1382,13 @@ mod tests {
     #[tokio::test]
     async fn create_plugin_lists_the_folder_it_made() {
         let dir = tempfile::tempdir().unwrap();
-        for file in ["zeren-plugin.json", "init.luau", "zeren.luau", ".hidden"] {
+        for file in ["zeron-plugin.json", "init.luau", "zeren.luau", ".hidden"] {
             std::fs::write(dir.path().join(file), "").unwrap();
         }
         std::fs::create_dir(dir.path().join("lib")).unwrap();
         assert_eq!(
             scaffold_files(dir.path().to_str().unwrap()).await,
-            vec!["init.luau", "zeren-plugin.json", "zeren.luau"]
+            vec!["init.luau", "zeron-plugin.json", "zeren.luau"]
         );
     }
 

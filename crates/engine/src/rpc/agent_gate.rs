@@ -15,7 +15,7 @@
 //! - What it writes into a chat carries Zeren's header naming the sending
 //!   chat, built here; a header in the text can't claim another chat.
 //!
-//! The calling chat is the one its MCP server names (`x-zeren-chat`): the
+//! The calling chat is the one its MCP server names (`x-zeron-chat`): the
 //! engine sets that server's environment, so a sandboxed agent can't change
 //! it. A server with no chat (one someone configured by hand) is capped by
 //! nothing but still can't forge a header.

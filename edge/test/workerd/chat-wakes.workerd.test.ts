@@ -16,7 +16,7 @@ const post = (chat: string, host: string, batch = "prompt") => SELF.fetch(
 );
 async function hostSocket(host: string, user = owner) {
   const response = await deviceRoom(host).fetch("https://device/ws?role=host&nudgeAck=1", {
-    headers: { "x-zeren-auth-user": user, upgrade: "websocket" }
+    headers: { "x-zeron-auth-user": user, upgrade: "websocket" }
   });
   expect(response.status).toBe(101);
   const socket = response.webSocket!;

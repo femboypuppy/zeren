@@ -1,10 +1,10 @@
-//! Sharing templates: a template as one signed file (`<id>.zeren-template`),
+//! Sharing templates: a template as one signed file (`<id>.zeron-template`),
 //! and that file installed on another device.
 //!
 //! A package is JSON: `{format, manifest, files: {rel: base64}}`. Its
 //! manifest (`id, name, description, version, zeren_version`) is signed as a
 //! plugin's is (`signing`), with this device's key, in the template domain
-//! (`zeren-template:v1\n`: a plugin's signature never verifies as a
+//! (`zeron-template:v1\n`: a plugin's signature never verifies as a
 //! template's, nor the reverse), over each file's sha256.
 //!
 //! Importing reads the whole package and checks its signature over every
@@ -21,7 +21,7 @@
 //! Zeren knew them then, the package it was, and where it came from.
 //!
 //! A package comes from a file, or a link (`origin`): one to a
-//! `.zeren-template`, or a GitHub repository's release carrying one (its
+//! `.zeron-template`, or a GitHub repository's release carrying one (its
 //! latest, or a tag). Where it came from is checked for a new version as a
 //! plugin's is (`check`, by the engine every few hours and as Settings →
 //! Templates opens): a newer package signed by the same key is kept in
@@ -41,11 +41,11 @@ use super::signing::{self, FileHashes, SigCheck, SigningKey, TEMPLATE_PAYLOAD_PR
 use super::status::Author;
 use super::templates::{self, MANIFEST, PREVIEW, ZEREN, inside, valid_id};
 
-pub const FORMAT: &str = "zeren-template:v1";
-pub const EXTENSION: &str = "zeren-template";
+pub const FORMAT: &str = "zeron-template:v1";
+pub const EXTENSION: &str = "zeron-template";
 pub const PENDING: &str = ".pending";
 pub const IMPORTED: &str = ".imported.json";
-/// Updates found, waiting to be installed (`<id>.json`, `<id>.zeren-template`).
+/// Updates found, waiting to be installed (`<id>.json`, `<id>.zeron-template`).
 pub const UPDATES: &str = ".updates";
 /// The app's mark of one of Zeren's built-in themes (apps/zgx
 /// theme_templates `MARK`): never written from a package.
@@ -76,7 +76,7 @@ pub fn protected(rel: &str) -> bool {
 const UNSIGNED: &str = "This template isn't signed, so Zeren can't tell who made it or whether it was changed. Ask its author to export it again from Zeren.";
 const TAMPERED: &str = "This template was changed after it was signed, so Zeren won't install it. Ask its author for a fresh copy.";
 const BAD_SIGNATURE: &str = "This template's signature doesn't check out, so Zeren won't install it. Ask its author for a fresh copy.";
-const NOT_A_PACKAGE: &str = "This isn't a Zeren template. Templates are shared as .zeren-template files, exported from Zeren.";
+const NOT_A_PACKAGE: &str = "This isn't a Zeren template. Templates are shared as .zeron-template files, exported from Zeren.";
 
 /// A package, read and verified.
 pub struct Package {
@@ -129,7 +129,7 @@ impl Package {
 }
 
 /// `ExportTemplate`: template `id` as a signed package at `out` (a
-/// `.zeren-template` file outside the templates folder; replaced if there).
+/// `.zeron-template` file outside the templates folder; replaced if there).
 /// `{id, path, files, key}`.
 pub fn export(dir: &Path, id: &str, out: &Path, key: &SigningKey) -> Result<Value, String> {
     if id == ZEREN {
@@ -222,7 +222,7 @@ pub fn export(dir: &Path, id: &str, out: &Path, key: &SigningKey) -> Result<Valu
 }
 
 /// Where Zeren saves an export when it isn't told where:
-/// `<data>/template-exports/<id>.zeren-template`.
+/// `<data>/template-exports/<id>.zeron-template`.
 pub fn default_export_path(data_dir: &Path, id: &str) -> PathBuf {
     data_dir
         .join("template-exports")
@@ -680,12 +680,12 @@ pub fn imported(folder: &Path) -> Option<Value> {
 // ── From a link ─────────────────────────────────────────────────────────────
 
 /// What `link` names, if a template can come from it: a link to a
-/// `.zeren-template`, or a GitHub repository (its latest release's, or its
+/// `.zeron-template`, or a GitHub repository (its latest release's, or its
 /// page) or release (`…/releases/latest`, `…/releases/tag/<tag>`) carrying
 /// one. A repository itself isn't a template: templates are shared signed.
 pub fn origin(link: &str) -> Result<Origin, String> {
     let not_one = || {
-        "That link isn't a template: give a link to a .zeren-template file, or a GitHub repository or release with one".to_string()
+        "That link isn't a template: give a link to a .zeron-template file, or a GitHub repository or release with one".to_string()
     };
     let link = link.trim();
     if link.is_empty() || link.chars().any(|c| c.is_whitespace() || c.is_control()) {
@@ -761,7 +761,7 @@ pub async fn fetch(origin: &Origin) -> Result<(Package, Source), String> {
             )
         }
         Origin::Git { .. } => return Err(
-            "A template comes from a .zeren-template file or a release, not a repository's files"
+            "A template comes from a .zeron-template file or a release, not a repository's files"
                 .into(),
         ),
     };
@@ -1114,7 +1114,7 @@ mod tests {
     #[test]
     fn plugins_template_packages_round_trip_with_protected_files_left_out() {
         let d = with_template("round");
-        let out = d.parent().unwrap().join("midnight.zeren-template");
+        let out = d.parent().unwrap().join("midnight.zeron-template");
         let alice = key();
         let made = export(&d, "midnight", &out, &alice).unwrap();
         assert_eq!(made["files"], 4);
@@ -1149,7 +1149,7 @@ mod tests {
         assert_eq!(listed.len(), 1);
         let name = waiting["pending"].as_str().unwrap();
         assert_eq!(listed[0]["pending"], name);
-        assert_eq!(listed[0]["source"], "midnight.zeren-template");
+        assert_eq!(listed[0]["source"], "midnight.zeron-template");
 
         // Allowed: installed as signed, and no longer waiting.
         let hash = waiting["hash"].as_str().unwrap();
@@ -1229,7 +1229,7 @@ mod tests {
             "manifest": manifest,
             "files": files.iter().map(|(r, b)| (r.clone(), json!(B64.encode(b)))).collect::<serde_json::Map<_, _>>(),
         });
-        let path = d.join("sneaky.zeren-template");
+        let path = d.join("sneaky.zeron-template");
         std::fs::write(&path, serde_json::to_vec(&package).unwrap()).unwrap();
 
         let templates_dir = d.join("templates");
@@ -1256,7 +1256,7 @@ mod tests {
     #[test]
     fn plugins_template_packages_tampered_or_unsigned_are_refused() {
         let d = with_template("tampered");
-        let out = d.parent().unwrap().join("midnight.zeren-template");
+        let out = d.parent().unwrap().join("midnight.zeron-template");
         let alice = key();
         export(&d, "midnight", &out, &alice).unwrap();
         let bob_dir = dir("tampered-bob").join("templates");
@@ -1338,7 +1338,7 @@ mod tests {
     #[test]
     fn plugins_template_packages_consent_for_others_not_for_yours() {
         let d = with_template("consent");
-        let out = d.parent().unwrap().join("midnight.zeren-template");
+        let out = d.parent().unwrap().join("midnight.zeron-template");
         let alice = key();
         export(&d, "midnight", &out, &alice).unwrap();
 
@@ -1374,22 +1374,22 @@ mod tests {
         let d = with_template("export");
         let k = key();
         let parent = d.parent().unwrap();
-        assert!(export(&d, "zeren", &parent.join("z.zeren-template"), &k).is_err());
+        assert!(export(&d, "zeren", &parent.join("z.zeron-template"), &k).is_err());
         assert!(
-            export(&d, "nope", &parent.join("n.zeren-template"), &k)
+            export(&d, "nope", &parent.join("n.zeron-template"), &k)
                 .unwrap_err()
                 .contains("no template nope")
         );
-        assert!(export(&d, "midnight", Path::new("rel.zeren-template"), &k).is_err());
+        assert!(export(&d, "midnight", Path::new("rel.zeron-template"), &k).is_err());
         assert!(export(&d, "midnight", &parent.join("m.zip"), &k).is_err());
-        assert!(export(&d, "midnight", &parent.join("missing/m.zeren-template"), &k).is_err());
+        assert!(export(&d, "midnight", &parent.join("missing/m.zeron-template"), &k).is_err());
         assert!(
-            export(&d, "midnight", &d.join("midnight/m.zeren-template"), &k)
+            export(&d, "midnight", &d.join("midnight/m.zeron-template"), &k)
                 .unwrap_err()
                 .contains("outside")
         );
         // Replaces an earlier export.
-        let out = parent.join("m.zeren-template");
+        let out = parent.join("m.zeron-template");
         export(&d, "midnight", &out, &k).unwrap();
         export(&d, "midnight", &out, &k).unwrap();
         assert!(read(&out).is_ok());
@@ -1418,8 +1418,8 @@ mod tests {
             release("ada/midnight", Some("v2"))
         );
         assert_eq!(
-            origin("example.com/t/midnight.zeren-template").unwrap(),
-            Origin::Link("https://example.com/t/midnight.zeren-template".into())
+            origin("example.com/t/midnight.zeron-template").unwrap(),
+            Origin::Link("https://example.com/t/midnight.zeron-template".into())
         );
         // Not a template: a repository's files, a page that isn't one, a
         // plugin, plain http, nothing.
@@ -1434,12 +1434,12 @@ mod tests {
                 .contains("isn't a template")
         );
         assert!(
-            origin("example.com/x/focus.zeren-plugin")
+            origin("example.com/x/focus.zeron-plugin")
                 .unwrap_err()
                 .contains("isn't a template")
         );
         assert!(
-            origin("http://example.com/m.zeren-template")
+            origin("http://example.com/m.zeron-template")
                 .unwrap_err()
                 .contains("https")
         );
@@ -1449,7 +1449,7 @@ mod tests {
     #[tokio::test]
     async fn plugins_template_packages_update_in_place_from_where_it_came() {
         let d = with_template("update");
-        let out = d.parent().unwrap().join("midnight.zeren-template");
+        let out = d.parent().unwrap().join("midnight.zeron-template");
         let alice = key();
         export(&d, "midnight", &out, &alice).unwrap();
         // Alice's other device: installed at once, its source the file.
@@ -1571,7 +1571,7 @@ mod tests {
     #[tokio::test]
     async fn plugins_template_packages_a_signed_downgrade_never_updates() {
         let d = with_template("downgrade");
-        let out = d.parent().unwrap().join("midnight.zeren-template");
+        let out = d.parent().unwrap().join("midnight.zeron-template");
         let alice = key();
         write(
             &d.join("midnight").join(MANIFEST),
@@ -1628,7 +1628,7 @@ mod tests {
     #[tokio::test]
     async fn plugins_template_packages_one_installed_under_a_free_id_still_updates() {
         let d = with_template("want2");
-        let out = d.parent().unwrap().join("midnight.zeren-template");
+        let out = d.parent().unwrap().join("midnight.zeron-template");
         let alice = key();
         export(&d, "midnight", &out, &alice).unwrap();
         let other = dir("want2-other").join("templates");
@@ -1672,7 +1672,7 @@ mod tests {
     fn plugins_template_packages_builtin_theme_is_never_installed_from_a_package() {
         let d = with_template("posing");
         let alice = key();
-        let out = d.parent().unwrap().join("midnight.zeren-template");
+        let out = d.parent().unwrap().join("midnight.zeron-template");
         // A package whose signed manifest says it's Zeren's Catppuccin.
         let mut files = BTreeMap::new();
         files.insert("theme.luau".to_owned(), b"return nil".to_vec());
@@ -1738,22 +1738,22 @@ mod tests {
             std::fs::create_dir_all(d).unwrap();
         }
         let ok = |p: &Path| check_export_path(p, &data, Some(home.path()));
-        assert!(ok(&docs.join("m.zeren-template")).is_ok());
-        assert!(ok(&ssh.join("authorized_keys.zeren-template")).is_err());
-        assert!(ok(&data.join("m.zeren-template")).is_err());
+        assert!(ok(&docs.join("m.zeron-template")).is_ok());
+        assert!(ok(&ssh.join("authorized_keys.zeron-template")).is_err());
+        assert!(ok(&data.join("m.zeron-template")).is_err());
         // Over a file that isn't a package: refused; over an earlier export: fine.
-        std::fs::write(docs.join("notes.zeren-template"), "my notes").unwrap();
-        assert!(ok(&docs.join("notes.zeren-template")).is_err());
+        std::fs::write(docs.join("notes.zeron-template"), "my notes").unwrap();
+        assert!(ok(&docs.join("notes.zeron-template")).is_err());
         std::fs::write(
-            docs.join("old.zeren-template"),
+            docs.join("old.zeron-template"),
             serde_json::to_vec(&json!({ "format": FORMAT })).unwrap(),
         )
         .unwrap();
-        assert!(ok(&docs.join("old.zeren-template")).is_ok());
+        assert!(ok(&docs.join("old.zeron-template")).is_ok());
         #[cfg(unix)]
         {
-            std::os::unix::fs::symlink(ssh.join("x"), docs.join("link.zeren-template")).unwrap();
-            assert!(ok(&docs.join("link.zeren-template")).is_err());
+            std::os::unix::fs::symlink(ssh.join("x"), docs.join("link.zeron-template")).unwrap();
+            assert!(ok(&docs.join("link.zeron-template")).is_err());
         }
         assert!(default_export_path(&data, "midnight").starts_with(&data));
     }

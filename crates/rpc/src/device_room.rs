@@ -680,13 +680,13 @@ impl DeviceLink {
     }
 
     /// [`Self::connect`], and the device the room verified this dial as
-    /// (its 101's `x-zeren-caller-device`), if it did.
+    /// (its 101's `x-zeron-caller-device`), if it did.
     async fn connect_seen(url: &str) -> Result<(Self, Option<String>), RpcError> {
         let (ws, headers) = zeren_sync::dial::connect_ws_with_headers(url)
             .await
             .map_err(|e| RpcError::Transport(format!("device room unreachable: {e}")))?;
         let stamped = headers
-            .get("x-zeren-caller-device")
+            .get("x-zeron-caller-device")
             .and_then(|v| v.to_str().ok())
             .map(str::to_owned);
         Ok((Self::from_socket(ws), stamped))
@@ -885,9 +885,9 @@ pub struct CallerProof {
 /// device has a key to prove itself with.
 pub type CallerProofFn = Arc<dyn Fn(&str, &str, i64) -> Option<CallerProof> + Send + Sync>;
 
-/// `"zeren-device-link:v1:{target}:{connId}:{ts}"`: what a dial's proof signs.
+/// `"zeron-device-link:v1:{target}:{connId}:{ts}"`: what a dial's proof signs.
 pub fn caller_proof_message(target: &str, conn_id: &str, ts: i64) -> String {
-    format!("zeren-device-link:v1:{target}:{conn_id}:{ts}")
+    format!("zeron-device-link:v1:{target}:{conn_id}:{ts}")
 }
 
 /// `&callerDevice=…&callerKey=…&callerTs=…&callerProof=…`, or nothing when a
@@ -1366,7 +1366,7 @@ mod tests {
             ),
             (
                 methods::INSTALL_PLUGIN,
-                serde_json::json!({"path": "/tmp/x.zeren-plugin"}),
+                serde_json::json!({"path": "/tmp/x.zeron-plugin"}),
             ),
         ] {
             assert!(
@@ -1390,7 +1390,7 @@ mod tests {
             ),
             (
                 methods::INSTALL_PLUGIN,
-                serde_json::json!({"url": "https://example.com/x.zeren-plugin"}),
+                serde_json::json!({"url": "https://example.com/x.zeron-plugin"}),
             ),
         ] {
             guard.handle(method, params).await.expect(method);
@@ -1627,7 +1627,7 @@ mod tests {
         assert_eq!(caller_query(&odd, 1), "");
         assert_eq!(
             caller_proof_message("dev-b", "c1", 5),
-            "zeren-device-link:v1:dev-b:c1:5"
+            "zeron-device-link:v1:dev-b:c1:5"
         );
     }
 

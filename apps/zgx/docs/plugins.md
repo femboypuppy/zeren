@@ -1,6 +1,6 @@
 # Writing a Zeren plugin
 
-A plugin is a folder: `zeren-plugin.json` (its manifest), `init.luau` (its code) and `zeren.luau` (Zeren's helpers, the SDK). It runs in Zeren's window in a sandbox of its own, with only what its manifest asks for and the person allowed. Agents make plugins through Zeren's MCP tools. This guide is the whole reference: read it once, then use the loop at the end.
+A plugin is a folder: `zeron-plugin.json` (its manifest), `init.luau` (its code) and `zeren.luau` (Zeren's helpers, the SDK). It runs in Zeren's window in a sandbox of its own, with only what its manifest asks for and the person allowed. Agents make plugins through Zeren's MCP tools. This guide is the whole reference: read it once, then use the loop at the end.
 
 ## Manifest
 
@@ -425,11 +425,11 @@ zeren.set_status("shortcut", nil)   -- cleared
 
 ## Translations
 
-Zeren speaks the language chosen in Settings → General → Language (English or 简体中文 today, or the Mac's own). A plugin can too: its words go in `locales/`, beside `zeren-plugin.json`, a file per language, with `en.json` the source:
+Zeren speaks the language chosen in Settings → General → Language (English or 简体中文 today, or the Mac's own). A plugin can too: its words go in `locales/`, beside `zeron-plugin.json`, a file per language, with `en.json` the source:
 
 ```
 my-plugin/
-  zeren-plugin.json
+  zeron-plugin.json
   init.luau
   locales/
     en.json        { "timer": { "start": "Start", "left": "{n, plural, one {# minute} other {# minutes}} left" } }
@@ -469,9 +469,9 @@ zeren.toast(zeren.s("timer.done"))
 
 A plugin travels as its folder, signed. The person installs it with Settings → Plugins → Install…; an agent uses these tools:
 
-- **`install_plugin { path }`** installs a `.zeren-plugin` file. **`install_plugin { url, ref?, folder? }`** installs from a link:
-  - a link to a `.zeren-plugin` file;
-  - a GitHub release (`…/releases/latest`, `…/releases/tag/<tag>`), from its `.zeren-plugin` asset;
+- **`install_plugin { path }`** installs a `.zeron-plugin` file. **`install_plugin { url, ref?, folder? }`** installs from a link:
+  - a link to a `.zeron-plugin` file;
+  - a GitHub release (`…/releases/latest`, `…/releases/tag/<tag>`), from its `.zeron-plugin` asset;
   - a git repository: `owner/repo`, its GitHub page, `…/tree/<branch>/<folder>`, or any https git URL.
 - **`update_plugin { id }`** installs the newest version from wherever the plugin came from. **`update_plugin { check = true }`** only reports what's new: each update's version and the permissions it adds or removes.
 
@@ -481,7 +481,7 @@ Zeren checks the signature over every file before anything is written, so an uns
 - **An update:** it must be signed by the same key as the installed version. One that asks for a new permission still installs, but waits for the person to allow just that.
 - **Removing a plugin** (Settings) takes away its folder, what it stored, its pages and its placements.
 
-To publish a plugin, commit its folder with its signed `zeren-plugin.json` to a repository, or attach the `.zeren-plugin` file to a GitHub release. Zeren re-signs your own plugins as you save them, so what you commit is already signed. The package format (`zeren-plugin:v1`) is the same signed package templates use: the manifest, plus every file as base64.
+To publish a plugin, commit its folder with its signed `zeron-plugin.json` to a repository, or attach the `.zeron-plugin` file to a GitHub release. Zeren re-signs your own plugins as you save them, so what you commit is already signed. The package format (`zeron-plugin:v1`) is the same signed package templates use: the manifest, plus every file as base64.
 
 ## Three examples
 

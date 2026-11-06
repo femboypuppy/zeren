@@ -11,7 +11,7 @@ and hands enrolled devices short-lived **grants**: access tokens only, never ref
   (`VAULT`, `entrypoint: "VaultApi"`), which passes an identity it has already verified
   (WorkOS user or runner JWT). The vault re-validates every field it receives.
 - **Grants need a device signature.** The device key (Ed25519, enrolled per device) signs
-  `zeren-vault-grant\n{userId}\n{deviceId}\n{provider}\n{ts}`. The `ts` must be within ±120 s and
+  `zeron-vault-grant\n{userId}\n{deviceId}\n{provider}\n{ts}`. The `ts` must be within ±120 s and
   strictly greater than the device's last one. The device must be enrolled, not revoked, and
   listed in the credential's `authorizedDevices`. Runner callers may only request grants for
   their own device.

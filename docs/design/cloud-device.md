@@ -113,7 +113,7 @@ refresh tokens are single-use; sharing a laptop's `session.json` would race). In
    with the vault as device kind `cloud`, with the account's logical device as `parentId`, so
    providers authorized for Cloud cover every session machine.
 2. Every token refresh is `POST /runner/token {orgId, userId, deviceId, ts, sig}` with
-   `sig = Ed25519("zeren-runner-token\n{orgId}\n{userId}\n{deviceId}\n{ts}")`, `ts` in Unix
+   `sig = Ed25519("zeron-runner-token\n{orgId}\n{userId}\n{deviceId}\n{ts}")`, `ts` in Unix
    milliseconds within ±120 s and strictly greater than the last accepted `ts`. The Worker
    answers with a **runner JWT** (ES256, `RUNNER_JWT_PRIVATE_KEY` secret, 1 h lifetime):
    `{iss: "zeren-edge", sub: userId, org_id, dev: deviceId, cld: accountDeviceId, kind: "runner"}`.
@@ -142,7 +142,7 @@ session. Enforced at the edge:
   `/blob/{chatId}/*` only while registry row `chats/{chatId}` is live and its
   `fields.deviceId` equals the runner's device; otherwise 403 `not_host`. Positive answers are
   cached per isolate for ≤5 min; refusals are never cached.
-- **Registry** (`edge/src/registry-runner.ts`; the Worker stamps `x-zeren-runner-device`
+- **Registry** (`edge/src/registry-runner.ts`; the Worker stamps `x-zeron-runner-device`
   on runner forwards and strips any inbound value). Writes: `devices` only its own row;
   `chats`, `spaces`, `sessions` only when the existing live row is hosted by the runner AND
   the row after the op still is (no claiming, handing away or ownerless rows); deletes need a
@@ -395,7 +395,7 @@ The vault only refreshes. It owns each refresh token from upload on.
 ### Grants
 
 `POST /vault/{orgId}/grant {provider, deviceId, ts, sig}` (sig by the device key, same scheme
-as runner tokens with prefix `zeren-vault-grant`) → `{provider, accessToken, expiresAt,
+as runner tokens with prefix `zeron-vault-grant`) → `{provider, accessToken, expiresAt,
 accountId?, generation}`. A grant requires: the device is enrolled and not revoked, the device
 is in the credential's `authorizedDevices`, the user is not disabled, and the global kill switch
 (`VAULT_DISABLED=1`) is off. Grants are the provider's own access token, refreshed by the vault
@@ -562,8 +562,8 @@ the bearer's `org_id`.
 Types are in `edge/vault/src/api.ts` (TypeScript) and `crates/proto/src/cloud.rs` (Rust).
 Signatures are base64url (no padding) Ed25519 over UTF-8:
 
-- runner token: `zeren-runner-token\n{orgId}\n{userId}\n{deviceId}\n{ts}`
-- vault grant: `zeren-vault-grant\n{userId}\n{deviceId}\n{provider}\n{ts}`
+- runner token: `zeron-runner-token\n{orgId}\n{userId}\n{deviceId}\n{ts}`
+- vault grant: `zeron-vault-grant\n{userId}\n{deviceId}\n{provider}\n{ts}`
 
 `ZEREN_RUNNER_ENROLL` = `{orgId}.{userId}.{deviceId}.{code}` (`code` is 32 random bytes,
 base64url). After enrollment the engine persists `{data_dir}/runner.json`

@@ -25,7 +25,7 @@ pub enum Caller {
     /// Full-token local IPC (the app, the CLI) or an in-process client.
     Local,
     /// Local IPC with the agent-scoped token. `chat` is the chat the MCP
-    /// server says it serves (`x-zeren-chat`): claimed, for the record only.
+    /// server says it serves (`x-zeron-chat`): claimed, for the record only.
     Agent { chat: Option<String> },
     /// Another device through the device-room relay. The relay doesn't say
     /// which device yet, so `device` is `None` until it does.

@@ -51,7 +51,7 @@ pub fn themes(data_dir: &Path) -> PathBuf {
 /// A new plugin's README: what it is and where the guide is.
 pub fn plugin_readme(name: &str, guide: &Path) -> String {
     format!(
-        "# {name}\n\nA Zeren plugin. `init.luau` is its code, `zeren-plugin.json` its manifest (permissions, what it may change, its tools) and `zeren.luau` Zeren's helpers. Zeren re-signs and reloads it each time you save.\n\nHow to write one: {guide}\n\nCheck your work with the `plugin_status` tool (`snapshot: true` for a picture of where it shows), and `describe_elements` for where it can go.\n",
+        "# {name}\n\nA Zeren plugin. `init.luau` is its code, `zeron-plugin.json` its manifest (permissions, what it may change, its tools) and `zeren.luau` Zeren's helpers. Zeren re-signs and reloads it each time you save.\n\nHow to write one: {guide}\n\nCheck your work with the `plugin_status` tool (`snapshot: true` for a picture of where it shows), and `describe_elements` for where it can go.\n",
         guide = guide.display()
     )
 }

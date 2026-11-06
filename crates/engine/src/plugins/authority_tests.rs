@@ -465,7 +465,7 @@ async fn the_agent_token_cannot_allow_over_ipc() {
 async fn an_agent_cannot_choose_where_a_template_is_exported() {
     let f = fixture();
     let outside = tempfile::tempdir().unwrap();
-    let path = outside.path().join("x.zeren-template");
+    let path = outside.path().join("x.zeron-template");
     for caller in [Caller::Agent { chat: None }, Caller::Peer { device: None }] {
         let refused = with_caller(
             caller,
@@ -511,7 +511,7 @@ fn a_dial_proof_is_the_device_key_over_the_link_message() {
     assert!(
         verifier
             .verify(
-                b"zeren-device-link:v1:dev-c:c1:5",
+                b"zeron-device-link:v1:dev-c:c1:5",
                 &b64.decode(&signature).unwrap()
             )
             .is_err()

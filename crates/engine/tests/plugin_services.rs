@@ -189,7 +189,7 @@ async fn install(e: &Engine, dir: &Path, version: &str) {
         "icon": "icon.svg",
     });
     std::fs::write(
-        folder.join("zeren-plugin.json"),
+        folder.join("zeron-plugin.json"),
         serde_json::to_vec_pretty(&manifest).unwrap(),
     )
     .unwrap();
@@ -362,7 +362,7 @@ async fn a_window_on_one_device_calls_its_service_on_another() {
         .client
         .call(
             methods::INSTALL_PLUGIN,
-            json!({ "targetDeviceId": "device-b", "path": "/tmp/x.zeren-plugin" }),
+            json!({ "targetDeviceId": "device-b", "path": "/tmp/x.zeron-plugin" }),
         )
         .await;
     assert!(refused.is_err(), "{refused:?}");

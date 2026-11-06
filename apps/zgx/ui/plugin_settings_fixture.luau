@@ -69,7 +69,7 @@ local model = {
 	backdrops = false,
 }
 
--- Parallax scenes' settings (plugins-builtin/parallax-scenes/zeren-plugin.json's).
+-- Parallax scenes' settings (plugins-builtin/parallax-scenes/zeron-plugin.json's).
 local SCENES_SETTINGS = {
 	{ id = "wallpaper", kind = "wallpaper", section = "Wallpaper" },
 	{ id = "scene", kind = "choice", style = "select", section = "Scene", label = "Scene", description = "What a new chat opens on.", default = "violet-dusk", options = { { value = "shuffle", label = "Shuffle", description = "Another scene each time a new chat opens." }, { value = "violet-dusk", label = "Dusk" }, { value = "aurora", label = "Aurora" }, { value = "blossom", label = "Blossom" }, { value = "lighthouse", label = "Lighthouse" }, { value = "canyon", label = "Canyon" }, { value = "lotus", label = "Lotus" }, { value = "icebergs", label = "Icebergs" }, { value = "wheat", label = "Wheat" }, { value = "volcano", label = "Volcano" }, { value = "terraces", label = "Terraces" }, { value = "surf", label = "Surf" }, { value = "saturnine", label = "Saturnine" }, { value = "rooftops", label = "Rooftops" }, { value = "station", label = "Station" } } },

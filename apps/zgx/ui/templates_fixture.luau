@@ -143,7 +143,7 @@ ui.command {
 	id = "installed_theirs",
 	title = "The install finishes: someone else's, waiting",
 	run = function()
-		table.insert(waiting, { pending = "ledger-1700000001", name = "Ledger", source = "ledger.zeren-template" })
+		table.insert(waiting, { pending = "ledger-1700000001", name = "Ledger", source = "ledger.zeron-template" })
 		publish()
 		settle(true, { pending = "ledger-1700000001", name = "Ledger", needs_consent = true })
 	end,
@@ -250,7 +250,7 @@ ui.command {
 	id = "waiting",
 	title = "Someone's template waits for you",
 	run = function()
-		table.insert(waiting, { pending = "ledger-1700000000", name = "Ledger", source = "ledger.zeren-template" })
+		table.insert(waiting, { pending = "ledger-1700000000", name = "Ledger", source = "ledger.zeron-template" })
 		publish()
 	end,
 }

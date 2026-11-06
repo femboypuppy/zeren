@@ -531,7 +531,7 @@ pub mod methods {
     /// `.removed`.
     pub const DELETE_TEMPLATE: &str = "DeleteTemplate";
     /// `{id, path}` → `{id, path, files, key}`: the template as a signed
-    /// package (`path`, a `.zeren-template` file), signed with this device's
+    /// package (`path`, a `.zeron-template` file), signed with this device's
     /// plugin key in the template domain. Never-templated files are left out.
     pub const EXPORT_TEMPLATE: &str = "ExportTemplate";
     /// `{path}` → yours (signed by this device's key): installed,
@@ -594,7 +594,7 @@ pub mod methods {
     /// with yours (allowed what they ask, on unless turned off, never
     /// removed).
     pub const SET_BUILTIN_PLUGINS: &str = "SetBuiltinPlugins";
-    /// `{path}` (a `.zeren-plugin` file) or `{url, ref?, folder?}` (a
+    /// `{path}` (a `.zeron-plugin` file) or `{url, ref?, folder?}` (a
     /// package link, a GitHub release, a git repository) → `{plugin,
     /// update, from?, added, removed, waiting}`: someone else's plugin
     /// installed, verified first; it waits for you in the app (`waiting`)
@@ -609,7 +609,7 @@ pub mod methods {
     /// (checked first when none was found yet). Refused when someone else
     /// signed it or it was changed; new permissions wait for you again.
     pub const UPDATE_PLUGIN: &str = "UpdatePlugin";
-    /// `{id, to?}` → `{path}`: a plugin as a `.zeren-plugin` package (an
+    /// `{id, to?}` → `{path}`: a plugin as a `.zeron-plugin` package (an
     /// own plugin is re-signed first), into the folder or file `to`.
     pub const EXPORT_PLUGIN: &str = "ExportPlugin";
     /// `{source, title, body, session?}` → `{outcome: "posted" | "off" |

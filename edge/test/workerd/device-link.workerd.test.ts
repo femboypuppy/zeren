@@ -73,7 +73,7 @@ const relayed = async (bearer: string, target: string, query: string, h: Awaited
   ws.send(encodeDeviceFrame({ s: `s-${connId}`, k: "rpc", from: "someone-else", fromDevice: "forged" } as DeviceFrameHeader, new Uint8Array([1])));
   await expect.poll(() => h.seen.find((f) => f.s === `s-${connId}`)).toBeDefined();
   ws.close();
-  return { header: h.seen.find((f) => f.s === `s-${connId}`)!, stamped: res.headers.get("x-zeren-caller-device") };
+  return { header: h.seen.find((f) => f.s === `s-${connId}`)!, stamped: res.headers.get("x-zeron-caller-device") };
 };
 
 describe("relay device stamp", () => {

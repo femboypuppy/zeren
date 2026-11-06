@@ -48,7 +48,7 @@ export const runnerTokenMessage = (
   userId: string,
   deviceId: string,
   ts: number
-): string => `zeren-runner-token\n${orgId}\n${userId}\n${deviceId}\n${ts}`;
+): string => `zeron-runner-token\n${orgId}\n${userId}\n${deviceId}\n${ts}`;
 
 /** Verify a base64url Ed25519 signature over `message` (UTF-8). Any malformed
  * input is simply "not verified" — callers never need to distinguish. */

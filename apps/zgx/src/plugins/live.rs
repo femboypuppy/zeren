@@ -513,7 +513,7 @@ pub fn pending(templates: &Path) -> Vec<serde_json::Value> {
         .filter_map(|e| {
             let file = e.file_name().to_string_lossy().into_owned();
             let name = file.strip_suffix(".json")?.to_string();
-            if !plain(&name) || !dir.join(format!("{name}.zeren-template")).is_file() {
+            if !plain(&name) || !dir.join(format!("{name}.zeron-template")).is_file() {
                 return None;
             }
             let mut about = read_json(&e.path());
