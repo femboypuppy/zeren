@@ -823,6 +823,7 @@ struct ModelRowsKey {
     query: String,
     rail: ModelRail,
     effective: Option<HarnessId>,
+    locked: bool,
     catalog_rev: u64,
     selected: Option<String>,
 }
@@ -1434,13 +1435,16 @@ impl Pickers {
     /// Move an existing chat to another agent, on `model` or that agent's
     /// remembered one. The old agent's native session can't resume under the
     /// new one, so the engine starts it fresh and hands it the conversation so
-    /// far (`zeren_engine::handoff`); the switch applies from the next message.
+    /// far through the engine's provider-history replay.
     fn switch_chat_harness(
         &mut self,
         harness: HarnessId,
         model: Option<String>,
         cx: &mut Context<Self>,
     ) {
+        if self.harness_locked(cx) {
+            return;
+        }
         let model = model.or_else(|| self.defaults.model_for(harness).map(|m| m.id.clone()));
         self.update_chat_config(cx, move |config| {
             config.harness = harness;
@@ -2860,6 +2864,10 @@ impl Pickers {
         {
             descriptors.insert(0, descriptor.clone());
         }
+        if self.harness_locked(cx) {
+            let effective = self.effective_harness(cx);
+            descriptors.retain(|d| Some(d.id) == effective);
+        }
         descriptors
     }
 
@@ -2877,6 +2885,7 @@ impl Pickers {
             query: self.search.read(cx).text().trim().to_string(),
             rail: self.model_rail,
             effective: self.effective_harness(cx),
+            locked: self.harness_locked(cx),
             catalog_rev: self.catalog_rev,
             selected: self.effective_model_id(cx).map(str::to_owned),
         };
@@ -7817,7 +7826,7 @@ mod tests {
                 assert!(pickers.harness_locked(cx), "locked mid-turn");
                 assert_eq!(pickers.rail_descriptors(cx).len(), 1);
                 pickers.pick_harness(HarnessId::Codex, cx);
-                assert_eq!(pickers.resolved(cx).harness, Some(HarnessId::Codex));
+                assert_eq!(pickers.resolved(cx).harness, Some(HarnessId::ClaudeCode));
             });
             let (state, pickers) = side_chat_picker(true, cx);
             state.update(cx, |state, _| {
@@ -10672,7 +10681,7 @@ mod tests {
                     cx.notify();
                 });
                 picker.show_compact_models(cx);
-                assert_eq!(picker.model_rows_len(cx), 2);
+                assert_eq!(picker.model_rows_len(cx), 1);
                 assert_eq!(picker.rail_descriptors(cx)[0].id, HarnessId::Codex);
                 picker
                     .search
@@ -10721,6 +10730,8 @@ mod tests {
         let handle = cx.add_window(|_, cx| {
             let state = cx.new(|_| {
                 let mut state = AppState::new();
+                state.local_device_id = Some("local".into());
+                state.devices = vec![host_device(true)];
                 state.chats.push(
                     serde_json::from_value(serde_json::json!({
                         "id": "saved-chat",
