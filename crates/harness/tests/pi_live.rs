@@ -81,6 +81,7 @@ async fn real_pi_mock_lifecycle() {
                 .unwrap();
                 rx
             }),
+            turn: Default::default(),
         };
         let request = RunRequest {
             prompt: prompt.into(),
@@ -91,10 +92,14 @@ async fn real_pi_mock_lifecycle() {
             cwd: cwd.display().to_string(),
             sandbox: SandboxLevel::WorkspaceWrite,
             auto_approve: true,
+            access: Default::default(),
+            plan: false,
             resume: session.clone(),
             attachments: vec![],
             worktree: None,
             mcp: None,
+            env: Default::default(),
+            extra_mcp: Vec::new(),
         };
         let previous_session = session.clone();
         let mut stream = harness.run(request, controls).await.unwrap();
@@ -119,6 +124,8 @@ async fn real_pi_mock_lifecycle() {
                                 .send(SteerMessage {
                                     prompt: "redirect".into(),
                                     message_id: None,
+                                    attachments: Vec::new(),
+                                    config: None,
                                 })
                                 .await
                                 .unwrap();
@@ -179,6 +186,7 @@ async fn real_pi_mock_lifecycle() {
         steering,
         interrupt: CancellationToken::new(),
         request_input: Box::new(|_| oneshot::channel().1),
+        turn: Default::default(),
     };
     let request = RunRequest {
         prompt: "after loss".into(),
@@ -189,10 +197,14 @@ async fn real_pi_mock_lifecycle() {
         cwd: cwd.display().to_string(),
         sandbox: SandboxLevel::WorkspaceWrite,
         auto_approve: true,
+        access: Default::default(),
+        plan: false,
         resume: session.clone(),
         attachments: vec![],
         worktree: None,
         mcp: None,
+        env: Default::default(),
+        extra_mcp: Vec::new(),
     };
     let events: Vec<_> = tokio::time::timeout(
         Duration::from_secs(20),
@@ -251,6 +263,7 @@ async fn real_pi_steering_bursts_share_the_next_model_call() {
         steering,
         interrupt: CancellationToken::new(),
         request_input: Box::new(|_| oneshot::channel().1),
+        turn: Default::default(),
     };
     let request = RunRequest {
         prompt: "burst hold".into(),
@@ -261,10 +274,14 @@ async fn real_pi_steering_bursts_share_the_next_model_call() {
         cwd: cwd.display().to_string(),
         sandbox: SandboxLevel::WorkspaceWrite,
         auto_approve: true,
+        access: Default::default(),
+        plan: false,
         resume: None,
         attachments: vec![],
         worktree: None,
         mcp: None,
+        env: Default::default(),
+        extra_mcp: Vec::new(),
     };
     let mut stream = harness.run(request, controls).await.unwrap();
     let calls = cwd.join("probe-model-calls.jsonl");
@@ -278,6 +295,8 @@ async fn real_pi_steering_bursts_share_the_next_model_call() {
         tx.send(SteerMessage {
             prompt: prompt.clone(),
             message_id: Some(format!("burst-user-{i}")),
+            attachments: Vec::new(),
+            config: None,
         })
         .await
         .unwrap();
@@ -298,12 +317,7 @@ async fn real_pi_steering_bursts_share_the_next_model_call() {
     // step, rather than being claimed as part of the already-running call.
     let late = vec!["late-1", "late-2", "late-3"];
     for prompt in &late {
-        tx.send(SteerMessage {
-            prompt: (*prompt).into(),
-            message_id: None,
-        })
-        .await
-        .unwrap();
+        tx.send(SteerMessage::text(*prompt)).await.unwrap();
     }
     drop(tx);
     wait_probe_lines(&inputs, burst.len() + late.len()).await;

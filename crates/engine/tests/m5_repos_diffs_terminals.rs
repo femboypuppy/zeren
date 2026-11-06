@@ -267,18 +267,33 @@ async fn repository_identity_spans_worktrees_and_clones() {
     assert_eq!(repos.repository_identity(&linked).await.unwrap(), identity);
     git(
         &repo,
-        &["remote", "add", "origin", "git@github-alias:zeronsh/old-name.git"],
+        &[
+            "remote",
+            "add",
+            "origin",
+            "git@github-alias:zeronsh/old-name.git",
+        ],
     )
     .await;
     let clone = temp.path().join("clone");
     git(
         temp.path(),
-        &["clone", "-q", repo.to_str().unwrap(), clone.to_str().unwrap()],
+        &[
+            "clone",
+            "-q",
+            repo.to_str().unwrap(),
+            clone.to_str().unwrap(),
+        ],
     )
     .await;
     git(
         &clone,
-        &["remote", "set-url", "origin", "https://github.com/zeronsh/new-name"],
+        &[
+            "remote",
+            "set-url",
+            "origin",
+            "https://github.com/zeronsh/new-name",
+        ],
     )
     .await;
     assert_eq!(repos.repository_identity(&repo).await.unwrap(), identity);
@@ -352,12 +367,17 @@ async fn repository_identity_spans_worktrees_and_clones() {
     .await;
     git(
         &shallow,
-        &["remote", "set-url", "origin", "https://GitHub.com/ZeronSH/Zeron.git"],
+        &[
+            "remote",
+            "set-url",
+            "origin",
+            "https://GitHub.com/ZeronSH/Zeren.git",
+        ],
     )
     .await;
     assert_eq!(
         repos.repository_identity(&shallow).await.unwrap(),
-        "github.com/zeronsh/zeron"
+        "github.com/femboypuppy/zeren"
     );
 
     // No commits yet: the remote (origin, else the first), then a
@@ -369,12 +389,17 @@ async fn repository_identity_spans_worktrees_and_clones() {
     assert!(local.starts_with("local:"), "{local}");
     git(
         &empty,
-        &["remote", "add", "upstream", "git@github.com:Anara/Comet.git"],
+        &[
+            "remote",
+            "add",
+            "upstream",
+            "git@github.com:Example/Comet.git",
+        ],
     )
     .await;
     assert_eq!(
         repos.repository_identity(&empty).await.unwrap(),
-        "github.com/anara/comet"
+        "github.com/example/comet"
     );
 }
 
@@ -1366,7 +1391,7 @@ async fn turn_diff_captures_only_changes_since_snapshot() {
     // Pre-turn state: a tracked edit and an untracked file already exist.
     std::fs::write(repo_dir.join("a.txt"), "one\ntwo\npre-turn\n").expect("edit a.txt");
     std::fs::write(repo_dir.join("pre.txt"), "before the turn\n").expect("pre.txt");
-    let turn_tree = snapshot_tree(&repo_dir).await.expect("snapshot");
+    let turn_tree = snapshot_tree(&repos, &repo_dir).await.expect("snapshot");
 
     // Nothing changed yet: the turn diff is empty (pre-existing untracked
     // files must NOT reappear as new).

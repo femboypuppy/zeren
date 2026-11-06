@@ -5,9 +5,19 @@ edition.workspace = true
 license.workspace = true
 publish.workspace = true
 
+# Shared by both binaries; the UI is referenced only by `zeren`, so the
+# background engine links without it.
+[lib]
+name = "zeren_app"
+path = "src/lib.rs"
+
 [[bin]]
 name = "zeren"
 path = "src/main.rs"
+
+[[bin]]
+name = "zeren-engine"
+path = "src/bin/zeren-engine.rs"
 
 [dependencies]
 zeren-engine.workspace = true
@@ -15,7 +25,9 @@ zeren-harness.workspace = true
 zeren-rpc.workspace = true
 zeren-ui.workspace = true
 zeren-update.workspace = true
+zeren-cli.workspace = true
 zeren-mcp.workspace = true
+zeren-notify.workspace = true
 tokio.workspace = true
 clap.workspace = true
 anyhow.workspace = true

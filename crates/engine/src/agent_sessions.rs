@@ -228,6 +228,8 @@ pub fn import_session_with(
             reasoning: None,
             model_options: Default::default(),
             sandbox: SandboxLevel::WorkspaceWrite,
+            access: Default::default(),
+            plan: false,
         }),
         last_message_preview: None,
         last_message_at: Some(last_at),
@@ -236,12 +238,13 @@ pub fn import_session_with(
         // run launches from the row's `cwd` — so both carry the same string.
         harness_session_id: Some(resume_id),
         harness_session_cwd: Some(cwd),
-        harness_session_harness: Some(harness),
+        harness_session_harness: Some(harness.as_str().to_owned()),
         space_id: Some(space_id.clone()),
         // Already read: an import must not raise a "finished, unseen" badge.
         last_seen_at: Some(last_at),
         room_gen: Some(2),
         parent_chat_id: None,
+        child_kind: None,
     })?;
     Ok(ImportedAgentSession {
         chat_id,

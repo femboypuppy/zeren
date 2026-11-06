@@ -199,7 +199,7 @@ impl TitleGenerator {
             serde_json::to_string(prompt).ok()?
         );
         for attempt in 0..=RETRY_DELAYS_MS.len() {
-            let request = RunRequest {
+            let mut request = RunRequest {
                 mcp: None,
                 prompt: title_prompt.clone(),
                 harness: Some(harness_id),
@@ -209,10 +209,21 @@ impl TitleGenerator {
                 cwd: scratch.path().to_string_lossy().into_owned(),
                 sandbox: SandboxLevel::ReadOnly,
                 auto_approve: false,
+                access: Default::default(),
+                plan: false,
                 attachments: Vec::new(),
                 resume: None,
                 worktree: None,
+                env: Default::default(),
+                extra_mcp: Vec::new(),
             };
+            // A Cloud device's credential broker supplies the CLI's login;
+            // without one there is no title to generate.
+            self.inner
+                .registry
+                .prepare_run(harness_id, &mut request)
+                .await
+                .ok()?;
             match tokio::time::timeout(
                 std::time::Duration::from_secs(30),
                 collect_text(harness.as_ref(), request, Some(execution_lease.clone())),
@@ -286,6 +297,7 @@ async fn collect_text(
         }),
         steering: steer_rx,
         interrupt: interrupt.clone(),
+        turn: Default::default(),
     };
     let mut stream = harness.run_title(request, controls).await?;
     let mut text = String::new();
@@ -378,9 +390,13 @@ mod tests {
             cwd: String::new(),
             sandbox: SandboxLevel::ReadOnly,
             auto_approve: false,
+            access: Default::default(),
+            plan: false,
             resume: None,
             attachments: vec![],
             worktree: None,
+            env: Default::default(),
+            extra_mcp: Vec::new(),
         };
         let result = collect_text(&harness, request, None).await;
         assert!(

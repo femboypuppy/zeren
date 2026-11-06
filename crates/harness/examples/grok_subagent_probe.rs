@@ -33,6 +33,7 @@ async fn main() {
         }),
         steering,
         interrupt: CancellationToken::new(),
+        turn: Default::default(),
     };
     let request = RunRequest {
         mcp: None,
@@ -48,9 +49,13 @@ async fn main() {
         cwd,
         sandbox: SandboxLevel::WorkspaceWrite,
         auto_approve: true,
+        access: Default::default(),
+        plan: false,
         attachments: Vec::new(),
         worktree: None,
         resume: None,
+        env: Default::default(),
+        extra_mcp: Vec::new(),
     };
     let mut stream = AcpHarness::grok()
         .run(request, controls)

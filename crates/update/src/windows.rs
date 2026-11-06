@@ -18,6 +18,10 @@ const LEGACY_CONFIG: &str = "zeron-update.json";
 /// Deterministic name for the copy that becomes the next installation; a
 /// crash between the two renames leaves at most this file behind.
 const INCOMING: &str = ".zeren-update-incoming.exe";
+/// The installed version, written by each update: the app's background
+/// engine (`zeren.exe engine`) compares it with its own to restart into the
+/// new image once idle.
+const VERSION_FILE: &str = "zeren-version";
 /// The installer's uninstall entry (`AppId` in `dist/windows/zeren.iss`, plus
 /// Inno Setup's `_is1` suffix). Settings → Apps reads `DisplayVersion` here.
 const UNINSTALL_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\Uninstall\{AD5DEC34-E254-467B-8F24-8127EBAF4DA6}_is1";
@@ -44,7 +48,11 @@ fn backup_path(installed: &Path) -> PathBuf {
 }
 
 pub(super) fn release_url() -> anyhow::Result<Option<String>> {
-    let exe = std::env::current_exe()?;
+    // A new version on trial runs from beside the installation.
+    let exe = match std::env::var_os(super::INSTALLED_AT_ENV) {
+        Some(directory) => PathBuf::from(directory).join("zeren.exe"),
+        None => std::env::current_exe()?,
+    };
     if !is_managed(&exe) {
         return Ok(None);
     }
@@ -156,6 +164,7 @@ pub fn apply(staged: &Path, directory: &Path, relaunch: bool) -> anyhow::Result<
     swap_into_place(staged, &installed)?;
     if let Ok(version) = std::fs::read_to_string(staged.with_file_name("version")) {
         refresh_installer_version(version.trim());
+        let _ = std::fs::write(directory.join(VERSION_FILE), version.trim());
     }
     if relaunch {
         std::process::Command::new(&installed)
@@ -173,6 +182,25 @@ pub fn apply(staged: &Path, directory: &Path, relaunch: bool) -> anyhow::Result<
     if let Some(parent) = staged.parent() {
         let _ = std::fs::remove_dir(parent);
     }
+    Ok(())
+}
+
+/// Make a new version that's proved itself the installed one, from the exe it's
+/// running as. A running image can be renamed, so it simply moves into place; the
+/// old one moves aside first and goes on running until it exits.
+pub(super) fn commit_trial(incoming: &Path, directory: &Path, version: &str) -> anyhow::Result<()> {
+    let installed = directory.join("zeren.exe");
+    recover_from_backup(&installed)?;
+    let backup = directory.join(BACKUP);
+    std::fs::rename(&installed, &backup).context("moving the old executable aside")?;
+    if let Err(err) = std::fs::rename(incoming, &installed) {
+        std::fs::rename(&backup, &installed)
+            .context("restoring the previous executable after a failed update")?;
+        return Err(err).context("installing the updated executable");
+    }
+    refresh_installer_version(version);
+    std::fs::write(directory.join(VERSION_FILE), version)
+        .context("recording the installed version")?;
     Ok(())
 }
 
@@ -227,6 +255,14 @@ fn swap_into_place(staged: &Path, installed: &Path) -> anyhow::Result<()> {
         return Err(err).context("installing the updated executable");
     }
     Ok(())
+}
+
+/// The version the last update installed in `directory`, if one recorded it.
+pub(super) fn installed_version(directory: &Path) -> Option<String> {
+    std::fs::read_to_string(directory.join(VERSION_FILE))
+        .ok()
+        .map(|version| version.trim().to_owned())
+        .filter(|version| !version.is_empty())
 }
 
 /// Called by the newly installed desktop before it opens the engine profile.
@@ -510,6 +546,7 @@ mod tests {
                 },
             )]
             .into(),
+            ..Default::default()
         };
         let error = stage(&base, &manifest, dir.path()).await.unwrap_err();
         server.join().unwrap();

@@ -43,6 +43,7 @@ async fn silent_npm_enoent_death_surfaces_decoded_error() {
         request_input: Box::new(|_| tokio::sync::oneshot::channel().1),
         steering,
         interrupt: CancellationToken::new(),
+        turn: Default::default(),
     };
     let request = RunRequest {
         mcp: None,
@@ -54,9 +55,13 @@ async fn silent_npm_enoent_death_surfaces_decoded_error() {
         cwd: "/tmp".into(),
         sandbox: SandboxLevel::WorkspaceWrite,
         auto_approve: true,
+        access: Default::default(),
+        plan: false,
         attachments: Vec::new(),
         worktree: None,
         resume: None,
+        env: Default::default(),
+        extra_mcp: Vec::new(),
     };
 
     let err = match harness.run(request, controls).await {

@@ -10,6 +10,8 @@
     <string>zeren</string>
     <key>CFBundleIconFile</key>
     <string>zeren.icns</string>
+    <key>CFBundleIconName</key>
+    <string>Zeren</string>
     <key>CFBundleIdentifier</key>
     <string>sh.zeron.app.dev</string>
     <key>CFBundleInfoDictionaryVersion</key>
@@ -29,6 +31,8 @@
          the same isolated development instance. -->
     <key>LSEnvironment</key>
     <dict>
+        <key>ZEREN_AUTO_UPDATE</key>
+        <string>0</string>
         <key>ZEREN_DATA_DIR</key>
         <string>__DATA_DIR__</string>
         <key>ZEREN_IPC_PORT</key>
@@ -36,6 +40,10 @@
     </dict>
     <key>NSMicrophoneUsageDescription</key>
     <string>Zeren uses your microphone for on-device dictation and for voice sessions you start. Voice sessions stream your audio to OpenAI through your ChatGPT-authenticated Codex account.</string>
+    <!-- macOS 26 attaches one-time-code AutoFill (a SafariPlatformSupport
+         helper process) to every text input unless the app opts out. -->
+    <key>NSAutoFillRequiresTextContentTypeForOneTimeCodeOnMac</key>
+    <true/>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSSupportsAutomaticGraphicsSwitching</key>

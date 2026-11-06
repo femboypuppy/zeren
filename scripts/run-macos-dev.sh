@@ -20,6 +20,22 @@ if pgrep -f -x "$CONTENTS/MacOS/zeren" >/dev/null 2>&1; then
   echo "Zeren Dev is already running. Quit it before rebuilding the signed bundle." >&2
   exit 1
 fi
+# The app's background engine keeps running after the app quits. Rebuilding
+# replaces its executable, so stop this bundle's engine (only this bundle's:
+# matched by its exact path) — its sessions stop with it.
+ENGINE="$CONTENTS/MacOS/Zeren Engine"
+if pgrep -f -x "$ENGINE" >/dev/null 2>&1; then
+  echo "Stopping Zeren Dev's background engine before rebuilding." >&2
+  pkill -TERM -f -x "$ENGINE" || true
+  for _ in $(seq 1 100); do
+    pgrep -f -x "$ENGINE" >/dev/null 2>&1 || break
+    sleep 0.1
+  done
+  if pgrep -f -x "$ENGINE" >/dev/null 2>&1; then
+    echo "Zeren Dev's background engine didn't stop; quit it and retry." >&2
+    exit 1
+  fi
+fi
 
 cd "$ROOT"
 cargo build -p zeren
@@ -27,6 +43,7 @@ cargo build -p zeren
 mkdir -p "$CONTENTS/MacOS" "$CONTENTS/Resources" "$DATA_DIR"
 TARGET_DIR="$(cargo metadata --no-deps --format-version 1 | python3 -c 'import json,sys; print(json.load(sys.stdin)["target_directory"])')"
 install -m 755 "$TARGET_DIR/debug/zeren" "$CONTENTS/MacOS/zeren"
+install -m 755 "$TARGET_DIR/debug/zeren-engine" "$ENGINE"
 sed "s/__VERSION__/$VERSION/g" "$ROOT/dist/macos/Info-dev.plist" >"$CONTENTS/Info.plist"
 plutil -replace CFBundleIdentifier -string "$BUNDLE_ID" "$CONTENTS/Info.plist"
 plutil -replace LSEnvironment.ZEREN_DATA_DIR -string "$DATA_DIR" "$CONTENTS/Info.plist"
@@ -34,19 +51,19 @@ plutil -replace LSEnvironment.ZEREN_IPC_PORT -string "$IPC_PORT" "$CONTENTS/Info
 if [[ -n "${CODEX_EXECUTABLE:-}" ]]; then
   plutil -insert LSEnvironment.CODEX_EXECUTABLE -string "$CODEX_EXECUTABLE" "$CONTENTS/Info.plist"
 fi
+# Another edge (staging, self-hosting) with its own sign-in client and
+# loopback callback: scripts/staging-app.sh.
+for var in ZEREN_EDGE_URL ZEREN_WORKOS_CLIENT_ID ZEREN_CALLBACK_PORT; do
+  if [[ -n "${!var:-}" ]]; then
+    plutil -insert "LSEnvironment.$var" -string "${!var}" "$CONTENTS/Info.plist"
+  fi
+done
 
 mkdir -p "$CONTENTS/Resources/licenses"
 cp "$ROOT/crates/voice/NOTICE.md" "$CONTENTS/Resources/licenses"/parakeet-v3.txt
 
-if [[ ! -f "$CONTENTS/Resources/zeren.icns" ]]; then
-  ICONSET="$DEV_ROOT/zeren-dev.iconset"
-  mkdir -p "$ICONSET"
-  for size in 16 32 128 256 512; do
-    sips -z "$size" "$size" "$ROOT/dist/macos/icon-1024.png" --out "$ICONSET/icon_${size}x${size}.png" >/dev/null
-    retina=$((size * 2))
-    sips -z "$retina" "$retina" "$ROOT/dist/macos/icon-1024.png" --out "$ICONSET/icon_${size}x${size}@2x.png" >/dev/null
-  done
-  iconutil -c icns "$ICONSET" -o "$CONTENTS/Resources/zeren.icns"
+if [[ ! -f "$CONTENTS/Resources/Assets.car" ]]; then
+  "$ROOT/scripts/macos-app-icon.sh" "$CONTENTS/Resources" || echo "warning: no app icon (it takes Xcode 26 or later)" >&2
 fi
 
 # A real Apple Development identity gives TCC a stable signing requirement
@@ -56,10 +73,13 @@ IDENTITY="${ZEREN_DEV_CODESIGN_IDENTITY:-}"
 if [[ -z "$IDENTITY" ]]; then
   IDENTITY="$(security find-identity -v -p codesigning 2>/dev/null | sed -n 's/.*"\(Apple Development:[^"]*\)".*/\1/p' | head -1)"
 fi
+# Inside out: the engine first, then the bundle that seals it.
 if [[ -n "$IDENTITY" ]]; then
-  codesign --entitlements "$ROOT/dist/macos/Dictation.entitlements" --force --sign "$IDENTITY" --identifier "$BUNDLE_ID" "$APP"
+  codesign --entitlements "$ROOT/dist/macos/Zeren.entitlements" --force --sign "$IDENTITY" --identifier "$BUNDLE_ID.engine" "$ENGINE"
+  codesign --entitlements "$ROOT/dist/macos/Zeren.entitlements" --force --sign "$IDENTITY" --identifier "$BUNDLE_ID" "$APP"
 else
-  codesign --entitlements "$ROOT/dist/macos/Dictation.entitlements" --force --sign - --identifier "$BUNDLE_ID" "$APP"
+  codesign --entitlements "$ROOT/dist/macos/Zeren.entitlements" --force --sign - --identifier "$BUNDLE_ID.engine" "$ENGINE"
+  codesign --entitlements "$ROOT/dist/macos/Zeren.entitlements" --force --sign - --identifier "$BUNDLE_ID" "$APP"
   echo "warning: no Apple Development signing identity found; macOS may ask for permissions again after a rebuild" >&2
 fi
 
@@ -74,12 +94,18 @@ echo "running Zeren Dev (bundle $BUNDLE_ID, data $DATA_DIR, IPC $IPC_PORT)" >&2
 # -W keeps the script attached until the app exits. Runtime logs remain in the
 # isolated data directory (`target/macos-dev/data/logs/zeren-headed.log`).
 OPEN_ENV=(
+  --env "ZEREN_AUTO_UPDATE=0"
   --env "ZEREN_DATA_DIR=$DATA_DIR"
   --env "ZEREN_IPC_PORT=$IPC_PORT"
 )
 if [[ -n "${CODEX_EXECUTABLE:-}" ]]; then
   OPEN_ENV+=(--env "CODEX_EXECUTABLE=$CODEX_EXECUTABLE")
 fi
+for var in ZEREN_EDGE_URL ZEREN_WORKOS_CLIENT_ID ZEREN_CALLBACK_PORT; do
+  if [[ -n "${!var:-}" ]]; then
+    OPEN_ENV+=(--env "$var=${!var}")
+  fi
+done
 if [[ -n "${ZEREN_OPEN_ROUTE:-}" ]]; then
   OPEN_ENV+=(--env "ZEREN_OPEN_ROUTE=$ZEREN_OPEN_ROUTE")
 fi

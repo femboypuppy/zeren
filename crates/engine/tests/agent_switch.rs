@@ -92,6 +92,11 @@ fn request(prompt: &str, harness: HarnessId) -> RunRequest {
         cwd: "/tmp".into(),
         sandbox: SandboxLevel::WorkspaceWrite,
         auto_approve: true,
+        access: Default::default(),
+        plan: false,
+        env: Default::default(),
+        extra_mcp: Vec::new(),
+        mcp: None,
         attachments: Vec::new(),
         worktree: None,
         resume: None,
@@ -187,11 +192,11 @@ async fn switching_agents_hands_the_conversation_to_a_fresh_session() {
     .await;
     assert_eq!(
         core.workspace.chat_harness_session(CHAT),
-        Some((
-            "mock-session".into(),
-            Some("/tmp".into()),
-            Some(HarnessId::Mock)
-        )),
+        Some(zeren_engine::workspace_host::StoredHarnessSession {
+            session_id: "mock-session".into(),
+            cwd: Some("/tmp".into()),
+            harness: Some(HarnessId::Mock),
+        }),
         "the stored session names its agent"
     );
 
@@ -205,7 +210,7 @@ async fn switching_agents_hands_the_conversation_to_a_fresh_session() {
             second.resume, None,
             "a Mock session never resumes under Codex"
         );
-        assert!(second.prompt.starts_with("<previous-conversation>"));
+        assert!(second.prompt.contains("<conversation>"));
         assert!(second.prompt.contains("remember the codeword PINEAPPLE"));
         assert!(second.prompt.contains("Mock got it"));
         assert!(second.prompt.ends_with("what was the codeword?"));
@@ -232,7 +237,7 @@ async fn switching_agents_hands_the_conversation_to_a_fresh_session() {
         "the sidebar preview shows the typed message"
     );
     assert_eq!(
-        core.workspace.chat_harness_session(CHAT).map(|s| s.2),
+        core.workspace.chat_harness_session(CHAT).map(|s| s.harness),
         Some(Some(HarnessId::Codex))
     );
 
@@ -245,14 +250,14 @@ async fn switching_agents_hands_the_conversation_to_a_fresh_session() {
         assert_eq!(third.prompt, "and now?");
     }
 
-    // Switching back hands over again (the old Mock session is not resumed).
+    // Switching back resumes its own session with only the missed messages.
     turn(&core, "back to you", HarnessId::Mock, "m4").await;
     {
         let log = requests.lock().unwrap();
         let (agent, fourth) = &log[3];
         assert_eq!(*agent, HarnessId::Mock);
-        assert_eq!(fourth.resume, None);
-        assert!(fourth.prompt.contains("was with Codex"));
+        assert_eq!(fourth.resume.as_deref(), Some("mock-session"));
+        assert!(fourth.prompt.contains("different AI provider"));
         assert!(fourth.prompt.ends_with("back to you"));
     }
     core.shutdown().await;
@@ -325,7 +330,7 @@ async fn rewinding_forks_before_a_message_and_hands_over_the_history() {
         let log = requests.lock().unwrap();
         let (_, first) = &log[2];
         assert_eq!(first.resume, None);
-        assert!(first.prompt.contains("continues in a new session"));
+        assert!(first.prompt.contains("<conversation>"));
         assert!(first.prompt.contains("remember the codeword PINEAPPLE"));
         assert!(
             !first.prompt.contains("write the whole app"),

@@ -30,6 +30,6 @@ For native startup timing, launch a development bundle with `RUST_LOG=info,zeren
 
 Real-model verification is an explicit development check using the `verify` example and external synthetic/public WAV files. Routine CI does not download the model or retain speech fixtures in the repository.
 
-Future mobile implementation is scoped in the [PR #591 handoff](https://github.com/zeronsh/zeron/pull/591#issuecomment-5869764738), including native capture, lifecycle cancellation, mobile inference benchmarks, UTF-16/UTF-8 selection handling and preservation of iOS delivery modes.
+Future mobile implementation is scoped in the [PR #591 handoff](https://github.com/femboypuppy/zeren/pull/591#issuecomment-5869764738), including native capture, lifecycle cancellation, mobile inference benchmarks, UTF-16/UTF-8 selection handling and preservation of iOS delivery modes.
 
 See the task evidence under `/Users/gaelcado/zeren/evidence/voice/` for actual runtime transcripts, hardware measurements and native build captures. Standalone synthetic model accuracy is distinct from a live microphone test.

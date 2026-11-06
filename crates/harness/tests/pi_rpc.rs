@@ -21,10 +21,14 @@ fn request(cwd: &std::path::Path, prompt: &str) -> RunRequest {
         cwd: cwd.display().to_string(),
         sandbox: SandboxLevel::WorkspaceWrite,
         auto_approve: true,
+        access: Default::default(),
+        plan: false,
         resume: None,
         attachments: vec![],
         worktree: None,
         mcp: None,
+        env: Default::default(),
+        extra_mcp: Vec::new(),
     }
 }
 fn controls() -> (RunControls, mpsc::Sender<SteerMessage>, CancellationToken) {
@@ -41,6 +45,7 @@ fn controls() -> (RunControls, mpsc::Sender<SteerMessage>, CancellationToken) {
                 let _ = tx.send(vec![]);
                 rx
             }),
+            turn: Default::default(),
         },
         tx,
         token,
@@ -215,6 +220,8 @@ async fn steers_confirm_on_consumption_and_interrupt_is_terminal_once() {
     tx.send(SteerMessage {
         prompt: "redirect".into(),
         message_id: Some("user-id".into()),
+        attachments: Vec::new(),
+        config: None,
     })
     .await
     .unwrap();
@@ -263,6 +270,8 @@ async fn idle_mailbox_starts_another_turn_without_restarting_process() {
                         tx.send(SteerMessage {
                             prompt: "second".into(),
                             message_id: None,
+                            attachments: Vec::new(),
+                            config: None,
                         })
                         .await
                         .unwrap();
@@ -510,6 +519,8 @@ async fn steering_burst_reaches_one_model_step_and_confirms_each_message_on_cons
             tx.send(SteerMessage {
                 prompt: prompt.clone(),
                 message_id: Some(format!("user-{i}")),
+                attachments: Vec::new(),
+                config: None,
             })
             .await
             .unwrap();
@@ -589,6 +600,8 @@ async fn handled_input_between_steers_keeps_its_own_delivery_receipt() {
             tx.send(SteerMessage {
                 prompt: prompt.into(),
                 message_id: None,
+                attachments: Vec::new(),
+                config: None,
             })
             .await
             .unwrap();
@@ -727,6 +740,8 @@ async fn late_extension_notifications_do_not_reopen_completed_turns() {
     tx.send(SteerMessage {
         prompt: "next".into(),
         message_id: None,
+        attachments: Vec::new(),
+        config: None,
     })
     .await
     .unwrap();
@@ -747,5 +762,176 @@ async fn late_extension_notifications_do_not_reopen_completed_turns() {
             ))
             .count(),
         1
+    );
+}
+
+/// A model or thinking switch reaches the live process before the message
+/// it was sent with: no new process, no lost session.
+#[tokio::test]
+async fn a_model_switch_applies_to_the_live_process() {
+    let dir = tempfile::tempdir().unwrap();
+    let (c, tx, _) = controls();
+    let mut opening = request(dir.path(), "which-model");
+    opening.model = Some("mock/mock".into());
+    let mut switched = opening.clone();
+    switched.model = Some("mock/mock-2".into());
+    switched.reasoning = Some(zeren_proto::ReasoningLevel::High);
+    let driver = harness().with_session_store(dir.path().join("index"));
+    assert!(driver.reconfigures_in_place(&opening, &switched));
+    let mut stream = driver.run(opening, c).await.unwrap();
+    let mut text = String::new();
+    let mut dones = 0;
+    let mut started = 0;
+    while dones < 2 {
+        let event = tokio::time::timeout(Duration::from_secs(5), stream.next())
+            .await
+            .unwrap()
+            .unwrap()
+            .unwrap();
+        match event {
+            AgentEvent::SessionStarted { .. } => started += 1,
+            AgentEvent::TextDelta { text: delta } => text.push_str(&delta),
+            AgentEvent::Done { .. } => {
+                dones += 1;
+                text.push('|');
+                if dones == 1 {
+                    tx.send(SteerMessage {
+                        config: Some(Box::new(switched.clone())),
+                        ..SteerMessage::text("which-model")
+                    })
+                    .await
+                    .unwrap();
+                }
+            }
+            _ => {}
+        }
+    }
+    assert_eq!(started, 1);
+    assert!(text.contains("reply:mock/medium|"), "{text}");
+    assert!(text.contains("reply:mock-2/high|"), "{text}");
+}
+
+#[tokio::test]
+async fn compaction_after_the_settle_barrier_still_ends_the_turn() {
+    let events = collect("compact-tail").await;
+    let dones: Vec<_> = events
+        .iter()
+        .filter_map(|e| match e {
+            AgentEvent::Done { status, .. } => Some(*status),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(dones, [DoneStatus::Completed], "{events:?}");
+}
+
+/// Pi idle with input it never starts has no settle event coming: the turn
+/// settles at the bound instead of staying Working.
+#[tokio::test]
+async fn idle_with_queued_input_settles_at_the_bound() {
+    let dir = tempfile::tempdir().unwrap();
+    let (c, tx, _) = controls();
+    drop(tx);
+    let stream = harness()
+        .with_idle_queue_timeout(Duration::from_millis(600))
+        .with_session_store(dir.path().join("index"))
+        .run(request(dir.path(), "stranded"), c)
+        .await
+        .unwrap();
+    let events: Vec<_> =
+        tokio::time::timeout(Duration::from_secs(5), stream.map(Result::unwrap).collect())
+            .await
+            .expect("the turn settled");
+    let dones: Vec<_> = events
+        .iter()
+        .filter_map(|e| match e {
+            AgentEvent::Done { status, .. } => Some(*status),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(dones, [DoneStatus::Completed], "{events:?}");
+}
+
+#[tokio::test]
+async fn extension_errors_and_stdout_noise_do_not_fail_the_turn() {
+    for prompt in ["ext-error", "noise"] {
+        let events = collect(prompt).await;
+        let dones: Vec<_> = events
+            .iter()
+            .filter_map(|e| match e {
+                AgentEvent::Done { status, error, .. } => Some((*status, error.clone())),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(
+            dones,
+            [(DoneStatus::Completed, None)],
+            "{prompt}: {events:?}"
+        );
+        if prompt == "noise" {
+            assert!(
+                events.contains(&AgentEvent::TextDelta {
+                    text: "cut \u{fffd}".into()
+                }),
+                "{events:?}"
+            );
+        } else {
+            assert!(
+                events.iter().any(
+                    |e| matches!(e, AgentEvent::Error { message } if message.contains("handler threw"))
+                ),
+                "{events:?}"
+            );
+        }
+    }
+}
+
+/// Pi refusing a steer fails that message, not the turn it was sent into.
+#[tokio::test]
+async fn a_rejected_steer_reports_and_the_turn_goes_on() {
+    let dir = tempfile::tempdir().unwrap();
+    let (c, tx, _) = controls();
+    let mut stream = harness()
+        .with_session_store(dir.path().join("index"))
+        .run(request(dir.path(), "slow"), c)
+        .await
+        .unwrap();
+    let mut events = vec![];
+    while let Some(event) = tokio::time::timeout(Duration::from_secs(5), stream.next())
+        .await
+        .unwrap()
+    {
+        let event = event.unwrap();
+        if matches!(&event, AgentEvent::SessionStarted { .. }) {
+            tx.send(SteerMessage::text("reject")).await.unwrap();
+        }
+        let done = matches!(event, AgentEvent::Done { .. });
+        events.push(event);
+        if done {
+            break;
+        }
+    }
+    drop(tx);
+    assert!(
+        events.iter().any(
+            |e| matches!(e, AgentEvent::Error { message } if message.contains("preflight rejected"))
+        ),
+        "{events:?}"
+    );
+    assert!(
+        matches!(
+            events.last(),
+            Some(AgentEvent::Done {
+                status: DoneStatus::Completed,
+                error: None,
+                ..
+            })
+        ),
+        "{events:?}"
+    );
+    assert!(
+        events.contains(&AgentEvent::TextDelta {
+            text: "reply:".into()
+        }),
+        "{events:?}"
     );
 }

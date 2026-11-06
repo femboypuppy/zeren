@@ -49,9 +49,13 @@ fn run_request(prompt: &str) -> RunRequest {
         cwd: "/tmp".into(),
         sandbox: SandboxLevel::WorkspaceWrite,
         auto_approve: true,
+        access: Default::default(),
+        plan: false,
         attachments: Vec::new(),
         worktree: None,
         resume: None,
+        env: Default::default(),
+        extra_mcp: Vec::new(),
     }
 }
 
@@ -221,6 +225,7 @@ async fn park_after_spawn() -> Parked {
         is_error: false,
         output: None,
         diff: None,
+        exit_code: None,
     })
     .unwrap();
     feed.send(done(DoneStatus::Completed)).unwrap();
