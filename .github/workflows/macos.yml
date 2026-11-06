@@ -46,7 +46,7 @@ jobs:
   macos-native:
     if: inputs.native
     # ONNX Runtime supplies macOS binaries for Apple silicon only.
-    runs-on: macos-15
+    runs-on: macos-26
     # A cold cache (first run, eviction, toolchain bump) takes about 32 minutes; warm is about 10.
     timeout-minutes: 45
     steps:
