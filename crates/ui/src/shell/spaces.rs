@@ -10154,6 +10154,8 @@ impl Shell {
             git_checked_at: None,
             checkout_id: None,
             repository_id: None,
+            github_repo: None,
+            icon: None,
             created_at: Utc::now(),
         };
         self.state.update(cx, |s, cx| {
@@ -10836,6 +10838,8 @@ mod project_flow_tests {
                     git_checked_at: None,
                     checkout_id: None,
                     repository_id: None,
+                    github_repo: None,
+                    icon: None,
                     created_at: Utc::now(),
                 });
             });
