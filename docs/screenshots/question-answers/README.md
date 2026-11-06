@@ -8,7 +8,7 @@ through the window's real key dispatch closes the open question, and the
 fixture checks the doc recorded the decline before it prints PASS.
 
 ```bash
-cargo run -p zeron-ui --features appshots-fixture \
+cargo run -p zeren-ui --features appshots-fixture \
   --example question-answers-fixture -- <output-dir>
 ```
 

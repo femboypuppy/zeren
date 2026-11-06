@@ -331,7 +331,7 @@ pub fn install(cx: &mut WindowContext, host: &ScriptHost) {
             a.mutate(params).await.map_err(String::from)
         }
     });
-    // A session's Zeron conversation link (production's links.rs): its id
+    // A session's Zeren conversation link (production's links.rs): its id
     // and its workspace's locator, the same hash, so either app opens it.
     host.async_action("sessions.link", move |id| {
         let id = text(&id);
@@ -504,7 +504,7 @@ impl Sessions {
                 if let Some(at) = seen {
                     fields.push(("seen", Value::Num(at as f64)));
                 }
-                // The Zeron it runs, as it last said (Settings → Devices).
+                // The Zeren it runs, as it last said (Settings → Devices).
                 if let Some(version) = d["version"].as_str().filter(|v| !v.is_empty()) {
                     fields.push(("version", Value::from(version)));
                 }
@@ -789,7 +789,7 @@ impl Sessions {
             params["config"] = config;
         }
         let made = engine::get().call("Mutate", params).await.map_err(|error| {
-            eprintln!("zeron-zgx: sessions: no Cloud session: {error}");
+            eprintln!("zeren-zgx: sessions: no Cloud session: {error}");
             match engine::outcome(&error) {
                 "failed" => cloud_words(&error),
                 word => word.to_string(),
@@ -869,7 +869,7 @@ impl Sessions {
                     .call("Mutate", json!({ "op": "changeSidebarPin", "change": change }))
                     .await
                 {
-                    eprintln!("zeron-zgx: sessions: a sidebar change didn't take: {error}");
+                    eprintln!("zeren-zgx: sessions: a sidebar change didn't take: {error}");
                 }
             }
             me.sending.set(false);
@@ -882,7 +882,7 @@ impl Sessions {
 }
 
 /// A device row of Cloud's: the logical Cloud device or a session's machine
-/// (`zeron_proto::is_cloud_device` and the Cloud capabilities).
+/// (`zeren_proto::is_cloud_device` and the Cloud capabilities).
 pub(crate) fn is_cloud(d: &Json) -> bool {
     let id = d["id"].as_str().unwrap_or_default();
     let platform = d["platform"].as_str().unwrap_or_default();
@@ -895,7 +895,7 @@ pub(crate) fn is_cloud(d: &Json) -> bool {
 
 /// An engine error as an outcome: offline, or failed.
 /// Why a project's picture wasn't set, as a word the dialog says plainly:
-/// `outdated` (this Mac's Zeron predates project icons and refused the
+/// `outdated` (this Mac's Zeren predates project icons and refused the
 /// request), `gone` (the project was removed meanwhile), `invalid` (the
 /// picture was refused), `offline`, else `failed`.
 fn icon_fail(error: &str) -> Outcome {
@@ -1259,7 +1259,7 @@ fn workspace_locator(scope: &str, device: Option<&str>, signed_in: Option<(Strin
         "local" => ("Local", format!("device:{}", device?)),
         _ => return None,
     };
-    Some(zeron_notify::links::workspace_locator_of(name, &identity))
+    Some(zeren_notify::links::workspace_locator_of(name, &identity))
 }
 
 /// The locator of the workspace the engine has open now (none until it's
@@ -1271,8 +1271,8 @@ pub(crate) async fn current_locator() -> Option<String> {
     workspace_locator(scope, info["deviceId"].as_str(), crate::auth::signed_in())
 }
 
-/// A Zeron conversation link (crates/notify, the shipping app's).
-use zeron_notify::links::conversation_link;
+/// A Zeren conversation link (crates/notify, the shipping app's).
+use zeren_notify::links::conversation_link;
 
 pub(crate) fn new_id() -> String {
     use std::hash::{BuildHasher, Hasher};
@@ -1335,7 +1335,7 @@ mod tests {
         assert_eq!(super::workspace_locator("local", Some("d9"), None).as_deref(), Some("e2ee91fa9d910190"));
         assert_eq!(super::workspace_locator("synced", None, None), None, "signed out: not knowable");
         assert_eq!(super::workspace_locator("local", None, who()), None);
-        assert_eq!(super::conversation_link("c 1/x", "abc"), "zeron://open/chat/c%201%2Fx?workspace=abc");
+        assert_eq!(super::conversation_link("c 1/x", "abc"), "zeren://open/chat/c%201%2Fx?workspace=abc");
     }
 
     /// The connection line says what production's pill says, a chat's

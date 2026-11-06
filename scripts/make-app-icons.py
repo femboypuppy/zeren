@@ -7,10 +7,10 @@ dist/icon holds the two finished macOS icons (Default and Dark) and the mark
 alone in ink and ivory. Where a platform can follow the system it gets both
 looks; where it can't (Windows, Linux, macOS before 26) it gets Dark, which
 reads on any taskbar. It also writes the logo the apps draw themselves, the
-mark alone, as each one's zeron-logo.svg.
+mark alone, as each one's zeren-logo.svg.
 
 The results are committed, so packaging needs none of this. Run it when the art
-changes. dist/macos/Zeron.icon/icon.json and the Android colours are written by
+changes. dist/macos/Zeren.icon/icon.json and the Android colours are written by
 hand; icon.json is tuned to render like the two finished icons. Android is flat
 on purpose: ink and ivory, with the mark and tile as separate layers.
 """
@@ -26,12 +26,12 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 ART = ROOT / "dist/icon"
-DOCUMENT = ROOT / "dist/macos/Zeron.icon"
+DOCUMENT = ROOT / "dist/macos/Zeren.icon"
 ICTOOL = "/Applications/Xcode.app/Contents/Applications/Icon Composer.app/Contents/Executables/ictool"
 
 INK = "#141418"
 IVORY = "#F4F1EA"
-MARK = re.search(r' d="([^"]+)"', (ART / "zeron-mark-solid-ink.svg").read_text()).group(1)
+MARK = re.search(r' d="([^"]+)"', (ART / "zeren-mark-solid-ink.svg").read_text()).group(1)
 
 # The mark on its 1024 canvas is 700 wide. For a small space, a browser tab or a
 # logo in an app, it's framed square with the canvas's margin taken off: every
@@ -197,17 +197,17 @@ def android_foreground():
 
 
 def main():
-    dark = Image.open(ART / "zeron-solid-macos-Dark.png").convert("RGBA")
+    dark = Image.open(ART / "zeren-solid-macos-Dark.png").convert("RGBA")
 
     # macOS.
     (DOCUMENT / "Assets").mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(ART / "zeron-mark-solid-ink.svg", DOCUMENT / "Assets/mark.svg")
+    shutil.copyfile(ART / "zeren-mark-solid-ink.svg", DOCUMENT / "Assets/mark.svg")
     macos_before_26(dark).save(ROOT / "dist/macos/icon-1024.png")
 
     # Linux and Windows.
-    inset(dark, 1024, 896).save(ROOT / "dist/zeron.png")
-    windows_ico(dark, ROOT / "dist/windows/zeron.ico")
-    (ROOT / "dist/zeron.svg").write_text(
+    inset(dark, 1024, 896).save(ROOT / "dist/zeren.png")
+    windows_ico(dark, ROOT / "dist/windows/zeren.ico")
+    (ROOT / "dist/zeren.svg").write_text(
         '<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" fill="none">\n'
         f'<rect x="100" y="100" width="824" height="824" rx="{824 * CORNER_OVER_TILE}" fill="{INK}"/>\n'
         f'<path fill="{IVORY}" transform="translate(512 512) scale(.8047) translate(-512 -512)" d="{MARK}"/>\n'
@@ -215,7 +215,7 @@ def main():
     )
 
     # iOS. Tinted is grayscale on black, which the system colours itself.
-    ios = ROOT / "apps/ios/Zeron/Assets.xcassets/AppIcon.appiconset"
+    ios = ROOT / "apps/ios/Zeren/Assets.xcassets/AppIcon.appiconset"
     with tempfile.TemporaryDirectory() as work:
         light_icon = ios_render("Default", LIGHT_TILE, work)
         dark_icon = ios_render("Dark", DARK_TILE, work)
@@ -236,21 +236,21 @@ def main():
     # ivory: ink would vanish. The home-screen icon can't follow the system.
     site = ROOT / "apps/landing/public"
     (site / "favicon.svg").write_text(adaptive_favicon())
-    (site / "assets/icons/zeron-mark-solid-ivory.svg").write_text(logo_svg(IVORY))
-    rsvg(logo_svg(INK), 128).save(site / "assets/zeron-favicon-light.png")
-    rsvg(logo_svg(IVORY), 128).save(site / "assets/zeron-favicon-dark.png")
-    dark_icon.resize((180, 180), Image.LANCZOS).save(site / "assets/zeron-app-icon.png")
+    (site / "assets/icons/zeren-mark-solid-ivory.svg").write_text(logo_svg(IVORY))
+    rsvg(logo_svg(INK), 128).save(site / "assets/zeren-favicon-light.png")
+    rsvg(logo_svg(IVORY), 128).save(site / "assets/zeren-favicon-dark.png")
+    dark_icon.resize((180, 180), Image.LANCZOS).save(site / "assets/zeren-app-icon.png")
 
     # The logo the apps draw themselves. Desktop and zgx tint it, iOS and Android
     # take its shape only. After changing it, run apps/zgx/tools/icon_svgs.py.
-    (ROOT / "crates/ui/assets/icons/zeron-logo.svg").write_text(logo_svg("currentColor"))
-    (ROOT / "apps/zgx/ui/assets/icons/ui/zeron-logo.svg").write_text(logo_svg("currentColor"))
-    (ROOT / "apps/ios/Zeron/Assets.xcassets/zeron-logo.imageset/zeron-logo.svg").write_text(logo_svg("#000000"))
-    (ROOT / "apps/android/icons/zeron.svg").write_text(logo_svg("#000000"))
+    (ROOT / "crates/ui/assets/icons/zeren-logo.svg").write_text(logo_svg("currentColor"))
+    (ROOT / "apps/zgx/ui/assets/icons/ui/zeren-logo.svg").write_text(logo_svg("currentColor"))
+    (ROOT / "apps/ios/Zeren/Assets.xcassets/zeren-logo.imageset/zeren-logo.svg").write_text(logo_svg("#000000"))
+    (ROOT / "apps/android/icons/zeren.svg").write_text(logo_svg("#000000"))
 
-    # zgx's sample project pictures: Zeron's, and the iOS app's.
+    # zgx's sample project pictures: Zeren's, and the iOS app's.
     favicons = ROOT / "apps/zgx/ui/assets/favicons"
-    inset(dark, 64, 60).save(favicons / "zeron.png")
+    inset(dark, 64, 60).save(favicons / "zeren.png")
     light_icon.resize((64, 64), Image.LANCZOS).save(favicons / "ios.png")
 
 

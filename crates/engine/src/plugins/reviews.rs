@@ -1,4 +1,4 @@
-//! Who may decide: one-time review capabilities for Zeron's consent window.
+//! Who may decide: one-time review capabilities for Zeren's consent window.
 //!
 //! Allowing a plugin (`DecidePlugin {allow: true}`), taking one as yours
 //! (`SignPlugin {id}`) and allowing a template (`DecideTemplate {allow:
@@ -7,8 +7,8 @@
 //! that plugin or package as shown, used up by the decision it was minted
 //! for, gone after [`TTL`]. Only the consent window's own host asks for one:
 //! the methods are refused to agents' scoped token
-//! ([`zeron_rpc::agent_allowed`]) and to other devices
-//! ([`zeron_rpc::peer_refused`]), and the window's Luau never sees it.
+//! ([`zeren_rpc::agent_allowed`]) and to other devices
+//! ([`zeren_rpc::peer_refused`]), and the window's Luau never sees it.
 //!
 //! What this holds against: an agent through its MCP server, a plugin or a
 //! template (which have no IPC token at all; they reach the engine only
@@ -21,7 +21,7 @@
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
-use zeron_rpc::RpcError;
+use zeren_rpc::RpcError;
 
 /// How long a review stays good: a decision is made while the sheet is up.
 pub const TTL: Duration = Duration::from_secs(10 * 60);
@@ -52,7 +52,7 @@ pub struct Reviews {
 /// mints a fresh one and tries again.
 pub fn needed(what: &str) -> RpcError {
     RpcError::Failed(format!(
-        "review: {what} needs Zeron's own consent window (open it there and decide again)"
+        "review: {what} needs Zeren's own consent window (open it there and decide again)"
     ))
 }
 
@@ -71,7 +71,7 @@ impl Reviews {
             };
             self.open.remove(&oldest);
         }
-        let token = zeron_rpc::ipc_auth::generate_token()
+        let token = zeren_rpc::ipc_auth::generate_token()
             .map_err(|e| RpcError::Failed(format!("Couldn't open a review: {e}")))?;
         self.open.insert(
             token.clone(),

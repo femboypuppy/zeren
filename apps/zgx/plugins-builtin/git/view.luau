@@ -29,9 +29,9 @@ local SCOPE_ICON: { [string]: string } = { working = "pen", branch = "git-branch
 -- under it, what's opened takes the list's place or opens under its row.
 local WIDE = 760
 
-return function(zeron: any, Repo: any, words: any)
-	local ChangesView = require("./changes")(zeron, Repo, words)
-	local HistoryView, CommitView = require("./history")(zeron, Repo, words)
+return function(zeren: any, Repo: any, words: any)
+	local ChangesView = require("./changes")(zeren, Repo, words)
+	local HistoryView, CommitView = require("./history")(zeren, Repo, words)
 
 	-- The branch the checkout is on, as a chip; a click lists the others
 	-- (local first, then the remote's not here yet), and New branch.
@@ -65,7 +65,7 @@ return function(zeron: any, Repo: any, words: any)
 				local value_of = if b.remote then b.local_name or b.name else b.name
 				local tag: string? = nil
 				if b.current then
-					tag = zeron.s("branches.current")
+					tag = zeren.s("branches.current")
 				elseif b.remote then
 					tag = string.match(b.name, "^([^/]+)/") or "origin"
 				else
@@ -107,9 +107,9 @@ return function(zeron: any, Repo: any, words: any)
 				items = items,
 				tone = "chip",
 				icon = "git-branch",
-				placeholder = zeron.t("branches.none"),
-				search = zeron.t("branches.search"),
-				label = zeron.s("branches.label"),
+				placeholder = zeren.t("branches.none"),
+				search = zeren.t("branches.search"),
+				label = zeren.s("branches.label"),
 				width = 300,
 				-- (Under its trigger's end, as the band's other menus open:
 				-- inside the panel, never off its edge.)
@@ -128,7 +128,7 @@ return function(zeron: any, Repo: any, words: any)
 				end,
 				actions = {
 					{
-						label = zeron.t("branches.new"),
+						label = zeren.t("branches.new"),
 						icon = "plus",
 						on_click = function()
 							naming:set(true)
@@ -136,21 +136,21 @@ return function(zeron: any, Repo: any, words: any)
 					},
 				},
 				empty = function(query: string): any
-					return { title = zeron.s("branches.no_match", { query = query }) }
+					return { title = zeren.s("branches.no_match", { query = query }) }
 				end,
 			},
 			Dialog {
 				open = naming,
-				title = zeron.t("branches.new_title"),
+				title = zeren.t("branches.new_title"),
 				body = function(): string
 					local s = m.status:get()
-					return zeron.s("branches.new_body", { from = (s and s.branch) or "HEAD" })
+					return zeren.s("branches.new_body", { from = (s and s.branch) or "HEAD" })
 				end,
-				confirm = { label = zeron.s("branches.create"), on_click = create },
+				confirm = { label = zeren.s("branches.create"), on_click = create },
 				TextField {
 					value = name,
-					name = zeron.s("branches.name"),
-					placeholder = zeron.t("branches.name_placeholder"),
+					name = zeren.s("branches.name"),
+					placeholder = zeren.t("branches.name_placeholder"),
 					autofocus = true,
 					on_commit = function()
 						create()
@@ -175,7 +175,7 @@ return function(zeron: any, Repo: any, words: any)
 		end)
 		local items: { any } = {}
 		for _, s in SCOPES do
-			table.insert(items, { value = s, label = zeron.s(`scope.{s}`), icon = SCOPE_ICON[s], description = zeron.s(`scope.{s}_about`) })
+			table.insert(items, { value = s, label = zeren.s(`scope.{s}`), icon = SCOPE_ICON[s], description = zeren.s(`scope.{s}_about`) })
 		end
 		return ui.row {
 			id = "git-scope",
@@ -188,7 +188,7 @@ return function(zeron: any, Repo: any, words: any)
 				icon = function(): any
 					return SCOPE_ICON[m.scope:get()] or "pen"
 				end,
-				label = zeron.s("scope.label"),
+				label = zeren.s("scope.label"),
 				width = 280,
 				placement = { side = "bottom", align = "start", offset = 4 },
 				on_choose = function(chosen: string)
@@ -246,17 +246,17 @@ return function(zeron: any, Repo: any, words: any)
 				end
 				-- (The chip's words start past its padding, its 12-point
 				-- glyph and the gap after it.)
-				local tight = (ui.theme.get("zeron.space.tight") :: number?) or 6
+				local tight = (ui.theme.get("zeren.space.tight") :: number?) or 6
 				return ui.raw(tight * 2 + 12, "where a chip's words start: its padding, glyph and gap")
 			end,
 			items = "center",
 			gap = "$space.1",
 			ui.text {
-				zeron.t("scope.against"),
+				zeren.t("scope.against"),
 				class = "git-against",
 				shrink = 0,
 				-- (Lifted as a chip's words are, so all share one line.)
-				mb = "$zeron.space.hair",
+				mb = "$zeren.space.hair",
 				text_size = "$font.size.sm",
 				color = "$text.secondary",
 			},
@@ -265,9 +265,9 @@ return function(zeron: any, Repo: any, words: any)
 				items = items,
 				tone = "chip",
 				icon = "git-branch",
-				placeholder = zeron.t("scope.base_choose"),
-				search = zeron.t("branches.search"),
-				label = zeron.s("scope.base_label"),
+				placeholder = zeren.t("scope.base_choose"),
+				search = zeren.t("branches.search"),
+				label = zeren.s("scope.base_label"),
 				width = 280,
 				placement = { side = "bottom", align = "start", offset = 4 },
 				on_open = function()
@@ -287,7 +287,7 @@ return function(zeron: any, Repo: any, words: any)
 		local trigger = IconButton {
 			id = "git-more",
 			icon = "more-horizontal",
-			label = zeron.s("more.label"),
+			label = zeren.s("more.label"),
 			tone = "quiet",
 			tooltip_side = "bottom",
 			lit = open,
@@ -298,9 +298,9 @@ return function(zeron: any, Repo: any, words: any)
 		return ui.popover(Glass.style({
 			open = open,
 			anchor = trigger,
-			label = zeron.s("more.label"),
+			label = zeren.s("more.label"),
 			placement = { side = "bottom", align = "end", offset = 4 },
-			w = ui.theme.get("zeron.menu.width") :: number?,
+			w = ui.theme.get("zeren.menu.width") :: number?,
 			p = 0,
 			gap = 0,
 			rounded = "$radius.lg",
@@ -321,13 +321,13 @@ return function(zeron: any, Repo: any, words: any)
 					}
 				end
 				return Menu.Group {
-					row("refresh", zeron.s("more.fetch"), function()
+					row("refresh", zeren.s("more.fetch"), function()
 						m.act("fetch", "fetch")
 					end),
-					row("arrow-down", zeron.s("more.pull"), function()
+					row("arrow-down", zeren.s("more.pull"), function()
 						m.act("pull", "pull")
 					end, false, not (s and s.upstream)),
-					row("trash-bin-minimalistic", zeron.s("more.discard_all"), function()
+					row("trash-bin-minimalistic", zeren.s("more.discard_all"), function()
 						m.set_scope("working", nil)
 						m.discard_ask:set(os.clock())
 					end, true, not s or (s.changes or 0) == 0),
@@ -340,10 +340,10 @@ return function(zeron: any, Repo: any, words: any)
 	-- commit in a tab of its own.)
 	return ui.component(function(props: { tab: any, view: string, panel: any? }): Node
 		local data = props.tab.data or {}
-		local here = zeron.context("session")
+		local here = zeren.context("session")
 		local id = data.session or (here and here.id)
 		if type(id) ~= "string" or id == "" then
-			return EmptyState { icon = "git-branch", title = zeron.s("tab.no_session_title"), body = zeron.s("tab.no_session_body"), fill = true }
+			return EmptyState { icon = "git-branch", title = zeren.s("tab.no_session_title"), body = zeren.s("tab.no_session_body"), fill = true }
 		end
 		local m = Repo.get(id)
 		-- (Asked again as its device says it changed, while the tab is on
@@ -440,8 +440,8 @@ return function(zeron: any, Repo: any, words: any)
 					items = "center",
 					justify = "center",
 					gap = "$space.3",
-					progress.ProgressRing { size = 20, tone = "neutral", label = zeron.s("loading") },
-					ui.text { zeron.t("tab.asking"), text_size = "$font.size.sm", color = "$text.tertiary" },
+					progress.ProgressRing { size = 20, tone = "neutral", label = zeren.s("loading") },
+					ui.text { zeren.t("tab.asking"), text_size = "$font.size.sm", color = "$text.tertiary" },
 				}
 			end
 			local problem = string.match(key, "^problem:")
@@ -457,7 +457,7 @@ return function(zeron: any, Repo: any, words: any)
 					body = said.body,
 					action = if said.retry
 						then {
-							label = zeron.s("try_again"),
+							label = zeren.s("try_again"),
 							on_click = function()
 								m.refresh(true)
 							end,
@@ -474,7 +474,7 @@ return function(zeron: any, Repo: any, words: any)
 				-- (A commit's own tab: what it was opened with.)
 				local c = data.commit
 				if type(c) ~= "table" or type(c.sha) ~= "string" then
-					return EmptyState { icon = "git-commit", title = zeron.s("history.pick_title"), body = zeron.s("history.pick_body"), size = "sm", fill = true }
+					return EmptyState { icon = "git-commit", title = zeren.s("history.pick_title"), body = zeren.s("history.pick_body"), size = "sm", fill = true }
 				end
 				return CommitView { model = m, c = c, wide = wide, panel = props.panel }
 			end

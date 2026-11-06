@@ -29,7 +29,7 @@ interface FakeSandbox {
   rate: number;
   /** Usage reads that still report `running: true` after a stop (meter lag). */
   runningReads: number;
-  /** Exit status of `zeron quiesce` (75 = the engine is busy). */
+  /** Exit status of `zeren quiesce` (75 = the engine is busy). */
   quiesceExit?: number;
 }
 

@@ -1,8 +1,8 @@
--- A file's icon, as Zeron draws it (crates/ui/src/file_icons.rs): the
+-- A file's icon, as Zeren draws it (crates/ui/src/file_icons.rs): the
 -- Symbols set, in its own colours. Its exact name first (`Cargo.toml`,
 -- `.gitignore`), then its longest compound extension (`d.ts` before `ts`),
 -- then the generic file; a folder by its name (`src`, `assets`), else the
--- plain folder. Dark lifts the set's darker accents, as Zeron does: each
+-- plain folder. Dark lifts the set's darker accents, as Zeren does: each
 -- icon is drawn twice, and the theme says which shows.
 --
 -- `FileIcon { name = "init.luau", size = 16 }`, `FileIcon { name = "src",
@@ -57,7 +57,7 @@ local function component(props: Props): Node
 		local d = if type(dir) == "function" then dir() else dir
 		return of(n, d == true)
 	end
-	-- Both sets stacked: the theme's own shows (`zeron.files.icons`, 1 in
+	-- Both sets stacked: the theme's own shows (`zeren.files.icons`, 1 in
 	-- light, 0 in dark), so a subtree themed apart from the window draws its
 	-- own without the script knowing which it is in.
 	local function svg(set: string, opacity: string): Node
@@ -82,8 +82,8 @@ local function component(props: Props): Node
 		relative = true,
 		-- (The name beside it says what it is.)
 		aria_hidden = true,
-		svg("light", "$zeron.files.light"),
-		svg("dark", "$zeron.files.dark"),
+		svg("light", "$zeren.files.light"),
+		svg("dark", "$zeren.files.dark"),
 	}
 end
 

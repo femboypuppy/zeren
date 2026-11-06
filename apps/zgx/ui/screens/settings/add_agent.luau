@@ -59,15 +59,15 @@ local function sub_page(where: Node, page: Node): Node
 		-- (On its parent's middle, whatever wraps it: as every Settings page.)
 		self = "center",
 		-- (A theme number, read as it is built: max_w takes points.)
-		max_w = ui.theme.get("zeron.settings.measure") :: number?,
+		max_w = ui.theme.get("zeren.settings.measure") :: number?,
 		gap = "$space.4",
 		where,
 		page,
 	}
 end
 
--- The marks of the agents Zeron drives itself, by their harness (the
--- registry lists them too: their rows wear Zeron's mark, as their cards do).
+-- The marks of the agents Zeren drives itself, by their harness (the
+-- registry lists them too: their rows wear Zeren's mark, as their cards do).
 local BUILT_IN_MARKS: { [string]: string } = {
 	["claude-code"] = "claude",
 	codex = "openai",
@@ -93,7 +93,7 @@ local function matches(a: registry.Agent, q: string): boolean
 end
 
 -- The registry: every agent, searched, each a row that opens it; those
--- Zeron drives itself say so and stay put, and those added say so.
+-- Zeren drives itself say so and stay put, and those added say so.
 function M.registry_page(nav: Nav): Node
 	local query = ui.state("settings_add_agent_query", "")
 	local function q(): string

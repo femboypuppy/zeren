@@ -6,8 +6,8 @@
 #
 # The .so build needs the Android NDK + cargo-ndk (`cargo install cargo-ndk`,
 # `rustup target add aarch64-linux-android x86_64-linux-android`).
-# `ZERON_ANDROID_ABIS` picks the ABIs (default arm64-v8a x86_64);
-# `ZERON_ANDROID_PROFILE` the core's Cargo profile (default `mobile`;
+# `ZEREN_ANDROID_ABIS` picks the ABIs (default arm64-v8a x86_64);
+# `ZEREN_ANDROID_PROFILE` the core's Cargo profile (default `mobile`;
 # `mobile-dist` for published builds: thin LTO, stripped, as iOS archives).
 # Run by the app's `buildCore` Gradle task (apps/android).
 #
@@ -25,21 +25,21 @@ cd "$ROOT"
 LIB=""
 if command -v cargo-ndk >/dev/null && [[ -n "${ANDROID_NDK_HOME:-}" ]]; then
   ABIS=()
-  for abi in ${ZERON_ANDROID_ABIS:-arm64-v8a x86_64}; do ABIS+=(-t "$abi"); done
+  for abi in ${ZEREN_ANDROID_ABIS:-arm64-v8a x86_64}; do ABIS+=(-t "$abi"); done
   # The core links C++ (the terminal emulator and GPU paths): ship the NDK's
   # libc++_shared.so beside it.
   cargo ndk "${ABIS[@]}" --link-libcxx-shared -o "$OUT/jniLibs" \
-    build --locked -p zeron-mobile --lib --profile "${ZERON_ANDROID_PROFILE:-mobile}"
+    build --locked -p zeren-mobile --lib --profile "${ZEREN_ANDROID_PROFILE:-mobile}"
   echo "jniLibs: $OUT/jniLibs"
-  first="$(set -- ${ZERON_ANDROID_ABIS:-arm64-v8a x86_64}; echo "$1")"
-  LIB="$OUT/jniLibs/$first/libzeron_mobile.so"
+  first="$(set -- ${ZEREN_ANDROID_ABIS:-arm64-v8a x86_64}; echo "$1")"
+  LIB="$OUT/jniLibs/$first/libzeren_mobile.so"
 else
   echo "note: cargo-ndk / ANDROID_NDK_HOME not found — skipped the .so build"
-  cargo build --locked -p zeron-mobile --lib --profile mobile
-  LIB="$ROOT/target/mobile/libzeron_mobile.$([[ "$(uname)" == Darwin ]] && echo dylib || echo so)"
+  cargo build --locked -p zeren-mobile --lib --profile mobile
+  LIB="$ROOT/target/mobile/libzeren_mobile.$([[ "$(uname)" == Darwin ]] && echo dylib || echo so)"
 fi
 
-cargo build --locked -p zeron-mobile-bindgen --profile mobile
+cargo build --locked -p zeren-mobile-bindgen --profile mobile
 "$ROOT/target/mobile/uniffi-bindgen" generate --library "$LIB" --language kotlin \
   --no-format --out-dir "$OUT/kotlin"
 echo "kotlin bindings: $OUT/kotlin"

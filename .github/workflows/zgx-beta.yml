@@ -1,8 +1,8 @@
 name: zgx beta
 
-# Zeron.app's beta channel: the zgx interface (apps/zgx, its `beta` feature)
-# as the Zeron app itself, with the latest stable release's own engine inside
-# (scripts/package-zgx-beta.sh). Testers keep Zeron.app's engine, data and
+# Zeren.app's beta channel: the zgx interface (apps/zgx, its `beta` feature)
+# as the Zeren app itself, with the latest stable release's own engine inside
+# (scripts/package-zgx-beta.sh). Testers keep Zeren.app's engine, data and
 # device; the app updates itself from the beta channel and goes back to
 # Stable when they turn beta off (crates/update `channel`).
 #
@@ -42,7 +42,7 @@ concurrency:
 jobs:
   # Apple silicon only, as release.yml's macOS build.
   macos:
-    if: github.repository == 'zeronsh/zeron' && vars.ZGX_BETA_ENABLED == 'true'
+    if: github.repository == 'zeronsh/zeren' && vars.ZGX_BETA_ENABLED == 'true'
     runs-on: macos-latest
     timeout-minutes: 120
     environment: ${{ startsWith(github.ref, 'refs/tags/beta-v') && 'apple-release' || '' }}
@@ -89,7 +89,7 @@ jobs:
         env:
           STABLE: ${{ steps.version.outputs.stable }}
         run: |
-          file="zeron-$STABLE-macos-arm64-app.tar.gz"
+          file="zeren-$STABLE-macos-arm64-app.tar.gz"
           curl -fsS --retry 3 -o "$RUNNER_TEMP/stable-manifest.json" https://zeron.sh/releases/manifest.json
           sha="$(jq -r --arg f "$file" '.files[$f].sha256 // empty' "$RUNNER_TEMP/stable-manifest.json")"
           [ -n "$sha" ] || { echo "the stable manifest has no checksum for $file"; exit 1; }
@@ -151,13 +151,13 @@ jobs:
         env:
           BETA_VERSION: ${{ steps.version.outputs.version }}
         run: |
-          app="target/package-beta/Zeron.app"
+          app="target/package-beta/Zeren.app"
           plist="$app/Contents/Info.plist"
           plutil -p "$plist"
           test "$(plutil -extract CFBundleIdentifier raw "$plist")" = sh.zeron.app
-          test "$(plutil -extract ZeronVersion raw "$plist")" = "$BETA_VERSION"
-          test "$("$app/Contents/MacOS/zeron" --version)" = "zeron $BETA_VERSION"
-          test -x "$app/Contents/MacOS/Zeron Engine"
+          test "$(plutil -extract ZerenVersion raw "$plist")" = "$BETA_VERSION"
+          test "$("$app/Contents/MacOS/zeren" --version)" = "zeren $BETA_VERSION"
+          test -x "$app/Contents/MacOS/Zeren Engine"
           test -f "$app/Contents/Resources/ui/app.luau"
           codesign --verify --deep --strict --verbose=2 "$app"
           codesign -d --entitlements - "$app"
@@ -165,7 +165,7 @@ jobs:
             spctl --assess --type execute --verbose=2 "$app"
             xcrun stapler validate "$app"
           fi
-          echo "engine=$(plutil -extract ZeronEngineVersion raw "$plist")" >>"$GITHUB_OUTPUT"
+          echo "engine=$(plutil -extract ZerenEngineVersion raw "$plist")" >>"$GITHUB_OUTPUT"
           du -sh "$app"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -175,7 +175,7 @@ jobs:
             target/package-beta/*.tar.gz
           if-no-files-found: error
 
-  # The GitHub pre-release: never the latest release (Zeron's updater and
+  # The GitHub pre-release: never the latest release (Zeren's updater and
   # download links follow releases/latest), with the beta's manifest.
   release:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/beta-v')
@@ -194,8 +194,8 @@ jobs:
       - name: artifacts and the beta manifest
         run: |
           ls -l dist/
-          test -f "dist/zeron-$VERSION-macos-arm64.dmg"
-          test -f "dist/zeron-$VERSION-macos-arm64-app.tar.gz"
+          test -f "dist/zeren-$VERSION-macos-arm64.dmg"
+          test -f "dist/zeren-$VERSION-macos-arm64-app.tar.gz"
           # crates/update's Manifest: the beta's version, the stable engine it
           # carries (a switch back to Stable weighs it) and its macOS floor.
           manifest=$(jq -n --arg version "$VERSION" --arg engine "$ENGINE" \
@@ -209,17 +209,17 @@ jobs:
           cat beta-manifest.json
       - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
-          name: Zeron ${{ needs.macos.outputs.version }}
+          name: Zeren ${{ needs.macos.outputs.version }}
           prerelease: true
           make_latest: "false"
           files: |
             dist/*
             beta-manifest.json
           body: |
-            Zeron ${{ needs.macos.outputs.version }}, a beta of the next Zeron app.
+            Zeren ${{ needs.macos.outputs.version }}, a beta of the next Zeren app.
 
-            - It replaces Zeron.app and keeps your Zeron: the same engine, data, account and device.
-            - Once installed, it updates from the beta channel. To go back, turn off **Get beta updates** in Settings → About & updates; Zeron then installs the latest stable release.
+            - It replaces Zeren.app and keeps your Zeren: the same engine, data, account and device.
+            - Once installed, it updates from the beta channel. To go back, turn off **Get beta updates** in Settings → About & updates; Zeren then installs the latest stable release.
             - macOS 13 or later, Apple silicon.
 
   # The beta channel on R2: zeron.sh/releases/beta/*. Every key is under

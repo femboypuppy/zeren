@@ -42,7 +42,7 @@ use std::rc::Rc;
 use std::sync::{Arc, Mutex, OnceLock, mpsc};
 
 use serde_json::json;
-use zeron_visual as zv;
+use zeren_visual as zv;
 use zgx_script::{ScriptHost, Shared, Value};
 
 /// Time spent drawing canvases (this thread) and rendering scene and shader
@@ -149,7 +149,7 @@ impl Entry {
                 self.render();
             }
             Err(error) => {
-                eprintln!("zeron-zgx: visual {id} failed to load: {error}");
+                eprintln!("zeren-zgx: visual {id} failed to load: {error}");
                 self.load = Load::Failed(error.message);
                 self.rev += 1;
             }
@@ -407,7 +407,7 @@ async fn open(v: Rc<Visuals>, arg: Value) -> Result<Value, String> {
     v.with(&id, |e| match loaded {
         Ok((source, assets)) => e.start(&id, &source, assets),
         Err(why) => {
-            eprintln!("zeron-zgx: visual {id} unavailable: {why}");
+            eprintln!("zeren-zgx: visual {id} unavailable: {why}");
             e.load = Load::Failed(why);
             e.rev += 1;
         }
@@ -908,14 +908,14 @@ fn points_value(points: &[[f32; 2]]) -> Value {
 /// to build or rasterize: a circle (`c`), a rectangle (`r`), a line (`l`).
 fn command_value(cmd: &zv::DrawCmd) -> Value {
     match cmd {
-        zv::DrawCmd::Fill { points, color } if let Some((x, y, r)) = zeron_zgx_pixels::circle_of(points) => Value::record([
+        zv::DrawCmd::Fill { points, color } if let Some((x, y, r)) = zeren_zgx_pixels::circle_of(points) => Value::record([
             ("k", Value::from("c")),
             ("x", num(x)),
             ("y", num(y)),
             ("r", num(r)),
             ("c", color_value(*color)),
         ]),
-        zv::DrawCmd::Fill { points, color } if let Some((x, y, w, h)) = zeron_zgx_pixels::rect_of(points) => Value::record([
+        zv::DrawCmd::Fill { points, color } if let Some((x, y, w, h)) = zeren_zgx_pixels::rect_of(points) => Value::record([
             ("k", Value::from("r")),
             ("x", num(x)),
             ("y", num(y)),
@@ -942,7 +942,7 @@ fn command_value(cmd: &zv::DrawCmd) -> Value {
             if *closed {
                 all.push(points[0]);
             }
-            let runs = zeron_zgx_pixels::monotone_runs(&all);
+            let runs = zeren_zgx_pixels::monotone_runs(&all);
             Value::record([
                 ("k", Value::from("m")),
                 ("runs", list(runs.iter().map(|&(a, b)| points_value(&all[a..=b])).collect())),
@@ -1096,7 +1096,7 @@ fn gpu_send(job: Job) {
     static SENDER: OnceLock<Mutex<mpsc::Sender<Job>>> = OnceLock::new();
     let sender = SENDER.get_or_init(|| {
         let (tx, rx) = mpsc::channel::<Job>();
-        let _ = std::thread::Builder::new().name("zeron-visual-gpu".into()).spawn(move || gpu_thread(rx));
+        let _ = std::thread::Builder::new().name("zeren-visual-gpu".into()).spawn(move || gpu_thread(rx));
         Mutex::new(tx)
     });
     if let Ok(sender) = sender.lock() {
@@ -1105,8 +1105,8 @@ fn gpu_send(job: Job) {
 }
 
 fn gpu_thread(jobs: mpsc::Receiver<Job>) {
-    let mut scenes: HashMap<String, Option<zeron_visual_gpu::SceneState>> = HashMap::new();
-    let mut shaders: HashMap<String, Option<zeron_visual_gpu::ShaderState>> = HashMap::new();
+    let mut scenes: HashMap<String, Option<zeren_visual_gpu::SceneState>> = HashMap::new();
+    let mut shaders: HashMap<String, Option<zeren_visual_gpu::ShaderState>> = HashMap::new();
     while let Ok(job) = jobs.recv() {
         let start = std::time::Instant::now();
         let cpu = thread_cpu_ns();
@@ -1119,7 +1119,7 @@ fn gpu_thread(jobs: mpsc::Receiver<Job>) {
             Job::Scene { key, scene, camera, size, scale, palette, reply } => {
                 let rgba = move |c: zv::Color| palette.color(c);
                 let state = scenes.entry(key).or_default();
-                let frame = zeron_visual_gpu::render_scene(&scene, camera, size.0, size.1, scale, &rgba, state)
+                let frame = zeren_visual_gpu::render_scene(&scene, camera, size.0, size.1, scale, &rgba, state)
                     .map(|f| (f.width, f.height, f.bgra))
                     .unwrap_or_else(|| {
                         // No GPU here: the software renderer.
@@ -1136,7 +1136,7 @@ fn gpu_thread(jobs: mpsc::Receiver<Job>) {
                     .iter()
                     .map(|name| zv::TextureData::Encoded(assets.get(name).unwrap_or_else(|| Arc::from([]))))
                     .collect();
-                let spec = zeron_visual_gpu::ShaderSpec {
+                let spec = zeren_visual_gpu::ShaderSpec {
                     image: &node.code,
                     buffers: &node.buffers,
                     inputs: &names,
@@ -1145,7 +1145,7 @@ fn gpu_thread(jobs: mpsc::Receiver<Job>) {
                     textures: &textures,
                 };
                 let state = shaders.entry(key).or_default();
-                let out = zeron_visual_gpu::render_shader(&spec, &uniforms, size.0, size.1, state)
+                let out = zeren_visual_gpu::render_shader(&spec, &uniforms, size.0, size.1, state)
                     .map(|f| rendered((f.width, f.height, f.bgra)));
                 reply.send(out);
             }
@@ -1166,7 +1166,7 @@ pub fn bench_swap(bgra: Vec<u8>) -> usize {
 
 /// BGRA to RGBA, in place.
 fn rendered((width, height, mut bgra): (u32, u32, Vec<u8>)) -> Rendered {
-    zeron_zgx_pixels::bgra_to_rgba(&mut bgra);
+    zeren_zgx_pixels::bgra_to_rgba(&mut bgra);
     Rendered { width, height, rgba: bgra }
 }
 

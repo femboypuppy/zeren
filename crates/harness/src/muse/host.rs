@@ -69,7 +69,7 @@ impl Host {
         crate::compose_child_path(&mut cmd, exe);
         // An inherited API key would silently replace the user's own Muse
         // login; a run's explicit one (a Cloud device's) still wins below.
-        // Zeron updates Muse itself: no background self-update mid-session.
+        // Zeren updates Muse itself: no background self-update mid-session.
         cmd.env_remove("META_API_KEY")
             .env("MUSE_NO_AUTO_UPDATE", "1");
         crate::apply_run_env(&mut cmd, run_env);
@@ -130,8 +130,8 @@ impl Host {
                 "initialize",
                 json!({
                     "clientInfo": {
-                        "name": "zeron",
-                        "title": "Zeron",
+                        "name": "zeren",
+                        "title": "Zeren",
                         "version": env!("CARGO_PKG_VERSION"),
                     },
                     "capabilities": {
@@ -145,7 +145,7 @@ impl Host {
             .map_err(|failure| failed("initialize", &failure))?;
         if result["schema"]["version"].as_u64() != Some(SCHEMA_VERSION) {
             return Err(HarnessError::Protocol(
-                "Muse speaks an unsupported protocol version; update Zeron or Muse Code".into(),
+                "Muse speaks an unsupported protocol version; update Zeren or Muse Code".into(),
             ));
         }
         self.granted = result["grantedCapabilities"]

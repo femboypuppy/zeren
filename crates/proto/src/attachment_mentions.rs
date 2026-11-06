@@ -8,8 +8,8 @@
 //! the same name.
 use std::ops::Range;
 
-pub const IMAGE_MENTION_SCHEME: &str = "zeron-image:";
-pub const ATTACHMENT_MENTION_SCHEME: &str = "zeron-attachment:";
+pub const IMAGE_MENTION_SCHEME: &str = "zeren-image:";
+pub const ATTACHMENT_MENTION_SCHEME: &str = "zeren-attachment:";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AttachmentMention {
@@ -215,9 +215,9 @@ mod tests {
 
     #[test]
     fn links_round_trip_and_become_plain_labels() {
-        assert_eq!(image(2), "[Image 2](zeron-image:2)");
+        assert_eq!(image(2), "[Image 2](zeren-image:2)");
         let notes = attachment_mention_link(3, Some("my [notes].md"));
-        assert_eq!(notes, "[my \\[notes\\].md](zeron-attachment:3)");
+        assert_eq!(notes, "[my \\[notes\\].md](zeren-attachment:3)");
         let text = format!("compare {} with {notes} and {}", image(2), image(10));
         let mentions = attachment_mentions(&text);
         assert_eq!(
@@ -253,21 +253,21 @@ mod tests {
             format!("![example {link}](example.png)"),
             format!("`{file}`"),
             format!("\\{file}"),
-            "[Image 1](zeron-image:0)".to_string(),
-            "[Image 1](zeron-image:)".to_string(),
-            "[Image 1](zeron-image:1x)".to_string(),
-            "[Image 1](zeron-image:-1)".to_string(),
-            "[Image 1](zeron-image:../x)".to_string(),
-            "[Image 2](zeron-image:1)".to_string(),
-            "[Other](zeron-image:1)".to_string(),
-            "[Image 1](zeron-image:99999999999)".to_string(),
-            "[Image 01](zeron-image:01)".to_string(),
-            "[](zeron-attachment:1)".to_string(),
-            "[a.md](zeron-attachment:0)".to_string(),
-            "[a.md](zeron-attachment:1 \"title\")".to_string(),
-            "[a\nb.md](zeron-attachment:1)".to_string(),
-            "[a`b.md](zeron-attachment:1)".to_string(),
-            "[a\\xb.md](zeron-attachment:1)".to_string(),
+            "[Image 1](zeren-image:0)".to_string(),
+            "[Image 1](zeren-image:)".to_string(),
+            "[Image 1](zeren-image:1x)".to_string(),
+            "[Image 1](zeren-image:-1)".to_string(),
+            "[Image 1](zeren-image:../x)".to_string(),
+            "[Image 2](zeren-image:1)".to_string(),
+            "[Other](zeren-image:1)".to_string(),
+            "[Image 1](zeren-image:99999999999)".to_string(),
+            "[Image 01](zeren-image:01)".to_string(),
+            "[](zeren-attachment:1)".to_string(),
+            "[a.md](zeren-attachment:0)".to_string(),
+            "[a.md](zeren-attachment:1 \"title\")".to_string(),
+            "[a\nb.md](zeren-attachment:1)".to_string(),
+            "[a`b.md](zeren-attachment:1)".to_string(),
+            "[a\\xb.md](zeren-attachment:1)".to_string(),
         ] {
             assert!(attachment_mentions(&literal).is_empty(), "{literal}");
             assert_eq!(attachment_mention_prompt(&literal), literal);

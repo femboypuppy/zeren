@@ -53,7 +53,7 @@ local VIEW = 312
 -- What a panel adds outside its rows, either side (its 1 edge, its 4 inset):
 -- rows that line up with the button need a panel this much wider each way.
 local OVERHANG = 5
--- Between rows (`zeron.list.gap`, in points for the list's sums).
+-- Between rows (`zeren.list.gap`, in points for the list's sums).
 local GAP = 2
 
 return ui.component(function(props: Props): Node
@@ -114,25 +114,25 @@ return ui.component(function(props: Props): Node
 			return open:get()
 		end,
 		bg = function()
-			return if hovered:get() or open:get() then "$zeron.field.hover" else "$zeron.field.bg"
+			return if hovered:get() or open:get() then "$zeren.field.hover" else "$zeren.field.bg"
 		end,
 		border_color = function()
 			if invalid() then
-				return "$zeron.field.edge_error"
+				return "$zeren.field.edge_error"
 			elseif open:get() then
-				return "$zeron.field.edge_focus"
+				return "$zeren.field.edge_focus"
 			elseif hovered:get() then
-				return "$zeron.field.edge_hover"
+				return "$zeren.field.edge_hover"
 			end
-			return "$zeron.field.edge"
+			return "$zeren.field.edge"
 		end,
 		hover = {},
 		active = {},
 		-- The ring, its edge kept (a frame's edge never leaves).
 		focus = {
-			outline = "$zeron.focus.width",
-			outline_offset = "$zeron.focus.offset",
-			outline_color = "$zeron.focus.ring",
+			outline = "$zeren.focus.width",
+			outline_offset = "$zeren.focus.offset",
+			outline_color = "$zeren.focus.ring",
 		},
 		on_hover = function(inside: boolean)
 			hovered:set(inside)
@@ -171,7 +171,7 @@ return ui.component(function(props: Props): Node
 			grow = 1,
 			text_size = control.TEXT[size],
 			color = function()
-				return if chosen() then "$text.primary" else "$zeron.field.placeholder"
+				return if chosen() then "$text.primary" else "$zeren.field.placeholder"
 			end,
 		},
 		ui.div {
@@ -222,7 +222,7 @@ return ui.component(function(props: Props): Node
 				then ui.column {
 					grow = 1,
 					min_w = 0,
-					gap = "$zeron.space.hair",
+					gap = "$zeren.space.hair",
 					name,
 					ui.text { o.description, text_size = "$font.size.sm", line_height = "$font.line.sm", color = "$text.tertiary", wrap = true },
 				}
@@ -268,11 +268,11 @@ return ui.component(function(props: Props): Node
 			if now.over then
 				return wide + OVERHANG * 2
 			end
-			return math.max(wide, if now.tall then ui.theme.get("zeron.menu.width") :: number else 0)
+			return math.max(wide, if now.tall then ui.theme.get("zeren.menu.width") :: number else 0)
 		end,
 		placement = { side = "bottom", align = "start", offset = 4 },
 		open_over = over_id,
-		-- As Zeron's menus open: a quick fade, no travel over the button.
+		-- As Zeren's menus open: a quick fade, no travel over the button.
 		on_mount = function(el: Element)
 			anime.animate(el, { opacity = { 0, 1 }, duration = 120, ease = "out(3)" })
 		end,
@@ -297,7 +297,7 @@ return ui.component(function(props: Props): Node
 			local list = ui.column {
 				w_full = true,
 				p = "$space.1",
-				gap = "$zeron.list.gap",
+				gap = "$zeren.list.gap",
 				-- Below the button zgx has no chosen row to open on: on it here.
 				on_mount = function()
 					if over then

@@ -1,4 +1,4 @@
--- What setup asks of Zeron once you're signed in: your username, whether
+-- What setup asks of Zeren once you're signed in: your username, whether
 -- one is free, claiming it, and a member's card. Each is a host call
 -- (src/auth.rs) that carries the account's token, so it returns a promise:
 -- `:after(on_value, on_error)`, or its `done`, `value` and `error` read by
@@ -86,7 +86,7 @@ end
 -- (invalid, exists or failed).
 export type Invited = { sent: { string }, failed: { { email: string, error: string } } }
 
--- Invites `emails` to the organization as members; Zeron sends the emails.
+-- Invites `emails` to the organization as members; Zeren sends the emails.
 function M.invite(organization_id: string, emails: { string }): any
 	return ui.call("account.invite", { organization_id = organization_id, emails = emails })
 end

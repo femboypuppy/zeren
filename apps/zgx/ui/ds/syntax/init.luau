@@ -10,7 +10,7 @@
 --
 -- Each language is a small lexer: the C-like ones a table of rules for one
 -- shared lexer (code.luau over lex.luau), the rest their own (markup.luau).
--- Colours are the theme's `zeron.syntax.*` tokens.
+-- Colours are the theme's `zeren.syntax.*` tokens.
 
 local lex = require("@self/lex")
 local code = require("@self/code")

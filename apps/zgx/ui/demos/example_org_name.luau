@@ -101,7 +101,7 @@ return {
 							else "It's what your teammates see when they join."
 					end,
 					tone = function()
-						return if failed:get() then "$zeron.tone.danger.ink" else "$text.secondary"
+						return if failed:get() then "$zeren.tone.danger.ink" else "$text.secondary"
 					end,
 					ui.column {
 						w_full = true,

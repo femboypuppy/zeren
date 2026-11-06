@@ -23,7 +23,7 @@ pub fn install(cx: &mut WindowContext, host: &ScriptHost) {
         };
         let (tell, mut heard) = zgx::task::latest::<Option<f64>>();
         if std::thread::Builder::new()
-            .name("zeron-desktop-blur".into())
+            .name("zeren-desktop-blur".into())
             .spawn(move || hyprland::follow(&dir, tell))
             .is_err()
         {
@@ -202,8 +202,8 @@ mod tests {
     fn only_events_that_may_change_the_blur_are_asked_about() {
         assert!(hyprland::matters("configreloaded>>\n"));
         assert!(hyprland::matters("movewindowv2>>55aa,3,3\n"));
-        assert!(hyprland::matters("openwindow>>55aa,3,zeron-zgx,Zeron\n"));
-        assert!(!hyprland::matters("activewindow>>zeron-zgx,Zeron\n"));
+        assert!(hyprland::matters("openwindow>>55aa,3,zeren-zgx,Zeren\n"));
+        assert!(!hyprland::matters("activewindow>>zeren-zgx,Zeren\n"));
         assert!(!hyprland::matters("workspacev2>>3,3\n"));
     }
 }

@@ -1,6 +1,6 @@
 # Themes
 
-A theme is the colours Zeron's window wears. It's only colours, so it works with any template, and it can't run anything. The person picks one for light and one for dark (Settings → Themes, or Settings → Appearance). Agents read, make, change and switch themes with Zeron's MCP tools; this guide is the whole reference.
+A theme is the colours Zeren's window wears. It's only colours, so it works with any template, and it can't run anything. The person picks one for light and one for dark (Settings → Themes, or Settings → Appearance). Agents read, make, change and switch themes with Zeren's MCP tools; this guide is the whole reference.
 
 ## The tools
 
@@ -8,7 +8,7 @@ A theme is the colours Zeron's window wears. It's only colours, so it works with
 - **`get_theme { id }`**: a theme's colours, a palette for each scheme it has, in the shape the next two take. `adjusted` lists what the window moves to keep it legible.
 - **`create_theme { name, light?, dark? }`**: a new theme of yours from palettes (one at least). Or **`create_theme { name?, vscode }`** from a VS Code colour theme's JSON (`colors`, `tokenColors`, `type`), through the importer Settings → Themes uses.
 - **`update_theme { id, name?, light?, dark? }`**: change one of yours. A palette replaces that scheme's; `null` takes it away. Its ids stay the same, so while it's worn the window restyles at once.
-- **`delete_theme { id }`**: yours only. A scheme it was worn for goes back to the template's theme, or to Zeron's.
+- **`delete_theme { id }`**: yours only. A scheme it was worn for goes back to the template's theme, or to Zeren's.
 - **`use_theme { id, slot? }`**: wear it. `slot` is `"light"`, `"dark"` or `"both"` (the default: each scheme it has).
 
 Built-in themes and a template's own theme are read-only. To change one, copy it: `get_theme`, edit the colours, then `create_theme` with a new name.
@@ -50,4 +50,4 @@ The window keeps every theme readable. Text needs 4.5:1 against every surface, a
 
 ## Where it's kept
 
-This device's: `theme-library.json` (your themes) and `theme-choice.json` (what each scheme wears) in Zeron's data folder. Another of your devices has its own. A template's own theme is its `theme.luau` (docs/templates.md, Colours and themes).
+This device's: `theme-library.json` (your themes) and `theme-choice.json` (what each scheme wears) in Zeren's data folder. Another of your devices has its own. A template's own theme is its `theme.luau` (docs/templates.md, Colours and themes).

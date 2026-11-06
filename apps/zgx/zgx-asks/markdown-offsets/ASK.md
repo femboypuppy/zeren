@@ -1,6 +1,6 @@
 # Ask: where each `ui.markdown` block starts in its source
 
-**Who needs it:** Zeron's files pane, for review comments on a Markdown preview (the shipping app's `files/markdown_preview.rs`, `comment_block`). A comment is anchored to a line of the file. In the preview, it's left on and shown under the block that holds that line. To do that, the preview needs each top-level block's first source line.
+**Who needs it:** Zeren's files pane, for review comments on a Markdown preview (the shipping app's `files/markdown_preview.rs`, `comment_block`). A comment is anchored to a line of the file. In the preview, it's left on and shown under the block that holds that line. To do that, the preview needs each top-level block's first source line.
 
 **The problem:** `ui.markdown(text)` returns blocks (`{ t = "p", … }`) with no position. The parser knows it: `markdown/mod.rs` keeps `Top { start, blocks }` per top-level element (the byte offset of its first event) for incremental parsing, but it doesn't reach Luau. Guessing it in Luau, by splitting on blank lines, misplaces comments on lists, fences and tables, where the parser's idea of a block differs from blank-line chunks.
 

@@ -28,7 +28,7 @@ use base64::Engine as _;
 use base64::engine::general_purpose::STANDARD as BASE64;
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 use tokio::sync::mpsc;
-use zeron_proto::TerminalEvent;
+use zeren_proto::TerminalEvent;
 
 /// A device's own terminals, as the link's host side serves them.
 pub trait HostTerminals: Clone + Send + Sync + 'static {

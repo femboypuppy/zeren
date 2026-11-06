@@ -165,7 +165,7 @@ test("@ lists the session's files as it's typed, and a pick lands in the draft",
 	expect(app:text('role:textbox "Message"')).to_contain("chat.rs")
 end)
 
-test("an @ pick goes out as Zeron's file mention", function()
+test("an @ pick goes out as Zeren's file mention", function()
 	local app = mount("chat_fixture.luau")
 	app:resize(900, 700)
 	open(app, "s2")
@@ -182,17 +182,17 @@ test("an @ pick goes out as Zeron's file mention", function()
 	expect(app:wait('~"Look at"', { timeout_ms = 1000 })).to_be(true)
 	app:wait("#never-shown", { timeout_ms = 100 })
 	-- (As crates/proto file_mentions.rs `local_file_link` writes it.)
-	expect(app:state("calls")).to_contain("send:s2:Look at [chat.rs](zeron-file:src/chat.rs)")
+	expect(app:state("calls")).to_contain("send:s2:Look at [chat.rs](zeren-file:src/chat.rs)")
 end)
 
 test("a file mention link escapes its name and encodes its path, as production's", function()
 	local shared = require("../screens/chat/file_links")
-	expect(shared.link("src/a file#[x].rs")).to_be("[a file#\\[x\\].rs](zeron-file:src/a%20file%23%5Bx%5D.rs)")
-	expect(shared.link("src/components/", true)).to_be("[components](zeron-file:src/components/)")
-	expect(shared.path_of("zeron-file:src/a%20file%23%5Bx%5D.rs")).to_be("src/a file#[x].rs")
-	expect(shared.path_of("zeron-file:src/components/")).to_be("src/components/")
-	expect(shared.path_of("zeron-file:../a.rs")).to_be(nil)
-	expect(shared.path_of("zeron-file:/etc/passwd")).to_be(nil)
+	expect(shared.link("src/a file#[x].rs")).to_be("[a file#\\[x\\].rs](zeren-file:src/a%20file%23%5Bx%5D.rs)")
+	expect(shared.link("src/components/", true)).to_be("[components](zeren-file:src/components/)")
+	expect(shared.path_of("zeren-file:src/a%20file%23%5Bx%5D.rs")).to_be("src/a file#[x].rs")
+	expect(shared.path_of("zeren-file:src/components/")).to_be("src/components/")
+	expect(shared.path_of("zeren-file:../a.rs")).to_be(nil)
+	expect(shared.path_of("zeren-file:/etc/passwd")).to_be(nil)
 	expect(shared.path_of("https://example.com")).to_be(nil)
 end)
 
@@ -535,7 +535,7 @@ end)
 
 -- The model picker opens folded on the chosen model's reasoning, the list
 -- (its tabs, its search) a press away; Escape folds it back, then closes
--- it (Zeron's compact picker, the only one).
+-- it (Zeren's compact picker, the only one).
 local function searching(app: any): boolean
 	for line in app:tree():gmatch("[^\n]+") do
 		if line:find('textbox "Search', 1, true) and not line:find(" hidden", 1, true) then
@@ -654,7 +654,7 @@ end)
 
 -- An agent's completion settings (Settings → Providers): "Use $ for skills"
 -- off makes `$` ordinary text; "Separate / commands" off lists the skills
--- under `/` with the commands (Zeron's composer.rs `completion_trigger`).
+-- under `/` with the commands (Zeren's composer.rs `completion_trigger`).
 test("an agent's completion settings decide what $ and / open", function()
 	local app = mount("chat_fixture.luau")
 	app:resize(900, 700)
@@ -729,9 +729,9 @@ test("a dropped GIF or HEIC is a file chip, with no script error", function()
 end)
 
 -- Review comments left on files (the files pane's): chips on the composer,
--- sent after the words as Zeron's review-comments block, each its file and
--- line; with no words, Zeron's own line for them.
-test("review comments go with the message as Zeron's block", function()
+-- sent after the words as Zeren's review-comments block, each its file and
+-- line; with no words, Zeren's own line for them.
+test("review comments go with the message as Zeren's block", function()
 	local app = mount("chat_fixture.luau")
 	app:resize(900, 700)
 	open(app, "s2")
@@ -753,8 +753,8 @@ end)
 
 test("a chat mentioned (a session dropped from the sidebar) goes as production's chat link", function()
 	local links = require("../screens/chat/chat_links")
-	expect(links.link("Brief  Hello\nInteraction", "0fd51606-ab")).to_be("[Brief Hello Interaction](zeron-chat:0fd51606-ab)")
-	expect(links.link("a [b] `c` \\d", "x1")).to_be("[a \\[b\\] \\`c\\` \\\\d](zeron-chat:x1)")
+	expect(links.link("Brief  Hello\nInteraction", "0fd51606-ab")).to_be("[Brief Hello Interaction](zeren-chat:0fd51606-ab)")
+	expect(links.link("a [b] `c` \\d", "x1")).to_be("[a \\[b\\] \\`c\\` \\\\d](zeren-chat:x1)")
 	expect(links.link("t", "../etc")).to_be(nil)
 	local app = mount("chat_fixture.luau")
 	app:resize(900, 700)
@@ -768,9 +768,9 @@ test("a chat mentioned (a session dropped from the sidebar) goes as production's
 	app:wait("#never-shown", { timeout_ms = 100 })
 	local calls = app:state("calls")
 	expect(calls).to_contain("send:s2:Compare with [")
-	expect(calls).to_contain("](zeron-chat:s1)")
+	expect(calls).to_contain("](zeren-chat:s1)")
 	-- (Once, though mentioned twice.)
-	local _, n = string.gsub(calls, "zeron%-chat:s1", "")
+	local _, n = string.gsub(calls, "zeren%-chat:s1", "")
 	expect(n).to_be(1)
 end)
 
@@ -785,7 +785,7 @@ test("a chat's footer shows its own branch, fixed, not the new chat's picker", f
 	app:command("session_in_worktree")
 	app:frames(30)
 	expect(app:state("calls")).to_contain("refs:/tmp/atlas-wt/pr:here")
-	expect(app:wait('~"zeron/readme-pr"', { timeout_ms = 2000 })).to_be(true)
+	expect(app:wait('~"zeren/readme-pr"', { timeout_ms = 2000 })).to_be(true)
 	-- A worktree's glyph, its project's name before it.
 	expect(app:has("#composer-place-lead >> .place-lead-worktree")).to_be(true)
 	expect(app:text("#composer-place-project[1]")).to_be("Atlas")

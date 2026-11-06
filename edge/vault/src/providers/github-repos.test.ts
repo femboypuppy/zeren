@@ -17,8 +17,8 @@ describe("github repo listing helpers", () => {
   it("maps GitHub repositories", () => {
     expect(
       toRepoView({
-        full_name: "octo/zeron",
-        clone_url: "https://github.com/octo/zeron.git",
+        full_name: "octo/zeren",
+        clone_url: "https://github.com/octo/zeren.git",
         default_branch: "trunk",
         private: true,
         description: "The app",
@@ -26,8 +26,8 @@ describe("github repo listing helpers", () => {
         owner: { login: "octo" }
       })
     ).toEqual({
-      fullName: "octo/zeron",
-      cloneUrl: "https://github.com/octo/zeron.git",
+      fullName: "octo/zeren",
+      cloneUrl: "https://github.com/octo/zeren.git",
       defaultBranch: "trunk",
       private: true,
       description: "The app",
@@ -53,14 +53,14 @@ describe("github repo listing helpers", () => {
       private: false,
       pushedAt
     });
-    const repos = [repo("octo/alpha", 1), repo("octo/Zeron", 3), repo("zeron-org/desktop", 5), repo("octo/beta", 3)];
+    const repos = [repo("octo/alpha", 1), repo("octo/Zeren", 3), repo("zeren-org/desktop", 5), repo("octo/beta", 3)];
     expect(filterRepos(repos).map((r) => r.fullName)).toEqual([
-      "zeron-org/desktop",
+      "zeren-org/desktop",
       "octo/beta",
-      "octo/Zeron",
+      "octo/Zeren",
       "octo/alpha"
     ]);
-    expect(filterRepos(repos, "  ZER ").map((r) => r.fullName)).toEqual(["zeron-org/desktop", "octo/Zeron"]);
+    expect(filterRepos(repos, "  ZER ").map((r) => r.fullName)).toEqual(["zeren-org/desktop", "octo/Zeren"]);
     expect(filterRepos(repos, "nothing")).toEqual([]);
   });
 });

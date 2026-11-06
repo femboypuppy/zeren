@@ -19,14 +19,14 @@ local view = require("@app/screens/shell/view")
 -- A template's own theme files (the hot pink one's, both; the night one's,
 -- only dark).
 local function theme(scheme: string, accent: string, window: string, text: string): state.Scheme
-	return { theme = { type = scheme, extends = `zgx-{scheme}`, tokens = { accent = accent, text = { primary = text }, zeron = { window = window } } } }
+	return { theme = { type = scheme, extends = `zgx-{scheme}`, tokens = { accent = accent, text = { primary = text }, zeren = { window = window } } } }
 end
 
 local model: { state.Template } = {
-	{ id = "zeron", name = "Zeron", description = "The default interface.", author = "Zeron", version = "0.2.131", zeron_version = "0.2.131", builtin = true, active = true, status = "ok" },
+	{ id = "zeren", name = "Zeren", description = "The default interface.", author = "Zeren", version = "0.2.131", zeren_version = "0.2.131", builtin = true, active = true, status = "ok" },
 	{ id = "hot-pink", name = "Hot Pink", description = "Everything pink.", author = "you", version = "1.0.0", builtin = false, active = false, status = "ok", look = { stamp = "p1", light = theme("light", "#d6247a", "#fff0f6", "#3d0a22"), dark = theme("dark", "#ff3e9a", "#1a0010", "#ffe0ef") } },
 	{ id = "night", name = "Night", description = "A darker dark.", author = "you", version = "1.0.0", builtin = false, active = false, status = "ok", look = { stamp = "n1", dark = theme("dark", "#22ccaa", "#000000", "#e8fff9") } },
-	{ id = "airy", name = "Airy", description = "More room between things.", author = "you", version = "1.0.0", zeron_version = "0.2.131", builtin = false, active = false, status = "ok" },
+	{ id = "airy", name = "Airy", description = "More room between things.", author = "you", version = "1.0.0", zeren_version = "0.2.131", builtin = false, active = false, status = "ok" },
 }
 
 local function find(id: string): state.Template
@@ -43,7 +43,7 @@ local waiting: { state.Pending } = {}
 
 local function publish()
 	local list: { state.Template } = {}
-	local active = "zeron"
+	local active = "zeren"
 	for _, t in model do
 		table.insert(list, table.clone(t))
 		if t.active then
@@ -143,7 +143,7 @@ ui.command {
 	id = "installed_theirs",
 	title = "The install finishes: someone else's, waiting",
 	run = function()
-		table.insert(waiting, { pending = "ledger-1700000001", name = "Ledger", source = "ledger.zeron-template" })
+		table.insert(waiting, { pending = "ledger-1700000001", name = "Ledger", source = "ledger.zeren-template" })
 		publish()
 		settle(true, { pending = "ledger-1700000001", name = "Ledger", needs_consent = true })
 	end,
@@ -195,11 +195,11 @@ ui.command {
 }
 ui.command {
 	id = "updated",
-	title = "Zeron updates past Airy",
+	title = "Zeren updates past Airy",
 	run = function()
 		local t = find("airy")
 		t.status = "out_of_date"
-		t.zeron_version = "0.2.120"
+		t.zeren_version = "0.2.120"
 		publish()
 	end,
 }
@@ -250,7 +250,7 @@ ui.command {
 	id = "waiting",
 	title = "Someone's template waits for you",
 	run = function()
-		table.insert(waiting, { pending = "ledger-1700000000", name = "Ledger", source = "ledger.zeron-template" })
+		table.insert(waiting, { pending = "ledger-1700000000", name = "Ledger", source = "ledger.zeren-template" })
 		publish()
 	end,
 }
@@ -278,7 +278,7 @@ local theme_names = ui.state("theme_names", "")
 ui.command { id = "theme_names", title = "List the themes", run = function() theme_names:set(table.concat(ui.theme.names(), ",")) end }
 
 -- Light, for pictures of it (src/audit_shots.rs: `!theme_light`).
-ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeron-light") end }
+ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeren-light") end }
 
 return ui.div {
 	w_full = true,

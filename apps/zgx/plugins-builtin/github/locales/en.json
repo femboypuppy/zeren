@@ -233,7 +233,7 @@
     "sign_in": "Sign in to GitHub on this Mac with `gh auth login`.",
     "not_found": "GitHub can't find it, or your account can't see it.",
     "rate_limit": "GitHub's rate limit was reached. Try again in a few minutes.",
-    "rate_limit_until": "GitHub's rate limit was reached. Zeron asks again at {at}.",
+    "rate_limit_until": "GitHub's rate limit was reached. Zeren asks again at {at}.",
     "no_answer": "GitHub didn't answer.",
     "unreadable": "GitHub's answer couldn't be read.",
     "said_no": "GitHub said no."

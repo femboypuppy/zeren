@@ -5,20 +5,20 @@
 # dependency graph with different feature sets).
 #
 # Same coverage as the old invocations:
-#   zeron-harness  every test binary (cursor-compatibility ran `-p zeron-harness`
+#   zeren-harness  every test binary (cursor-compatibility ran `-p zeren-harness`
 #                  plus `--test pi_rpc` with native-fixture; native-fixture only
 #                  adds the pi_rpc fixture binaries, so it is on for the whole build)
-#   zeron-preview  every test binary (preview-tests)
-#   zeron-doc      lib + persistence and memory regressions + attachments_roundtrip
-#   zeron-sync, zeron-update   lib only (session-sync-regressions)
-#   zeron-cli, zeron-launch, zeron-notify   `zeron`'s command line, the engine
-#                  helper's start-up and the zeron:// links, shared by the apps
-#   zeron-engine   lib + the integration tests named below. Engine has many other
+#   zeren-preview  every test binary (preview-tests)
+#   zeren-doc      lib + persistence and memory regressions + attachments_roundtrip
+#   zeren-sync, zeren-update   lib only (session-sync-regressions)
+#   zeren-cli, zeren-launch, zeren-notify   `zeren`'s command line, the engine
+#                  helper's start-up and the zeren:// links, shared by the apps
+#   zeren-engine   lib + the integration tests named below. Engine has many other
 #                  integration binaries (live agents etc.) that no workflow ran, so
 #                  they are listed instead of globbed to avoid compiling them.
 #   voice (moved from voice-tests.yml offline-linux, which ran them as 14 separate
-#   `cargo test` builds): zeron-voice-media, zeron-voice-session and zeron-orb
-#                  lib, zeron-proto lib `voice` tests, zeron-mcp lib, zeron-rpc
+#   `cargo test` builds): zeren-voice-media, zeren-voice-session and zeren-orb
+#                  lib, zeren-proto lib `voice` tests, zeren-mcp lib, zeren-rpc
 #                  device_room, engine voice_runtime and device_routing. They need no
 #                  audio stack, and harness already depends on all of them.
 # nextest does not run doctests; these crates have none (their doc comments
@@ -39,15 +39,15 @@ for f in crates/harness/tests/*.rs crates/preview/tests/*.rs crates/doc/tests/*.
   [[ "$skip" == *" $name "* ]] || tests+=(--test "$name")
 done
 # `misc` (harness, engine and preview): the small suites, one binary each.
-# The orb geometry tests live in zeron-orb's `geometry`.
+# The orb geometry tests live in zeren-orb's `geometry`.
 for t in misc geometry session_publication restart_resume side_chats message_queue voice_runtime device_routing device_room; do
   tests+=(--test "$t")
 done
 
 exec cargo nextest run --config-file scripts/ci/nextest.toml --locked --no-fail-fast \
-  -p zeron-harness -p zeron-engine -p zeron-sync -p zeron-update -p zeron-doc -p zeron-preview \
-  -p zeron-mcp -p zeron-proto -p zeron-rpc -p zeron-orb -p zeron-voice-session -p zeron-voice-media \
-  -p zeron-cli -p zeron-launch -p zeron-notify \
-  --features zeron-harness/native-fixture \
+  -p zeren-harness -p zeren-engine -p zeren-sync -p zeren-update -p zeren-doc -p zeren-preview \
+  -p zeren-mcp -p zeren-proto -p zeren-rpc -p zeren-orb -p zeren-voice-session -p zeren-voice-media \
+  -p zeren-cli -p zeren-launch -p zeren-notify \
+  --features zeren-harness/native-fixture \
   --lib --bins "${tests[@]}" \
-  -E 'not ((package(zeron-proto) & not test(voice)) | (package(zeron-rpc) & kind(lib)))' "$@"
+  -E 'not ((package(zeren-proto) & not test(voice)) | (package(zeren-rpc) & kind(lib)))' "$@"

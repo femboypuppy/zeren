@@ -1,7 +1,7 @@
 -- Setup's ending. Signed in: the organization is ready, and what was set up
 -- in a few lines (the organization and your place in it, who was invited
 -- in this run, where its chats live), and the way into it. Without an
--- account: the chats stay on this Mac, and the way into Zeron. Not a
+-- account: the chats stay on this Mac, and the way into Zeren. Not a
 -- numbered step, so no dots. The gallery's All set is the design.
 --
 -- Not wired yet: the shell doesn't exist in this app, so the way in
@@ -24,8 +24,8 @@ local function tick(): Node
 		items = "center",
 		justify = "center",
 		rounded = "$radius.full",
-		bg = "$zeron.tone.success.wash",
-		color = "$zeron.tone.success.ink",
+		bg = "$zeren.tone.success.wash",
+		color = "$zeren.tone.success.ink",
 		ds.Icon { name = "check-circle", size = 16 },
 	}
 end
@@ -87,7 +87,7 @@ return function(props: Props): Node
 	return Onboarding.Step {
 		back = Onboarding.Back { on_click = props.on_back },
 		continue = {
-			label = (if named then ui.t("onboarding.done.open_org", { org = org }) else ui.t("onboarding.done.open_zeron")) :: any,
+			label = (if named then ui.t("onboarding.done.open_org", { org = org }) else ui.t("onboarding.done.open_zeren")) :: any,
 			max_w = 260,
 			on_click = actions.finish,
 		},

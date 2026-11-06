@@ -1,7 +1,7 @@
 //! Agent visuals in the design system (ds/visual) on the real host
 //! (src/visuals.rs, the shipping app's crates/visual): ui/visuals_fixture's
 //! scripts, every node type, mounted headless and used as a reader uses
-//! them. `cargo test --bin zeron-zgx visuals_tests`.
+//! them. `cargo test --bin zeren-zgx visuals_tests`.
 
 use zgx_script::{ScriptHost, testing::TestApp};
 
@@ -148,7 +148,7 @@ fn a_visual_being_read_says_so() {
 /// stores them) drawn as a reply draws it, with no script error and none
 /// saying it stopped: for checking a chat's worth of real visuals. Run on
 /// purpose:
-/// `VISUALS_DIR=… cargo test --bin zeron-zgx visuals_tests::scripts_in -- --ignored --nocapture`
+/// `VISUALS_DIR=… cargo test --bin zeren-zgx visuals_tests::scripts_in -- --ignored --nocapture`
 #[test]
 #[ignore = "run on purpose, on a folder of visual scripts"]
 fn scripts_in_a_folder_draw_without_errors() {
@@ -243,7 +243,7 @@ fn shoot(app: &mut TestApp, out: &std::path::Path) {
 /// zgx's GPU renderer every frame: idle (1.5 s of real time, its own
 /// animation running if it has one) and with the pointer sweeping across
 /// it. Prints ms of this thread a frame and script calls. Run on purpose:
-/// `VISUALS_DIR=… cargo test --bin zeron-zgx visuals_tests::cost -- --ignored --nocapture`
+/// `VISUALS_DIR=… cargo test --bin zeren-zgx visuals_tests::cost -- --ignored --nocapture`
 #[test]
 #[ignore = "run on purpose: a cost probe"]
 fn cost_of_each_visual() {
@@ -341,25 +341,25 @@ fn cost_of_each_visual() {
 
 /// How long crates/visual-gpu takes for one frame of a shader and a scene at
 /// a few sizes, warm: where a frame's time goes. Run on purpose:
-/// `cargo test --bin zeron-zgx visuals_tests::gpu_frame_bench -- --ignored --nocapture`
+/// `cargo test --bin zeren-zgx visuals_tests::gpu_frame_bench -- --ignored --nocapture`
 #[test]
 #[ignore = "run on purpose: a benchmark"]
 fn gpu_frame_bench() {
     use std::time::Instant;
-    use zeron_visual as zv;
-    println!("GPU: available {} {:?}", zeron_visual_gpu::available(), zeron_visual_gpu::unavailable_reason());
+    use zeren_visual as zv;
+    println!("GPU: available {} {:?}", zeren_visual_gpu::available(), zeren_visual_gpu::unavailable_reason());
     let code = "void mainImage(out vec4 c, in vec2 p) { vec2 uv = p / iResolution.xy; c = vec4(uv, 0.5 + 0.5 * sin(iTime), 1.0); }";
     for (w, h, bloom) in [(800u32, 300u32, 0.0f32), (1600, 600, 0.0), (1600, 600, 0.8), (800, 300, 0.8)] {
-        let spec = zeron_visual_gpu::ShaderSpec { image: code, buffers: &[], inputs: &[], blend: zv::shader::Blend::Light, bloom, textures: &[] };
+        let spec = zeren_visual_gpu::ShaderSpec { image: code, buffers: &[], inputs: &[], blend: zv::shader::Blend::Light, bloom, textures: &[] };
         let mut state = None;
         let mut uniforms = zv::shader::ShaderUniforms { resolution: [w as f32, h as f32, 2., 0.], ..Default::default() };
         for _ in 0..3 {
-            zeron_visual_gpu::render_shader(&spec, &uniforms, w, h, &mut state).unwrap();
+            zeren_visual_gpu::render_shader(&spec, &uniforms, w, h, &mut state).unwrap();
         }
         let start = Instant::now();
         for i in 0..20 {
             uniforms.time[0] = i as f32 * 0.03;
-            zeron_visual_gpu::render_shader(&spec, &uniforms, w, h, &mut state).unwrap();
+            zeren_visual_gpu::render_shader(&spec, &uniforms, w, h, &mut state).unwrap();
         }
         println!("shader {w}x{h} bloom {bloom}: {:.2} ms/frame", start.elapsed().as_secs_f64() * 50.);
     }
@@ -376,12 +376,12 @@ fn gpu_frame_bench() {
         let mut state = None;
         let camera = zv::Camera { yaw: 0.5, pitch: 0.4, zoom: 1. };
         for _ in 0..3 {
-            zeron_visual_gpu::render_scene(&scene, camera, w, h, scale, &rgba, &mut state).expect("GPU scene");
+            zeren_visual_gpu::render_scene(&scene, camera, w, h, scale, &rgba, &mut state).expect("GPU scene");
         }
         let start = Instant::now();
         for i in 0..20 {
             let camera = zv::Camera { yaw: 0.5 + i as f32 * 0.02, pitch: 0.4, zoom: 1. };
-            zeron_visual_gpu::render_scene(&scene, camera, w, h, scale, &rgba, &mut state).expect("GPU scene");
+            zeren_visual_gpu::render_scene(&scene, camera, w, h, scale, &rgba, &mut state).expect("GPU scene");
         }
         println!("scene {w}x{h} @{scale}x: {:.2} ms/frame", start.elapsed().as_secs_f64() * 50.);
     }
@@ -435,7 +435,7 @@ fn a_visual_scrolled_away_does_not_animate() {
 /// (a long reply: a few show, the rest scrolled away), scrolled from top to
 /// bottom and back over 3 s, drawn by zgx's GPU renderer each frame: this
 /// thread's ms a frame and the GPU thread's frames. Run on purpose:
-/// `VISUALS_DIR=… cargo test --bin zeron-zgx visuals_tests::cost_together -- --ignored --nocapture`
+/// `VISUALS_DIR=… cargo test --bin zeren-zgx visuals_tests::cost_together -- --ignored --nocapture`
 #[test]
 #[ignore = "run on purpose: a cost probe"]
 fn cost_together() {
@@ -534,7 +534,7 @@ fn a_show_visual_call_leaves_no_tool_row_and_its_visual_sits_in_place() {
     );
     let mcp = |id: &str, tool: &str, error: bool, output: &str| {
         json!({ "kind": "tool", "id": id, "resolved": true, "isError": error, "output": output,
-                "call": { "kind": "mcp", "server": "zeron", "tool": tool, "input": {} } })
+                "call": { "kind": "mcp", "server": "zeren", "tool": tool, "input": {} } })
     };
     let exec = |id: &str| {
         json!({ "kind": "tool", "id": id, "resolved": true, "isError": false,

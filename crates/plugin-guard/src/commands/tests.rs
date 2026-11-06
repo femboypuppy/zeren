@@ -36,17 +36,17 @@ fn it_takes_stdin_a_folder_and_a_timeout() {
     assert_eq!(ran["status"].as_i64(), Some(-1));
     let ran = run_on(&json!({ "program": "ls", "args": ["/no/such/place"] }), &allowed(&["ls"]), PATH, &|_| false).unwrap();
     assert!(ran["status"].as_i64().unwrap() != 0 && !ran["stderr"].as_str().unwrap().is_empty(), "{ran}");
-    assert!(run_on(&json!({ "program": "no-such-program-zeron" }), &allowed(&["no-such-program-zeron"]), PATH, &|_| false)
+    assert!(run_on(&json!({ "program": "no-such-program-zeren" }), &allowed(&["no-such-program-zeren"]), PATH, &|_| false)
         .unwrap_err()
         .contains("isn't installed"));
 }
 
 /// R2: the environment is an allow-list: harmless words and formatting,
-/// and the plugin's own `ZERON_PLUGIN_…`, never what changes what runs.
+/// and the plugin's own `ZEREN_PLUGIN_…`, never what changes what runs.
 #[test]
 fn it_sets_only_harmless_variables() {
     let ran = run_on(
-        &json!({ "program": "printenv", "args": ["ZERON_PLUGIN_WORD"], "env": { "ZERON_PLUGIN_WORD": "hello", "LC_ALL": "C" } }),
+        &json!({ "program": "printenv", "args": ["ZEREN_PLUGIN_WORD"], "env": { "ZEREN_PLUGIN_WORD": "hello", "LC_ALL": "C" } }),
         &allowed(&["printenv"]),
         PATH,
         &|_| false,
@@ -74,8 +74,8 @@ fn it_sets_only_harmless_variables() {
         json!({ "EDITOR": "touch /tmp/x" }),
         json!({ "PAGER": "touch /tmp/x" }),
         json!({ "HOME": "/tmp" }),
-        json!({ "ZERON_PLUGIN_": "x" }),
-        json!({ "ZERON_IPC_TOKEN_FILE": "/tmp/x" }),
+        json!({ "ZEREN_PLUGIN_": "x" }),
+        json!({ "ZEREN_IPC_TOKEN_FILE": "/tmp/x" }),
         json!({ "lower": "x" }),
         json!({ "1X": "x" }),
         json!({ "LANG": 3 }),
@@ -237,11 +237,11 @@ fn an_index_of_the_plugins_own_is_a_git_folders() {
     let git_dir = dir.path().join(".git");
     std::fs::create_dir(&git_dir).unwrap();
     std::fs::write(git_dir.join("HEAD"), "ref: refs/heads/main\n").unwrap();
-    let index = git_dir.join("zeron-git.index").display().to_string();
+    let index = git_dir.join("zeren-git.index").display().to_string();
     assert!(git_index_path(&index));
     assert!(git_args(&s(&["read-tree", &format!("--index-output={index}"), "-m", "HEAD"]), Some(dir.path())).is_ok());
     for bad in [
-        dir.path().join("zeron-git.index").display().to_string(),
+        dir.path().join("zeren-git.index").display().to_string(),
         git_dir.join("config").display().to_string(),
         "relative.index".into(),
         format!("{}/../x.index", git_dir.display()),

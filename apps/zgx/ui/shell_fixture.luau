@@ -135,7 +135,7 @@ for _, scheme in { "light", "dark" } do
 		menu = "Fixture",
 		run = function()
 			ui.theme.follow_system(false)
-			ui.theme.current:set(`zeron-{scheme}`)
+			ui.theme.current:set(`zeren-{scheme}`)
 		end,
 	}
 end
@@ -373,7 +373,7 @@ stub.link = function(id: string): any
 	note(`link:{id}`)
 	return {
 		after = function(_, ok: (any) -> ())
-			ok(`zeron://open/chat/{id}?workspace=0123456789abcdef`)
+			ok(`zeren://open/chat/{id}?workspace=0123456789abcdef`)
 		end,
 	}
 end
@@ -587,7 +587,7 @@ projects_stub.forget_icon = function(url: string)
 	note(`forget_icon:{url}`)
 end
 projects_stub.icon_file = function(url: string): any
-	return answer(uploaded[url] or "assets/favicons/zeron.png")
+	return answer(uploaded[url] or "assets/favicons/zeren.png")
 end
 projects_stub.delete = function(id: string): any
 	note(`delete_project:{id}`)

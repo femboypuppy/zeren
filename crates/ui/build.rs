@@ -29,13 +29,13 @@ fn main() {
 
     println!("cargo:rerun-if-changed=src/browser/linux/helper.c");
     println!("cargo:rerun-if-changed=src/browser/linux/wpe.c");
-    println!("cargo:rerun-if-env-changed=ZERON_WPE");
+    println!("cargo:rerun-if-env-changed=ZEREN_WPE");
     println!("cargo:rerun-if-env-changed=PKG_CONFIG_PATH");
     if env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("linux") {
         return;
     }
     build_wpe_helper();
-    let output = PathBuf::from(env::var_os("OUT_DIR").unwrap()).join("zeron-webkit");
+    let output = PathBuf::from(env::var_os("OUT_DIR").unwrap()).join("zeren-webkit");
     let flags = Command::new("pkg-config")
         .args(["--cflags", "--libs", "webkit2gtk-4.1", "json-glib-1.0"])
         .output()
@@ -66,10 +66,10 @@ fn main() {
 
 /// The WPE WebKit helper is optional: without WPE WebKit 2.50+ development
 /// files, with ones it does not compile against (an older GBM), or with
-/// `ZERON_WPE=0`, the build embeds an empty helper and the browser uses
+/// `ZEREN_WPE=0`, the build embeds an empty helper and the browser uses
 /// WebKitGTK.
 fn build_wpe_helper() {
-    let output = PathBuf::from(env::var_os("OUT_DIR").unwrap()).join("zeron-wpe");
+    let output = PathBuf::from(env::var_os("OUT_DIR").unwrap()).join("zeren-wpe");
     let packages = [
         "wpe-webkit-2.0 >= 2.50",
         "wpe-platform-2.0",
@@ -79,7 +79,7 @@ fn build_wpe_helper() {
         "glesv2",
         "xkbcommon",
     ];
-    let flags = (env::var("ZERON_WPE").as_deref() != Ok("0"))
+    let flags = (env::var("ZEREN_WPE").as_deref() != Ok("0"))
         .then(|| {
             Command::new("pkg-config")
                 .arg("--cflags")

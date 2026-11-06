@@ -81,7 +81,7 @@ test("the draft's highlight styles a token in type alone", function()
 	-- A span is `{ from, to, color }` with its faces as fields too.
 	for _, span in spans do
 		local s = span :: { [number]: any, weight: number?, bg: string? }
-		if s[3] == "$zeron.composer.token.trigger" then
+		if s[3] == "$zeren.composer.token.trigger" then
 			glyphs += 1
 		elseif s.weight == 500 then
 			names += 1

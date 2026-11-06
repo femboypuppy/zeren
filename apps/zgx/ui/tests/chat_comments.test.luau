@@ -1,6 +1,6 @@
 -- A review comment left from the files pane (screens/files/comments calls
 -- `shared.attach_comment { path, line, body, root }`): a chip naming its
--- file and line, following it when edits carry it, sent as Zeron's review
+-- file and line, following it when edits carry it, sent as Zeren's review
 -- comments block citing the file within the project.
 
 test("a comment from the files pane is a chip at its line, follows a move, and is sent as the review block", function()
@@ -22,10 +22,10 @@ test("a comment from the files pane is a chip at its line, follows a move, and i
 	expect(app:state("calls")).to_contain("send:s2:Please fix\n\nReview comments (each cites the workspace file and line it belongs to):\n- src/app.rs:14: Rename this.")
 end)
 
--- Comments a plugin left on a diff (Git's Changes: `zeron.compose_comment`,
+-- Comments a plugin left on a diff (Git's Changes: `zeren.compose_comment`,
 -- handed on by screens/plugins): chips naming their file and lines, told
 -- back to the plugin while they're carried, gone from it when taken off,
--- and sent as Zeron's diff comments block (production's
+-- and sent as Zeren's diff comments block (production's
 -- COMMENT_BLOCK_HEADER): each its file, its lines, its side, its note, the
 -- code under it.
 test("a plugin's comments on a diff are chips, told back while carried, and sent with their file, lines, side and code", function()

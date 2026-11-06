@@ -1,5 +1,5 @@
 -- Settings → Archived: the sessions put away, hidden from the sidebar until
--- restored (Zeron's: crates/ui/src/settings/archived.rs). Searched from one
+-- restored (Zeren's: crates/ui/src/settings/archived.rs). Searched from one
 -- field and laid out by when each last moved (today, yesterday, this week,
 -- earlier), each group a card of settings rows (as Plugins' are, washed
 -- edge to edge under the pointer): its project's tile, its title, where it
@@ -166,7 +166,7 @@ local Row = ui.component(function(props: { now: State<any> }): Node
 				items = "center",
 				justify = "center",
 				rounded = "$radius.lg",
-				bg = "$zeron.secondary.bg",
+				bg = "$zeren.secondary.bg",
 				SessionRow.mark(cur, function(): boolean
 					return true
 				end),
@@ -349,7 +349,7 @@ local function delete_all_button(): Node
 		-- the cards' end edge, gone under it when narrow the words' edge. Out
 		-- by the ghost's own padding either side.)
 		ui.div {
-			mx = ui.raw(-((ui.theme.get("zeron.space.snug") :: number?) or 10), "the ghost's own padding"),
+			mx = ui.raw(-((ui.theme.get("zeren.space.snug") :: number?) or 10), "the ghost's own padding"),
 			ds.Button {
 				id = "archived-delete-all",
 				tone = "ghost",

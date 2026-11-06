@@ -1,11 +1,11 @@
-//! Theme tools: read, make, change, delete and wear the colours Zeron's
+//! Theme tools: read, make, change, delete and wear the colours Zeren's
 //! window wears (the engine's `ListThemes` … `UseTheme`, over this device's
 //! theme files). A theme is data: no tool here asks the person, and only
 //! the person's own themes can be changed. The guide is
 //! apps/zgx/docs/themes.md, which `list_themes` links.
 
 use serde_json::{Value, json};
-use zeron_rpc::{RpcError, methods};
+use zeren_rpc::{RpcError, methods};
 
 use super::{ToolDef, Tools};
 
@@ -46,7 +46,7 @@ pub(super) fn catalog() -> Vec<ToolDef> {
     vec![
         ToolDef {
             name: LIST_THEMES,
-            description: "Every theme Zeron's window can wear on this device: built in, a template's own, and yours (imported or made with create_theme). Each has its id, name, source (\"built in\", \"a template's\" or \"yours\"), whether you can change it (editable: yours only), its variant for each scheme (variants: {light?, dark?}) and the schemes it's worn for now (in_use). `wearing` says what light and dark wear now; `guide` is the full reference (docs/themes.md).",
+            description: "Every theme Zeren's window can wear on this device: built in, a template's own, and yours (imported or made with create_theme). Each has its id, name, source (\"built in\", \"a template's\" or \"yours\"), whether you can change it (editable: yours only), its variant for each scheme (variants: {light?, dark?}) and the schemes it's worn for now (in_use). `wearing` says what light and dark wear now; `guide` is the full reference (docs/themes.md).",
             input_schema: json!({ "type": "object", "properties": {} }),
         },
         ToolDef {
@@ -89,7 +89,7 @@ pub(super) fn catalog() -> Vec<ToolDef> {
         },
         ToolDef {
             name: DELETE_THEME,
-            description: "Delete one of your themes from this device (built-in and template themes can't be deleted). A scheme it was worn for goes back to the template's theme, or to Zeron's.",
+            description: "Delete one of your themes from this device (built-in and template themes can't be deleted). A scheme it was worn for goes back to the template's theme, or to Zeren's.",
             input_schema: json!({ "type": "object", "properties": { "id": id("One of your themes' ids, from list_themes.") }, "required": ["id"] }),
         },
         ToolDef {
@@ -110,7 +110,7 @@ pub(super) fn catalog() -> Vec<ToolDef> {
 fn plain(error: RpcError) -> String {
     match error {
         RpcError::Failed(message) => message,
-        RpcError::UnknownMethod(_) => "This Zeron doesn't have theme tools yet; update Zeron to use them.".into(),
+        RpcError::UnknownMethod(_) => "This Zeren doesn't have theme tools yet; update Zeren to use them.".into(),
         other => other.to_string(),
     }
 }
@@ -131,7 +131,7 @@ impl Tools {
             DELETE_THEME => methods::DELETE_THEME,
             _ => methods::USE_THEME,
         };
-        let mut reply = self.zeron.call_rpc(method, args).await.map_err(plain)?;
+        let mut reply = self.zeren.call_rpc(method, args).await.map_err(plain)?;
         if method == methods::CREATE_THEME {
             reply["next"] = json!("To wear it, call use_theme with this id.");
         }
@@ -142,11 +142,11 @@ impl Tools {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::zeron::{Origin, Zeron};
+    use crate::zeren::{Origin, Zeren};
     use async_trait::async_trait;
     use std::path::PathBuf;
     use std::sync::Arc;
-    use zeron_rpc::{RpcReply, RpcService, memory_client};
+    use zeren_rpc::{RpcReply, RpcService, memory_client};
 
     /// The engine's theme half, on a data dir of its own: the catalogue it
     /// answers from, as the engine does.
@@ -157,7 +157,7 @@ mod tests {
     #[async_trait]
     impl RpcService for Engine {
         async fn handle(&self, method: &str, params: Value) -> Result<RpcReply, RpcError> {
-            use zeron_theme::catalog;
+            use zeren_theme::catalog;
             let dir = &self.dir;
             let said = |e: anyhow::Error| RpcError::Failed(e.to_string());
             let text = |k: &str| params.get(k).and_then(Value::as_str);
@@ -185,12 +185,12 @@ mod tests {
 
     fn tools(dir: &std::path::Path) -> Tools {
         let engine = Arc::new(Engine { dir: dir.to_path_buf() });
-        Tools::new(Arc::new(Zeron::with_client(memory_client(engine), Origin::default())))
+        Tools::new(Arc::new(Zeren::with_client(memory_client(engine), Origin::default())))
     }
 
     fn palette(seed: &str) -> Value {
-        let v = zeron_theme::builtin_registry().families.iter().flat_map(|f| &f.variants).find(|v| v.id == seed).unwrap();
-        zeron_theme::catalog::Palette::of(v).to_json(None)
+        let v = zeren_theme::builtin_registry().families.iter().flat_map(|f| &f.variants).find(|v| v.id == seed).unwrap();
+        zeren_theme::catalog::Palette::of(v).to_json(None)
     }
 
     #[tokio::test]
@@ -220,7 +220,7 @@ mod tests {
         // Gone, and its schemes back to the default.
         assert_eq!(tools.call(DELETE_THEME, json!({ "id": "custom-ink" })).await.unwrap(), json!({ "deleted": "custom-ink" }));
         let listed = tools.call(LIST_THEMES, json!({})).await.unwrap();
-        assert_eq!(listed["wearing"]["dark"]["variant"], "zeron-dark");
+        assert_eq!(listed["wearing"]["dark"]["variant"], "zeren-dark");
     }
 
     #[tokio::test]

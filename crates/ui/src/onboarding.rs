@@ -18,8 +18,8 @@ use gpui::{
     StyledImage as _, Subscription, Window, div, img, prelude::*, px,
 };
 
-use zeron_engine::registry::HarnessDescriptor;
-use zeron_proto::HarnessId;
+use zeren_engine::registry::HarnessDescriptor;
+use zeren_proto::HarnessId;
 
 use crate::appearance::{self, AppearanceMode};
 use crate::icons::{self, icon};
@@ -43,7 +43,7 @@ pub enum Step {
 }
 
 impl Step {
-    /// `ZERON_ONBOARDING` values: a step name, or anything else to start at
+    /// `ZEREN_ONBOARDING` values: a step name, or anything else to start at
     /// the beginning.
     pub fn parse(value: &str) -> Step {
         match value {
@@ -789,7 +789,7 @@ impl Onboarding {
             .items_center()
             .text_center()
             .child(
-                icon(icons::ZERON_LOGO)
+                icon(icons::ZEREN_LOGO)
                     .w(px(36.6))
                     .h(px(42.0))
                     .text_color(theme.text),
@@ -801,7 +801,7 @@ impl Onboarding {
                     .line_height(px(30.0))
                     .font_weight(gpui::FontWeight::SEMIBOLD)
                     .text_color(theme.text)
-                    .child(SharedString::from("Welcome to Zeron")),
+                    .child(SharedString::from("Welcome to Zeren")),
             )
             .child(
                 div()
@@ -859,8 +859,8 @@ impl Onboarding {
                 cx.notify();
             }))
         });
-        let mut accents = vec![zeron_theme::AccentSelection::ThemeDefault];
-        accents.extend(zeron_theme::AccentPreset::ALL.map(zeron_theme::AccentSelection::Preset));
+        let mut accents = vec![zeren_theme::AccentSelection::ThemeDefault];
+        accents.extend(zeren_theme::AccentPreset::ALL.map(zeren_theme::AccentSelection::Preset));
         let swatches = accents.into_iter().map(|selection| {
             crate::settings::appearance::accent_swatch(
                 theme,
@@ -1044,7 +1044,7 @@ impl Onboarding {
             .child(heading(
                 theme,
                 "Sync your work",
-                "Log in to keep your chats, projects and settings in step everywhere you use Zeron.",
+                "Log in to keep your chats, projects and settings in step everywhere you use Zeren.",
             ))
             .child(
                 widgets::section_card(theme)
@@ -1066,7 +1066,7 @@ impl Onboarding {
                         theme,
                         false,
                         icons::CLOUD,
-                        "Zeron Cloud",
+                        "Zeren Cloud",
                         "Hand chats to cloud machines that keep going while your computer sleeps.",
                     )),
             )
@@ -1129,7 +1129,7 @@ impl Onboarding {
             AgentsSummary::NoneInstalled => (
                 "Install an agent",
                 format!(
-                    "Zeron runs the coding agents you already use, and none are on {place} yet. Install one to continue."
+                    "Zeren runs the coding agents you already use, and none are on {place} yet. Install one to continue."
                 ),
             ),
             AgentsSummary::Installed(names) => (
@@ -1182,7 +1182,7 @@ impl Onboarding {
             .and_then(|page| page.read(cx).target_device().map(str::to_owned));
         match target {
             None => this_device().into(),
-            Some(id) if id == zeron_proto::CLOUD_ACCOUNTS_DEVICE => "Cloud".into(),
+            Some(id) if id == zeren_proto::CLOUD_ACCOUNTS_DEVICE => "Cloud".into(),
             Some(id) => self
                 .state
                 .read(cx)
@@ -1302,7 +1302,7 @@ impl Onboarding {
                     .map(|el| {
                         if has_projects {
                             el.child(
-                                wide_button(theme, "onboarding-finish", "Start using Zeron")
+                                wide_button(theme, "onboarding-finish", "Start using Zeren")
                                     .on_click(cx.listener(|this, _, _, cx| this.finish(false, cx))),
                             )
                         } else {
@@ -1395,7 +1395,7 @@ mod tests {
             id,
             name: name.into(),
             supports_steering: false,
-            steering_mode: zeron_proto::SteeringMode::TurnBoundary,
+            steering_mode: zeren_proto::SteeringMode::TurnBoundary,
             reasoning_levels: Vec::new(),
             installed,
             can_install: true,

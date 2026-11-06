@@ -26,7 +26,7 @@ local source = ui.state("files_source", "checkout")
 local active = ui.state("files_active", nil :: string?)
 local reveal = ui.state("files_reveal", nil :: string?)
 local doc = ui.state("files_doc", nil :: Doc?)
--- How wide the pane is, tree and file together (0: all there is): Zeron's
+-- How wide the pane is, tree and file together (0: all there is): Zeren's
 -- right pane at its narrowest and its default, where the tree can't sit
 -- beside the file and comes over it instead.
 local pane = ui.state("files_pane", 0)
@@ -373,7 +373,7 @@ return {
 			end, function(key: string): Node
 				local which = string.match(key, "^[^|]*") or "checkout"
 				local m = if which == "large" then large() else checkout
-				-- The pane, in a frame: Zeron's right pane at its narrowest
+				-- The pane, in a frame: Zeren's right pane at its narrowest
 				-- and its default, or all there is.
 				return FilesPane {
 					id = "files-pane",
@@ -392,7 +392,7 @@ return {
 					h_full = true,
 					rounded = "$radius.xl",
 					-- The bars' buttons sit in the card's corners: concentric.
-					theme = { zeron = { icon_button = { radius = control.nest("$radius.xl", 1, 6) } } },
+					theme = { zeren = { icon_button = { radius = control.nest("$radius.xl", 1, 6) } } },
 					border = 1,
 					border_color = "$border.subtle",
 					bg = "$surface.base",

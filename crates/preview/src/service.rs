@@ -162,8 +162,8 @@ fn candidates(
         listeners
             .into_iter()
             .filter(|l| {
-                l.zeron_owned
-                    && l.address.port() != zeron_proto::PREVIEW_PROXY_PORT
+                l.zeren_owned
+                    && l.address.port() != zeren_proto::PREVIEW_PROXY_PORT
                     && !reserved_ports.contains(&l.address.port())
                     && l.pid != std::process::id()
                     && !l.is_authentication_command()
@@ -334,7 +334,7 @@ impl PreviewService {
                     Err(error) => {
                         tracing::warn!(%error, "local previews could not start; retrying");
                         proxy_catalog.set_proxy_status(
-                            zeron_proto::PREVIEW_PROXY_PORT,
+                            zeren_proto::PREVIEW_PROXY_PORT,
                             Some(format!("Local previews could not start: {error}")),
                         )
                     }
@@ -471,7 +471,7 @@ impl Connector for LocalConnector {
 
 
 /// The local preview proxy, listening: on its usual port, or, with that
-/// taken (another Zeron engine on this computer has it: the app's and a
+/// taken (another Zeren engine on this computer has it: the app's and a
 /// development one, say), on one the system picks. Every preview address is
 /// built from the port it got (`PreviewSnapshot::proxy_port`), so nothing
 /// that opens a preview depends on which.
@@ -479,10 +479,10 @@ async fn serve_proxy(
     router: proxy::Router,
     stop: &CancellationToken,
 ) -> anyhow::Result<(u16, Vec<tokio::task::JoinHandle<()>>)> {
-    match proxy::serve(router.clone(), zeron_proto::PREVIEW_PROXY_PORT, stop.child_token()).await {
+    match proxy::serve(router.clone(), zeren_proto::PREVIEW_PROXY_PORT, stop.child_token()).await {
         Err(error) if address_in_use(&error) => {
             tracing::info!(
-                port = zeron_proto::PREVIEW_PROXY_PORT,
+                port = zeren_proto::PREVIEW_PROXY_PORT,
                 "the preview proxy's port is taken; listening on another"
             );
             proxy::serve(router, 0, stop.child_token()).await
@@ -508,7 +508,7 @@ mod tests {
             args: vec!["node".into()],
             started_at: 1_000,
             address: ([127, 0, 0, 1], port).into(),
-            zeron_owned: true,
+            zeren_owned: true,
             origin: Some("chat:chat".into()),
             chat_id: Some("chat".into()),
             signing_in: false,

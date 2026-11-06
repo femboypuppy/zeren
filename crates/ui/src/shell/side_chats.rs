@@ -24,7 +24,7 @@ pub(super) struct PendingFork {
 
 /// The row of a chat about to exist under `parent_id`, on `from`'s device
 /// with its checkout and configuration.
-fn draft_child_row(from: &zeron_proto::Chat, parent_id: String) -> zeron_proto::Chat {
+fn draft_child_row(from: &zeren_proto::Chat, parent_id: String) -> zeren_proto::Chat {
     let mut chat = from.clone();
     chat.id = uuid::Uuid::new_v4().to_string();
     chat.parent_chat_id = Some(parent_id);
@@ -84,7 +84,7 @@ impl Shell {
     /// the tab says what it waits on — or, failing, why, with a retry.
     pub(super) fn fork_chat(
         &mut self,
-        source: zeron_proto::Chat,
+        source: zeren_proto::Chat,
         parent_id: String,
         cx: &mut Context<Self>,
     ) {
@@ -138,7 +138,7 @@ impl Shell {
         cx.spawn(async move |this, cx| {
             let result = engine
                 .client()
-                .call_as::<zeron_proto::Chat>(methods::FORK_SIDE_CHAT, params)
+                .call_as::<zeren_proto::Chat>(methods::FORK_SIDE_CHAT, params)
                 .await;
             let _ = this.update(cx, |this, cx| {
                 match (result, this.side_chats.get_mut(&id)) {
@@ -167,7 +167,7 @@ impl Shell {
     }
 
     /// The host made the fork: its tab becomes the side chat, in place.
-    fn finish_fork(&mut self, id: u64, chat: zeron_proto::Chat, cx: &mut Context<Self>) {
+    fn finish_fork(&mut self, id: u64, chat: zeren_proto::Chat, cx: &mut Context<Self>) {
         let parent_listed = self
             .state
             .read(cx)
@@ -188,7 +188,7 @@ impl Shell {
     /// A fresh, empty side chat under `parent_id` (the active chat when
     /// None), opened in the right pane ready for its first message. Nothing
     /// is written until that message: the first send mints it with the same
-    /// shape the Zeron MCP server's `create_chat` does, so agent-spawned and
+    /// shape the Zeren MCP server's `create_chat` does, so agent-spawned and
     /// hand-started side chats list together, and an abandoned one leaves
     /// no row behind.
     pub(super) fn create_child_chat(&mut self, parent_id: Option<String>, cx: &mut Context<Self>) {
@@ -240,7 +240,7 @@ impl Shell {
 
     pub(super) fn open_side_chat(
         &mut self,
-        chat: zeron_proto::Chat,
+        chat: zeren_proto::Chat,
         key: String,
         cx: &mut Context<Self>,
     ) {
@@ -251,7 +251,7 @@ impl Shell {
     /// Returns the tab, reused when one already shows `chat`.
     fn open_side_chat_tab(
         &mut self,
-        chat: zeron_proto::Chat,
+        chat: zeren_proto::Chat,
         key: String,
         unsaved: bool,
         cx: &mut Context<Self>,
@@ -301,7 +301,7 @@ impl Shell {
     /// A side chat's own state, transcript and composer over `chat`.
     fn new_side_chat_tab(
         &mut self,
-        chat: zeron_proto::Chat,
+        chat: zeren_proto::Chat,
         unsaved: bool,
         cx: &mut Context<Self>,
     ) -> SideChatTab {
@@ -562,7 +562,7 @@ mod tests {
                     edge_token: None,
                     org_id: None,
                     workos_client_id: None,
-                    default_harness: zeron_proto::HarnessId::Mock,
+                    default_harness: zeren_proto::HarnessId::Mock,
                 },
                 cx,
             )
@@ -616,7 +616,7 @@ mod tests {
                     edge_token: None,
                     org_id: None,
                     workos_client_id: None,
-                    default_harness: zeron_proto::HarnessId::Mock,
+                    default_harness: zeren_proto::HarnessId::Mock,
                 },
                 cx,
             )
@@ -678,7 +678,7 @@ mod tests {
         window
             .update(cx, |shell, window, cx| {
                 shell.active_chat = "main".into();
-                let main: zeron_proto::Chat = serde_json::from_value(serde_json::json!({
+                let main: zeren_proto::Chat = serde_json::from_value(serde_json::json!({
                     "id": "main", "deviceId": "local", "cwd": "/tmp/main",
                     "archived": false, "createdAt": Utc::now(),
                 }))
@@ -695,7 +695,7 @@ mod tests {
                 let chat_id = side.read(cx).selected_chat.clone().unwrap();
                 assert!(side.read(cx).side_chat_unsaved());
                 // A model picked before the first send is what gets minted.
-                let config: zeron_proto::ChatConfig = serde_json::from_value(serde_json::json!({
+                let config: zeren_proto::ChatConfig = serde_json::from_value(serde_json::json!({
                     "harness": "codex", "sandbox": "workspace-write",
                 }))
                 .unwrap();
@@ -708,7 +708,7 @@ mod tests {
                 assert_eq!(create["cwd"], "/tmp/main");
                 assert_eq!(create["config"]["harness"], "codex");
                 let row = side.read(cx).selected_chat_row().cloned().unwrap();
-                assert_eq!(row.config.unwrap().harness, zeron_proto::HarnessId::Codex);
+                assert_eq!(row.config.unwrap().harness, zeren_proto::HarnessId::Codex);
                 assert_eq!(shell.state.read(cx).chats.len(), 1, "no row yet");
                 // A draft cannot keep it: no row could reopen it.
                 let composer = shell.side_chats[&id].composer.clone();
@@ -742,7 +742,7 @@ mod tests {
                 );
             })
             .unwrap();
-        let chat: zeron_proto::Chat = serde_json::from_value(serde_json::json!({
+        let chat: zeren_proto::Chat = serde_json::from_value(serde_json::json!({
             "id": "side", "parentChatId": "main", "deviceId": "local", "cwd": "/tmp/other",
             "archived": false, "createdAt": Utc::now(),
         }))
@@ -750,7 +750,7 @@ mod tests {
         window
             .update(cx, |shell, _, cx| {
                 shell.active_chat = "main".into();
-                let main: zeron_proto::Chat = serde_json::from_value(serde_json::json!({
+                let main: zeren_proto::Chat = serde_json::from_value(serde_json::json!({
                     "id": "main", "deviceId": "local", "cwd": "/tmp/main",
                     "archived": false, "createdAt": Utc::now(),
                 }))
@@ -901,20 +901,20 @@ mod tests {
         let (replies, inbound) = tokio::sync::mpsc::channel(256);
         let engine = {
             let _guard = runtime.enter();
-            crate::state::EngineHandle::from_test_client(zeron_rpc::RpcClient::new(out, inbound))
+            crate::state::EngineHandle::from_test_client(zeren_rpc::RpcClient::new(out, inbound))
         };
         let window = shell_window(dir, cx);
         window
             .update(cx, |shell, _, cx| {
                 shell.active_chat = "main".into();
-                let main: zeron_proto::Chat = serde_json::from_value(serde_json::json!({
+                let main: zeren_proto::Chat = serde_json::from_value(serde_json::json!({
                     "id": "main", "deviceId": "omarchy", "cwd": "/srv/main",
                     "archived": false, "createdAt": Utc::now(),
                 }))
                 .unwrap();
                 shell.state.update(cx, |state, _| {
                     state.local_device_id = Some("local".into());
-                    state.devices = vec![zeron_proto::Device {
+                    state.devices = vec![zeren_proto::Device {
                         id: "omarchy".into(),
                         name: "omarchy".into(),
                         platform: "linux".into(),
@@ -1144,7 +1144,7 @@ mod tests {
         let request = engine.fork_request(cx).expect("fork sent");
         window
             .update(cx, |shell, _, cx| {
-                let row: zeron_proto::Chat = serde_json::from_value(serde_json::json!({
+                let row: zeren_proto::Chat = serde_json::from_value(serde_json::json!({
                     "id": fork_id, "parentChatId": "main", "deviceId": "omarchy",
                     "cwd": "/srv/main", "archived": false, "createdAt": Utc::now(),
                 }))

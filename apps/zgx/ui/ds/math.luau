@@ -108,7 +108,7 @@ function M.Math(props: Props): Node?
 		local now = M.lay_out(tex, display)
 		return if now and now.error == nil then now else first
 	end)
-	local text = props.size or (ui.theme.get("zeron.prose.size") :: number?) or 15
+	local text = props.size or (ui.theme.get("zeren.prose.size") :: number?) or 15
 	local function scale(): number
 		return text * M.size:get() / 100
 	end

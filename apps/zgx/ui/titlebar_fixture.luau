@@ -51,7 +51,7 @@ return ui.column {
 			actions = ui.row {
 				id = "titlebar-actions",
 				items = "center",
-				gap = "$zeron.island.gap",
+				gap = "$zeren.island.gap",
 				ui.show(holds, ds.Button { tone = "ghost", size = "sm", "Focus" }),
 			},
 			actions_island = function(): boolean

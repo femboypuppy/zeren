@@ -41,7 +41,7 @@ export type Props = {
 	grow: number?,
 }
 
--- Padding above and below the text inside the frame (zeron.space.tight,
+-- Padding above and below the text inside the frame (zeren.space.tight,
 -- in points for the height's sum).
 local PAD_Y = 6
 
@@ -56,7 +56,7 @@ return ui.component(function(props: Props): Node
 	local hovered = ui.use_state(false)
 	local measure = ui.ref()
 	local input_ref = ui.ref()
-	local line = ui.theme.get("zeron.field.line") :: number? or 20
+	local line = ui.theme.get("zeren.field.line") :: number? or 20
 	local rows, max_rows = props.rows or 3, props.max_rows or 10
 	local font = if props.mono then "$font.mono" else nil
 
@@ -157,7 +157,7 @@ return ui.component(function(props: Props): Node
 		hovered = hovered,
 		error = props.error,
 		h = ui.tween(height, { duration = 160, ease = "out(3)" }),
-		py = "$zeron.space.tight",
+		py = "$zeren.space.tight",
 		items = "stretch",
 		relative = true,
 		overflow = "hidden",

@@ -1,4 +1,4 @@
-// Zeron element picker. Injected only while the user annotates; the host
+// Zeren element picker. Injected only while the user annotates; the host
 // polls `take(nonce)` for picks. The overlay lives in closed shadow roots with
 // pointer-events disabled, so page styles and hit testing stay untouched.
 //
@@ -7,7 +7,7 @@
 // input picks, and secrets the page shows in attributes or the URL are
 // scrubbed before they leave.
 (() => {
-  if (window.__zeronAnnotator) return;
+  if (window.__zerenAnnotator) return;
   const MAX_HTML = 2000, MAX_ATTRS = 12, MAX_VALUE = 120, MAX_TEXT = 200;
   const VOID = new Set(['area','base','br','col','embed','hr','img','input','link','meta','source','track','wbr']);
   const SECRET = /pass|secret|token|api[-_]?key|auth|session|csrf|nonce|signature|credential/i;
@@ -155,7 +155,7 @@
     };
   };
 
-  // Shared look: Zeron's palette and UI font, handed over by the host.
+  // Shared look: Zeren's palette and UI font, handed over by the host.
   const vars = () => {
     const t = theme, on = contrast(t.accent || '#7c6cf2');
     return `:host{all:initial;--accent:${t.accent};--on-accent:${on};--surface:${t.surface};--border:${t.border};` +
@@ -222,7 +222,7 @@
 
   const mount = () => {
     let root;
-    [host, root] = shadowHost('zeron-annotator', 2147483647, `
+    [host, root] = shadowHost('zeren-annotator', 2147483647, `
       .box{position:fixed;display:none;border:${BORDER}px solid var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent);
         transition:left 80ms ease-out,top 80ms ease-out,width 80ms ease-out,height 80ms ease-out,border-radius 80ms ease-out}
       ${FLAG_CSS}
@@ -243,7 +243,7 @@
     ui = { box: root.querySelector('.box'), flag: root.querySelector('.flag'), hint: root.querySelector('.hint'), title: root.querySelector('.title') };
     requestAnimationFrame(() => ui && ui.hint.classList.remove('enter'));
     const cursor = document.createElement('style');
-    cursor.id = 'zeron-annotator-cursor';
+    cursor.id = 'zeren-annotator-cursor';
     cursor.textContent = '*{cursor:crosshair!important}';
     document.documentElement.appendChild(cursor);
   };
@@ -305,7 +305,7 @@
   const watchMarks = (on) => {
     if (on && !layer) {
       let root;
-      [layer, root] = shadowHost('zeron-annotations', 2147483646, `
+      [layer, root] = shadowHost('zeren-annotations', 2147483646, `
         .mark{position:fixed;display:none;border:${BORDER}px solid var(--accent);background:color-mix(in srgb,var(--accent) 4%,transparent);
           transition:background-color 120ms ease-out}
         .mark.focus{background:color-mix(in srgb,var(--accent) 16%,transparent)}
@@ -372,7 +372,7 @@
     for (const [type, fn] of LISTEN) window.removeEventListener(type, fn, true);
     if (frame) cancelAnimationFrame(frame);
     host?.remove();
-    document.getElementById('zeron-annotator-cursor')?.remove();
+    document.getElementById('zeren-annotator-cursor')?.remove();
     host = ui = target = null;
   };
   const api = {
@@ -409,5 +409,5 @@
     },
   };
   // Fixed once defined, so a page cannot swap the picker out mid-session.
-  Object.defineProperty(window, '__zeronAnnotator', { value: Object.freeze(api), configurable: false, writable: false });
+  Object.defineProperty(window, '__zerenAnnotator', { value: Object.freeze(api), configurable: false, writable: false });
 })();

@@ -1,8 +1,8 @@
-//! Terminals on other devices: the hub lives in `zeron-term-link` (the
+//! Terminals on other devices: the hub lives in `zeren-term-link` (the
 //! phone runs the same one); this engine supplies its relay and its direct
 //! peers.
 
-pub use zeron_term_link::remote::*;
+pub use zeren_term_link::remote::*;
 
 #[cfg(all(test, unix))]
 mod tests {
@@ -13,14 +13,14 @@ mod tests {
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::{Arc, Mutex};
     use std::time::Duration;
-    use zeron_term_link::remote::TerminalPath;
+    use zeren_term_link::remote::TerminalPath;
 
     use async_trait::async_trait;
     use futures::StreamExt;
     use futures::stream::BoxStream;
-    use zeron_preview::mux::BoxIo;
-    use zeron_proto::TerminalEvent;
-    use zeron_rpc::{RpcError, methods};
+    use zeren_preview::mux::BoxIo;
+    use zeren_proto::TerminalEvent;
+    use zeren_rpc::{RpcError, methods};
 
     use crate::terminals::Terminals;
     use crate::terminals::link;
@@ -335,14 +335,14 @@ mod tests {
     /// The phone's side of a real WebRTC pair: a viewer's peers that serve
     /// nothing, whose network can be "changed" (every connection dropped).
     struct PeerDirect {
-        peers: zeron_preview::peer::Peers,
+        peers: zeren_preview::peer::Peers,
         changes: tokio::sync::watch::Sender<u64>,
     }
 
     struct Refuse;
 
     #[async_trait]
-    impl zeron_preview::mux::Connector for Refuse {
+    impl zeren_preview::mux::Connector for Refuse {
         async fn connect(&self, _service: &str) -> anyhow::Result<BoxIo> {
             anyhow::bail!("viewers serve nothing")
         }
@@ -371,13 +371,13 @@ mod tests {
     async fn a_terminal_rides_a_real_webrtc_pair_through_a_network_change() {
         let host = Host::new();
         let stop = tokio_util::sync::CancellationToken::new();
-        let (mut host_peers, mut host_out) = zeron_preview::peer::Peers::new(
+        let (mut host_peers, mut host_out) = zeren_preview::peer::Peers::new(
             "host".into(),
             Arc::new(link::Service::new(host.terminals.clone())),
             stop.clone(),
         );
         let (mut phone_peers, mut phone_out) =
-            zeron_preview::peer::Peers::new("phone".into(), Arc::new(Refuse), stop.clone());
+            zeren_preview::peer::Peers::new("phone".into(), Arc::new(Refuse), stop.clone());
         host_peers.set_ice_servers(Vec::new()).unwrap();
         phone_peers.set_ice_servers(Vec::new()).unwrap();
         host_peers
@@ -489,13 +489,13 @@ mod tests {
     async fn bench_keystroke_echo() {
         let host = Host::new();
         let stop = tokio_util::sync::CancellationToken::new();
-        let (mut host_peers, mut host_out) = zeron_preview::peer::Peers::new(
+        let (mut host_peers, mut host_out) = zeren_preview::peer::Peers::new(
             "host".into(),
             Arc::new(link::Service::new(host.terminals.clone())),
             stop.clone(),
         );
         let (mut phone_peers, mut phone_out) =
-            zeron_preview::peer::Peers::new("phone".into(), Arc::new(Refuse), stop.clone());
+            zeren_preview::peer::Peers::new("phone".into(), Arc::new(Refuse), stop.clone());
         for peers in [&mut host_peers, &mut phone_peers] {
             peers.set_ice_servers(Vec::new()).unwrap();
             peers.set_udp_addrs(vec!["127.0.0.1:0".into()]).unwrap();

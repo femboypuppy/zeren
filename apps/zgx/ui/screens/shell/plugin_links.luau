@@ -1,6 +1,6 @@
 -- A web link a built-in plugin can show itself: a pull request's, in the GitHub
 -- plugin's tab beside the chat, while that plugin is on and its "Open pull request
--- links in Zeron" setting is. Anything else goes where links go.
+-- links in Zeren" setting is. Anything else goes where links go.
 --
 --   plugin_links.take(session, url)   true when a plugin's tab took it
 

@@ -1,10 +1,10 @@
 --!strict
--- Settings → Themes: every theme Zeron can wear, laid out as Plugins and
+-- Settings → Themes: every theme Zeren can wear, laid out as Plugins and
 -- Templates are (ds.Settings.Catalog): the same search, tabs, card of rows
 -- and empty states. A theme is only colours, so it's worn with whichever
 -- template runs, and it needs no allowing: it's data (src/themes.rs).
 --
--- Its tabs: all of them; Zeron's built in; those templates bring (a
+-- Its tabs: all of them; Zeren's built in; those templates bring (a
 -- template's own colours, worn where you haven't chosen a theme); and
 -- yours, imported from VS Code (a theme's .json, or an extension's folder,
 -- by Import theme or dropped on the page).
@@ -55,7 +55,7 @@ local function about(e: state.Entry): string
 	if e.status and e.status.ok == false then
 		return e.status.message or ui.t("themes.page.needs_fixing"):get()
 	end
-	if e.id == "zeron" then
+	if e.id == "zeren" then
 		return ui.t("themes.page.about.default"):get()
 	end
 	local light, dark = state.has(e, "light") ~= nil, state.has(e, "dark") ~= nil
@@ -249,7 +249,7 @@ local function controls(e: state.Entry, now: State<any>): Node
 	end
 	local more: Node
 	if #groups == 0 then
-		more = ui.div { w = "$zeron.icon_button.sm", h = "$zeron.icon_button.sm", shrink = 0 }
+		more = ui.div { w = "$zeren.icon_button.sm", h = "$zeren.icon_button.sm", shrink = 0 }
 	else
 		local anchor = ds.IconButton {
 			icon = "more-horizontal",
@@ -330,7 +330,7 @@ local function row(e: state.Entry, _i: number, now: State<any>): Node
 	}
 end
 
--- What a tab with nothing in it says (All and Built in always hold Zeron's).
+-- What a tab with nothing in it says (All and Built in always hold Zeren's).
 local function none(which: string): Node
 	if which == "templates" then
 		return ds.EmptyState {

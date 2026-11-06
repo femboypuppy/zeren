@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Build this checkout's `zeron` for Linux x86_64 (what Boat sandboxes run) in
+# Build this checkout's `zeren` for Linux x86_64 (what Boat sandboxes run) in
 # a Docker container, and package it as the tarball the Cloud install script
-# downloads: target/package-dev/zeron-<version>-linux-x86_64.tar.gz, plus
+# downloads: target/package-dev/zeren-<version>-linux-x86_64.tar.gz, plus
 # target/package-dev/latest.txt naming that version.
 #
 # For trying unreleased engine changes on real Cloud machines
@@ -13,7 +13,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-IMAGE="zeron-linux-dev-build:1"
+IMAGE="zeren-linux-dev-build:1"
 OUT="$ROOT/target/package-dev"
 BASE="$(grep -m1 '^version' "$ROOT/Cargo.toml" | sed 's/.*"\(.*\)".*/\1/')"
 VERSION="$BASE-dev.$(date +%Y%m%d%H%M%S)"
@@ -37,26 +37,26 @@ RUN curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --default-to
 DOCKERFILE
 fi
 
-echo "building zeron $VERSION for linux-x86_64"
+echo "building zeren $VERSION for linux-x86_64"
 # RUSTUP_TOOLCHAIN: the image's own stable, not rust-toolchain.toml — its
 # rustfmt/clippy components (unneeded for a build) make rustup update the
 # toolchain in place, which fails on the image's overlay filesystem.
 docker run --rm --platform linux/amd64 \
   -v "$ROOT:/src" \
-  -v zeron-linux-dev-target:/target \
-  -v zeron-linux-dev-registry:/opt/cargo/registry \
-  -v zeron-linux-dev-git:/opt/cargo/git \
+  -v zeren-linux-dev-target:/target \
+  -v zeren-linux-dev-registry:/opt/cargo/registry \
+  -v zeren-linux-dev-git:/opt/cargo/git \
   -e CARGO_TARGET_DIR=/target \
   -e CARGO_PROFILE_RELEASE_LTO=off \
   -e RUSTUP_TOOLCHAIN=stable \
   -w /src "$IMAGE" \
-  sh -c "cargo build --release -p zeron && cp /target/release/zeron /src/target/package-dev/zeron.linux-x86_64 && cp /target/release/zeron-engine /src/target/package-dev/zeron-engine.linux-x86_64"
+  sh -c "cargo build --release -p zeren && cp /target/release/zeren /src/target/package-dev/zeren.linux-x86_64 && cp /target/release/zeren-engine /src/target/package-dev/zeren-engine.linux-x86_64"
 
-STAGE="$OUT/zeron-$VERSION-linux-x86_64"
+STAGE="$OUT/zeren-$VERSION-linux-x86_64"
 rm -rf "$STAGE"
 mkdir -p "$STAGE"
-mv "$OUT/zeron.linux-x86_64" "$STAGE/zeron"
-mv "$OUT/zeron-engine.linux-x86_64" "$STAGE/zeron-engine"
+mv "$OUT/zeren.linux-x86_64" "$STAGE/zeren"
+mv "$OUT/zeren-engine.linux-x86_64" "$STAGE/zeren-engine"
 tar -czf "$STAGE.tar.gz" -C "$OUT" "$(basename "$STAGE")"
 rm -rf "$STAGE"
 echo "$VERSION" > "$OUT/latest.txt"

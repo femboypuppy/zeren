@@ -1,10 +1,10 @@
-//! The themes Zeron's window can wear, and the one chosen for each scheme,
+//! The themes Zeren's window can wear, and the one chosen for each scheme,
 //! as both the window (apps/zgx/src/themes.rs) and the engine's theme tools
 //! (crates/engine/src/plugins/themes.rs) read and write them. A theme is
 //! data: a palette for light, for dark or both. It never carries code.
 //!
 //! Three kinds are listed:
-//! - Zeron's built-in themes (`builtin_registry`): each family's first light
+//! - Zeren's built-in themes (`builtin_registry`): each family's first light
 //!   and first dark together, any other variant on its own;
 //! - a template's own `theme.luau`, read as data ([`crate::luau_data`]);
 //! - yours, in `<data>/theme-library.json`: VS Code themes imported, and
@@ -12,7 +12,7 @@
 //!
 //! What's chosen is one theme for light and one for dark, in
 //! `<data>/theme-choice.json`. A slot with nothing chosen wears the running
-//! template's own theme, else Zeron's.
+//! template's own theme, else Zeren's.
 //!
 //! A [`Palette`] is the shape the window's mapping (`ds/palettes`) wears, and
 //! the shape the tools take: surfaces, inks, accent and tones, code colours
@@ -298,8 +298,8 @@ impl Palette {
                 ansi,
             },
             source: ThemeSource {
-                format: "zeron-palette".into(),
-                url: "zeron:palette".into(),
+                format: "zeren-palette".into(),
+                url: "zeren:palette".into(),
                 revision: "1".into(),
                 license: "Yours".into(),
                 asset_hash: format!("sha256:{:x}", Sha256::digest(encoded.as_bytes())),
@@ -431,12 +431,12 @@ pub fn legibility(palette: &Palette, scheme: &str) -> Vec<Fix> {
     const FIRST: [&str; 11] = ["comment", "keyword", "string", "number", "type", "function", "property", "variable", "punctuation", "tag", "attribute"];
     for (i, name) in FIRST.iter().enumerate() {
         let min = if i == 0 || i == 8 { 3.0 } else { 4.5 };
-        fix(&format!("zeron.syntax.{name}"), &hex(palette.syntax[i]), &code, min);
+        fix(&format!("zeren.syntax.{name}"), &hex(palette.syntax[i]), &code, min);
     }
     if let Some(ansi) = ansi {
         for (name, i) in [("teal", 7), ("amber", 4), ("rose", 2), ("violet", 6), ("lime", 3), ("sky", 5)] {
             let c = ansi[if dark { i + 8 } else { i } - 1];
-            fix(&format!("zeron.visual.series.{name}"), &hex(c), &window, 3.0);
+            fix(&format!("zeren.visual.series.{name}"), &hex(c), &window, 3.0);
         }
         // The terminal's sixteen, on the window's surfaces as its inks: 3:1
         // the two that are the background's own shade (black and bright
@@ -466,7 +466,7 @@ impl Builtin {
     }
 }
 
-/// Every built-in theme, in the shipping app's order (Zeron's first): each
+/// Every built-in theme, in the shipping app's order (Zeren's first): each
 /// family's first light and first dark as one theme under the family's name,
 /// and each variant after those as a theme of its own, under its own name.
 pub fn builtin() -> Vec<Builtin> {
@@ -513,7 +513,7 @@ fn template_variant(template: &str, scheme: &str) -> String {
 }
 
 /// Each template's own theme in `templates` (`<data>/templates`): every
-/// folder of one (not Zeron's own, `.zeron`, nor any hidden one) with a
+/// folder of one (not Zeren's own, `.zeren`, nor any hidden one) with a
 /// manifest, its `theme.luau` read as data. One without a theme is listed
 /// with a null `file`.
 pub fn template_themes(templates: &Path) -> Vec<TemplateTheme> {
@@ -525,7 +525,7 @@ pub fn template_themes(templates: &Path) -> Vec<TemplateTheme> {
             continue;
         }
         let dir = entry.path();
-        let manifest: Json = read_small(&dir.join("zeron-template.json")).and_then(|t| serde_json::from_str(&t).ok()).unwrap_or_default();
+        let manifest: Json = read_small(&dir.join("zeren-template.json")).and_then(|t| serde_json::from_str(&t).ok()).unwrap_or_default();
         if !manifest.is_object() {
             continue;
         }
@@ -544,7 +544,7 @@ pub fn running_template(templates: &Path) -> Option<String> {
     let id = id.trim();
     let ok = !id.is_empty()
         && id.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
-        && templates.join(id).join("zeron-template.json").is_file();
+        && templates.join(id).join("zeren-template.json").is_file();
     ok.then(|| id.to_string())
 }
 
@@ -582,7 +582,7 @@ fn template_theme(t: &TemplateTheme) -> Option<(Vec<Json>, Json)> {
 // ── The choice ──────────────────────────────────────────────────────────────
 
 /// The theme chosen for each scheme: a variant's id, or none (the running
-/// template's own theme for it, else Zeron's).
+/// template's own theme for it, else Zeren's).
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Choice {
     pub light: Option<String>,
@@ -739,7 +739,7 @@ fn source_said(source: &str) -> &'static str {
 }
 
 /// What each scheme wears now, by id: the theme chosen for it, else the
-/// running template's own, else Zeron's.
+/// running template's own, else Zeren's.
 fn worn(described: &Json, data_dir: &Path) -> BTreeMap<&'static str, (String, String)> {
     let entries = described["entries"].as_array().cloned().unwrap_or_default();
     let list = described["list"].as_array().cloned().unwrap_or_default();
@@ -752,8 +752,8 @@ fn worn(described: &Json, data_dir: &Path) -> BTreeMap<&'static str, (String, St
         let suggested = running.as_ref().and_then(|e| entries.iter().find(|x| x["id"] == e.as_str())).and_then(|e| {
             e["variants"].as_array()?.iter().filter_map(Json::as_str).find(|v| kind_of(v).as_deref() == Some(scheme)).map(str::to_string)
         });
-        let variant = chosen.or(suggested).unwrap_or_else(|| format!("zeron-{scheme}"));
-        let theme = entry_of(&variant).and_then(|e| e["id"].as_str()).unwrap_or("zeron").to_string();
+        let variant = chosen.or(suggested).unwrap_or_else(|| format!("zeren-{scheme}"));
+        let theme = entry_of(&variant).and_then(|e| e["id"].as_str()).unwrap_or("zeren").to_string();
         out.insert(scheme, (theme, variant));
     }
     out
@@ -1092,7 +1092,7 @@ pub fn update(data_dir: &Path, id: &str, name: Option<&str>, light: Option<&Json
     }
     // Names follow: one variant alone takes the theme's; two say which.
     let alone = entry.family.variants.len() == 1;
-    let made_here = |v: &ThemeVariant| v.source.format == "zeron-palette";
+    let made_here = |v: &ThemeVariant| v.source.format == "zeren-palette";
     for v in &mut entry.family.variants {
         let scheme = if v.appearance.is_dark() { "dark" } else { "light" };
         if alone || made_here(v) || v.name.is_empty() {
@@ -1286,7 +1286,7 @@ mod tests {
         let listed = list(dir);
         let ink = listed["themes"].as_array().unwrap().iter().find(|t| t["id"] == "custom-ink").unwrap();
         assert_eq!(ink["variants"], json!({ "light": "custom-ink-light", "dark": "custom-ink-dark" }));
-        assert_eq!(listed["wearing"]["dark"], json!({ "theme": "zeron", "variant": "zeron-dark" }));
+        assert_eq!(listed["wearing"]["dark"], json!({ "theme": "zeren", "variant": "zeren-dark" }));
         // Worn for dark; its colours changed: the same id, so it restyles.
         let used = use_theme(dir, "custom-ink", "dark").unwrap();
         assert_eq!(used["chosen"], json!({ "dark": "custom-ink-dark" }));
@@ -1318,7 +1318,7 @@ mod tests {
         // A template's own theme.
         let t = dir.join("templates/ledger");
         std::fs::create_dir_all(&t).unwrap();
-        std::fs::write(t.join("zeron-template.json"), r#"{"name":"Ledger"}"#).unwrap();
+        std::fs::write(t.join("zeren-template.json"), r#"{"name":"Ledger"}"#).unwrap();
         std::fs::write(t.join("theme.luau"), "return { name = \"Ledger Ink\", dark = { background = \"#2e3440\" } }").unwrap();
         std::fs::write(dir.join("templates/.active"), "ledger").unwrap();
         assert!(delete(dir, "template-ledger").unwrap_err().to_string().contains("template's own"));
@@ -1398,7 +1398,7 @@ mod tests {
     #[test]
     fn every_built_in_family_is_listed_light_and_dark_together_and_one_variant_alone() {
         let all = builtin();
-        assert_eq!(all[0].id, "zeron");
+        assert_eq!(all[0].id, "zeren");
         let ayu = find_builtin("ayu").unwrap();
         assert_eq!(ayu.variants.iter().map(|v| v.id.as_str()).collect::<Vec<_>>(), ["ayu-light", "ayu-dark"]);
         assert_eq!(find_builtin("ayu-mirage").unwrap().variants.len(), 1);

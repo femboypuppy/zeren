@@ -7,8 +7,8 @@
 //! height and its painted content can never disagree.
 
 use std::sync::Arc;
-use zeron_markdown::parser::{Block, InlineRun, InlineStyle, TableAlign};
-use zeron_text::{InlineBox, OverflowWrap, PrepareOptions, Prepared, Span, WhiteSpace, WidthCache, line_growth};
+use zeren_markdown::parser::{Block, InlineRun, InlineStyle, TableAlign};
+use zeren_text::{InlineBox, OverflowWrap, PrepareOptions, Prepared, Span, WhiteSpace, WidthCache, line_growth};
 
 use super::display::{ColorRole, Decoration, DisplayBuilder, TextRun, WidgetKind};
 use super::style::{Family, Resolved, TYPE, Typography, Weight, baseline};
@@ -439,7 +439,7 @@ pub(crate) fn prepare_runs(ctx: &mut Ctx, runs: &[InlineRun], kind: TextKind, mu
             chip,
         });
     }
-    let p = zeron_text::prepare(
+    let p = zeren_text::prepare(
         &ctx.typo.book,
         ctx.cache,
         &text,
@@ -480,7 +480,7 @@ pub(crate) fn prepare_plain(
         atomic: false,
         inline_box: None,
     }];
-    let p = zeron_text::prepare(
+    let p = zeren_text::prepare(
         &ctx.typo.book,
         ctx.cache,
         text,
@@ -643,8 +643,8 @@ fn prepare_table(
     (PTable { cells, align: align.to_vec(), cols }, width * height)
 }
 
-fn syntax_color(kind: zeron_syntax::HighlightKind) -> ColorRole {
-    use zeron_syntax::HighlightKind as K;
+fn syntax_color(kind: zeren_syntax::HighlightKind) -> ColorRole {
+    use zeren_syntax::HighlightKind as K;
     match kind {
         K::Comment => ColorRole::SyntaxComment,
         K::Keyword => ColorRole::SyntaxKeyword,
@@ -670,7 +670,7 @@ fn highlight_cover(source: &str, language: Option<&str>) -> Vec<(std::ops::Range
     let mut cursor = 0usize;
     let doc = (source.len() <= 64 * 1024)
         .then(|| {
-            zeron_syntax::highlight(zeron_syntax::HighlightRequest {
+            zeren_syntax::highlight(zeren_syntax::HighlightRequest {
                 source,
                 path: None,
                 fence_tag: language,
@@ -720,7 +720,7 @@ fn prepare_code(ctx: &mut Ctx, language: Option<&str>, code: &str) -> PCode {
             inline_box: None,
         })
         .collect();
-    let p = zeron_text::prepare(
+    let p = zeren_text::prepare(
         &ctx.typo.book,
         ctx.cache,
         source,
@@ -1012,7 +1012,7 @@ fn first_line_above(blocks: &[PBlock], width: f32) -> f32 {
     if !t.p.has_inline_boxes() {
         return 0.0;
     }
-    let first = t.p.layout_next_line(zeron_text::Cursor::START, width);
+    let first = t.p.layout_next_line(zeren_text::Cursor::START, width);
     line_growth(first.and_then(|l| t.p.line_range_box_extents(&l)), t.lh, t.base).0
 }
 

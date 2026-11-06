@@ -218,7 +218,7 @@ function M.Note(props: NoteProps): Node
 		ui.text { props.from, literal = true, text_size = "$font.size.md", weight = "$font.weight.medium", color = "$text.primary" },
 		ui.column {
 			w_full = true,
-			theme = { zeron = { prose = { size = "{zeron.prose.small.size}", line = "{zeron.prose.small.line}" } } },
+			theme = { zeren = { prose = { size = "{zeren.prose.small.size}", line = "{zeren.prose.small.line}" } } },
 			Markdown { text = props.body },
 		},
 		if props.actions and #props.actions > 0 then ui.row(actions) else nil,

@@ -16,7 +16,7 @@ use std::collections::HashMap;
 use std::net::IpAddr;
 use std::sync::{Arc, RwLock};
 
-use zeron_plugin_guard::net::Policy;
+use zeren_plugin_guard::net::Policy;
 use zgx_script::{FetchPolicy, Url};
 
 /// Each loaded plugin's rules, by id. Its requests run off the window's

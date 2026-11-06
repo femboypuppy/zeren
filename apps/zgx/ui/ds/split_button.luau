@@ -39,11 +39,11 @@ export type Props = {
 local RADIUS: { [Button.Size]: string } = { xs = "$radius.lg", sm = "$radius.md", md = "$radius.lg", lg = "$radius.lg" }
 local SQUARE: { [Button.Size]: number } = { xs = 24, sm = 28, md = 32, lg = 40 }
 local FILL: { [Button.Tone]: string } = {
-	primary = "$zeron.primary.bg",
-	secondary = "$zeron.secondary.bg",
+	primary = "$zeren.primary.bg",
+	secondary = "$zeren.secondary.bg",
 	ghost = "#00000000",
 	accent = "$accent",
-	danger = "$zeron.destructive.bg",
+	danger = "$zeren.destructive.bg",
 }
 
 return ui.component(function(props: Props): Node
@@ -55,7 +55,7 @@ return ui.component(function(props: Props): Node
 		return if type(d) == "function" then d() else d == true
 	end
 	-- Inside the halves: the row round them clips anything outside.
-	local ring: Styles = { outline = "$zeron.focus.width", outline_color = "$zeron.focus.ring", outline_offset = -2 }
+	local ring: Styles = { outline = "$zeren.focus.width", outline_color = "$zeren.focus.ring", outline_offset = -2 }
 	local face: Button.Props = {
 		tone = tone,
 		size = size,
@@ -102,7 +102,7 @@ return ui.component(function(props: Props): Node
 				then ui.column {
 					grow = 1,
 					min_w = 0,
-					gap = "$zeron.space.hair",
+					gap = "$zeren.space.hair",
 					FadeText { item.label, text_size = "$font.size.md", color = ink },
 					ui.text { item.description, text_size = "$font.size.sm", line_height = "$font.line.sm", color = "$text.tertiary", wrap = true },
 				}
@@ -135,7 +135,7 @@ return ui.component(function(props: Props): Node
 				top = 8,
 				bottom = 8,
 				w = 1,
-				bg = if tone == "primary" then "$zeron.primary.text" elseif tone == "accent" then "$accent.text" elseif tone == "danger" then "$zeron.destructive.text" else "$text.primary",
+				bg = if tone == "primary" then "$zeren.primary.text" elseif tone == "accent" then "$accent.text" elseif tone == "danger" then "$zeren.destructive.text" else "$text.primary",
 				opacity = 0.25,
 			},
 		},
@@ -144,7 +144,7 @@ return ui.component(function(props: Props): Node
 			anchor = chevron,
 			placement = { side = "bottom", align = "end", offset = 4 },
 			w = 248,
-			ui.column { w_full = true, p = "$space.1", gap = "$zeron.list.gap", table.unpack(rows) },
+			ui.column { w_full = true, p = "$space.1", gap = "$zeren.list.gap", table.unpack(rows) },
 		}),
 	}
 end)

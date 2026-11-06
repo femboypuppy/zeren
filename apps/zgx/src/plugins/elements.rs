@@ -1,4 +1,4 @@
-//! Where plugins can go: Zeron's named elements, each with what it is, where
+//! Where plugins can go: Zeren's named elements, each with what it is, where
 //! a person would say it is, and what it gives to what's built in it (its
 //! `provide`). A plugin places its nodes by selector (`#id`, `.class`, a
 //! role and a name), so this is the map agents write selectors from
@@ -23,7 +23,7 @@ const fn e(selector: &'static str, place: &'static str, about: &'static str, pro
     Element { selector, place, about, provides }
 }
 
-/// Zeron's named elements. Everything in the window also has `appearance`
+/// Zeren's named elements. Everything in the window also has `appearance`
 /// and `route` (`#shell`'s). What a place gives is an id or a plain value,
 /// never a record: a session's, a message's or a project's id, a file's or
 /// a block's token (`tokens`), each found in the plugin's records as far
@@ -41,8 +41,8 @@ pub const ELEMENTS: &[Element] = &[
     // (Not Settings: sealed, no plugin's to change or add to.)
     e("#chat-home", "a new chat", "A new chat, before it's sent: no session here.", &[]),
     // What a new chat opens on, when Settings → Appearance's Wallpaper names
-    // the plugin replacing it (`ui.change`): Zeron's effect is drawn over it.
-    e("#new-chat-background", "a new chat's background", "Behind a new chat, under Zeron's effect: replace it to draw the background. `pointer` is { x, y }, 0 to 1 (0.5 at rest).", &["pointer"]),
+    // the plugin replacing it (`ui.change`): Zeren's effect is drawn over it.
+    e("#new-chat-background", "a new chat's background", "Behind a new chat, under Zeren's effect: replace it to draw the background. `pointer` is { x, y }, 0 to 1 (0.5 at rest).", &["pointer"]),
     e("#chat-session", "a chat", "A session's page: everything in it has its session.", &["session"]),
     e("#session-header", "a chat's header", "A session page's header.", &[]),
     e("#transcript", "a chat", "A session's transcript.", &[]),
@@ -70,8 +70,8 @@ pub const ELEMENTS: &[Element] = &[
     e(".md-heading", "a reply's heading", "A heading in a reply.", &[]),
 ];
 
-/// The names Zeron and every template promise to keep: a plugin placed by
-/// one of these keeps working across Zeron's updates and templates. The rest
+/// The names Zeren and every template promise to keep: a plugin placed by
+/// one of these keeps working across Zeren's updates and templates. The rest
 /// may move.
 pub const STABLE: &[&str] = &[
     "#sidebar",
@@ -122,14 +122,14 @@ pub fn parts(selector: &str) -> (Option<String>, Vec<String>) {
     (id, classes)
 }
 
-/// Where `selector` is in words: its element's place, or "part of Zeron".
+/// Where `selector` is in words: its element's place, or "part of Zeren".
 pub fn place(selector: &str) -> &'static str {
     let last = selector.rsplit(">>").next().unwrap_or(selector).trim();
     ELEMENTS
         .iter()
         .find(|e| e.selector == last || last.starts_with(e.selector))
         .map(|e| e.place)
-        .unwrap_or("part of Zeron")
+        .unwrap_or("part of Zeren")
 }
 
 /// The ids and classes zgx's report of the window names (mounted now, or
@@ -208,10 +208,10 @@ pub fn describe(ids: &BTreeSet<String>, classes: &BTreeSet<String>, tree: serde_
         "elements": elements,
         "everywhere": ["appearance", "route"],
         "window": tree,
-        "stable": "Elements marked stable keep their names across Zeron's updates, and every template keeps them: place by these where you can. Others may move.",
-        "how": "Place a node by selector: zeron.place { at = \".session-row\", after = function() return ui.text { … } end }. \
+        "stable": "Elements marked stable keep their names across Zeren's updates, and every template keeps them: place by these where you can. Others may move.",
+        "how": "Place a node by selector: zeren.place { at = \".session-row\", after = function() return ui.text { … } end }. \
                 Selectors: #id, .class, `#a >> .b` (inside), role:button \"Send\". What's built at a place reads what it gives \
-                with zeron.context(name) (nil where absent) or zeron.need(name) (draws nothing there, and Settings says why). \
+                with zeren.context(name) (nil where absent) or zeren.need(name) (draws nothing there, and Settings says why). \
                 Records carry only what the plugin was allowed: sessions.read, messages.read, profile.read, account.email, files.read.",
     })
 }
@@ -237,7 +237,7 @@ mod tests {
     fn places_are_told_in_words() {
         assert_eq!(place("#titlebar-actions"), "the title bar");
         assert_eq!(place("#sidebar >> .session-row"), "a sidebar row");
-        assert_eq!(place("#nowhere"), "part of Zeron");
+        assert_eq!(place("#nowhere"), "part of Zeren");
         assert_eq!(place("#transcript >> .md-code.lang-mermaid"), "a reply's code block");
     }
 

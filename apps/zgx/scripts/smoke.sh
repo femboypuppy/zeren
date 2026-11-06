@@ -3,16 +3,16 @@
 # against an engine of its own (port 27898, its own data and home) whose
 # agent is a fake ACP agent (scripts/smoke_agent.py, as Grok). One walk through the core flows, a line per step with its time.
 #
-#   scripts/smoke.sh            run against target/release/zeron-zgx as built, clean up
+#   scripts/smoke.sh            run against target/release/zeren-zgx as built, clean up
 #   scripts/smoke.sh --build    rebuild it first if src/ is newer and nothing runs from it
 #   scripts/smoke.sh --keep     leave the app, the engine and the run folder up afterwards
 #   scripts/smoke.sh --explore  only launch (app + engine) and print how to reach them
 #   scripts/smoke.sh --step x   run the steps up to and including x
 #
 # Isolated: never the production engine (27654, ~/.comet-native) or the
-# staging one (27871, ~/.zeron-staging). The app runs on a frozen copy of
-# ui/ (ZERON_ZGX_UI), so other saves under ui/ can't reload it mid-run, in a
-# small corner window that keeps no frame (ZERON_ZGX_FRAME), as a renamed
+# staging one (27871, ~/.zeren-staging). The app runs on a frozen copy of
+# ui/ (ZEREN_ZGX_UI), so other saves under ui/ can't reload it mid-run, in a
+# small corner window that keeps no frame (ZEREN_ZGX_FRAME), as a renamed
 # binary (macOS keys a window's saved frame by the process's name).
 #
 # Exits 0 when every step passes.
@@ -40,8 +40,8 @@ say() { print -r -- "smoke: $*" }
 die() { print -u2 -r -- "smoke: $*"; exit 1 }
 
 # ---- the binaries -----------------------------------------------------------
-APP=$ZGX/target/release/zeron-zgx
-ENGINE=$ROOT/target/debug/zeron-engine
+APP=$ZGX/target/release/zeren-zgx
+ENGINE=$ROOT/target/debug/zeren-engine
 # (scripts/smoke_agent.py: fake-acp.sh's happy turn, on every prompt, in a
 # process that lives across turns as a real agent's does.)
 FAKE=$ZGX/scripts/smoke_agent.py
@@ -51,20 +51,20 @@ FAKE=$ZGX/scripts/smoke_agent.py
 # running it): the run uses a clone of it as it is, and says when the source
 # is newer. `--build` rebuilds only when nothing runs from it.
 STALE=0
-[[ -x $APP ]] || die "no app at $APP: build it once (cargo build --release --bin zeron-zgx)"
+[[ -x $APP ]] || die "no app at $APP: build it once (cargo build --release --bin zeren-zgx)"
 [[ -n $(find $ZGX/src $ZGX/Cargo.toml $ZGX/Cargo.lock -newer $APP -print -quit 2>/dev/null) ]] && STALE=1
 if (( STALE && BUILD )); then
 	if pgrep -f "^$APP( |\$)" >/dev/null 2>&1; then
-		die "--build: target/release/zeron-zgx is running (pids $(pgrep -f "^$APP( |\$)" | tr '\n' ' ')); not rebuilt under it"
+		die "--build: target/release/zeren-zgx is running (pids $(pgrep -f "^$APP( |\$)" | tr '\n' ' ')); not rebuilt under it"
 	fi
-	say "building the app (its source is newer than target/release/zeron-zgx)"
-	(cd $ZGX && cargo build --release --bin zeron-zgx --quiet) || die "the app didn't build"
+	say "building the app (its source is newer than target/release/zeren-zgx)"
+	(cd $ZGX && cargo build --release --bin zeren-zgx --quiet) || die "the app didn't build"
 	STALE=0
 fi
-(( STALE )) && say "note: src/ is newer than target/release/zeron-zgx; this run is of the binary as built (ui/ is current). --build rebuilds it when nothing runs from it."
+(( STALE )) && say "note: src/ is newer than target/release/zeren-zgx; this run is of the binary as built (ui/ is current). --build rebuilds it when nothing runs from it."
 if [[ ! -x $ENGINE ]]; then
-	say "building the engine (none at target/debug/zeron-engine)"
-	(cd $ROOT && cargo build -p zeron-engine --quiet) || die "the engine didn't build"
+	say "building the engine (none at target/debug/zeren-engine)"
+	(cd $ROOT && cargo build -p zeren-engine --quiet) || die "the engine didn't build"
 fi
 
 # ---- the run's folder, and leaving nothing behind -------------------------------
@@ -100,18 +100,18 @@ cp -cR $ZGX/ui $RUN/ui
 	git init -q -b main
 	printf '# Smoke project\n\nA scratch project for scripts/smoke.sh.\n' > README.md
 	printf 'first line\nsecond line\n' > notes.txt
-	cp $ZGX/ui/assets/favicons/zeron.png picture.png
+	cp $ZGX/ui/assets/favicons/zeren.png picture.png
 	git add -A && git -c user.name=smoke -c user.email=smoke@example.invalid commit -qm "smoke project"
 )
 
-# Only what we set: none of this shell's Zeron settings (they name the
+# Only what we set: none of this shell's Zeren settings (they name the
 # engine this shell runs under).
 CLEAN=(env -i PATH=$PATH TMPDIR=${TMPDIR:-/tmp} LANG=${LANG:-en_US.UTF-8} USER=$USER LOGNAME=${LOGNAME:-$USER} SHELL=/bin/zsh TERM=xterm-256color)
 
 # ---- the engine -----------------------------------------------------------------
 # (`zgx-smoke` in its argv[0], so a later run knows it as ours.)
 ln -s $ENGINE $RUN/bin/zgx-smoke-engine
-$CLEAN HOME=$RUN/home RUST_LOG=${SMOKE_ENGINE_LOG:-info} ZERON_DATA_DIR=$RUN/engine ZERON_IPC_PORT=$PORT GROK_EXECUTABLE=$FAKE \
+$CLEAN HOME=$RUN/home RUST_LOG=${SMOKE_ENGINE_LOG:-info} ZEREN_DATA_DIR=$RUN/engine ZEREN_IPC_PORT=$PORT GROK_EXECUTABLE=$FAKE \
 	$RUN/bin/zgx-smoke-engine > $RUN/engine.log 2>&1 &
 ENGINE_PID=$!
 for _ in {1..100}; do
@@ -129,8 +129,8 @@ FRAME="$(( (SCREEN_W - W - 12) * SCALE )),$(( 40 * SCALE )),$(( W * SCALE )),$((
 (
 	cd $RUN
 	exec $CLEAN HOME=$RUN/apphome ZGX_CHECK=0 ZGX_RENDER_WHEN_COVERED=1 \
-		ZERON_ZGX_ENGINE_SPAWN=0 ZERON_ZGX_ENGINE_PORT=$PORT ZERON_ZGX_ENGINE_DATA=$RUN/engine \
-		ZERON_ZGX_UI=$RUN/ui ZERON_ZGX_FRAME=$FRAME \
+		ZEREN_ZGX_ENGINE_SPAWN=0 ZEREN_ZGX_ENGINE_PORT=$PORT ZEREN_ZGX_ENGINE_DATA=$RUN/engine \
+		ZEREN_ZGX_UI=$RUN/ui ZEREN_ZGX_FRAME=$FRAME \
 		$RUN/bin/zgx-smoke main --inspect > $RUN/app.log 2>&1
 ) &
 APP_PID=$!

@@ -8,12 +8,12 @@ local decode = require("@self/decode")
 
 local M = {}
 
--- Dithered as Zeron dithers its wallpapers (crates/ui/src/
+-- Dithered as Zeren dithers its wallpapers (crates/ui/src/
 -- new_thread_background_effects.rs, `dither_pixels`): square cells `cell`
 -- points across, edge to edge, each taking the picture's colour at its
 -- centre; where its brightest channel passes the cell's 4×4 Bayer threshold
 -- it is lifted to its full value, else it is that colour at 8%. Laid over
--- the picture at `strength` (as Zeron's halftone is), so the picture still
+-- the picture at `strength` (as Zeren's halftone is), so the picture still
 -- shows through.
 -- params[0]: the cell (points), the strength (0 to 1).
 M.dither = ui.layer_shader([[
@@ -32,7 +32,7 @@ fn layer(input:LayerInput)->vec4<f32> {
 }
 ]])
 
--- The dither's parameters: cells `cell` points across (Zeron's: 2), laid
+-- The dither's parameters: cells `cell` points across (Zeren's: 2), laid
 -- over the picture at `strength` (half, by default).
 function M.dither_params(cell: number?, strength: number?): { any }
 	return { { cell or 2, strength or 0.5, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } }
@@ -78,7 +78,7 @@ function M.ascii_params(px: number?, strength: number?, threshold: number?): { a
 	return { { px or 1.5, strength or 0.75, threshold or 0.22, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } }
 end
 
--- Printed in dots, as Zeron's halftone (new_thread_background_effects.rs,
+-- Printed in dots, as Zeren's halftone (new_thread_background_effects.rs,
 -- `halftone_pixels`): square cells `cell` points across, each a round dot
 -- of the colour at its centre, wider where the picture is brighter (in
 -- the light, where it's darker), on paper: black in the dark, white in
@@ -108,7 +108,7 @@ function M.halftone_params(cell: number?, strength: number?, light: boolean?): {
 	return { { cell or 4, strength or 0.6, 0, if light then 1 else 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } }
 end
 
--- A display's lines, as Zeron's scanlines (`scanline_pixels`): every
+-- A display's lines, as Zeren's scanlines (`scanline_pixels`): every
 -- `pitch` points a line a third of it tall, darkened (in the light,
 -- lifted towards white) by `strength`; the picture between them as it is.
 -- params[0]: the pitch (points), the strength (0 to 1), unused, light (1)
@@ -127,7 +127,7 @@ fn layer(input:LayerInput)->vec4<f32> {
 ]])
 
 -- The lines' parameters: every `pitch` points (3, by default), at
--- `strength` (0.48: Zeron's), on light or dark.
+-- `strength` (0.48: Zeren's), on light or dark.
 function M.scanlines_params(pitch: number?, strength: number?, light: boolean?): { any }
 	return { { pitch or 3, strength or 0.48, 0, if light then 1 else 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } }
 end

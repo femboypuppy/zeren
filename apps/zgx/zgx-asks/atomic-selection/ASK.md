@@ -1,8 +1,8 @@
 # Ask: a selectable node that selects as one unit
 
-**Who needs it:** Zeron's display math (`ui/ds/math.luau`). A formula is drawn on a `ui.canvas`; its TeX rides as unseen text laid under it, so a selection across the reply washes the formula's box and copy gives `$$tex$$`. The same goes for any drawn thing whose copy is text (a diagram's source, a chart's data).
+**Who needs it:** Zeren's display math (`ui/ds/math.luau`). A formula is drawn on a `ui.canvas`; its TeX rides as unseen text laid under it, so a selection across the reply washes the formula's box and copy gives `$$tex$$`. The same goes for any drawn thing whose copy is text (a diagram's source, a chart's data).
 
-**The problem:** the unseen text is ordinary text, so a drag that starts or ends inside the formula selects part of the TeX, and copy gives `$$\frac{-b \pm \sqrt{b` — half a formula. Zeron's shipping app treats a formula as one character: in a selection or not, whole.
+**The problem:** the unseen text is ordinary text, so a drag that starts or ends inside the formula selects part of the TeX, and copy gives `$$\frac{-b \pm \sqrt{b` — half a formula. Zeren's shipping app treats a formula as one character: in a selection or not, whole.
 
 **The ask:** a way to make a node select as one unit, with the text it copies as. For example:
 

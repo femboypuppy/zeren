@@ -142,7 +142,7 @@ export interface VaultStatusView {
  *   scopes, subscriptionType? }`, refreshable) — or `{ oauthToken, expiresAt? }`, a
  *   long-lived token from `claude setup-token` (not refreshable; default expiry one year).
  *   Running Claude Code on the user's own Cloud device with their subscription is
- *   permitted for Zeron under its arrangement with Anthropic; grants go only to the
+ *   permitted for Zeren under its arrangement with Anthropic; grants go only to the
  *   unmodified Claude Code CLI on the user's own devices.
  * - `anthropic-key` / `openai-key`: `{ key }`.
  * - `github`: not uploadable; use the device flow. The resulting user token
@@ -177,7 +177,7 @@ export interface EnrollDeviceRequest {
 
 /**
  * `sig` = base64url Ed25519 signature by the device key over the UTF-8 bytes of
- * `zeron-vault-grant\n{userId}\n{deviceId}\n{provider}\n{ts}`. `ts` is Unix ms,
+ * `zeren-vault-grant\n{userId}\n{deviceId}\n{provider}\n{ts}`. `ts` is Unix ms,
  * accepted within ±120 s and strictly greater than the device's last accepted
  * grant `ts` (replay fence).
  */

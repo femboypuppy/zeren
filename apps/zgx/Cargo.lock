@@ -6245,7 +6245,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e13084392c5e4bc371903e2935a5eaeed24905a7511356b883835e18a78f6879"
 
 [[package]]
-name = "zeron-cli"
+name = "zeren-cli"
 version = "0.2.137"
 dependencies = [
  "anyhow",
@@ -6255,12 +6255,12 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "windows-sys 0.61.2",
- "zeron-launch",
- "zeron-update",
+ "zeren-launch",
+ "zeren-update",
 ]
 
 [[package]]
-name = "zeron-launch"
+name = "zeren-launch"
 version = "0.2.137"
 dependencies = [
  "libc",
@@ -6268,7 +6268,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zeron-notify"
+name = "zeren-notify"
 version = "0.2.137"
 dependencies = [
  "objc",
@@ -6277,18 +6277,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "zeron-plugin-guard"
+name = "zeren-plugin-guard"
 version = "0.2.137"
 dependencies = [
  "serde_json",
 ]
 
 [[package]]
-name = "zeron-preview-label"
+name = "zeren-preview-label"
 version = "0.2.137"
 
 [[package]]
-name = "zeron-proto"
+name = "zeren-proto"
 version = "0.2.137"
 dependencies = [
  "chrono",
@@ -6299,7 +6299,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zeron-theme"
+name = "zeren-theme"
 version = "0.2.137"
 dependencies = [
  "anyhow",
@@ -6313,7 +6313,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zeron-update"
+name = "zeren-update"
 version = "0.2.137"
 dependencies = [
  "anyhow",
@@ -6330,7 +6330,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zeron-visual"
+name = "zeren-visual"
 version = "0.2.137"
 dependencies = [
  "base64 0.22.1",
@@ -6342,17 +6342,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "zeron-visual-gpu"
+name = "zeren-visual-gpu"
 version = "0.2.137"
 dependencies = [
  "pollster",
  "tracing",
  "wgpu",
- "zeron-visual",
+ "zeren-visual",
 ]
 
 [[package]]
-name = "zeron-zgx"
+name = "zeren-zgx"
 version = "0.0.0"
 dependencies = [
  "base64 0.22.1",
@@ -6385,17 +6385,17 @@ dependencies = [
  "usvg",
  "windows-sys 0.61.2",
  "zatex",
- "zeron-cli",
- "zeron-launch",
- "zeron-notify",
- "zeron-plugin-guard",
- "zeron-preview-label",
- "zeron-proto",
- "zeron-theme",
- "zeron-update",
- "zeron-visual",
- "zeron-visual-gpu",
- "zeron-zgx-pixels",
+ "zeren-cli",
+ "zeren-launch",
+ "zeren-notify",
+ "zeren-plugin-guard",
+ "zeren-preview-label",
+ "zeren-proto",
+ "zeren-theme",
+ "zeren-update",
+ "zeren-visual",
+ "zeren-visual-gpu",
+ "zeren-zgx-pixels",
  "zgx",
  "zgx-desktop",
  "zgx-gpu",
@@ -6404,7 +6404,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zeron-zgx-pixels"
+name = "zeren-zgx-pixels"
 version = "0.0.0"
 
 [[package]]

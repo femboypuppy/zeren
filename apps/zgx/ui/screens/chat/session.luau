@@ -77,7 +77,7 @@ local function loading(): Node
 				return prefs.conversation_width:get()
 			end,
 			gap = "$space.3",
-			ui.row { w_full = true, justify = "end", ds.Skeleton { w = 220, h = 36, rounded = "$zeron.prose.bubble.radius" } },
+			ui.row { w_full = true, justify = "end", ds.Skeleton { w = 220, h = 36, rounded = "$zeren.prose.bubble.radius" } },
 			ds.Skeleton { w = 120 },
 			ds.Skeleton { w_full = true },
 			ds.Skeleton { w = "80%" },
@@ -92,7 +92,7 @@ local function Session(id: Id?): Node
 	-- panel (a link outside its folder stays as it is); a chat mentioned,
 	-- that chat.
 	local function open_link(target: string)
-		local chat = string.match(target, "^zeron%-chat:([%w%-_]+)$")
+		local chat = string.match(target, "^zeren%-chat:([%w%-_]+)$")
 		if chat then
 			route.open_session(chat)
 			return

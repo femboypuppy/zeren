@@ -31,7 +31,7 @@ use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use tokio::io::AsyncWriteExt;
-use zeron_proto::RegistryAgent;
+use zeren_proto::RegistryAgent;
 
 use crate::HarnessError;
 
@@ -48,7 +48,7 @@ const MAX_EXTRACTED_BYTES: u64 = 3 * 1024 * 1024 * 1024;
 const MAX_ARCHIVE_ENTRIES: usize = 20_000;
 const STALL_TIMEOUT: Duration = Duration::from_secs(60);
 const UV_TIMEOUT: Duration = Duration::from_secs(600);
-const MARKER: &str = ".zeron-install-ok";
+const MARKER: &str = ".zeren-install-ok";
 
 /// One agent of the index, as published.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -113,11 +113,11 @@ pub enum Kind {
     /// A Python package, installed with uv.
     Uvx,
     /// One of your own: a program on the device and its arguments, as you
-    /// gave them (`own.<slug>`), never installed or updated by Zeron.
+    /// gave them (`own.<slug>`), never installed or updated by Zeren.
     Own,
 }
 
-/// The registry's ids for the agents Zeron drives itself, each with its own
+/// The registry's ids for the agents Zeren drives itself, each with its own
 /// harness: shown as built in, never added again from the registry.
 pub const BUILT_IN: &[(&str, &str)] = &[
     ("claude-acp", "claude-code"),
@@ -130,7 +130,7 @@ pub const BUILT_IN: &[(&str, &str)] = &[
     ("antigravity-acp", "antigravity"),
 ];
 
-/// The built-in harness slug for a registry id Zeron drives itself.
+/// The built-in harness slug for a registry id Zeren drives itself.
 pub fn built_in(registry_id: &str) -> Option<&'static str> {
     BUILT_IN
         .iter()
@@ -169,12 +169,12 @@ fn short(text: &str, max: usize) -> bool {
 }
 
 /// An https URL with a host and no credentials. (A test registry served on
-/// this machine's loopback passes too, with `ZERON_ACP_REGISTRY_LOOPBACK=1`.)
+/// this machine's loopback passes too, with `ZEREN_ACP_REGISTRY_LOOPBACK=1`.)
 pub fn safe_url(url: &str) -> bool {
     reqwest::Url::parse(url).is_ok_and(|u| {
         let loopback = u.scheme() == "http"
             && matches!(u.host_str(), Some("127.0.0.1" | "localhost"))
-            && std::env::var("ZERON_ACP_REGISTRY_LOOPBACK").is_ok_and(|v| v == "1");
+            && std::env::var("ZEREN_ACP_REGISTRY_LOOPBACK").is_ok_and(|v| v == "1");
         (u.scheme() == "https" || loopback)
             && u.host_str().is_some()
             && u.username().is_empty()
@@ -182,10 +182,10 @@ pub fn safe_url(url: &str) -> bool {
     })
 }
 
-/// The index to read: `$ZERON_ACP_REGISTRY_URL` (a test registry), else the
+/// The index to read: `$ZEREN_ACP_REGISTRY_URL` (a test registry), else the
 /// published one.
 pub fn index_url() -> String {
-    std::env::var("ZERON_ACP_REGISTRY_URL")
+    std::env::var("ZEREN_ACP_REGISTRY_URL")
         .ok()
         .filter(|u| safe_url(u))
         .unwrap_or_else(|| INDEX_URL.to_owned())
@@ -406,19 +406,19 @@ pub fn set_agents_root(dir: PathBuf) {
     let _ = ROOT.set(dir);
 }
 
-/// Where added agents live: `$ZERON_AGENTS_DIR`, else the engine's
-/// ([`set_agents_root`]), else `$ZERON_DATA_DIR/agents`, else beside the
-/// managed adapters (`~/.zeron/agents`; the local app-data directory on
+/// Where added agents live: `$ZEREN_AGENTS_DIR`, else the engine's
+/// ([`set_agents_root`]), else `$ZEREN_DATA_DIR/agents`, else beside the
+/// managed adapters (`~/.zeren/agents`; the local app-data directory on
 /// Windows).
 pub fn agents_root() -> Option<PathBuf> {
     let value = |key: &str| std::env::var_os(key).filter(|v| !v.is_empty()).map(PathBuf::from);
-    if let Some(dir) = value("ZERON_AGENTS_DIR") {
+    if let Some(dir) = value("ZEREN_AGENTS_DIR") {
         return Some(dir);
     }
     if let Some(dir) = ROOT.get() {
         return Some(dir.clone());
     }
-    if let Some(dir) = value("ZERON_DATA_DIR") {
+    if let Some(dir) = value("ZEREN_DATA_DIR") {
         return Some(dir.join("agents"));
     }
     crate::adapter_install::adapters_root().and_then(|root| root.parent().map(|p| p.join("agents")))
@@ -702,7 +702,7 @@ pub fn remove(agent: RegistryAgent) -> Result<(), HarnessError> {
         Ok(()) => Ok(()),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
         Err(e) => {
-            tracing::warn!(target: "zeron_harness::acp_registry", "{} left files behind: {e}", dir.display());
+            tracing::warn!(target: "zeren_harness::acp_registry", "{} left files behind: {e}", dir.display());
             Ok(())
         }
     }
@@ -938,7 +938,7 @@ async fn download_checked(url: &str, sha256: Option<&str>, dest: &Path, name: &s
         .and_then(reqwest::Response::error_for_status)
         .map_err(|e| failed(e.to_string()))?;
     if response.content_length().is_some_and(|n| n > MAX_ARCHIVE_BYTES) {
-        return Err(failed("it's larger than Zeron takes".into()));
+        return Err(failed("it's larger than Zeren takes".into()));
     }
     let mut body = response.bytes_stream();
     let mut file = tokio::fs::File::create(dest).await?;
@@ -952,7 +952,7 @@ async fn download_checked(url: &str, sha256: Option<&str>, dest: &Path, name: &s
             Some(Ok(bytes)) => {
                 received = received.saturating_add(bytes.len() as u64);
                 if received > MAX_ARCHIVE_BYTES {
-                    return Err(failed("it's larger than Zeron takes".into()));
+                    return Err(failed("it's larger than Zeren takes".into()));
                 }
                 digest.update(&bytes);
                 file.write_all(&bytes).await?;
@@ -990,7 +990,7 @@ fn extract(url: &str, archive: &Path, dest: &Path, cmd: &Path) -> Result<(), Har
         return extract_tar(file()?, dest);
     }
     if url.ends_with(".tar.xz") || url.ends_with(".txz") || url.ends_with(".dmg") || url.ends_with(".pkg") || url.ends_with(".msi") {
-        return Err(HarnessError::Install("the build comes in a format Zeron can't unpack".into()));
+        return Err(HarnessError::Install("the build comes in a format Zeren can't unpack".into()));
     }
     // A raw executable, named as the registry's `cmd`.
     let target = dest.join(cmd);
@@ -1039,7 +1039,7 @@ fn extract_tar(reader: impl std::io::Read, dest: &Path) -> Result<(), HarnessErr
         }
         total = total.saturating_add(entry.size());
         if total > MAX_EXTRACTED_BYTES {
-            return Err(HarnessError::Install("the archive unpacks larger than Zeron takes".into()));
+            return Err(HarnessError::Install("the archive unpacks larger than Zeren takes".into()));
         }
         if let Some(parent) = output.parent() {
             std::fs::create_dir_all(parent)?;
@@ -1081,7 +1081,7 @@ fn extract_zip(archive: &Path, dest: &Path) -> Result<(), HarnessError> {
         }
         total = total.saturating_add(entry.size());
         if total > MAX_EXTRACTED_BYTES {
-            return Err(HarnessError::Install("the archive unpacks larger than Zeron takes".into()));
+            return Err(HarnessError::Install("the archive unpacks larger than Zeren takes".into()));
         }
         if let Some(parent) = output.parent() {
             std::fs::create_dir_all(parent)?;
@@ -1139,7 +1139,7 @@ pub async fn fetch_index(url: &str, etag: Option<&str>) -> Result<(Option<Vec<u8
 /// Fetches an agent's icon: only from the registry's own CDN, only a small
 /// SVG.
 pub async fn fetch_icon(url: &str) -> Option<String> {
-    let test_registry = std::env::var("ZERON_ACP_REGISTRY_LOOPBACK").is_ok_and(|v| v == "1");
+    let test_registry = std::env::var("ZEREN_ACP_REGISTRY_LOOPBACK").is_ok_and(|v| v == "1");
     if !(url.starts_with(ICON_ORIGIN) || test_registry) || !safe_url(url) {
         return None;
     }
@@ -1309,7 +1309,7 @@ mod tests {
     #[tokio::test]
     async fn icons_come_only_from_the_registrys_cdn_and_small() {
         // (Refused before any request: another host, plain http.)
-        if std::env::var("ZERON_ACP_REGISTRY_LOOPBACK").is_err() {
+        if std::env::var("ZEREN_ACP_REGISTRY_LOOPBACK").is_err() {
             assert!(fetch_icon("https://example.com/gemini.svg").await.is_none());
             assert!(fetch_icon("http://cdn.agentclientprotocol.com/registry/v1/latest/gemini.svg").await.is_none());
             assert!(fetch_icon("https://cdn.agentclientprotocol.com.example.com/gemini.svg").await.is_none());

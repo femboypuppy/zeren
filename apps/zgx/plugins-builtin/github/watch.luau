@@ -20,7 +20,7 @@
 -- GitHub's quota for the hour runs low (`rateLimit`, in every answer),
 -- everything is asked less often; near its end, nothing until it resets.
 -- A pull request the engine already watches for a session on screen
--- (`zeron.github.watch_pr`, Zeron's own sign-in) comes from there, pushed;
+-- (`zeren.github.watch_pr`, Zeren's own sign-in) comes from there, pushed;
 -- gh asks of it only at the slow pace.
 --
 --   watch.pr(session_id)   in a build function: a function reading that
@@ -44,7 +44,7 @@ local BATCH_REPOS, BATCH_BRANCHES = 50, 150
 -- next round, a moment later.
 local LOOKUPS = 8
 -- After a failed ask, the next waits longer each time (a beat, doubling,
--- at most 15 minutes), as Zeron's own watcher does.
+-- at most 15 minutes), as Zeren's own watcher does.
 local BACKOFF_FIRST, BACKOFF_MAX = 1, 30
 -- Where what was last heard is kept. (`watch` was written while a session
 -- whose repository wasn't known took any pull request of yours from a
@@ -73,7 +73,7 @@ local function epoch(iso: string?): number?
 	return days * 86400 + (tonumber(h) :: number) * 3600 + (tonumber(mi) :: number) * 60 + (tonumber(s) :: number)
 end
 
-return function(zeron: any, pulls: any)
+return function(zeren: any, pulls: any)
 	local M = {}
 	-- Each session's pull request (or false: none) as gh last told it: in
 	-- plain Lua for the watch's own work, and for what draws it in a state
@@ -220,7 +220,7 @@ return function(zeron: any, pulls: any)
 
 	-- What the engine told of session `id` (a table), if anything.
 	local function engine_of(id: string): any
-		local ok, all = pcall(zeron.github.heard)
+		local ok, all = pcall(zeren.github.heard)
 		local e = ok and type(all) == "table" and all[id] or nil
 		return if type(e) == "table" then e else nil
 	end
@@ -316,7 +316,7 @@ return function(zeron: any, pulls: any)
 	-- to ask later), or "none" here.
 	local looking: { [string]: boolean } = {}
 	local function lookup(id: string, s: any, start: boolean): string
-		local project = if s.project then zeron.context_of("project", s.project) else nil
+		local project = if s.project then zeren.context_of("project", s.project) else nil
 		for _, f in { s.cwd, project and project.path } do
 			if type(f) == "string" and f ~= "" and repos[f] ~= false then
 				if repos[f] then
@@ -361,7 +361,7 @@ return function(zeron: any, pulls: any)
 		local later = false
 		-- (Sessions whose repository isn't known here.)
 		local unknown: { [string]: any } = {}
-		for id, s in zeron.sessions() do
+		for id, s in zeren.sessions() do
 			local branch = branch_of(s)
 			local period = branch and every(id, s, now)
 			if not branch or not period then
@@ -459,10 +459,10 @@ return function(zeron: any, pulls: any)
 		beat += 1
 		round()
 	end)
-	-- Asked again now (Zeron's menu bar: GitHub › Refresh pull requests).
+	-- Asked again now (Zeren's menu bar: GitHub › Refresh pull requests).
 	ui.command {
 		id = "refresh",
-		title = zeron.s("command.refresh"),
+		title = zeren.s("command.refresh"),
 		run = function()
 			table.clear(asked_at)
 			resume_at = 0
@@ -473,8 +473,8 @@ return function(zeron: any, pulls: any)
 	local shape: { [string]: string } = {}
 	ui.effect(function()
 		local moved = false
-		for id in zeron.sessions() do
-			local s = zeron.context_of("session", id) or {}
+		for id in zeren.sessions() do
+			local s = zeren.context_of("session", id) or {}
 			local b = `{branch_of(s) or ""}|{s.status or ""}`
 			if shape[id] ~= b then
 				shape[id] = b
@@ -500,10 +500,10 @@ return function(zeron: any, pulls: any)
 			soon()
 		end
 		-- Its own state, and what the engine says of it alone (where
-		-- Zeron's sign-in lets it watch, "github": pushed as it moves). The
+		-- Zeren's sign-in lets it watch, "github": pushed as it moves). The
 		-- engine's stands; gh adds a draft, which the engine doesn't say.
 		local mine = cell(session)
-		local ok, theirs = pcall(zeron.github.watch_pr, session)
+		local ok, theirs = pcall(zeren.github.watch_pr, session)
 		local engine: (() -> any)? = if ok and type(theirs) == "function" then theirs :: any else nil
 		return function(): any
 			local m = mine:get()

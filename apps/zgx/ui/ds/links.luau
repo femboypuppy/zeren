@@ -1,12 +1,12 @@
 -- Where a web link in prose goes when it is clicked: the system's browser
 -- (zgx's own `href`), or whatever the app sets here (its browser tab beside
--- the chat, with "Open links in Zeron" on). ds/markdown reads it as it
+-- the chat, with "Open links in Zeren" on). ds/markdown reads it as it
 -- makes a link; the shell sets it. `opener(url)` answers true when it took
 -- the link, false to let it open outside.
 --
 --   Links.opener = function(url) return panel.open_url(session, url) end
 --   Links.panel = function(url) … end   the browser tab, whatever the setting
---   Links.in_app = function() return prefs.open_links:peek() == "zeron" end
+--   Links.in_app = function() return prefs.open_links:peek() == "zeren" end
 --
 -- A link's context menu (ds/menu_at shows it), by its kind:
 --   web       Open, Open in browser panel or in default browser (whichever
@@ -35,14 +35,14 @@ M.panel = nil :: ((url: string) -> boolean)?
 -- Whether that tab can take one now (a chat or a page open); without it,
 -- whenever there's `panel`.
 M.panel_ready = nil :: (() -> boolean)?
--- Whether Open goes to the app ("Open links in" Zeron). Without it, to the
+-- Whether Open goes to the app ("Open links in" Zeren). Without it, to the
 -- app whenever it has an opener.
 M.in_app = nil :: (() -> boolean)?
 -- Whether this VM may write the clipboard (a plugin's may not without its
 -- "clipboard" permission: Copy is left out of its menus then).
 M.can_copy = true
 -- Whether this VM opens links outside itself (`ui.invoke("open_url")`): a
--- plugin's opens them only where Zeron does (its opener).
+-- plugin's opens them only where Zeren does (its opener).
 M.system = true
 
 -- Whether the app takes links now (a function, so a span follows it).

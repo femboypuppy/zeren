@@ -4,7 +4,7 @@
 fn sync_keeps_git_available_with_256_file_descriptors() {
     let output = std::process::Command::new(std::env::current_exe().unwrap())
         .args(["--exact", "resource_limit_child", "--nocapture"])
-        .env("ZERON_RESOURCE_TEST_CHILD", "1")
+        .env("ZEREN_RESOURCE_TEST_CHILD", "1")
         .output()
         .unwrap();
     eprintln!("{}", String::from_utf8_lossy(&output.stderr));
@@ -19,7 +19,7 @@ fn sync_keeps_git_available_with_256_file_descriptors() {
 #[cfg(unix)]
 #[test]
 fn resource_limit_child() {
-    if std::env::var_os("ZERON_RESOURCE_TEST_CHILD").is_none() {
+    if std::env::var_os("ZEREN_RESOURCE_TEST_CHILD").is_none() {
         return;
     }
     unsafe {
@@ -40,9 +40,9 @@ fn resource_limit_child() {
 async fn stress() {
     use futures::{SinkExt, StreamExt};
     use std::{sync::Arc, time::Duration};
-    use zeron_engine::{DocHost, DocHostConfig, EdgeConfig};
-    use zeron_proto::HarnessId;
-    use zeron_sync::{
+    use zeren_engine::{DocHost, DocHostConfig, EdgeConfig};
+    use zeren_proto::HarnessId;
+    use zeren_sync::{
         DocsStore,
         chat_frames::{decode, encode, frame_type},
     };
@@ -150,7 +150,7 @@ async fn stress() {
     server.abort();
     let _ = server.await;
     tokio::time::timeout(Duration::from_secs(3), async {
-        while zeron_sync::budget::shared().stats().sockets != 0 {
+        while zeren_sync::budget::shared().stats().sockets != 0 {
             tokio::time::sleep(Duration::from_millis(10)).await;
         }
     })

@@ -4,13 +4,13 @@
 //! interface's scripts, the plugins', the engine's first answers and the
 //! agents' model lists commit 150-180 MB of mimalloc's heap for about 27 MB
 //! in use a minute later. mimalloc keeps the freed pages dirty for reuse,
-//! and the system counts them against Zeron (`footprint`'s "App-Specific
+//! and the system counts them against Zeren (`footprint`'s "App-Specific
 //! Tag 1"). Once the window has settled, a forced collect returns them; the
 //! heap commits again as it needs to, as it would anyway.
 //!
-//! `ZERON_ZGX_HEAP_STATS=1` prints mimalloc's own statistics (by size class,
+//! `ZEREN_ZGX_HEAP_STATS=1` prints mimalloc's own statistics (by size class,
 //! peak and current) to stderr before and after each collect;
-//! `ZERON_ZGX_HEAP_COLLECT=0` leaves the heap as it is, to compare.
+//! `ZEREN_ZGX_HEAP_COLLECT=0` leaves the heap as it is, to compare.
 
 use std::time::Duration;
 use zgx_desktop::WindowContext;
@@ -36,10 +36,10 @@ pub fn install(cx: &mut WindowContext) {
     if INSTALLED.with(|i| i.replace(true)) {
         return;
     }
-    if std::env::var("ZERON_ZGX_HEAP_COLLECT").is_ok_and(|v| v == "0") {
+    if std::env::var("ZEREN_ZGX_HEAP_COLLECT").is_ok_and(|v| v == "0") {
         return;
     }
-    let stats = std::env::var("ZERON_ZGX_HEAP_STATS").is_ok_and(|v| v == "1");
+    let stats = std::env::var("ZEREN_ZGX_HEAP_STATS").is_ok_and(|v| v == "1");
     cx.tasks.spawn(async move {
         let mut waited = Duration::ZERO;
         for at in AFTER {
@@ -54,7 +54,7 @@ pub fn install(cx: &mut WindowContext) {
 /// whose heap holds what the scripts and the interface allocate).
 fn collect(stats: bool) {
     if stats {
-        eprintln!("zeron-zgx: heap: before collect");
+        eprintln!("zeren-zgx: heap: before collect");
         // SAFETY: mimalloc's printer with no output callback (stderr).
         unsafe { mi_stats_print(std::ptr::null_mut()) };
     }
@@ -62,7 +62,7 @@ fn collect(stats: bool) {
     // arenas; it frees nothing in use.
     unsafe { mi_collect(true) };
     if stats {
-        eprintln!("zeron-zgx: heap: after collect");
+        eprintln!("zeren-zgx: heap: after collect");
         // SAFETY: as above.
         unsafe { mi_stats_print(std::ptr::null_mut()) };
     }

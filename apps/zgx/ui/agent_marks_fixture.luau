@@ -1,7 +1,7 @@
 -- Agents' marks, light and dark side by side, as each place draws them
 -- (ds.AgentMark): Providers' cards (32), the registry's rows (32), the model
 -- picker's tabs and rows (16 and 14, bare) and the sidebar's rows (14,
--- bare). Zeron's own agents in their bundled brand marks beside agents from
+-- bare). Zeren's own agents in their bundled brand marks beside agents from
 -- the ACP registry in the registry's own icons (assets/icons/registry), in
 -- the theme's ink; one whose icon didn't come (the registry's glyph); and
 -- one of your own (its initial). For captures and tests
@@ -104,7 +104,7 @@ local function board(theme: string, title: string): Node
 		w = 560,
 		p = "$space.6",
 		gap = "$space.5",
-		bg = "$zeron.window",
+		bg = "$zeren.window",
 		ui.text { title, text_size = "$font.size.lg", weight = "$font.weight.semibold", color = "$text.primary" },
 		heading("PROVIDERS · ADD AN AGENT (32, on the tile)"),
 		ui.grid { w_full = true, cols = 2, gap = "$space.3", table.unpack(cards) },
@@ -120,6 +120,6 @@ return ui.row {
 	id = "agent-marks",
 	w_full = true,
 	h_full = true,
-	board("zeron-light", "Light"),
-	board("zeron-dark", "Dark"),
+	board("zeren-light", "Light"),
+	board("zeren-dark", "Dark"),
 }

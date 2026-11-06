@@ -1,6 +1,6 @@
 --!strict
 -- A session's pull request as a row of its hover card, under its branch, as
--- Zeron's card has it (crates/ui/src/shell/session_hover_card.rs): drawn as
+-- Zeren's card has it (crates/ui/src/shell/session_hover_card.rs): drawn as
 -- the card's own rows are (ds/session_card: its words, quiet, where the
 -- rows' words stand), then the pull request's badge, the sidebar's own
 -- (ds/badge `PullRequest`: its state's glyph and number in its colour).

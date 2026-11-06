@@ -8,14 +8,14 @@
  * - A user bearer: the dial carries
  *     callerDevice=<id>&callerKey=<b64url plugin key>&callerTs=<epoch ms>
  *     &callerProof=<b64url ed25519 signature over
- *       "zeron-device-link:v1:" + target + ":" + connId + ":" + callerTs>
+ *       "zeren-device-link:v1:" + target + ":" + connId + ":" + callerTs>
  *   The time must be within `MAX_SKEW_MS`. The key must be registered to the
  *   bearer's own user and not revoked (plugin-keys.ts; binding a new one needs
  *   a fresh sign-in), with `callerDevice` as its registered device.
  *
  * Anything missing or wrong leaves the dial unstamped, not refused: old
  * engines keep their relay, and a receiver treats an unstamped caller as an
- * unknown device. A stamped dial's 101 carries `x-zeron-caller-device`, and
+ * unknown device. A stamped dial's 101 carries `x-zeren-caller-device`, and
  * every frame it relays carries `fromDevice` (device-room.ts).
  */
 import type { Verified } from "./auth";
@@ -24,7 +24,7 @@ import type { Env } from "./env";
 import { forward } from "./forward";
 import { userDirectoryStub } from "./user-directory";
 
-export const DEVICE_LINK_PREFIX = "zeron-device-link:v1:";
+export const DEVICE_LINK_PREFIX = "zeren-device-link:v1:";
 /** How far a dial's `callerTs` may be from the edge's clock. */
 export const MAX_SKEW_MS = 5 * 60_000;
 

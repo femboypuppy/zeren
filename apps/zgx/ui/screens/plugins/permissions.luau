@@ -1,6 +1,6 @@
 --!strict
 -- The macOS permissions a plugin's settings page can show a row for (a
--- `permission` setting, Zeron's own plugins alone): Zeron's words for each,
+-- `permission` setting, Zeren's own plugins alone): Zeren's words for each,
 -- whether it's granted, and the way to grant it. The host already checks
 -- both for Appshots (src/appshots: `appshots.state`'s `capture` and `text`,
 -- "ready" or "required"; `appshots.request` asks once, then opens System

@@ -10,8 +10,8 @@ use gpui::{
     Context, Entity, IntoElement, Render, SharedString, Subscription, Task, Window, div,
     prelude::*, px,
 };
-use zeron_proto::{AgentAccount, AgentAccountsSnapshot, HarnessId};
-use zeron_rpc::methods;
+use zeren_proto::{AgentAccount, AgentAccountsSnapshot, HarnessId};
+use zeren_rpc::methods;
 
 use crate::popover;
 use crate::settings::accounts::{
@@ -62,9 +62,9 @@ pub fn ring_fraction(
         && let Some(model) = model
     {
         let label = if cursor_model_is_first_party(model) {
-            zeron_proto::CURSOR_USAGE_CURSOR
+            zeren_proto::CURSOR_USAGE_CURSOR
         } else {
-            zeron_proto::CURSOR_USAGE_OTHER
+            zeren_proto::CURSOR_USAGE_OTHER
         };
         if let Some(window) = account.usage_windows.iter().find(|w| w.label == label) {
             return Some(window.used_fraction.clamp(0.0, 1.0));
@@ -520,7 +520,7 @@ impl Render for AccountUsage {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zeron_proto::AgentUsageWindow;
+    use zeren_proto::AgentUsageWindow;
 
     fn account(harness: HarnessId, active: bool, used: &[f32]) -> AgentAccount {
         serde_json::from_value(serde_json::json!({
@@ -559,9 +559,9 @@ mod tests {
     fn cursor_ring_follows_the_selected_models_pool() {
         let mut cursor = account(HarnessId::Cursor, true, &[0.5, 0.01, 0.48]);
         for (window, label) in cursor.usage_windows.iter_mut().zip([
-            zeron_proto::CURSOR_USAGE_CURSOR,
-            zeron_proto::CURSOR_USAGE_GROK,
-            zeron_proto::CURSOR_USAGE_OTHER,
+            zeren_proto::CURSOR_USAGE_CURSOR,
+            zeren_proto::CURSOR_USAGE_GROK,
+            zeren_proto::CURSOR_USAGE_OTHER,
         ]) {
             window.label = label.into();
         }

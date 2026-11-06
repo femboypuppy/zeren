@@ -1,8 +1,8 @@
 --!strict
 -- GitHub, through its CLI (gh) as you're signed in to it on this Mac: the
--- plugin runs it (`zeron.run`, "commands": ["gh"]) and asks GitHub's own API,
--- REST and GraphQL. Nothing of Zeron's stands between: what GitHub can do,
--- this can. What it reads is kept in the plugin's database (`zeron.db`), so a
+-- plugin runs it (`zeren.run`, "commands": ["gh"]) and asks GitHub's own API,
+-- REST and GraphQL. Nothing of Zeren's stands between: what GitHub can do,
+-- this can. What it reads is kept in the plugin's database (`zeren.db`), so a
 -- pull request opens at once and is asked again behind it.
 --
 --   gh.graphql(query, variables, { background })
@@ -19,7 +19,7 @@
 
 export type Task = { after: (self: Task, ok: (value: any) -> (), failed: ((why: string) -> ())?) -> Task }
 
-return function(zeron: any)
+return function(zeren: any)
 	local M = {}
 
 	-- A value to come: `start(resolve, reject)` runs at once; whoever asks
@@ -67,20 +67,20 @@ return function(zeron: any)
 		local text = string.gsub(why, "^%s+", "")
 		text = string.gsub(text, "%s+$", "")
 		if string.find(text, "isn't installed", 1, true) then
-			return zeron.s("gh.no_cli")
+			return zeren.s("gh.no_cli")
 		elseif string.find(text, "gh auth login", 1, true) or string.find(text, "not logged in", 1, true) then
-			return zeron.s("gh.sign_in")
+			return zeren.s("gh.sign_in")
 		elseif string.find(text, "HTTP 404", 1, true) or string.find(text, "Could not resolve to a", 1, true) then
-			return zeron.s("gh.not_found")
+			return zeren.s("gh.not_found")
 		elseif string.find(text, "rate limit", 1, true) then
-			return zeron.s("gh.rate_limit")
+			return zeren.s("gh.rate_limit")
 		end
 		-- gh's own prefix off: GitHub's words.
 		text = string.gsub(text, "^gh: ", "")
-		return if text ~= "" then text else zeron.s("gh.no_answer")
+		return if text ~= "" then text else zeren.s("gh.no_answer")
 	end
 
-	-- GitHub's rate limits are tight, so as Zeron's own GitHub code does
+	-- GitHub's rate limits are tight, so as Zeren's own GitHub code does
 	-- (crates/engine/src/source_control.rs): once GitHub says its limit is
 	-- reached, nothing is asked for 15 minutes (every ask fails at once,
 	-- saying so); and the same read asked again while it's on its way is
@@ -142,7 +142,7 @@ return function(zeron: any)
 		if os.time() < limited_until then
 			local at = os.date("%H:%M", limited_until)
 			return task(function(_, reject)
-				reject(zeron.s("gh.rate_limit_until", { at = at }))
+				reject(zeren.s("gh.rate_limit_until", { at = at }))
 			end)
 		end
 		local key = if share then table.concat(args, "\0") .. "\0" .. (stdin or "") else nil
@@ -151,7 +151,7 @@ return function(zeron: any)
 		end
 		local t = task(function(resolve, reject)
 			queued(function(finished: () -> ())
-			zeron.run("gh", args, { stdin = stdin, timeout = 60 }):after(function(r: any)
+			zeren.run("gh", args, { stdin = stdin, timeout = 60 }):after(function(r: any)
 				finished()
 				if key then
 					in_flight[key] = nil
@@ -195,9 +195,9 @@ return function(zeron: any)
 			run({ "api", "graphql", "--input", "-" }, body, read, opts and opts.background):after(function(out: string)
 				local answer = decoded(out)
 				if type(answer) ~= "table" then
-					reject(zeron.s("gh.unreadable"))
+					reject(zeren.s("gh.unreadable"))
 				elseif answer.data == nil and answer.errors and answer.errors[1] then
-					local message = tostring(answer.errors[1].message or zeron.s("gh.said_no"))
+					local message = tostring(answer.errors[1].message or zeren.s("gh.said_no"))
 					-- (GraphQL's limit comes as an answer, not a failure.)
 					if limited(message) or answer.errors[1].type == "RATE_LIMITED" then
 						limited_until = os.time() + RATE_LIMIT_PAUSE
@@ -303,7 +303,7 @@ return function(zeron: any)
 
 	-- The cache: one table, made once; every read and write waits for it.
 	local ready = task(function(resolve, reject)
-		zeron.db.exec("CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value TEXT NOT NULL, at INTEGER NOT NULL)"):after(function()
+		zeren.db.exec("CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value TEXT NOT NULL, at INTEGER NOT NULL)"):after(function()
 			resolve(true)
 		end, function(err: any)
 			reject(tostring(if type(err) == "table" and err.message then err.message else err))
@@ -321,7 +321,7 @@ return function(zeron: any)
 			return
 		end
 		ready:after(function()
-			zeron.db.query("SELECT value, at FROM cache WHERE key = ?", { key }):after(function(rows: any)
+			zeren.db.query("SELECT value, at FROM cache WHERE key = ?", { key }):after(function(rows: any)
 				local row = type(rows) == "table" and rows[1] or nil
 				if row then
 					local ok_decode, value = pcall(ui.json.decode, row.value)
@@ -343,7 +343,7 @@ return function(zeron: any)
 	function M.keep(key: string, value: any)
 		memory[key] = { value = value, at = os.time() }
 		ready:after(function()
-			zeron.db.exec("INSERT OR REPLACE INTO cache (key, value, at) VALUES (?, ?, ?)", { key, ui.json.encode(value), os.time() })
+			zeren.db.exec("INSERT OR REPLACE INTO cache (key, value, at) VALUES (?, ?, ?)", { key, ui.json.encode(value), os.time() })
 		end)
 	end
 

@@ -1,10 +1,10 @@
 -- Right after sign-in, for an account with no username yet: choosing one.
 -- It's the card's address (zeron.sh/c/mara), so there's no card without
 -- one, and it's chosen once. The gallery's Claim your username
--- (demos/example_username) is the design; this asks Zeron for real.
+-- (demos/example_username) is the design; this asks Zeren for real.
 --
 -- One field; under it the address it makes, then, a beat after the typing
--- stops, what Zeron says of it (free, taken, reserved) or what keeps it
+-- stops, what Zeren says of it (free, taken, reserved) or what keeps it
 -- from being a username yet, said before anyone is asked. The way on opens
 -- only once it's free; it claims the name and goes on to the card. Gone
 -- wrong, the line under the title says so and the button offers another
@@ -31,14 +31,14 @@ export type Props = {
 	on_has_one: () -> (),
 }
 
--- How long the typing has to rest before Zeron is asked.
+-- How long the typing has to rest before Zeren is asked.
 local REST = 400
 
 return function(props: Props): Node
 	local typed = ui.use_state("")
 	-- What the address line says: a problem (empty, invalid, start, short,
 	-- long), or "checking", "available", "taken", "reserved", "unknown"
-	-- (Zeron couldn't be asked).
+	-- (Zeren couldn't be asked).
 	local check = ui.use_state("empty")
 	-- Claiming, and what the last claim ended in (an api word), if not a card.
 	local saving = ui.use_state(false)
@@ -182,7 +182,7 @@ return function(props: Props): Node
 				line_height = "$font.line.sm",
 				color = function()
 					local c = check:get()
-					return if c == "taken" or c == "reserved" or c == "invalid" or c == "start" then "$zeron.tone.danger.ink" else "$text.secondary"
+					return if c == "taken" or c == "reserved" or c == "invalid" or c == "start" then "$zeren.tone.danger.ink" else "$text.secondary"
 				end,
 			},
 		},
@@ -192,11 +192,11 @@ return function(props: Props): Node
 			-- its progress.)
 			-- zgx-lint: allow(untracked-get)
 			status("checking", ds.ProgressRing { size = 12, tone = "neutral", label = ui.t("onboarding.username.checking_label"):get() }, ui.t("onboarding.username.checking"), "$text.tertiary"),
-			status("available", mark("check-circle"), ui.t("onboarding.username.available"), "$zeron.tone.success.ink"),
-			status("taken", mark("close-circle"), ui.t("onboarding.username.taken"), "$zeron.tone.danger.ink"),
-			status("reserved", mark("close-circle"), ui.t("onboarding.username.reserved"), "$zeron.tone.danger.ink"),
-			status("invalid", mark("info-circle"), ui.t("onboarding.username.invalid"), "$zeron.tone.danger.ink"),
-			status("start", mark("info-circle"), ui.t("onboarding.username.start"), "$zeron.tone.danger.ink"),
+			status("available", mark("check-circle"), ui.t("onboarding.username.available"), "$zeren.tone.success.ink"),
+			status("taken", mark("close-circle"), ui.t("onboarding.username.taken"), "$zeren.tone.danger.ink"),
+			status("reserved", mark("close-circle"), ui.t("onboarding.username.reserved"), "$zeren.tone.danger.ink"),
+			status("invalid", mark("info-circle"), ui.t("onboarding.username.invalid"), "$zeren.tone.danger.ink"),
+			status("start", mark("info-circle"), ui.t("onboarding.username.start"), "$zeren.tone.danger.ink"),
 			status("short", nil, ui.t("onboarding.username.short", { n = api.MIN }), "$text.tertiary"),
 			status("long", nil, ui.t("onboarding.username.long", { n = api.MAX }), "$text.tertiary"),
 			status("unknown", mark("info-circle"), ui.t("onboarding.username.unknown"), "$text.tertiary"),
@@ -209,7 +209,7 @@ return function(props: Props): Node
 		-- Back to the look, and no skipping (a username is the card;
 		-- skipping was at sign-in). Signed into the wrong account: Sign out
 		-- is on the look, one step back.
-		-- (Welcoming someone who already had Zeron, there's no look to go back to, and
+		-- (Welcoming someone who already had Zeren, there's no look to go back to, and
 		-- they aren't kept from their chats: they can leave it for now.)
 		back = if state.welcome then nil else Onboarding.Back { on_click = props.on_back },
 		aside = if state.welcome
@@ -238,7 +238,7 @@ return function(props: Props): Node
 					else ui.t("onboarding.username.body"):get()
 			end,
 			tone = function()
-				return if failed:get() then "$zeron.tone.danger.ink" else "$text.secondary"
+				return if failed:get() then "$zeren.tone.danger.ink" else "$text.secondary"
 			end,
 			ui.column {
 				w_full = true,

@@ -6,7 +6,7 @@
 //!   { chat, ready, error?, services = { { id, name, port, url, project,
 //!     device, cwd, pid, started, process, command } } }
 //!
-//! `process` names what listens, short (`cargo test zeron_engine`, `node
+//! `process` names what listens, short (`cargo test zeren_engine`, `node
 //! server.js`, `python3 -m http.server`): the engine's `process`, else made
 //! here from the process's arguments where it runs on this machine (the
 //! same pid in the same folder). `command` is that whole command line,
@@ -26,7 +26,7 @@
 use serde_json::{Value as Json, json};
 use std::{cell::RefCell, rc::Rc};
 use zgx_script::{ScriptHost, Shared, Value};
-use zeron_preview_label::{process_label, shown_command};
+use zeren_preview_label::{process_label, shown_command};
 
 use crate::engine::{
     self,
@@ -113,7 +113,7 @@ fn waiting(chat: &str) -> Value {
     ])
 }
 
-/// The engine's snapshot (zeron_proto::PreviewSnapshot) as the scripts read it.
+/// The engine's snapshot (zeren_proto::PreviewSnapshot) as the scripts read it.
 fn snapshot(chat: &str, item: &Json) -> Value {
     let proxy_port = item["proxyPort"].as_u64().unwrap_or(0);
     let services: Vec<Value> = item["services"]
@@ -236,13 +236,13 @@ mod tests {
     fn a_snapshot_names_each_service_through_the_proxy() {
         let item = json!({
             "proxyPort": 27800,
-            "services": [{ "id": "a", "name": "web", "port": 3000, "hostname": "web.zeron.localhost", "projectName": "site", "deviceName": "mac", "cwd": "/w" }],
+            "services": [{ "id": "a", "name": "web", "port": 3000, "hostname": "web.zeren.localhost", "projectName": "site", "deviceName": "mac", "cwd": "/w" }],
             "remote": false
         });
         let v = snapshot("c1", &item);
         let Value::List(list) = v.field("services").unwrap() else { panic!("services") };
         assert_eq!(list.len(), 1);
-        assert_eq!(crate::auth::text(&list[0].field("url").unwrap()), "http://web.zeron.localhost:27800");
+        assert_eq!(crate::auth::text(&list[0].field("url").unwrap()), "http://web.zeren.localhost:27800");
         assert!(v.field("ready").unwrap().truthy());
         // (An older engine sends no command, and pid 123 isn't in /w here.)
         assert_eq!(crate::auth::text(&list[0].field("process").unwrap()), "");
@@ -295,13 +295,13 @@ mod tests {
             |a: &[&str]| process_label(&a.iter().map(|s| s.to_string()).collect::<Vec<_>>());
         assert_eq!(
             label(&[
-                "/w/target/debug/deps/zeron_engine-0123456789abcdef",
+                "/w/target/debug/deps/zeren_engine-0123456789abcdef",
                 "--test-threads",
                 "4"
             ]),
-            "cargo test zeron_engine"
+            "cargo test zeren_engine"
         );
-        assert_eq!(label(&["/usr/bin/zeron-engine", "serve"]), "zeron-engine");
+        assert_eq!(label(&["/usr/bin/zeren-engine", "serve"]), "zeren-engine");
         assert_eq!(label(&["node", "/w/server.js"]), "node server.js");
         assert_eq!(
             label(&["node", "/w/node_modules/.bin/vite", "--port", "5173"]),

@@ -1,4 +1,4 @@
--- A chat's background processes, as Zeron's tray has them
+-- A chat's background processes, as Zeren's tray has them
 -- (background_tray.rs): Stop asks the chat's host to stop one, and says so
 -- if it couldn't.
 

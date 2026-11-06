@@ -65,7 +65,7 @@ local DEVICES: { ds.ComposerDevice } = {
 	{ value = "studio", label = "studio", offline = true },
 	{ value = "cloud", label = "Cloud", cloud = true },
 }
-local branch = ui.state("branch", "zeron/zgx-onboarding-design-system" :: string?)
+local branch = ui.state("branch", "zeren/zgx-onboarding-design-system" :: string?)
 -- The agents, and their models with the reasoning each offers (low to
 -- high) and the level it starts on.
 local HARNESSES: { ds.Harness } = {
@@ -147,8 +147,8 @@ local options = ui.state("model_options", {} :: { [string]: string })
 local demo_effort = ui.state("demo_effort", "xhigh" :: string?)
 local BRANCHES: { Dropdown.Item } = {
 	{ value = "main", label = "main" },
-	{ value = "zeron/zgx-onboarding-design-system", label = "zeron/zgx-onboarding-design-system" },
-	{ value = "zeron/composer", label = "zeron/composer" },
+	{ value = "zeren/zgx-onboarding-design-system", label = "zeren/zgx-onboarding-design-system" },
+	{ value = "zeren/composer", label = "zeren/composer" },
 }
 
 -- The window's own geometry (not spacing): the title bar's strip, the
@@ -210,7 +210,7 @@ local GROUPS: { Group } = {
 						gap = "$space.6",
 						block(
 							"STYLES",
-							ds.Text { "Welcome to Zeron", style = "display" },
+							ds.Text { "Welcome to Zeren", style = "display" },
 							ds.Text { "Choose a look", style = "title" },
 							ds.Text { "Heading", style = "heading" },
 							ds.Text { "Body copy sits at thirteen points, in Geist.", style = "body" },
@@ -244,7 +244,7 @@ local GROUPS: { Group } = {
 					for _, step in STEPS do
 						table.insert(head, ui.text { step, w = SWATCH, shrink = 0, font = "$font.mono", text_size = "$font.size.xs", color = "$text.tertiary", align = "center" })
 					end
-					local rows: { Node } = { ui.row { gap = "$zeron.space.hair", table.unpack(head) } }
+					local rows: { Node } = { ui.row { gap = "$zeren.space.hair", table.unpack(head) } }
 					for _, hue in HUES do
 						local cells: { Node } = { ds.Text { hue, style = "caption", tone = "secondary", w = NAME, shrink = 0 } }
 						for _, step in STEPS do
@@ -257,9 +257,9 @@ local GROUPS: { Group } = {
 								tooltip = `palette.{hue}.{step}`,
 							})
 						end
-						table.insert(rows, ui.row { gap = "$zeron.space.hair", items = "center", table.unpack(cells) })
+						table.insert(rows, ui.row { gap = "$zeren.space.hair", items = "center", table.unpack(cells) })
 					end
-					return ui.column { gap = "$zeron.space.hair", table.unpack(rows) }
+					return ui.column { gap = "$zeren.space.hair", table.unpack(rows) }
 				end,
 			},
 			-- Every palette a window can wear, and the import
@@ -515,7 +515,7 @@ local GROUPS: { Group } = {
 				id = "sidebar",
 				title = "App shell",
 				fill = true,
-				about = "The window as Zeron's: its title bar, its sidebar (grouped, sorted, your sections, dragged), a new chat over its wallpaper, a session's page, the composer travelling between them.",
+				about = "The window as Zeren's: its title bar, its sidebar (grouped, sorted, your sections, dragged), a new chat over its wallpaper, a session's page, the composer travelling between them.",
 				demo = function()
 					local compact = ui.persist("demo_sidebar_compact", true)
 					local collapsed = ui.state("demo_sidebar_collapsed", false)
@@ -525,12 +525,12 @@ local GROUPS: { Group } = {
 					}
 					local projects: { SidebarTypes.Project } = {
 						{
-							id = "zeron",
-							name = "Zeron",
-							src = "assets/favicons/zeron.png",
+							id = "zeren",
+							name = "Zeren",
+							src = "assets/favicons/zeren.png",
 							hue = "violet",
 							sessions = {
-								{ id = "s-onboarding", created = "2d", title = "Onboarding in zgx", status = "working", time = "now", agent = "claude", device = "MacBook Pro", branch = "zeron/zgx-onboarding", pr = { number = 1094, state = "draft", title = "zgx onboarding and design system" } },
+								{ id = "s-onboarding", created = "2d", title = "Onboarding in zgx", status = "working", time = "now", agent = "claude", device = "MacBook Pro", branch = "zeren/zgx-onboarding", pr = { number = 1094, state = "draft", title = "zgx onboarding and design system" } },
 								{ id = "s-rebase", created = "5h", title = "Which branch should this rebase onto?", status = "input", time = "4m", agent = "openai", device = "devbox", branch = "main" },
 								{ id = "s-presence", created = "1d", title = "Rename the presence room", status = "done", time = "12m", agent = "claude", device = "MacBook Pro", branch = "presence-rename", pr = { number = 1088, state = "merged", title = "Rename the presence room" } },
 								{ id = "s-flaky", created = "3d", title = "Fix the flaky local_first test", status = "failed", time = "1h", agent = "openai", device = "studio", branch = "fix/local-first" },
@@ -660,7 +660,7 @@ local GROUPS: { Group } = {
 					-- A window: its title bar (the window's buttons, and the
 					-- sidebar's toggle beside them, where it stays at any width),
 					-- the sidebar, the open session.
-					-- The title bar's height (Zeron's).
+					-- The title bar's height (Zeren's).
 					local TITLE_H = 38
 					-- What the page shows behind it: a picture, as ds.Wallpaper draws
 					-- one (a card scene's sky standing in for your own), its effect.
@@ -671,7 +671,7 @@ local GROUPS: { Group } = {
 					-- The title bar's files toggle (lit while they'd show).
 					local demo_files = ui.state("demo_sidebar_files", false)
 					-- The sidebar's width (dragged at its edge), and what collapsing
-					-- leaves: a rail of icons, or nothing (as Zeron's today).
+					-- leaves: a rail of icons, or nothing (as Zeren's today).
 					local side_w = ui.persist("demo_sidebar_width", 256)
 					local side_mode = ui.persist("demo_sidebar_mode", "rail")
 					-- Its view options (its "…"), shared by it and its rail.
@@ -713,7 +713,7 @@ local GROUPS: { Group } = {
 					if effect:peek() == "blur" then
 						effect:set("none")
 					end
-					-- Faded as Zeron fades its wallpaper: from the top, full, to
+					-- Faded as Zeren fades its wallpaper: from the top, full, to
 					-- nothing at the bottom, across its whole height.
 					local faded = ui.persist("demo_sidebar_faded", true)
 					-- How strongly an effect draws over the picture, and (ASCII) how
@@ -759,13 +759,13 @@ local GROUPS: { Group } = {
 					local px = ui.state("demo_sidebar_px", 0.5)
 					local py = ui.state("demo_sidebar_py", 0.5)
 					local page_ref = ui.ref()
-					-- How the composer travels: Zeron's critically damped dock
+					-- How the composer travels: Zeren's critically damped dock
 					-- spring (ω ≈ 27, between its 0.42 s and 0.47 s).
 					local DOCK: SpringOptions = { stiffness = 730, damping = 54 }
 					local dock_ref = ui.ref()
 					-- The composer, as the gallery's composer page has it.
 					-- The project a new chat works in, from the sidebar's projects.
-					local project = ui.state("demo_sidebar_project", "zeron" :: string?)
+					local project = ui.state("demo_sidebar_project", "zeren" :: string?)
 					local project_choices: { ComposerTypes.Project } = {}
 					for _, p in projects do
 						table.insert(project_choices, { value = p.id, label = p.name, hue = p.hue, src = p.src })
@@ -774,7 +774,7 @@ local GROUPS: { Group } = {
 						return ds.Composer {
 							value = draft,
 							placeholder = placeholder,
-							-- A new chat's opens out, as the app's (and Zeron's) does.
+							-- A new chat's opens out, as the app's (and Zeren's) does.
 							expanded = below,
 							menus_below = below,
 							project = project,
@@ -802,7 +802,7 @@ local GROUPS: { Group } = {
 							end,
 						}
 					end
-					-- (The art is a new chat's canvas, as Zeron's: a session's page
+					-- (The art is a new chat's canvas, as Zeren's: a session's page
 					-- has none.)
 					local function new_chat(): boolean
 						return chosen:get() == nil
@@ -895,7 +895,7 @@ local GROUPS: { Group } = {
 								},
 							}
 						end, { absolute = true, left = 0, right = 0, top = 0, bottom = 0 }),
-						-- The composer: one, travelling between the pages as Zeron's
+						-- The composer: one, travelling between the pages as Zeren's
 						-- does (crates/ui/src/composer_dock.rs): docked at a session's
 						-- foot, lifted to a little over the middle of a new chat, its
 						-- width easing between the two, on one critically damped
@@ -1048,7 +1048,7 @@ local GROUPS: { Group } = {
 								ds.TitleBar {
 									collapsed = collapsed,
 									lights = true,
-									-- As Zeron's: only over a new chat's art.
+									-- As Zeren's: only over a new chat's art.
 									island = function(): boolean
 										return collapsed:get() and new_chat() and wallpaper:get() ~= "none"
 									end,
@@ -1621,7 +1621,7 @@ local GROUPS: { Group } = {
 			{
 				id = "marks",
 				title = "Marks",
-				about = "The agents Zeron runs, each on its tile.",
+				about = "The agents Zeren runs, each on its tile.",
 				demo = function()
 					return block(
 						"MARKS",
@@ -1723,7 +1723,7 @@ local GROUPS: { Group } = {
 					return ui.column {
 						gap = "$space.6",
 						block("IN A CHAT'S HEADER", ui.column { gap = "$space.3", table.unpack(header) }),
-						block("IN A LIST", ui.column { gap = "$zeron.list.gap", table.unpack(rows) }),
+						block("IN A LIST", ui.column { gap = "$zeren.list.gap", table.unpack(rows) }),
 						block("WITH THEIR NAMES", row(table.unpack(tags))),
 						block("GLYPHS", row(table.unpack(glyphs))),
 					}
@@ -1754,7 +1754,7 @@ ROUTES.sidebar_session = "/sidebar/session/:id"
 router = ui.router {
 	routes = ROUTES,
 	initial = ROUTES[page:peek()] or "/buttons",
-	scheme = "zeron-gallery",
+	scheme = "zeren-gallery",
 }
 -- `page` follows the route, so the page is kept across launches; set from
 -- outside (as devtools set it), it moves the route.
@@ -1830,7 +1830,7 @@ local function nav(): Node
 				fade = { 16, 16 },
 				fade_overflow = true,
 				-- (The inset inside: a scroll clips inside its own padding.)
-				ui.column { w_full = true, px = "$space.3", pb = "$space.3", gap = "$zeron.list.gap", table.unpack(items) },
+				ui.column { w_full = true, px = "$space.3", pb = "$space.3", gap = "$zeren.list.gap", table.unpack(items) },
 			},
 		},
 	}
@@ -1932,7 +1932,7 @@ local function header(): Node
 			function()
 				return PAGES[page_of(router.route:get().name)].title
 			end,
-			-- As Zeron's title bar: body size, medium.
+			-- As Zeren's title bar: body size, medium.
 			style = "body",
 			weight = "$font.weight.medium",
 			grow = 1,
@@ -2051,10 +2051,10 @@ return ui.overlay {
 	w_full = true,
 	h_full = true,
 	theme = function()
-		return if dark:get() then "zeron-dark" else "zeron-light"
+		return if dark:get() then "zeren-dark" else "zeren-light"
 	end,
 	bg = function()
-		return if frosted:get() then "$background" else "$zeron.window"
+		return if frosted:get() then "$background" else "$zeren.window"
 	end,
 	-- The title bar's strip: it moves the window.
 	ui.div { absolute = true, left = 0, right = 0, top = 0, h = TITLEBAR, window_drag = true },

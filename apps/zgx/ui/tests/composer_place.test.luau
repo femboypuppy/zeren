@@ -59,9 +59,9 @@ test("composer place: where it runs leads, a worktree's glyph or a folder, then 
 	-- A worktree: its glyph, the project's name › the branch. No tile.
 	expect(app:has("#composer-place-lead >> .place-lead-worktree")).to_be(true)
 	expect(app:text("#composer-place-lead")).to_be("")
-	expect(app:text("#composer-place-project[1]")).to_be("zeron")
+	expect(app:text("#composer-place-project[1]")).to_be("zeren")
 	expect(showing(app, "#composer-place-branch")).to_be(true)
-	expect(app:text("#composer-place-branch[1]")).to_be("zeron/create-readme-update-for-onboarding")
+	expect(app:text("#composer-place-branch[1]")).to_be("zeren/create-readme-update-for-onboarding")
 	-- The project's own checkout: a folder.
 	app:set_state("test_place_checkout", "local")
 	rested(app)
@@ -108,7 +108,7 @@ test("composer place: short of room the branch gives way first, then the project
 	expect(app:error()).to_be(nil)
 end)
 
-test("composer place: the context ring opens a card of the numbers, as Zeron writes them", function()
+test("composer place: the context ring opens a card of the numbers, as Zeren writes them", function()
 	local app = mounted()
 	app:hover("#composer-context")
 	rested(app)

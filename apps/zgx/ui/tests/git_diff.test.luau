@@ -10,12 +10,12 @@ test("a diff's lines are coloured as their language is, once per file", function
 	app:frames(5)
 	local said = app:text("#hl")
 	-- `fn`, a keyword: a colour of its own, not plain text's.
-	expect(string.find(said, "fn=$zeron.syntax.", 1, true) ~= nil).to_be(true)
-	expect(string.find(said, "fn=$zeron.syntax.text", 1, true)).to_be(nil)
+	expect(string.find(said, "fn=$zeren.syntax.", 1, true) ~= nil).to_be(true)
+	expect(string.find(said, "fn=$zeren.syntax.text", 1, true)).to_be(nil)
 	-- A hunk's header has none; asked again, the same answer, kept.
 	expect(string.find(said, "hunk=none", 1, true) ~= nil).to_be(true)
 	expect(string.find(said, "same=true", 1, true) ~= nil).to_be(true)
-	-- A language Zeron doesn't colour: none at all.
+	-- A language Zeren doesn't colour: none at all.
 	expect(string.find(said, "unknown=true", 1, true) ~= nil).to_be(true)
 end)
 

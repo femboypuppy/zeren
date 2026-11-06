@@ -45,7 +45,7 @@ return function(props: Props): Node
 		-- The knob's box: it is placed in the track, whatever is around it.
 		relative = true,
 		rounded = "$radius.full",
-		bg = ui.tween(value, { from = "$zeron.switch.track", to = "$zeron.switch.on", duration = 180 }),
+		bg = ui.tween(value, { from = "$zeren.switch.track", to = "$zeren.switch.on", duration = 180 }),
 		ui.div {
 			absolute = true,
 			left = INSET,
@@ -53,8 +53,8 @@ return function(props: Props): Node
 			w = KNOB,
 			h = KNOB,
 			rounded = "$radius.full",
-			bg = "$zeron.switch.knob",
-			shadow = "$zeron.switch.knob_lift",
+			bg = "$zeren.switch.knob",
+			shadow = "$zeren.switch.knob_lift",
 			x = motion.spring(value, { from = 0, to = W - KNOB - INSET * 2, stiffness = 420, damping = 30 }),
 		},
 	}

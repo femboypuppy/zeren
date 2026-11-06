@@ -1,7 +1,7 @@
 # fx provider screenshots
 
 Unedited captures of the Linux desktop app built from this branch with
-`cargo build -p zeron`, running on Xvfb with Mesa's software Vulkan driver.
+`cargo build -p zeren`, running on Xvfb with Mesa's software Vulkan driver.
 The app uses an isolated data directory and the real fx 0.0.15 executable.
 No fx account is configured in the capture environment.
 

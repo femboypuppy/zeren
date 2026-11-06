@@ -1,4 +1,4 @@
--- A question of several pages steps back as Zeron's does (composer.rs
+-- A question of several pages steps back as Zeren's does (composer.rs
 -- wizard `back`): Back, or Escape, from the second page asks the host to
 -- take that page's answer off, and what was picked there shows chosen.
 

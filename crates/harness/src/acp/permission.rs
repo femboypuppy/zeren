@@ -7,7 +7,7 @@
 //! of the person. Yes allows once, no rejects once, and a permission no one
 //! can be asked about (setup, a control call) is refused.
 use serde_json::{Value, json};
-use zeron_proto::{AccessMode, ToolCall, UserInputQuestion};
+use zeren_proto::{AccessMode, ToolCall, UserInputQuestion};
 
 use crate::approval::{self, Action};
 

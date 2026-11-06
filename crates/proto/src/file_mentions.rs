@@ -1,6 +1,6 @@
 //! Canonical file chips shared by the editor and harness delivery boundary.
 use std::ops::Range;
-pub const FILE_MENTION_SCHEME: &str = "zeron-file:";
+pub const FILE_MENTION_SCHEME: &str = "zeren-file:";
 
 pub struct FileMentionLink {
     pub range: Range<usize>,
@@ -155,8 +155,8 @@ mod tests {
             format!("```\n{file}\n```"),
             format!("\\{file}"),
             format!("![example {file}](example.png)"),
-            "[x](zeron-file:../x)".into(),
-            "[other](zeron-file:src/x)".into(),
+            "[x](zeren-file:../x)".into(),
+            "[other](zeren-file:src/x)".into(),
         ] {
             assert!(file_mention_links(&literal).is_empty());
             assert_eq!(file_mention_prompt(&literal), literal);
@@ -165,10 +165,10 @@ mod tests {
         let links = file_mention_links(&image_then_file);
         assert_eq!(links.len(), 1);
         assert_eq!(&image_then_file[links[0].range.clone()], file);
-        for name in ["src/é.rs", "src/](zeron-file:x)", "src/what?.rs"] {
+        for name in ["src/é.rs", "src/](zeren-file:x)", "src/what?.rs"] {
             let raw = local_file_link(name, false);
             assert_eq!(file_mention_links(&raw)[0].path, name);
-            assert!(!file_mention_prompt(&raw).contains("](zeron-file:src/"));
+            assert!(!file_mention_prompt(&raw).contains("](zeren-file:src/"));
         }
     }
 }

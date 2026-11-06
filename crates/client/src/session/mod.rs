@@ -17,12 +17,12 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, RwLock, Weak};
 
 use tokio::sync::watch;
-use zeron_doc::{
+use zeren_doc::{
     CommandBasedOn, MessagePart, MessageRole, MessageStatus, QueueDeliveryGate, QueuedMessage,
     SessionCommandEntry, SessionCommandPayload, SessionCommandStatus, SessionDoc,
     SessionMessageEntry,
 };
-use zeron_proto::{
+use zeren_proto::{
     ChatIndicator, ContextUsage, RunRequest, SandboxLevel, UserInputAnswer, WorktreeSpec,
 };
 
@@ -382,7 +382,7 @@ impl SessionCore {
     /// Serialized doc write, then an incremental refresh.
     pub(crate) fn write<R>(
         &self,
-        f: impl FnOnce(&SessionDoc) -> std::result::Result<R, zeron_doc::DocError>,
+        f: impl FnOnce(&SessionDoc) -> std::result::Result<R, zeren_doc::DocError>,
     ) -> Result<R> {
         let result = {
             let _gate = lock(&self.write_gate);
@@ -445,7 +445,7 @@ impl SessionCore {
         // A Cloud chat whose machine isn't up yet: it is being started (or
         // woken) for the latest message.
         let cloud_booting = workspace.session(&self.chat_id).is_some_and(|row| {
-            zeron_proto::is_cloud_device(&row.device_id, "")
+            zeren_proto::is_cloud_device(&row.device_id, "")
                 && !workspace.device(&row.device_id).is_some_and(|d| d.online)
         });
         drop(workspace);
@@ -607,7 +607,7 @@ impl SessionCore {
                 turn_id: Some(turn_id),
                 frontier: None,
             }),
-            expires_at: Some(now + zeron_doc::COMMAND_DEFAULT_TTL_MS),
+            expires_at: Some(now + zeren_doc::COMMAND_DEFAULT_TTL_MS),
             status: SessionCommandStatus::Pending,
             resolution: None,
         };
@@ -869,7 +869,7 @@ fn refresh_setup_placeholder(st: &mut CoreState, cloud_booting: bool) -> bool {
             .find_map(|p| st.echoes.get(&p.message_id))
             .or_else(|| transcript.iter().rev().find(|e| e.role() == MessageRole::User));
         latest_user.filter(|_| cloud_booting).and_then(|message| {
-            let setup_id = zeron_proto::cloud_setup_entry_id(&message.id);
+            let setup_id = zeren_proto::cloud_setup_entry_id(&message.id);
             // Nothing after the message in the doc, and no setup entry yet.
             let answered = transcript.iter().any(|e| e.id == setup_id)
                 || transcript
@@ -884,7 +884,7 @@ fn refresh_setup_placeholder(st: &mut CoreState, cloud_booting: bool) -> bool {
     let next = wanted.map(|(message_id, setup_id, name, created_at)| {
         if let Some(current) = &st.setup_placeholder
             && current.id == setup_id
-            && matches!(current.message.parts.first(), Some(MessagePart::Tool { call: zeron_proto::ToolCall::Unknown { name: n, .. }, .. }) if n == name)
+            && matches!(current.message.parts.first(), Some(MessagePart::Tool { call: zeren_proto::ToolCall::Unknown { name: n, .. }, .. }) if n == name)
         {
             return current.clone();
         }
@@ -895,8 +895,8 @@ fn refresh_setup_placeholder(st: &mut CoreState, cloud_booting: bool) -> bool {
                 id: setup_id,
                 role: MessageRole::Assistant,
                 parts: vec![MessagePart::Tool {
-                    id: zeron_proto::cloud_setup_part_id(&message_id, "machine"),
-                    call: zeron_proto::ToolCall::Unknown { name: name.into(), input: None },
+                    id: zeren_proto::cloud_setup_part_id(&message_id, "machine"),
+                    call: zeren_proto::ToolCall::Unknown { name: name.into(), input: None },
                     is_error: false,
                     resolved: false,
                     output: None,
@@ -1099,7 +1099,7 @@ impl SessionHandle {
             && !client.is_demo()
         {
             return Err(ClientError::Unsupported(
-                "the host is too old for image attachments — update Zeron on it".into(),
+                "the host is too old for image attachments — update Zeren on it".into(),
             ));
         }
         let refs =
@@ -1310,7 +1310,7 @@ impl SessionHandle {
         };
         let reply = self
             .queue_rpc(
-                zeron_rpc::methods::BEGIN_QUEUED_MESSAGE_EDIT,
+                zeren_rpc::methods::BEGIN_QUEUED_MESSAGE_EDIT,
                 serde_json::json!({
                     "chatId": self.core.chat_id,
                     "id": id,
@@ -1349,7 +1349,7 @@ impl SessionHandle {
 
     pub async fn renew_queued_edit(&self, lease: &QueueEditLease) -> bool {
         self.queue_rpc(
-            zeron_rpc::methods::RENEW_QUEUED_MESSAGE_EDIT,
+            zeren_rpc::methods::RENEW_QUEUED_MESSAGE_EDIT,
             serde_json::json!({
                 "chatId": self.core.chat_id,
                 "id": lease.row_id,
@@ -1377,7 +1377,7 @@ impl SessionHandle {
             params["text"] = serde_json::Value::String(text);
         }
         match self
-            .queue_rpc(zeron_rpc::methods::FINISH_QUEUED_MESSAGE_EDIT, params)
+            .queue_rpc(zeren_rpc::methods::FINISH_QUEUED_MESSAGE_EDIT, params)
             .await
         {
             Ok(value) => match value.get("outcome").and_then(|o| o.as_str()) {
@@ -1409,9 +1409,9 @@ impl SessionHandle {
             self.core.recompute_composer(&client);
         }
         let method = match action {
-            QueueAction::SendNow => zeron_rpc::methods::SEND_QUEUED_MESSAGE_NOW,
-            QueueAction::Steer => zeron_rpc::methods::STEER_QUEUED_MESSAGE_NOW,
-            QueueAction::Remove => zeron_rpc::methods::REMOVE_QUEUED_MESSAGE,
+            QueueAction::SendNow => zeren_rpc::methods::SEND_QUEUED_MESSAGE_NOW,
+            QueueAction::Steer => zeren_rpc::methods::STEER_QUEUED_MESSAGE_NOW,
+            QueueAction::Remove => zeren_rpc::methods::REMOVE_QUEUED_MESSAGE,
         };
         let result = self
             .queue_rpc(
@@ -1618,11 +1618,11 @@ mod setup_placeholder_tests {
         let mut st = state_with_pending_send();
         assert!(refresh_setup_placeholder(&mut st, true));
         let placeholder = st.setup_placeholder.clone().expect("placeholder under the message");
-        assert_eq!(placeholder.id, zeron_proto::cloud_setup_entry_id("m1"));
+        assert_eq!(placeholder.id, zeren_proto::cloud_setup_entry_id("m1"));
         assert!(placeholder.is_streaming());
         assert!(matches!(
             placeholder.message.parts.first(),
-            Some(MessagePart::Tool { call: zeron_proto::ToolCall::Unknown { name, .. }, .. }) if name == "Starting a machine"
+            Some(MessagePart::Tool { call: zeren_proto::ToolCall::Unknown { name, .. }, .. }) if name == "Starting a machine"
         ));
         // Unchanged: the same entry (row reuse), no change reported.
         assert!(!refresh_setup_placeholder(&mut st, true));

@@ -110,7 +110,7 @@ fn click(target: &'static str) -> impl FnOnce(&mut TestApp) {
 /// scope closing with nothing focused before falls back to the first
 /// focusable (`pop_focus_scope`'s `next_focus`), and any plain key (Escape
 /// too) makes what gets focus back draw its ring (`pointer_modality`).
-/// zgx took the change (f3b6b53e, 3c47d763; Zeron's pin since 944fa878d): this checks it.
+/// zgx took the change (f3b6b53e, 3c47d763; Zeren's pin since 944fa878d): this checks it.
 #[test]
 fn escape_gives_focus_back_without_a_ring() {
     let mut f = Vec::new();

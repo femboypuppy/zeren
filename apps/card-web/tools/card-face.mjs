@@ -23,7 +23,7 @@ export const deriveCard = (seed, scenes = CARD_SCENES) => ({
 
 if (process.argv[1] && import.meta.url.endsWith(process.argv[1].split("/").pop())) {
   const vectors = [
-    ["", 2872998923], ["a", 444641715], ["zeron", 3920131753],
+    ["", 2872998923], ["a", 444641715], ["zeren", 3920131753],
     ["user_test_0001:scene", 62640894], ["user_test_0001:holo", 1378625095], ["user_test_0001:sky", 1678271501],
     ["é", 2387039943], ["ユーザー", 3445456616], ["🂡", 3106548733]
   ];

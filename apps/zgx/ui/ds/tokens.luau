@@ -1,4 +1,4 @@
--- The theme layer: Zeron's two themes (themes/*.json, which restyle in
+-- The theme layer: Zeren's two themes (themes/*.json, which restyle in
 -- place as they are saved) and the app's own tokens, declared in standard
 -- terms so any theme styles them. Values live here and in the theme files,
 -- nowhere else.
@@ -16,12 +16,12 @@ function M.setup()
 	-- The app's own editors draw ds/editor_menu.
 	ui.theme.tokens {
 		menu = {
-			bg = "{zeron.menu.tint}",
+			bg = "{zeren.menu.tint}",
 			hover = "{hover}",
 		},
 	}
 	ui.theme.tokens {
-		zeron = {
+		zeren = {
 			-- Half-steps of the spacing scale (space.1 to 8: 4, 8, 12, 16, 24,
 			-- 32, 48, 64), for controls: a thumb's inset in its track, a chip's
 			-- padding and gap, a small button's padding.
@@ -70,11 +70,11 @@ function M.setup()
 				radius = "{radius.lg}",
 			},
 			-- The lines of a tree (a group's sessions off its header, as
-			-- Zeron's transcript draws its tools): the text's own ink, faint
-			-- (Zeron's hairline at 12%), so it reads in both themes.
+			-- Zeren's transcript draws its tools): the text's own ink, faint
+			-- (Zeren's hairline at 12%), so it reads in both themes.
 			tree = "alpha({text.primary}, 0.12)",
 			-- The open session's title in the window's top strip: the text's
-			-- own ink a little under full (Zeron's at 85%), so it reads as the
+			-- own ink a little under full (Zeren's at 85%), so it reads as the
 			-- window's, not as the page's heading.
 			title = "alpha({text.primary}, 0.85)",
 			-- A raised thing: its edge, the light on its top (an inset shadow;
@@ -103,7 +103,7 @@ function M.setup()
 				shadow = "{shadow.lg}",
 				-- A menu's chosen row: quieter than a sidebar's (many rows
 				-- close together), a step above the hover wash.
-				selected = "{zeron.selected.flat.bg}",
+				selected = "{zeren.selected.flat.bg}",
 				-- A destructive row's wash, lit or asking once more: the
 				-- danger's hue, as faint as the hover wash reads.
 				danger = "alpha({danger}, 0.14)",
@@ -118,7 +118,7 @@ function M.setup()
 			},
 			-- An island: controls gathered on glass over the page (the title
 			-- bar's at the window's top left as the sidebar goes, the sidebar's
-			-- rail at its bottom left), one look for both, as Zeron's
+			-- rail at its bottom left), one look for both, as Zeren's
 			-- (shell.rs `titlebar_island_vertical_geometry`): its corner, its
 			-- inset from the window's edges, its padding round its controls,
 			-- its controls' size, the gap between them and between their
@@ -130,7 +130,7 @@ function M.setup()
 				control = 24,
 				gap = 2,
 				group = 8,
-				tint = "{zeron.menu.tint}",
+				tint = "{zeren.menu.tint}",
 				blur = 20,
 				shadow = "{shadow.sm}",
 			},
@@ -148,11 +148,11 @@ function M.setup()
 				radius = 26,
 				text = 14,
 				line = 22,
-				-- The caret: the accent, two points wide, as Zeron's.
+				-- The caret: the accent, two points wide, as Zeren's.
 				caret = "{accent}",
 				caret_width = 2,
 				-- What the message carries, as chips in a strip over the draft
-				-- (ds/composer_cargo), at Zeron's inline chip's scale (chip.rs:
+				-- (ds/composer_cargo), at Zeren's inline chip's scale (chip.rs:
 				-- a row less three, corner 5, a 14 glyph): a chip's height and
 				-- corner, its glyph, how wide it may grow, the gap between chips,
 				-- the strip's inset from the pill's edge (the draft's own, so
@@ -179,7 +179,7 @@ function M.setup()
 					-- pill's only with the same gap above as beside.)
 					top = 16,
 					below = 12,
-					bg = "{zeron.secondary.bg}",
+					bg = "{zeren.secondary.bg}",
 					edge = "{border}",
 					-- Over a thumbnail while it uploads or after it fails: the
 					-- scrim, and the ink of the ring or the glyph on it.
@@ -191,10 +191,10 @@ function M.setup()
 				-- how far one tucks under the next (and the last under the pill),
 				-- a header's height and a row's.
 				tray = {
-					tint = "{zeron.menu.tint}",
-					solid = "{zeron.menu.solid}",
+					tint = "{zeren.menu.tint}",
+					solid = "{zeren.menu.solid}",
 					edge = "{border}",
-					blur = "{zeron.menu.blur}",
+					blur = "{zeren.menu.blur}",
 					radius = 16,
 					step = 16,
 					tuck = 10,
@@ -214,19 +214,19 @@ function M.setup()
 				-- skill's in the accent, both a weight up. And the track that
 				-- unrolls from the microphone while dictating.
 				token = { trigger = "{text.tertiary}", file = "{text.primary}", action = "{accent}", weight = 500 },
-				voice = { h = 28, ink = "{accent}", bg = "{zeron.secondary.bg}" },
+				voice = { h = 28, ink = "{accent}", bg = "{zeren.secondary.bg}" },
 			},
 			-- A line glyph's stroke, in points at 16 (the sidebar icon's). The
 			-- themes may weigh it differently: a dark line on light reads
 			-- thinner than the same line light on dark.
 			glyph = { stroke = 1.1667 },
 			-- Inline code and code blocks in what is typed: a wash behind them.
-			code = { wash = "{zeron.secondary.bg}" },
+			code = { wash = "{zeren.secondary.bg}" },
 			-- The code editor: Geist Mono at the transcript's code size; the
-			-- wash behind the caret's row (Zeron's 2.5%, a breath); a matched
+			-- wash behind the caret's row (Zeren's 2.5%, a breath); a matched
 			-- bracket's; a search's matches, the current one firmer; a line
 			-- just gone to, washed in the accent as it lands; its selection (the
-			-- accent, as Zeron's editor); a folded line's summary; and its status
+			-- accent, as Zeren's editor); a folded line's summary; and its status
 			-- bar's height.
 			editor = {
 				size = 13,
@@ -246,9 +246,9 @@ function M.setup()
 			-- The command palette's card: in the window over its dimmed page
 			-- (not over the platform's material, as a menu is), so a denser
 			-- glass than a menu's tint over its own blur.
-			palette = { tint = "{surface.overlay}", solid = "{zeron.menu.solid}" },
+			palette = { tint = "{surface.overlay}", solid = "{zeren.menu.solid}" },
 			-- A transcript, set for reading at length. Prose a step up from
-			-- Zeron's 14 on 22: 15 on 24 (a 1.6 leading) reads easier over a
+			-- Zeren's 14 on 22: 15 on 24 (a 1.6 leading) reads easier over a
 			-- long reply on glass. Headings in three real steps, tight above
 			-- what they head; tables a touch smaller than prose; code in Geist
 			-- Mono at 13 on 20, which sits at the prose's x-height, and inline
@@ -264,10 +264,10 @@ function M.setup()
 				text = {
 					xs = { size = 12, line = 16 },
 					sm = { size = 13, line = 20 },
-					body = { size = "{zeron.prose.size}", line = "{zeron.prose.line}" },
+					body = { size = "{zeren.prose.size}", line = "{zeren.prose.line}" },
 					lg = { size = 16, line = 24 },
-					xl = { size = "{zeron.prose.h2.size}", line = "{zeron.prose.h2.line}" },
-					xxl = { size = "{zeron.prose.h1.size}", line = "{zeron.prose.h1.line}" },
+					xl = { size = "{zeren.prose.h2.size}", line = "{zeren.prose.h2.line}" },
+					xxl = { size = "{zeren.prose.h1.size}", line = "{zeren.prose.h1.line}" },
 				},
 				series = {
 					teal = "{palette.teal.500}",
@@ -278,8 +278,8 @@ function M.setup()
 					sky = "{palette.sky.500}",
 				},
 			},
-			-- The bubble: Zeron's wash (one step softer than a selection) and
-			-- its 16 corner; an attachment's thumbnail, Zeron's size.
+			-- The bubble: Zeren's wash (one step softer than a selection) and
+			-- its 16 corner; an attachment's thumbnail, Zeren's size.
 			prose = {
 				size = 15,
 				line = 24,
@@ -295,7 +295,7 @@ function M.setup()
 					edge = "{border.subtle}",
 				},
 				measure = 660,
-				bubble = { bg = "{zeron.secondary.bg}", radius = 16 },
+				bubble = { bg = "{zeren.secondary.bg}", radius = 16 },
 				thumb = { w = 120, h = 84, radius = 10 },
 				-- A picture a reply shows (ds/reply_picture): at most the
 				-- reading column's width by 420, never past its own size; a
@@ -347,10 +347,10 @@ function M.setup()
 			-- checks behind an image's transparency (over the panel's own fill).
 			-- The pane's band (ds/files_pane): the tree's head and the file's
 			-- header share it, one line high (`head`), or two (`stack`); the
-			-- tree's width beside the file (Zeron's files panel, 286), and the
-			-- least a file wants beside it (Zeron's narrowest pane, 360): with
+			-- tree's width beside the file (Zeren's files panel, 286), and the
+			-- least a file wants beside it (Zeren's narrowest pane, 360): with
 			-- less, the tree hides and comes over the file instead.
-			-- Files carried over a chat: the scrim over all of it (Zeron's at
+			-- Files carried over a chat: the scrim over all of it (Zeren's at
 			-- two thirds; the light theme's own in its file).
 			drop = { scrim = "#00000066" },
 			files = {
@@ -366,8 +366,8 @@ function M.setup()
 				light = 1,
 				dark = 0,
 			},
-			-- An agent's status: its glyph's and label's colour (`zeron.status.*`)
-			-- and its dot's in a list (`zeron.status.dot.*`), a hue a state,
+			-- An agent's status: its glyph's and label's colour (`zeren.status.*`)
+			-- and its dot's in a list (`zeren.status.dot.*`), a hue a state,
 			-- each theme its own.
 			status = {
 				working = "{info}",
@@ -396,7 +396,7 @@ function M.setup()
 			-- own.
 			slider = { track = "{surface.sunken}", tint = 0.14, ring = 0.3 },
 			-- A segmented control's thumb.
-			segmented = { thumb = "{zeron.selected.flat.bg}" },
+			segmented = { thumb = "{zeren.selected.flat.bg}" },
 			-- A switch: its track (off, and on: translucent, the glass showing
 			-- through) and its knob.
 			switch = {
@@ -438,12 +438,12 @@ function M.setup()
 			},
 			-- A check or a radio: its box (sunken until it is on), its edge,
 			-- the accent it fills with on, and the mark's ink.
-			check = { bg = "{zeron.field.bg}", edge = "{border.strong}", on = "{accent}", mark = "{accent.text}" },
+			check = { bg = "{zeren.field.bg}", edge = "{border.strong}", on = "{accent}", mark = "{accent.text}" },
 			-- A tone's ink and the wash and edge that carry it (a badge, a
 			-- banner, a toast's glyph), each theme its own steps: pale inks on
 			-- dark, deep inks on light.
 			tone = {
-				neutral = { ink = "{text.secondary}", wash = "{zeron.secondary.bg}", edge = "{border}" },
+				neutral = { ink = "{text.secondary}", wash = "{zeren.secondary.bg}", edge = "{border}" },
 				accent = { ink = "{accent}", wash = "alpha({accent}, 0.14)", edge = "alpha({accent}, 0.3)" },
 				info = { ink = "{info}", wash = "alpha({info}, 0.12)", edge = "alpha({info}, 0.28)" },
 				success = { ink = "{success}", wash = "alpha({success}, 0.12)", edge = "alpha({success}, 0.28)" },
@@ -454,7 +454,7 @@ function M.setup()
 			-- colour laid under it this faint, its ink this strong (the
 			-- sidebar's pull request badge, generalised).
 			-- Lit (under the pointer, a badge that's a link): stronger, as
-			-- Zeron's sidebar badge brightens.
+			-- Zeren's sidebar badge brightens.
 			badge = { wash = 0.12, ink = 0.9, lit = { wash = 0.22, ink = 1 } },
 			-- A review's verdict, as a chip: its hue.
 			review = { approved = "{success}", changes = "{danger}", commented = "{text.secondary}", pending = "{warning}" },
@@ -469,7 +469,7 @@ function M.setup()
 			-- corner, the dim, and its width at each size.
 			dialog = {
 				tint = "{surface.overlay}",
-				solid = "{zeron.menu.solid}",
+				solid = "{zeren.menu.solid}",
 				shadow = "{shadow.lg}",
 				-- The bare stage it stands on: no shadow of its own.
 				stage = "0 0 0 0 #00000000",
@@ -486,7 +486,7 @@ function M.setup()
 			-- The lightbox (ds/lightbox): the room a fitted picture keeps from
 			-- the window's edges, and under it for the controls; their island's
 			-- inset from the foot; the scrim's blur (its fill is each theme's).
-			lightbox = { inset = 40, foot = 72, island_inset = 16, blur = 24, scrim = "{backdrop}", shadow = "{zeron.dialog.stage}" },
+			lightbox = { inset = 40, foot = 72, island_inset = 16, blur = 24, scrim = "{backdrop}", shadow = "{zeren.dialog.stage}" },
 			-- Settings: the column a page reads in, a row's least height, the
 			-- room a row's control keeps at its end, and a group's card (a
 			-- quiet fill with a hairline, the rows' dividers fainter).
@@ -528,9 +528,9 @@ function M.setup()
 			-- there: the card's own on a light window, none on a dark one,
 			-- where many pooled into a halo.
 			wall = {
-				scrim = "alpha({zeron.window}, 0)",
-				veil = "alpha({zeron.window}, 0.56)",
-				shadow = "{zeron.card.shadow}",
+				scrim = "alpha({zeren.window}, 0)",
+				veil = "alpha({zeren.window}, 0.56)",
+				shadow = "{zeren.card.shadow}",
 			},
 			-- A member card: a printed card, the same in either theme. Paper,
 			-- its inks (strong, muted, faint, and a violet one),
@@ -578,7 +578,7 @@ function M.setup()
 				},
 			},
 			-- Code's colours, by what each piece of it is (ds/syntax). Here in
-			-- the standard tokens, so any theme colours code; Zeron's themes pick
+			-- the standard tokens, so any theme colours code; Zeren's themes pick
 			-- palette hues for them. The structure (comments, punctuation,
 			-- operators) is the text's own ink, fainter, so it takes the colour
 			-- of whatever is behind it, glass or opaque, and the words carry the
@@ -615,10 +615,10 @@ function M.setup()
 			},
 		},
 	}
-	ui.theme.load("ds/themes/zeron-dark.json")
-	ui.theme.load("ds/themes/zeron-light.json")
+	ui.theme.load("ds/themes/zeren-dark.json")
+	ui.theme.load("ds/themes/zeren-light.json")
 	-- The theme chosen for each scheme, else the template's own (its
-	-- theme.luau; the default's returns nil), else Zeron's, worn over those
+	-- theme.luau; the default's returns nil), else Zeren's, worn over those
 	-- themes through the one mapping (ds/palettes), and worn again as the
 	-- choice or the themes change. (Guarded: a plugin, lent the design
 	-- system, has no app of its own to read.)
@@ -651,7 +651,7 @@ function M.setup()
 		local kind = ui.theme.kind()
 		local dark = not (kind == "light" or kind == "high-contrast-light")
 		ui.theme.tokens {
-			zeron = {
+			zeren = {
 				inset = {
 					-- A card lifted off the window, lighter than it: the
 					-- theme's raised surface.
@@ -679,10 +679,10 @@ function M.setup()
 			if type(radius) ~= "number" then
 				return
 			end
-			local gap = (ui.theme.get("zeron.inset.gap") :: number?) or 4
+			local gap = (ui.theme.get("zeren.inset.gap") :: number?) or 4
 			local card = math.max(0, radius - gap)
 			ui.theme.tokens {
-				zeron = {
+				zeren = {
 					-- (And what follows its corner inside its 1-point edge,
 					-- as the effect below has it.)
 					inset = { radius = card, inner_radius = math.max(0, card - 1) },
@@ -691,15 +691,15 @@ function M.setup()
 		end)
 	end
 	ui.effect(function()
-		local chip = control.nest("$zeron.composer.radius", 1, "$zeron.composer.chip.inset")
-		local option = control.nest("$zeron.composer.radius", 1, control.nest("$zeron.composer.chip.inset", 8))
-		local tray_row = control.nest("$zeron.composer.tray.radius", 1, "$space.1")
+		local chip = control.nest("$zeren.composer.radius", 1, "$zeren.composer.chip.inset")
+		local option = control.nest("$zeren.composer.radius", 1, control.nest("$zeren.composer.chip.inset", 8))
+		local tray_row = control.nest("$zeren.composer.tray.radius", 1, "$space.1")
 		ui.theme.tokens {
-			zeron = {
+			zeren = {
 				menu = { row_radius = control.nest("$radius.lg", 1, "$space.1") },
 				-- What follows a card's corner inside its 1-point edge (where
 				-- a dropped tab would land, over a panel card's body).
-				inset = { inner_radius = control.nest("$zeron.inset.radius", 1) },
+				inset = { inner_radius = control.nest("$zeren.inset.radius", 1) },
 				tag = { remove_radius = control.nest("$radius.md", 3) },
 				composer = {
 					chip = { radius = chip },

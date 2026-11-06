@@ -1,5 +1,5 @@
 -- Setup's first screen for someone signed out: the way to an account, or on
--- without one. A welcome opens it (Welcome to Zeron, two lines at display
+-- without one. A welcome opens it (Welcome to Zeren, two lines at display
 -- size), three lines say what an account gives (crates/ui/src/onboarding.rs
 -- render_sync, each promise cut to a line), and the footer is setup's: I
 -- already have an account at the left; Skip for now, then the pill that
@@ -217,7 +217,7 @@ function M.screen(props: Props?): Node
 			text_size = "$font.size.md",
 			line_height = "$font.line.md",
 			color = function()
-				return if status:get() == "failed" then "$zeron.tone.danger.ink" else "$text.secondary"
+				return if status:get() == "failed" then "$zeren.tone.danger.ink" else "$text.secondary"
 			end,
 		},
 	}

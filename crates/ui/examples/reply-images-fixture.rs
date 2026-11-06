@@ -4,7 +4,7 @@
 //! engine's own `ReadChatImageChunk` verdict for every path. `show-image`: the
 //! image parts `show_image` publishes, stored as it stores them.
 //!
-//! `cargo run -p zeron-ui --features appshots-fixture,resource-profile --example reply-images-fixture -- \
+//! `cargo run -p zeren-ui --features appshots-fixture,resource-profile --example reply-images-fixture -- \
 //!    [hold-secs] [app-id] [markdown|show-image]`
 //!
 //! Prints `READY` once the reads have landed (or been refused), keeps the
@@ -13,7 +13,7 @@
 use gpui::{AppContext, Bounds, WindowBounds, WindowOptions, px, size};
 use serde_json::json;
 use std::{io::Write, path::Path, sync::Arc, time::Duration};
-use zeron_ui::*;
+use zeren_ui::*;
 
 fn port() -> u16 {
     std::net::TcpListener::bind("127.0.0.1:0")
@@ -73,7 +73,7 @@ fn main() -> anyhow::Result<()> {
     let app_id = args
         .get(1)
         .cloned()
-        .unwrap_or_else(|| "zeron-fixture-chat".into());
+        .unwrap_or_else(|| "zeren-fixture-chat".into());
     tracing_subscriber::fmt()
         .with_env_filter(std::env::var("RUST_LOG").unwrap_or_else(|_| "warn".into()))
         .init();
@@ -104,10 +104,10 @@ fn main() -> anyhow::Result<()> {
 
     let runtime = tokio::runtime::Runtime::new()?;
     let core = runtime.block_on(async {
-        zeron_engine::EngineCore::assemble(
+        zeren_engine::EngineCore::assemble(
             &engine_dir,
-            Arc::new(zeron_engine::HarnessRegistry::new()),
-            zeron_proto::HarnessId::ClaudeCode,
+            Arc::new(zeren_engine::HarnessRegistry::new()),
+            zeren_proto::HarnessId::ClaudeCode,
             None,
         )
     })?;
@@ -144,7 +144,7 @@ fn main() -> anyhow::Result<()> {
     ];
 
     // The engine's verdict for each path, as the UI would send it.
-    let client = runtime.block_on(async { zeron_rpc::memory_client(core.rpc_service()) });
+    let client = runtime.block_on(async { zeren_rpc::memory_client(core.rpc_service()) });
     for (label, path) in shown.iter().chain(&refused) {
         let absolute = if path.starts_with('/') || path.contains(':') || path.starts_with('~') {
             path.clone()
@@ -152,7 +152,7 @@ fn main() -> anyhow::Result<()> {
             folder.join(path).to_string_lossy().into_owned()
         };
         let verdict = runtime.block_on(client.call(
-            zeron_rpc::methods::READ_CHAT_IMAGE_CHUNK,
+            zeren_rpc::methods::READ_CHAT_IMAGE_CHUNK,
             json!({ "chatId": chat_id, "path": absolute, "offset": 0 }),
         ));
         match verdict {
@@ -163,7 +163,7 @@ fn main() -> anyhow::Result<()> {
 
     let entry = |id: &str, role: &str, mut parts: Vec<serde_json::Value>, text: &str| {
         parts.push(json!({ "kind": "text", "id": format!("{id}-text"), "text": text }));
-        serde_json::from_value::<zeron_doc::SessionMessageEntry>(json!({
+        serde_json::from_value::<zeren_doc::SessionMessageEntry>(json!({
             "id": id, "role": role, "createdAt": 0, "deviceId": device, "status": "complete",
             "parts": parts,
         }))
@@ -217,7 +217,7 @@ fn main() -> anyhow::Result<()> {
     let data = temp.path().join("ui");
     std::fs::create_dir(&data)?;
     let ipc_port = port();
-    let _ipc = runtime.block_on(zeron_engine::serve_ipc(ipc_port, &data, core.rpc_service()))?;
+    let _ipc = runtime.block_on(zeren_engine::serve_ipc(ipc_port, &data, core.rpc_service()))?;
     let boot = EngineBootConfig {
         data_dir: data.clone(),
         ipc_port,
@@ -225,7 +225,7 @@ fn main() -> anyhow::Result<()> {
         edge_token: None,
         org_id: None,
         workos_client_id: None,
-        default_harness: zeron_proto::HarnessId::ClaudeCode,
+        default_harness: zeren_proto::HarnessId::ClaudeCode,
     };
     let handle = runtime.block_on(state::EngineHandle::bootstrap(boot.clone()))?;
     let chats = core.workspace.read_chats()?;
@@ -270,8 +270,8 @@ fn main() -> anyhow::Result<()> {
             let state = cx.new(|_| {
                 let mut s = state::AppState::new();
                 s.fixture_attachment_engine(handle);
-                s.connection = zeron_proto::view::ConnectionStatus::Ready;
-                s.workspace_scope = Some(zeron_proto::WorkspaceScope::Development);
+                s.connection = zeren_proto::view::ConnectionStatus::Ready;
+                s.workspace_scope = Some(zeren_proto::WorkspaceScope::Development);
                 s.local_device_id = Some(device.clone());
                 s.devices = vec![
                     serde_json::from_value(json!({"id": device, "name": "This device",
@@ -307,7 +307,7 @@ fn main() -> anyhow::Result<()> {
                 pause(cx, 800).await;
                 state.update(cx, |s, cx| {
                     s.receive_transcript_frame(
-                        zeron_doc::TranscriptFrame::Reset { reset: entries },
+                        zeren_doc::TranscriptFrame::Reset { reset: entries },
                         cx,
                     )
                     .unwrap();

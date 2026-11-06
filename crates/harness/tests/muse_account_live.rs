@@ -1,8 +1,8 @@
 //! Against a real `muse` (opt-in): `MUSE_LIVE_BIN=/path/to/muse cargo test
-//! -p zeron-harness --test muse_account_live -- --ignored --nocapture`.
+//! -p zeren-harness --test muse_account_live -- --ignored --nocapture`.
 //! Uses a throwaway, file-backed config root: never the user's own login.
 use std::collections::BTreeMap;
-use zeron_harness::muse::account;
+use zeren_harness::muse::account;
 
 fn live() -> Option<(
     std::path::PathBuf,
@@ -49,10 +49,10 @@ async fn a_fresh_root_is_signed_out_and_a_device_login_hands_back_its_code() {
 #[ignore]
 async fn an_approved_device_login_runs_real_turns_and_signs_out() {
     use futures::StreamExt;
-    use zeron_harness::{
+    use zeren_harness::{
         CancellationToken, Harness, MuseHarness, RunControls, SteerMessage, TurnControl,
     };
-    use zeron_proto::{AgentEvent, RunRequest, SandboxLevel};
+    use zeren_proto::{AgentEvent, RunRequest, SandboxLevel};
     let Some((bin, root, env)) = live() else {
         return;
     };
@@ -152,7 +152,7 @@ async fn an_approved_device_login_runs_real_turns_and_signs_out() {
     assert!(!out.signed_in());
 }
 
-/// One real turn on an account that is already signed in (a Zeron-kept
+/// One real turn on an account that is already signed in (a Zeren-kept
 /// root: `MUSE_LIVE_ROOT=<agent-accounts/muse-homes/<slot>/config>`), with the
 /// session opted into Muse's experimental surface: the turn completes and
 /// the subscription's usage arrives as `PlanUsage`.
@@ -160,8 +160,8 @@ async fn an_approved_device_login_runs_real_turns_and_signs_out() {
 #[ignore]
 async fn a_real_turn_reports_the_subscriptions_usage() {
     use futures::StreamExt;
-    use zeron_harness::{CancellationToken, Harness, MuseHarness, RunControls, TurnControl};
-    use zeron_proto::{AgentEvent, RunRequest, SandboxLevel};
+    use zeren_harness::{CancellationToken, Harness, MuseHarness, RunControls, TurnControl};
+    use zeren_proto::{AgentEvent, RunRequest, SandboxLevel};
     let (Some(bin), Some(root)) = (
         std::env::var_os("MUSE_LIVE_BIN"),
         std::env::var_os("MUSE_LIVE_ROOT"),

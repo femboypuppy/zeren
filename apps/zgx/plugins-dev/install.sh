@@ -1,6 +1,6 @@
 #!/bin/sh
-# Copies example plugins into a Zeron data dir's plugins folder and signs
-# them as that engine's account (`zeron plugin sign`), for a scratch engine:
+# Copies example plugins into a Zeren data dir's plugins folder and signs
+# them as that engine's account (`zeren plugin sign`), for a scratch engine:
 #
 #   ./install.sh <data-dir> <port> [plugin ...]     (default: all five)
 #
@@ -17,15 +17,15 @@ shift 2
 case "$port" in 27654) echo "refusing the production engine's port" >&2; exit 1 ;; esac
 case "$(cd "$data" && pwd)" in "$HOME/.comet-native"*) echo "refusing the production engine's data" >&2; exit 1 ;; esac
 [ $# -gt 0 ] || set -- compact-sidebar focus notes-tool ping session-status
-zeron=${ZERON_BIN:-$root/target/debug/zeron}
+zeren=${ZEREN_BIN:-$root/target/debug/zeren}
 mkdir -p "$data/plugins"
 for id in "$@"; do
   rm -rf "$data/plugins/$id"
   cp -R "$here/$id" "$data/plugins/$id"
-  cp "$root/apps/zgx/plugins-sdk/zeron.luau" "$data/plugins/$id/zeron.luau"
+  cp "$root/apps/zgx/plugins-sdk/zeren.luau" "$data/plugins/$id/zeren.luau"
 done
 sleep 1
 for id in "$@"; do
-  env -u ZERON_IPC_TOKEN ZERON_IPC_PORT="$port" ZERON_DATA_DIR="$data" ZERON_IPC_TOKEN_FILE="$data/ipc-token" "$zeron" plugin sign "$id"
+  env -u ZEREN_IPC_TOKEN ZEREN_IPC_PORT="$port" ZEREN_DATA_DIR="$data" ZEREN_IPC_TOKEN_FILE="$data/ipc-token" "$zeren" plugin sign "$id"
 done
-env -u ZERON_IPC_TOKEN ZERON_IPC_PORT="$port" ZERON_DATA_DIR="$data" ZERON_IPC_TOKEN_FILE="$data/ipc-token" "$zeron" plugin list
+env -u ZEREN_IPC_TOKEN ZEREN_IPC_PORT="$port" ZEREN_DATA_DIR="$data" ZEREN_IPC_TOKEN_FILE="$data/ipc-token" "$zeren" plugin list

@@ -104,7 +104,7 @@ test("this computer's actions name no device; another computer's folders aren't 
 	expect(asked(app, "set_off:focus:true@")).to_be(true)
 	pick(app, "devbox")
 	-- One that can't load there says why, with no folder to show here.
-	expect(app:tree()).to_contain("permission Zeron doesn")
+	expect(app:tree()).to_contain("permission Zeren doesn")
 	expect(app:has('role:button "Show folder"')).to_be(false)
 	-- None there: a link to install one, not this computer's folder.
 	app:command("devbox_empty")
@@ -184,7 +184,7 @@ test("the device choice sits at the top right, centred on the title's line; shor
 	expect(th > 0 and ph > 0).to_be(true)
 	expect(math.abs((py + ph / 2) - (ty + th / 2)) <= 1).to_be(true)
 	-- At the far end of the title's row: past the description's measure.
-	local dx, _, dw = box(app, '"What plugins add to Zeron on each of your computers, and the tools they give your agents."')
+	local dx, _, dw = box(app, '"What plugins add to Zeren on each of your computers, and the tools they give your agents."')
 	expect(px + pw > dx + dw or dw == 0).to_be(true)
 	-- Narrow: under the title, as every page's trail goes.
 	app:resize(420, 900)

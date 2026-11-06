@@ -1,5 +1,5 @@
 //! What a listening process is, in words: the short label a device
-//! advertises with a preview service (`zeron_proto::preview::PreviewService::
+//! advertises with a preview service (`zeren_proto::preview::PreviewService::
 //! process`) and the command line shown only on the machine it runs on, with
 //! anything that looks like a credential left out. One copy, with no
 //! dependencies, for the engine that advertises and the zgx app that shows.
@@ -24,7 +24,7 @@ fn secret_flag(flag: &str) -> bool {
 
 /// What a listener is, in a few words, for clients to name it by: its
 /// program, and what a runner runs (`node server.js`, `python3 -m
-/// http.server`, `vite`, `npm run dev`, `cargo test zeron_engine` for a
+/// http.server`, `vite`, `npm run dev`, `cargo test zeren_engine` for a
 /// test binary). Never its other arguments, which may hold credentials:
 /// only a script's or module's name, a package's, or a runner's
 /// subcommand, each kept only while it looks like a plain name.
@@ -196,8 +196,8 @@ mod tests {
         assert_eq!(label(&["node", "/w/node_modules/@scope/cli/bin/run.js"]), "@scope/cli");
         assert_eq!(label(&["npm", "run", "dev"]), "npm run dev");
         assert_eq!(label(&["cargo", "test", "-p", "x"]), "cargo test");
-        assert_eq!(label(&["/w/target/debug/deps/zeron_engine-0123456789abcdef", "--x"]), "cargo test zeron_engine");
-        assert_eq!(label(&["/usr/bin/zeron-engine", "serve", "--token", "abc"]), "zeron-engine");
+        assert_eq!(label(&["/w/target/debug/deps/zeren_engine-0123456789abcdef", "--x"]), "cargo test zeren_engine");
+        assert_eq!(label(&["/usr/bin/zeren-engine", "serve", "--token", "abc"]), "zeren-engine");
         assert_eq!(label(&[]), "");
         // A flag's value is never what runs: `--flag value` is a pair.
         assert_eq!(label(&["node", "-p", "3000", "server.js"]), "node");

@@ -4,7 +4,7 @@
 
 **Today.** A reload (`ScriptHost::reload`) puts focus back on a plain focusable node that's built again (`ui.row { focusable = true }`). It doesn't put it back on a row of a `ui.list`, even a keyed one whose row is rebuilt under the same key in the same place. Nothing has focus afterwards.
 
-Same on every pin Zeron has used, so this isn't a regression:
+Same on every pin Zeren has used, so this isn't a regression:
 
 | zgx | plain node (before, after) | `ui.list` row (before, after) |
 |---|---|---|
@@ -16,4 +16,4 @@ Same on every pin Zeron has used, so this isn't a regression:
 
 **Ask:** match the focused node across a reload the way plain nodes already are, through the list's row key: a list with `key` puts focus back on the row with the same key once it's built (or, if the reload leaves it out of view, once it's built again). A positional list could match by index.
 
-**Meanwhile in Zeron:** `ds/file_tree.luau` takes a `keys` state, the path of the row with the keyboard, which `screens/files/workspace.luau` keeps across reloads. The row with that path focuses itself as it mounts. Drop it once this lands.
+**Meanwhile in Zeren:** `ds/file_tree.luau` takes a `keys` state, the path of the row with the keyboard, which `screens/files/workspace.luau` keeps across reloads. The row with that path focuses itself as it mounts. Drop it once this lands.

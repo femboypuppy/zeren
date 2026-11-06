@@ -1,7 +1,7 @@
 -- How an agent's mark is drawn (ds/agent_mark draws it; kept apart, with
 -- no requires, for tests to read):
 --
--- - an agent Zeron drives itself: its bundled brand mark (ds.Mark);
+-- - an agent Zeren drives itself: its bundled brand mark (ds.Mark);
 -- - an agent from the ACP registry: the registry's own icon for it (the
 --   entry's `icon`, fetched by the engine from the registry's CDN and kept
 --   on the device), in one ink: the theme's text colour, on a quiet tile, or
@@ -32,7 +32,7 @@ M.FALLBACK = "assets/icons/acp-registry.svg"
 -- The ink on a tile (the theme's text colour) and the tile (its quiet
 -- wash): both theme tokens, so a theme change redraws them.
 M.INK = "$text.primary"
-M.TILE = "$zeron.secondary.bg"
+M.TILE = "$zeren.secondary.bg"
 
 -- Whether an SVG is one an icon may be drawn from: an SVG, short of the
 -- engine's cap. (The engine cleans what it fetches; this is the app's side.)

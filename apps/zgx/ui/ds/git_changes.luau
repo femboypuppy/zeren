@@ -1,5 +1,5 @@
 -- The changed files of a commit or a pull request as one list, drawn for
--- the worst case: a thousand files, a diff of thousands of lines. Zeron's
+-- the worst case: a thousand files, a diff of thousands of lines. Zeren's
 -- own Changes panel is a single virtualized list at line granularity
 -- (changes.rs: every file header, hunk header and line a row of its own;
 -- a folded file keeps no body rows), and this does the same with
@@ -254,7 +254,7 @@ local List = ui.component(function(props: ListProps): Node
 	-- The room between a row's wash and the card's edge over the first
 	-- row and under the last: the list's gap, as between the washes, so
 	-- with the wash's own inset the room is the sides' (README rule 6).
-	local gap = (ui.theme.get("zeron.list.gap") :: number?) or 2
+	local gap = (ui.theme.get("zeren.list.gap") :: number?) or 2
 	-- Blocks measure themselves; the list takes the height it last saw.
 	local measured: { [string]: number } = {}
 	local remeasure = ui.use_state(0)
@@ -781,7 +781,7 @@ function M.panel(props: Panel): Node
 		},
 	}
 	local function rule(): Node
-		return ui.div { h = 1, w_full = true, shrink = 0, bg = "$zeron.settings.rule", aria_hidden = true }
+		return ui.div { h = 1, w_full = true, shrink = 0, bg = "$zeren.settings.rule", aria_hidden = true }
 	end
 	-- The filter: a quiet field, a row of the card, its words on the head's
 	-- column; inset evenly, with the corner that inset gives it inside the
@@ -798,9 +798,9 @@ function M.panel(props: Panel): Node
 		grow = 1,
 		min_h = 0,
 		rounded = git.RADIUS,
-		bg = "$zeron.settings.card",
+		bg = "$zeren.settings.card",
 		border = git.EDGE,
-		border_color = "$zeron.settings.edge",
+		border_color = "$zeren.settings.edge",
 		overflow = "hidden",
 		head,
 		rule(),

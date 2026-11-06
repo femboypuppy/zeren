@@ -10,7 +10,7 @@
 //!   changed without you choosing it here (an agent's `use_template`, an
 //!   update, a file written by hand), the account's signing keys (one added
 //!   on another device, this device's revoked), and the default interface
-//!   at launch because the template crashed Zeron (safe mode);
+//!   at launch because the template crashed Zeren (safe mode);
 //!
 //! No menu bar where the system has none (Windows, Linux): zgx's drawn one
 //! (`app_menu_bar`) was a row of its own across the window's top, over the
@@ -76,7 +76,7 @@ pub struct Notice {
 
 /// The default interface, in safe mode (the menu bar's "Use Default
 /// Interface").
-const USE_DEFAULT: Action = Action { label: "Use default interface", command: super::USE_ZERON_TEMPLATE };
+const USE_DEFAULT: Action = Action { label: "Use default interface", command: super::USE_ZEREN_TEMPLATE };
 
 impl Notice {
     /// The template changed without you choosing it here: to `name`, or
@@ -118,13 +118,13 @@ impl Notice {
         Notice { title, body, tone: Tone::Warning, action: None, stays: true }
     }
 
-    /// Zeron opened with the default interface (safe mode): ⌥ held, or
+    /// Zeren opened with the default interface (safe mode): ⌥ held, or
     /// the template crashed it twice as it opened.
     pub fn safe_at_launch(reason: preview::SafeReason) -> Self {
         let (body, tone, stays) = match reason {
-            preview::SafeReason::Held => ("You held ⌥ as Zeron opened. Pick a template in Settings → Templates to use it again.", Tone::Neutral, false),
+            preview::SafeReason::Held => ("You held ⌥ as Zeren opened. Pick a template in Settings → Templates to use it again.", Tone::Neutral, false),
             preview::SafeReason::Crashed => (
-                "Your template closed Zeron twice as it opened. Pick it again in Settings → Templates once it's fixed.",
+                "Your template closed Zeren twice as it opened. Pick it again in Settings → Templates once it's fixed.",
                 Tone::Warning,
                 true,
             ),
@@ -136,7 +136,7 @@ impl Notice {
 thread_local! {
     static NOTICES: RefCell<Option<zgx::reactive::Signal<Vec<Shown>>>> = const { RefCell::new(None) };
     static NEXT: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
-    /// Whether Zeron shows Chinese now, as the toasts last read it.
+    /// Whether Zeren shows Chinese now, as the toasts last read it.
     static CHINESE: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
     /// Whether a preview shows: the scripts' popups stay in the window then,
     /// under the toasts (`compose`).
@@ -158,7 +158,7 @@ const MAX: usize = 3;
 /// A notice in the host's toasts: the same one again restarts it rather
 /// than adding another.
 pub fn notice(notice: Notice) {
-    eprintln!("zeron-zgx: notice: {}: {}", notice.title, notice.body);
+    eprintln!("zeren-zgx: notice: {}: {}", notice.title, notice.body);
     let Some(signal) = NOTICES.with(|n| n.borrow().clone()) else { return };
     let id = NEXT.with(|n| {
         n.set(n.get() + 1);
@@ -192,11 +192,11 @@ pub fn view(cx: &mut WindowContext, locale: zgx::reactive::Signal<zgx_script::Va
     column().child(toasts(&cx.ui.runtime, locale))
 }
 
-/// Development (debug builds): `ZERON_ZGX_HOST_TOASTS=1` lays the toasts
+/// Development (debug builds): `ZEREN_ZGX_HOST_TOASTS=1` lays the toasts
 /// over a fixture's window to look at them: "Inset" in preview, and a
 /// switch and a new signing key told. None otherwise.
 pub fn dev_toasts(cx: &mut WindowContext) -> Option<View> {
-    if !cfg!(debug_assertions) || std::env::var_os("ZERON_ZGX_HOST_TOASTS").is_none() {
+    if !cfg!(debug_assertions) || std::env::var_os("ZEREN_ZGX_HOST_TOASTS").is_none() {
         return None;
     }
     preview::set(Some(preview::Preview { id: "inset".into(), name: "Inset".into() }));
@@ -231,7 +231,7 @@ pub fn compose(chrome: View, scripts: View) -> View {
 // ── Look ────────────────────────────────────────────────────────────────────
 
 /// The toasts' colours in a theme: ds's menus' solid glass, text and
-/// washes, from ui/ds/themes (zeron-dark.json, zeron-light.json). Solid,
+/// washes, from ui/ds/themes (zeren-dark.json, zeren-light.json). Solid,
 /// not the menus' frost: nothing a template draws under it changes how
 /// it reads.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -286,7 +286,7 @@ const LIGHT: Ink = Ink {
     pressed: Color(0, 0, 0, 0x12),
 };
 
-/// ds's toast: `$zeron.toast.width`, `$radius.xl`, its padding (space.4
+/// ds's toast: `$zeren.toast.width`, `$radius.xl`, its padding (space.4
 /// at the start, space.2 at the end, space.3 down) and gap (space.3), 16
 /// points off the window's corner, space.2 between toasts.
 const WIDTH: f32 = 340.;
@@ -509,7 +509,7 @@ fn toasts(runtime: &zgx::reactive::Runtime, locale: zgx::reactive::Signal<zgx_sc
                         ink,
                         minimise,
                         vec![
-                            action("Revert", ink, || super::host_command(super::USE_ZERON_TEMPLATE)),
+                            action("Revert", ink, || super::host_command(super::USE_ZEREN_TEMPLATE)),
                             action("Keep", ink, || super::host_command(super::KEEP_TEMPLATE)),
                         ],
                     ));
@@ -519,7 +519,7 @@ fn toasts(runtime: &zgx::reactive::Runtime, locale: zgx::reactive::Signal<zgx_sc
         },
     );
     component(move |_| {
-        modal("Zeron", shown)
+        modal("Zeren", shown)
             .top_layer()
             .autofocus(false)
             .p(0.)
@@ -723,10 +723,10 @@ mod tests {
         assert!(!held.get(), "and go where they like once it's over");
     }
 
-    /// Its line follows the language Zeron shows; the rest of the host's
+    /// Its line follows the language Zeren shows; the rest of the host's
     /// toasts are English (docs/i18n.md).
     #[test]
-    fn the_preview_s_line_is_in_chinese_when_zeron_is() {
+    fn the_preview_s_line_is_in_chinese_when_zeren_is() {
         TEST_LOCALE.with(|l| l.set("zh-Hans"));
         preview::set(Some(sleek()));
         let mut app = mount();
@@ -868,7 +868,7 @@ mod tests {
                 _ => None,
             }
         };
-        for (name, ink) in [("zeron-dark", DARK), ("zeron-light", LIGHT), ("zeron-dark", DARK)] {
+        for (name, ink) in [("zeren-dark", DARK), ("zeren-light", LIGHT), ("zeren-dark", DARK)] {
             themes.set(name).unwrap_or_else(|e| panic!("{name}: {e:?}"));
             app.frames(6);
             assert_eq!(fill(&mut app), Some(ink.card), "{name}");
@@ -985,7 +985,7 @@ return ui.column {
         app.click("#host-preview >> role:button \"Revert\"");
         app.frames(6);
         let ran = super::super::HOST_COMMANDS_RAN.with(|r| r.borrow().clone());
-        assert_eq!(ran, vec![super::super::KEEP_TEMPLATE.to_owned(), super::super::USE_ZERON_TEMPLATE.to_owned()]);
+        assert_eq!(ran, vec![super::super::KEEP_TEMPLATE.to_owned(), super::super::USE_ZEREN_TEMPLATE.to_owned()]);
         app.click("role:button \"Minimize\"");
         app.frames(6);
         assert!(app.find("#host-preview-pill").is_some(), "the host's minimise took its click too");

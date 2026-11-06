@@ -1,4 +1,4 @@
-//! zeron-harness — one interface over coding agents (plus a mock for tests).
+//! zeren-harness — one interface over coding agents (plus a mock for tests).
 //!
 //! NATIVE DRIVERS speak each agent's own wire directly: Claude Code over
 //! stream-json ([`ClaudeHarness`]), Codex over the app-server JSON-RPC
@@ -19,7 +19,7 @@ use futures::stream::BoxStream;
 use tokio::sync::{mpsc, oneshot};
 pub use tokio_util::sync::CancellationToken;
 
-use zeron_proto::{
+use zeren_proto::{
     AccessMode, AgentEvent, HarnessId, Model, ReasoningLevel, RunRequest, SlashCommand,
     SteeringMode, UserInputAnswer, UserInputQuestion,
 };
@@ -110,7 +110,7 @@ impl TurnControl {
     /// Driver: the background processes the runtime runs now, oldest first —
     /// its whole set, not a delta. (Background agents are subagents, shown as
     /// such; they count in [`Self::set_background`] only.)
-    pub fn set_background_processes(&self, processes: Vec<zeron_proto::BackgroundTask>) {
+    pub fn set_background_processes(&self, processes: Vec<zeren_proto::BackgroundTask>) {
         self.processes.set(processes);
     }
 
@@ -137,7 +137,7 @@ impl TurnControl {
     /// Host: the runtime's background processes as they change.
     pub fn watch_background_processes(
         &self,
-    ) -> tokio::sync::watch::Receiver<Vec<zeron_proto::BackgroundTask>> {
+    ) -> tokio::sync::watch::Receiver<Vec<zeren_proto::BackgroundTask>> {
         self.processes.watch()
     }
 
@@ -149,7 +149,7 @@ impl TurnControl {
 
     /// Host: the tail of a listed process's output; `None` when it is not
     /// listed. May read a file: call it off the async runtime.
-    pub fn background_output(&self, id: &str) -> Option<zeron_proto::BackgroundTaskOutput> {
+    pub fn background_output(&self, id: &str) -> Option<zeren_proto::BackgroundTaskOutput> {
         self.processes.output(id)
     }
 }
@@ -182,7 +182,7 @@ pub struct RunControls {
     /// detached session task must retain this lease through its cleanup.
     /// Standalone callers without an update coordinator can leave it unset.
     pub execution_lease: Option<std::sync::Arc<tokio::sync::OwnedRwLockReadGuard<()>>>,
-    /// The run sends questions and awaits answers (blocks the agent, mirrors zeron).
+    /// The run sends questions and awaits answers (blocks the agent, mirrors zeren).
     /// No answers at all — an empty list, or a dropped sender — is a decline:
     /// the person closed the questions, or the run stopped waiting. Drivers
     /// answer it with their protocol's own decline where it has one.
@@ -314,7 +314,7 @@ pub trait Harness: Send + Sync {
     async fn skills(
         &self,
         cwd: &std::path::Path,
-    ) -> Result<Option<Vec<zeron_proto::invocation::Skill>>, HarnessError> {
+    ) -> Result<Option<Vec<zeren_proto::invocation::Skill>>, HarnessError> {
         if self.id() == HarnessId::Mock {
             return Ok(None);
         }
@@ -360,7 +360,7 @@ mod catalog;
 mod catalog_failure;
 pub(crate) mod code_signature;
 /// Secret redaction, shared with the doc fold (command output tails).
-pub use zeron_proto::redact;
+pub use zeren_proto::redact;
 pub use catalog_failure::{CatalogFailure, CatalogFailureCode};
 pub mod claude;
 pub mod codex;
@@ -504,7 +504,7 @@ fn apply_login_shell_env(cmd: &mut std::process::Command) {
 /// Rolling tail of a child's stderr, shared between the reader task and the
 /// crash-message composer: an unexpected exit surfaces "<name> exited
 /// unexpectedly (<status>): <last stderr lines>" instead of a bare shrug —
-/// the proper background-crash message old zeron showed (user requirement).
+/// the proper background-crash message old zeren showed (user requirement).
 #[derive(Clone, Default)]
 pub(crate) struct StderrTail(
     std::sync::Arc<std::sync::Mutex<std::collections::VecDeque<String>>>,
@@ -778,7 +778,7 @@ pub fn supports_titles(id: HarnessId) -> bool {
 }
 
 /// Drivers that launch without the provider's own subagent tools when the
-/// run's Zeron server is side-chats-only ([`zeron_proto::McpServer::side_chats_only`]),
+/// run's Zeren server is side-chats-only ([`zeren_proto::McpServer::side_chats_only`]),
 /// and get them back on the next launch without it. Not Codex: its driver
 /// starts such a thread, but a thread keeps the multi-agent mode it last ran
 /// with (openai/codex rust-v0.153.4, codex-rs/core/src/session/mod.rs

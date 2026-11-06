@@ -9,7 +9,7 @@
 # which is what the fixture exists to catch.
 # usage: run-macos-fixture.sh <fixture-binary> <capture-dir>
 set -uo pipefail
-ROOT="${ZERON_ROOT:-$(cd "$(dirname "$0")/../.." && pwd)}"
+ROOT="${ZEREN_ROOT:-$(cd "$(dirname "$0")/../.." && pwd)}"
 BINARY="$1"
 OUT="$2"
 ATTEMPTS="${FIXTURE_ATTEMPTS:-3}"

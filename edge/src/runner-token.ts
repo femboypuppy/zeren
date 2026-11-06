@@ -5,7 +5,7 @@
  * edge mints its own short-lived ES256 token once the engine proves
  * possession of its enrolled Ed25519 key (`POST /runner/token`).
  *
- * Claims: `{iss: "zeron-edge", sub: userId, org_id, dev: deviceId, cld:
+ * Claims: `{iss: "zeren-edge", sub: userId, org_id, dev: deviceId, cld:
  * accountDeviceId, kind: "runner"}`, 1 h lifetime. `dev` is the session
  * device (one per Cloud session sandbox), `cld` the account's logical Cloud
  * device (owner of the Cloud projects). Deleting the Cloud device clears its key, so the engine goes
@@ -18,7 +18,7 @@
 import { SignJWT, decodeJwt, importJWK, jwtVerify, type JWK } from "jose";
 import type { Env } from "./env";
 
-export const RUNNER_ISSUER = "zeron-edge";
+export const RUNNER_ISSUER = "zeren-edge";
 export const RUNNER_TOKEN_TTL_MS = 60 * 60 * 1000;
 
 export interface RunnerIdentity {

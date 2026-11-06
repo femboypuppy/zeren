@@ -11,10 +11,10 @@ use futures::StreamExt;
 use futures::stream::BoxStream;
 use tokio::sync::{mpsc, oneshot};
 
-use zeron_harness::{
+use zeren_harness::{
     AcpHarness, CancellationToken, Harness, HarnessError, RunControls, SteerMessage, TurnControl,
 };
-use zeron_proto::{AgentEvent, DoneStatus, RunRequest, SandboxLevel};
+use zeren_proto::{AgentEvent, DoneStatus, RunRequest, SandboxLevel};
 
 fn fixture_path() -> PathBuf {
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -59,7 +59,7 @@ struct Run {
     turn: TurnControl,
     _interrupt: CancellationToken,
     /// Held so a question dialog stays open until the test drops it.
-    _answers: mpsc::UnboundedReceiver<oneshot::Sender<Vec<zeron_proto::UserInputAnswer>>>,
+    _answers: mpsc::UnboundedReceiver<oneshot::Sender<Vec<zeren_proto::UserInputAnswer>>>,
 }
 
 impl Run {

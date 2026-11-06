@@ -1,7 +1,7 @@
 //! The desktop app's background engine: started by the app when nothing
 //! serves its port, it outlives the app's window — close or quit the app and
-//! sessions keep running — and shows up as its own process ("Zeron Engine"
-//! in Activity Monitor, `zeron-engine` elsewhere).
+//! sessions keep running — and shows up as its own process ("Zeren Engine"
+//! in Activity Monitor, `zeren-engine` elsewhere).
 //!
 //! It is started as a detached child of the app rather than through a
 //! service manager. On macOS that keeps privacy permissions (Files &
@@ -20,13 +20,13 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use async_trait::async_trait;
-use zeron_rpc::{RpcError, RpcReply, RpcService, methods};
+use zeren_rpc::{RpcError, RpcReply, RpcService, methods};
 
 use crate::{Engine, EngineConfig, InstanceLock, WorkspaceScope, deferred, desktop_notify};
 
 // Starting the engine helper is shared with the command line and the zgx
 // app, which don't link the engine (crates/launch).
-pub use zeron_launch::{
+pub use zeren_launch::{
     APP_ENV, ENGINE_EXECUTABLES, ENGINE_SUBCOMMAND, MANAGED_ENV, app_path, engine_command,
     reap, spawn_detached,
 };
@@ -36,10 +36,10 @@ pub use zeron_launch::{
 const HANDOFF: Duration = Duration::from_secs(60);
 
 /// Start the background engine for `config`, detached from the app
-/// ([`zeron_launch::launch`]).
+/// ([`zeren_launch::launch`]).
 pub fn launch(config: &EngineConfig, app_exe: &Path) -> std::io::Result<Child> {
-    zeron_launch::launch(
-        &zeron_launch::LaunchConfig {
+    zeren_launch::launch(
+        &zeren_launch::LaunchConfig {
             data_dir: config.data_dir.clone(),
             ipc_port: config.ipc_port,
             edge_url: config.edge_url.clone(),
@@ -91,15 +91,15 @@ async fn acquire_lock(data_dir: &Path) -> anyhow::Result<InstanceLock> {
 /// now keeps it — not this process's own image, which an update leaves
 /// behind (a Linux install's previous version directory; Windows renames the
 /// running image aside).
-fn installed_executable(exe: &Path, install: &zeron_update::InstallKind) -> PathBuf {
+fn installed_executable(exe: &Path, install: &zeren_update::InstallKind) -> PathBuf {
     let name = exe.file_name().unwrap_or_default();
     match install {
-        zeron_update::InstallKind::Managed { app_root } => app_root.join("current").join(name),
-        zeron_update::InstallKind::MacApp { bundle } => {
+        zeren_update::InstallKind::Managed { app_root } => app_root.join("current").join(name),
+        zeren_update::InstallKind::MacApp { bundle } => {
             bundle.join("Contents").join("MacOS").join(name)
         }
         #[cfg(windows)]
-        zeron_update::InstallKind::WindowsPortable { directory } => directory.join("zeron.exe"),
+        zeren_update::InstallKind::WindowsPortable { directory } => directory.join("zeren.exe"),
         _ => exe.to_path_buf(),
     }
 }
@@ -116,7 +116,7 @@ fn stop_when_uninstalled(
     let Ok(exe) = std::env::current_exe() else {
         return;
     };
-    let installed = installed_executable(&exe, &zeron_update::detect_install());
+    let installed = installed_executable(&exe, &zeren_update::detect_install());
     let sessions = runtime.core().sessions.clone();
     let terminals = runtime.core().terminals.clone();
     tokio::spawn(async move {
@@ -184,7 +184,7 @@ fn app_running(dir: &Path) -> bool {
 /// Relaunch this engine with its own arguments and environment; the new one
 /// waits for this one to release the data directory.
 fn relaunch_self() -> anyhow::Result<()> {
-    let exe = installed_executable(&std::env::current_exe()?, &zeron_update::detect_install());
+    let exe = installed_executable(&std::env::current_exe()?, &zeren_update::detect_install());
     let mut command = Command::new(exe);
     command.args(std::env::args_os().skip(1));
     let child = spawn_detached(&mut command)?;
@@ -232,8 +232,8 @@ impl Engine {
         // `app_starts_engine`), so the restart waits for the app to run and
         // this engine keeps serving the old version until then.
         #[cfg(target_os = "macos")]
-        zeron_update::set_managed_restart_ready(app_starts_engine);
-        zeron_update::set_managed_restart(move || {
+        zeren_update::set_managed_restart_ready(app_starts_engine);
+        zeren_update::set_managed_restart(move || {
             if cfg!(target_os = "macos") {
                 tracing::info!("restarting into the update: the app starts the new engine");
             } else {
@@ -315,27 +315,27 @@ mod tests {
 
     #[test]
     fn relaunches_run_the_installed_version() {
-        let exe = Path::new("/home/me/.zeron/app/0.2.114/zeron-engine");
+        let exe = Path::new("/home/me/.zeren/app/0.2.114/zeren-engine");
         assert_eq!(
             installed_executable(
                 exe,
-                &zeron_update::InstallKind::Managed {
-                    app_root: PathBuf::from("/home/me/.zeron/app"),
+                &zeren_update::InstallKind::Managed {
+                    app_root: PathBuf::from("/home/me/.zeren/app"),
                 }
             ),
-            PathBuf::from("/home/me/.zeron/app/current/zeron-engine")
+            PathBuf::from("/home/me/.zeren/app/current/zeren-engine")
         );
         assert_eq!(
             installed_executable(
-                Path::new("/Applications/Zeron.app/Contents/MacOS/Zeron Engine"),
-                &zeron_update::InstallKind::MacApp {
-                    bundle: PathBuf::from("/Applications/Zeron.app"),
+                Path::new("/Applications/Zeren.app/Contents/MacOS/Zeren Engine"),
+                &zeren_update::InstallKind::MacApp {
+                    bundle: PathBuf::from("/Applications/Zeren.app"),
                 }
             ),
-            PathBuf::from("/Applications/Zeron.app/Contents/MacOS/Zeron Engine")
+            PathBuf::from("/Applications/Zeren.app/Contents/MacOS/Zeren Engine")
         );
         assert_eq!(
-            installed_executable(exe, &zeron_update::InstallKind::Unmanaged),
+            installed_executable(exe, &zeren_update::InstallKind::Unmanaged),
             exe.to_path_buf()
         );
     }
@@ -372,10 +372,10 @@ mod tests {
             std::process::Command::new(&exe).spawn().unwrap()
         };
         assert!(!app_running(&macos), "nothing runs from the bundle yet");
-        let mut engine = start("Zeron Engine");
+        let mut engine = start("Zeren Engine");
         std::thread::sleep(Duration::from_millis(200));
         assert!(!app_running(&macos), "the engine isn't the app");
-        let mut app = start("zeron");
+        let mut app = start("zeren");
         std::thread::sleep(Duration::from_millis(200));
         assert!(app_running(&macos));
         for child in [&mut engine, &mut app] {

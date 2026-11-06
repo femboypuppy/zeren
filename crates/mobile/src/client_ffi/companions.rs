@@ -4,7 +4,7 @@
 
 use std::sync::Arc;
 
-use zeron_client as zc;
+use zeren_client as zc;
 
 use super::CoreClient;
 use super::session::SessionHandle;

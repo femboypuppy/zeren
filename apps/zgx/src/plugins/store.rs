@@ -1,4 +1,4 @@
-//! Each plugin's storage (`zeron.store`): what it keeps between runs, for
+//! Each plugin's storage (`zeren.store`): what it keeps between runs, for
 //! it alone, in `<data>/plugins/.storage/<id>.json` (removing the plugin
 //! removes it, the engine's `RemovePlugin`). At most [`MAX_BYTES`] a plugin.
 

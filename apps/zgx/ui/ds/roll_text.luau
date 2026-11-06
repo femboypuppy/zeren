@@ -1,4 +1,4 @@
--- A label that rolls as it changes, as Zeron's chips do (crates/ui/src/
+-- A label that rolls as it changes, as Zeren's chips do (crates/ui/src/
 -- roll_text.rs, a port of Scritto's `<scritto-text>` roll): the characters
 -- the old and new text share at either end stay put (the shared tail slides
 -- to its new place), and the changed middle rolls: the old characters rise
@@ -22,7 +22,7 @@ local prefers = require("@self/prefers")
 
 -- Scritto's roll: 550 ms, a glyph travelling .35 em from a .6 scale, tilted
 -- 2 degrees and blurred .1 em while it moves, the starts spread over 30% of
--- the duration; Zeron's ease, out-quint (no overshoot).
+-- the duration; Zeren's ease, out-quint (no overshoot).
 local DURATION, STAGGER = 550, 0.3
 local TRAVEL, REST_SCALE, TILT, BLUR = 0.35, 0.6, 2, 0.1
 local EASE = "outQuint"

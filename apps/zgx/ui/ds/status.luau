@@ -184,14 +184,14 @@ end
 -- The working ring alone, as a spinner: `size` points, in `ink` (a token;
 -- a button's busy state draws it in the button's own text colour).
 function M.Spinner(props: { size: number?, ink: string? }): Node
-	return ring(props.ink or "$zeron.status.working", props.size or 14)
+	return ring(props.ink or "$zeren.status.working", props.size or 14)
 end
 
 -- A state's glyph, `size` points: working and connecting their ring.
 local function glyph(kind: Kind, size: number): Node?
 	local k = KINDS[kind]
 	if kind == "working" or kind == "connecting" then
-		return ring(`$zeron.status.{kind}`, size)
+		return ring(`$zeren.status.{kind}`, size)
 	end
 	return if k.glyph then Icon { name = k.glyph, size = size } else nil
 end
@@ -204,7 +204,7 @@ function M.StatusIcon(props: { kind: Kind | () -> Kind, size: number? }): Node
 	local given = props.kind
 	if type(given) ~= "function" then
 		local kind = given :: Kind
-		return ui.div { shrink = 0, color = `$zeron.status.{kind}`, glyph(kind, size) }
+		return ui.div { shrink = 0, color = `$zeren.status.{kind}`, glyph(kind, size) }
 	end
 	local kind = given :: () -> Kind
 	local function drawn(): string
@@ -214,11 +214,11 @@ function M.StatusIcon(props: { kind: Kind | () -> Kind, size: number? }): Node
 	return ui.div {
 		shrink = 0,
 		color = function(): string
-			return `$zeron.status.{kind()}`
+			return `$zeren.status.{kind()}`
 		end,
 		ui.switch(drawn, {
-			working = ring("$zeron.status.working", size),
-			connecting = ring("$zeron.status.connecting", size),
+			working = ring("$zeren.status.working", size),
+			connecting = ring("$zeren.status.connecting", size),
 			glyph = ui.show(function(): boolean
 				return KINDS[kind()].glyph ~= nil
 			end, Icon {
@@ -244,7 +244,7 @@ M.Status = ui.component(function(props: { kind: Kind, label: string?, since: num
 	return ui.row {
 		gap = "$space.1",
 		items = "center",
-		color = `$zeron.status.{props.kind}`,
+		color = `$zeren.status.{props.kind}`,
 		text_size = "$font.size.sm",
 		weight = "$font.weight.medium",
 		glyph(props.kind, 16),
@@ -270,7 +270,7 @@ function M.StatusDot(props: { kind: Kind, size: number? }): Node
 		h = size,
 		shrink = 0,
 		rounded = "$radius.full",
-		bg = `$zeron.status.dot.{props.kind}`,
+		bg = `$zeren.status.dot.{props.kind}`,
 		tooltip = k.long,
 		label = k.long,
 	}
@@ -299,7 +299,7 @@ function M.StatusTag(props: { kind: Kind }): Node
 	return ui.row {
 		gap = "$space.1",
 		items = "center",
-		color = `$zeron.status.{props.kind}`,
+		color = `$zeren.status.{props.kind}`,
 		M.StatusDot { kind = props.kind, size = 6 },
 		ui.text { locale.t(NAMES[props.kind][2]), text_size = "$font.size.xs" },
 	}

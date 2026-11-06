@@ -65,11 +65,11 @@ local function outline(): Node
 		h = H * ZOOM,
 		shrink = 0,
 		p = "$space.3",
-		rounded = "$zeron.card.radius",
+		rounded = "$zeren.card.radius",
 		border = 1,
 		border_dash = { 4, 4 },
 		border_color = "$border.strong",
-		ui.text { "zeron", font = "$font.sans", weight = "$font.weight.bold", text_size = "$font.size.xs", color = "$text.disabled" },
+		ui.text { "zeren", font = "$font.sans", weight = "$font.weight.bold", text_size = "$font.size.xs", color = "$text.disabled" },
 	}
 end
 

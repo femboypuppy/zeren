@@ -130,7 +130,7 @@ export const sandboxFor = async (deviceId: string) => {
   await expect
     .poll(
       async () => {
-        found = (await boatState()).sandboxes.find((s) => s.env.ZERON_RUNNER_ENROLL?.includes(`.${deviceId}.`));
+        found = (await boatState()).sandboxes.find((s) => s.env.ZEREN_RUNNER_ENROLL?.includes(`.${deviceId}.`));
         return found !== undefined;
       },
       { timeout: 10_000, interval: 50 }
@@ -140,7 +140,7 @@ export const sandboxFor = async (deviceId: string) => {
 };
 
 export const enrollCodeFor = async (deviceId: string) =>
-  (await sandboxFor(deviceId)).env.ZERON_RUNNER_ENROLL!.split(".").at(-1)!;
+  (await sandboxFor(deviceId)).env.ZEREN_RUNNER_ENROLL!.split(".").at(-1)!;
 
 export interface RunnerKey {
   readonly publicKey: string;

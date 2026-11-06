@@ -1,6 +1,6 @@
 # Ask: pictures in Markdown that aren't alone in their paragraph
 
-**Who needs it:** Zeron's reply pictures (`apps/zgx/ui/ds/markdown.luau`, `ds/reply_picture.luau`). Agents write pictures inside paragraphs all the time: "Here it is:" with the picture on the next line, or two or three pictures on consecutive lines. `ui.markdown` drops all but a lone picture.
+**Who needs it:** Zeren's reply pictures (`apps/zgx/ui/ds/markdown.luau`, `ds/reply_picture.luau`). Agents write pictures inside paragraphs all the time: "Here it is:" with the picture on the next line, or two or three pictures on consecutive lines. `ui.markdown` drops all but a lone picture.
 
 Seen on zgx `aaa304eb`. `zgx test apps/zgx/zgx-asks/markdown-pictures` runs the repro (3 failing tests).
 
@@ -22,6 +22,6 @@ The empty paragraph in the last row comes from `TagEnd::Paragraph` pushing the p
 - (b) A picture inline among words keeps its `src`: a run `{ x = alt, img = src }`, so an app can draw it or link it rather than lose it.
 - (c) No empty `p` is left where a picture took its paragraph.
 
-## Zeron's workaround meanwhile
+## Zeren's workaround meanwhile
 
 `ds/markdown_pictures.luau`: before parsing, a line that is one picture is given a blank line on each side (outside code fences). After parsing, pictures that follow one another, past the empty paragraphs, are merged into one `pics` block. `ds/markdown_find` parses the same way, so find's block numbers still agree. An inline picture among words still shows only its alt text.

@@ -6,8 +6,8 @@
 //! - the programs it runs (`commands`);
 //! - its MCP server (`mcp.command`, `args`, `env`);
 //! - the screens it replaces (`ui.replace`: the module runs as the app);
-//! - the parts of Zeron it changes (`ui.change` targets: shown, never
-//!   asked about, and not bound: a plugin may change anything but Zeron's
+//! - the parts of Zeren it changes (`ui.change` targets: shown, never
+//!   asked about, and not bound: a plugin may change anything but Zeren's
 //!   Settings and its decision controls, which zgx keeps);
 //! - its tools (name, input and description: the description is read by
 //!   every agent);
@@ -270,7 +270,7 @@ pub fn diff(before: &Value, after: &Value) -> Diff {
             let any = strings(&before["network"]).iter().any(|h| h == ANY_HOST);
             added(&before["network"], &after["network"])
                 .into_iter()
-                .filter(|h| !any || h == ANY_HOST || zeron_plugin_guard::net::risky(h))
+                .filter(|h| !any || h == ANY_HOST || zeren_plugin_guard::net::risky(h))
                 .collect()
         },
         settings_changed,

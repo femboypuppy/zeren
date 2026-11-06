@@ -29,14 +29,14 @@ local M = {}
 -- opening closes every popup open outside it: zgx's own, since #1419.)
 function M.style(props: { [any]: any }, kind: Kind?): { [any]: any }
 	if kind == "island" then
-		props.rounded = props.rounded or "$zeron.island.radius"
+		props.rounded = props.rounded or "$zeren.island.radius"
 		props.bg = function()
-			return if frosted() then "$zeron.island.tint" else "$zeron.menu.solid"
+			return if frosted() then "$zeren.island.tint" else "$zeren.menu.solid"
 		end
 		props.backdrop_blur = function()
-			return if frosted() then "$zeron.island.blur" else 0
+			return if frosted() then "$zeren.island.blur" else 0
 		end
-		props.shadow = "$zeron.island.shadow"
+		props.shadow = "$zeren.island.shadow"
 		props.border = 1
 		props.border_color = "$border.subtle"
 		return props
@@ -44,14 +44,14 @@ function M.style(props: { [any]: any }, kind: Kind?): { [any]: any }
 	props.rounded = props.rounded or "$radius.lg"
 	-- (Where popups can't blur what's under them, Windows', solid too.)
 	props.bg = function()
-		return if material.menus_see_through() then "$zeron.menu.tint" else "$zeron.menu.solid"
+		return if material.menus_see_through() then "$zeren.menu.tint" else "$zeren.menu.solid"
 	end
 	props.backdrop_blur = function()
-		return if material.menus_see_through() then "$zeron.menu.blur" else 0
+		return if material.menus_see_through() then "$zeren.menu.blur" else 0
 	end
 	props.border = 1
 	props.border_color = "$border"
-	props.shadow = "$zeron.menu.shadow"
+	props.shadow = "$zeren.menu.shadow"
 	return props
 end
 

@@ -1,6 +1,6 @@
 # Ask: an inline chip span as one pill
 
-**Who needs it:** Zeron's sent messages. A file or chat mention (`[chat.rs](zeron-file:src/chat.rs)`) shows as a chip in the line, as the shipping app's bubble draws it (crates/ui transcript.rs `user_bubble_text`, composer/chip.rs `paint_chip`): an icon in a small well, then the name, on one rounded wash (corner 5), clickable. The app draws it as a `ui.span` in ds/markdown.luau (`mention_chip`).
+**Who needs it:** Zeren's sent messages. A file or chat mention (`[chat.rs](zeren-file:src/chat.rs)`) shows as a chip in the line, as the shipping app's bubble draws it (crates/ui transcript.rs `user_bubble_text`, composer/chip.rs `paint_chip`): an icon in a small well, then the name, on one rounded wash (corner 5), clickable. The app draws it as a `ui.span` in ds/markdown.luau (`mention_chip`).
 
 **What's wrong** (zgx `b3371f8b`):
 

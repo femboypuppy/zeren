@@ -1,10 +1,10 @@
 -- Naming your organization, for someone signed in and in none: one field,
 -- the address the name makes on the line under it, and the way on, which
--- makes it (Zeron's `POST /auth/orgs`, you its first member), works in it
+-- makes it (Zeren's `POST /auth/orgs`, you its first member), works in it
 -- from now on and goes on to inviting to it. An account makes one of its
 -- own; one already in an organization works in that one and passes over
 -- this step and inviting (asked at sign-in, and again here in case the
--- answer came late). The gallery's Name your organization is the design. Zeron has no address to check yet, so
+-- answer came late). The gallery's Name your organization is the design. Zeren has no address to check yet, so
 -- the line says the address and nothing of whether it's free. Gone wrong,
 -- the line under the title says so in the danger's ink and the button
 -- offers another go; nothing else moves.
@@ -135,7 +135,7 @@ return function(props: Props): Node
 					else ui.t("onboarding.org.body"):get()
 			end,
 			tone = function()
-				return if failed:get() then "$zeron.tone.danger.ink" else "$text.secondary"
+				return if failed:get() then "$zeren.tone.danger.ink" else "$text.secondary"
 			end,
 			ui.column {
 				w_full = true,

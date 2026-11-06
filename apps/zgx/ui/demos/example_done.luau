@@ -8,7 +8,7 @@ local kit = require("@demos/example_kit")
 return {
 	id = "ex_done",
 	title = "All set",
-	about = "The last step of setup: the organization made, what was set up in three lines, and the way in. After it the window closes and Zeron opens on the organization.",
+	about = "The last step of setup: the organization made, what was set up in three lines, and the way in. After it the window closes and Zeren opens on the organization.",
 	demo = function()
 		return kit.stage {
 			w = 680,
@@ -43,8 +43,8 @@ return {
 								items = "center",
 								justify = "center",
 								rounded = "$radius.full",
-								bg = "$zeron.tone.success.wash",
-								color = "$zeron.tone.success.ink",
+								bg = "$zeren.tone.success.wash",
+								color = "$zeren.tone.success.ink",
 								ds.Icon { name = "check-circle", size = 16 },
 							},
 						},

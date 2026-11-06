@@ -3,17 +3,17 @@
 //! a real ⌘F, types queries through the field, opens a hit with a real Enter,
 //! and captures each state:
 //!
-//!   ZERON_OPEN_ROUTE=settings/general cargo run -p zeron-ui \
+//!   ZEREN_OPEN_ROUTE=settings/general cargo run -p zeren-ui \
 //!     --example settings-search-fixture --features appshots-fixture -- <output-dir> [name]
 //!
-//! `ZERON_PALETTE_LIGHT` selects the light palette, `ZERON_FIXTURE_FROSTED`
-//! the frosted surface, and `ZERON_FIXTURE_SIZE=<w>x<h>` the window size.
+//! `ZEREN_PALETTE_LIGHT` selects the light palette, `ZEREN_FIXTURE_FROSTED`
+//! the frosted surface, and `ZEREN_FIXTURE_SIZE=<w>x<h>` the window size.
 use gpui::{
     AppContext, AsyncApp, Bounds, KeyDownEvent, Keystroke, PlatformInput, WindowBounds,
     WindowOptions, point, px, size,
 };
 use std::{path::PathBuf, time::Duration};
-use zeron_ui::*;
+use zeren_ui::*;
 
 async fn pause(cx: &mut AsyncApp, ms: u64) {
     cx.background_executor()
@@ -69,7 +69,7 @@ fn main() -> anyhow::Result<()> {
     let output = PathBuf::from(args.next().expect("output directory"));
     let name = args.next().unwrap_or_else(|| "settings-search".into());
     std::fs::create_dir_all(&output)?;
-    let (width, height) = std::env::var("ZERON_FIXTURE_SIZE")
+    let (width, height) = std::env::var("ZEREN_FIXTURE_SIZE")
         .ok()
         .and_then(|value| {
             let (w, h) = value.split_once('x')?;
@@ -87,10 +87,10 @@ fn main() -> anyhow::Result<()> {
             gpui_base::init(cx);
             let mut settings = settings::UiSettings::default();
             settings.sidebar_width = 260.0;
-            settings.surface = if std::env::var_os("ZERON_FIXTURE_FROSTED").is_some() {
-                zeron_theme::SurfacePreference::Frosted
+            settings.surface = if std::env::var_os("ZEREN_FIXTURE_FROSTED").is_some() {
+                zeren_theme::SurfacePreference::Frosted
             } else {
-                zeron_theme::SurfacePreference::Opaque
+                zeren_theme::SurfacePreference::Opaque
             };
             settings.save(&data).unwrap();
             settings::init(settings.clone(), data.clone(), cx);
@@ -106,7 +106,7 @@ fn main() -> anyhow::Result<()> {
                 cx,
             );
             theme_library::init(data.clone(), cx);
-            let mode = if std::env::var_os("ZERON_PALETTE_LIGHT").is_some() {
+            let mode = if std::env::var_os("ZEREN_PALETTE_LIGHT").is_some() {
                 appearance::AppearanceMode::Light
             } else {
                 appearance::AppearanceMode::Dark
@@ -130,8 +130,8 @@ fn main() -> anyhow::Result<()> {
             app_menus::init(cx);
             let state = cx.new(|_| {
                 let mut s = state::AppState::new();
-                s.connection = zeron_proto::view::ConnectionStatus::Ready;
-                s.workspace_scope = Some(zeron_proto::WorkspaceScope::Local);
+                s.connection = zeren_proto::view::ConnectionStatus::Ready;
+                s.workspace_scope = Some(zeren_proto::WorkspaceScope::Local);
                 s.local_device_id = Some("local".into());
                 s.devices = vec![
                     serde_json::from_value(serde_json::json!({

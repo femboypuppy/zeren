@@ -1,8 +1,8 @@
 # Message Markdown runtime evidence
 
-Captured on 2026-10-26 on Linux (X11, Mesa software Vulkan) from `message-markdown-fixture`: an offline shell with one chat whose prompts are written in Markdown, one of them sent by another chat through Zeron's `send_message`. The `before-*` captures run the fixture against `main` `962a3207`, from before its last reply gained the fence and quote that `*-blocks.png` shows.
+Captured on 2026-10-26 on Linux (X11, Mesa software Vulkan) from `message-markdown-fixture`: an offline shell with one chat whose prompts are written in Markdown, one of them sent by another chat through Zeren's `send_message`. The `before-*` captures run the fixture against `main` `962a3207`, from before its last reply gained the fence and quote that `*-blocks.png` shows.
 
-Build and run: `cargo run -p zeron-ui --features appshots-fixture --example message-markdown-fixture` (ZERON_PALETTE_LIGHT=1 for the light theme). The window was captured from the X display with `import`, and the rail tick of the agent-sent prompt hovered with `xdotool`.
+Build and run: `cargo run -p zeren-ui --features appshots-fixture --example message-markdown-fixture` (ZEREN_PALETTE_LIGHT=1 for the light theme). The window was captured from the X display with `import`, and the rail tick of the agent-sent prompt hovered with `xdotool`.
 
 - User bubbles render their Markdown like a reply does (strong, emphasis, inline code, lists, fences with highlighting and copy); typed newlines stay line breaks. Prompts that read the same as typed, and prompts carrying file chips, keep the plain bubble.
 - The rail's preview card shows `Message from [provider mark] Chat` over an agent-sent prompt instead of its routing header, and renders the prompt and the reply's opening as styled prose clamped to a few lines (`*-hover.png`). Only prose shows: fences, quotes, tables, display formulas and rules are left out (`*-blocks.png`: `Then run:` without its fence, the reply without its output block and quote); a message of nothing but a fence shows its first line.

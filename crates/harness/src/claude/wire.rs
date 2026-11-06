@@ -808,10 +808,10 @@ mod tests {
 
     #[test]
     fn control_response_errors_are_read() {
-        let line = r#"{"type":"control_response","response":{"subtype":"error","request_id":"zeron_model_1","error":"Unknown model"}}"#;
+        let line = r#"{"type":"control_response","response":{"subtype":"error","request_id":"zeren_model_1","error":"Unknown model"}}"#;
         match parse_frame(line).expect("parses") {
             Frame::ControlResponse(f) => {
-                assert_eq!(f.response.request_id, "zeron_model_1");
+                assert_eq!(f.response.request_id, "zeren_model_1");
                 assert_eq!(f.response.error_message().as_deref(), Some("Unknown model"));
             }
             other => panic!("unexpected frame: {other:?}"),

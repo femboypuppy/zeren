@@ -37,21 +37,21 @@ fn parked_command() -> Command {
 
 #[test]
 fn parked_child_helper() {
-    if let Ok(handle) = std::env::var("ZERON_TEST_INHERITED_EVENT") {
+    if let Ok(handle) = std::env::var("ZEREN_TEST_INHERITED_EVENT") {
         // Signal only if the parent's sentinel handle accidentally survived the
         // launch allow-list. Handle reuse in this child cannot signal that event.
         unsafe {
             windows_sys::Win32::System::Threading::SetEvent(handle.parse::<usize>().unwrap() as _)
         };
     }
-    if std::env::var_os("ZERON_TEST_PARKED_CHILD").is_some() {
+    if std::env::var_os("ZEREN_TEST_PARKED_CHILD").is_some() {
         std::thread::sleep(Duration::from_secs(15));
     }
 }
 
 #[test]
 fn stdin_eof_helper() {
-    if let Some(marker) = std::env::var_os("ZERON_TEST_STDIN_EOF_MARKER") {
+    if let Some(marker) = std::env::var_os("ZEREN_TEST_STDIN_EOF_MARKER") {
         let _ = std::io::copy(&mut std::io::stdin(), &mut std::io::sink());
         std::fs::write(marker, "eof").unwrap();
     }
@@ -60,7 +60,7 @@ fn eof_command(marker: &std::path::Path) -> Command {
     let mut command = Command::new(std::env::current_exe().unwrap());
     command
         .args(["--exact", "process::windows::tests::stdin_eof_helper"])
-        .env("ZERON_TEST_STDIN_EOF_MARKER", marker)
+        .env("ZEREN_TEST_STDIN_EOF_MARKER", marker)
         .stdin(Stdio::piped())
         .stdout(Stdio::null())
         .stderr(Stdio::null());
@@ -75,7 +75,7 @@ fn eof_command(marker: &std::path::Path) -> Command {
 async fn teardown_waits_on_stdin_eof_only_when_one_is_coming() {
     let grace = Duration::from_secs(20);
     let mut parked = parked_command();
-    parked.env("ZERON_TEST_PARKED_CHILD", "1");
+    parked.env("ZEREN_TEST_PARKED_CHILD", "1");
     let mut child = parked.spawn().unwrap();
     let started = Instant::now();
     crate::shutdown_child(&mut child, grace).await;
@@ -137,7 +137,7 @@ async fn unrelated_inheritable_handles_are_not_passed_to_agents() {
     let event = unsafe { OwnedHandle::from_raw_handle(event) };
     let mut command = parked_command();
     command.env(
-        "ZERON_TEST_INHERITED_EVENT",
+        "ZEREN_TEST_INHERITED_EVENT",
         (event.as_raw_handle() as usize).to_string(),
     );
     let mut child = command.spawn().unwrap();
@@ -190,7 +190,7 @@ fn ordinary_subprocess_cannot_keep_agent_pipes_open() {
         // A raw std launch deliberately does not participate in our allow-list.
         let foreign = std::process::Command::new(std::env::current_exe()?)
             .args(["--exact", "process::windows::tests::parked_child_helper"])
-            .env("ZERON_TEST_PARKED_CHILD", "1")
+            .env("ZEREN_TEST_PARKED_CHILD", "1")
             .stdin(std::process::Stdio::null())
             .stdout(std::process::Stdio::null())
             .stderr(std::process::Stdio::null())
@@ -230,11 +230,11 @@ fn ordinary_subprocess_cannot_keep_agent_pipes_open() {
 
 #[test]
 fn crash_interval_owner_helper() {
-    let Some(pid_file) = std::env::var_os("ZERON_TEST_CRASH_PID_FILE") else {
+    let Some(pid_file) = std::env::var_os("ZEREN_TEST_CRASH_PID_FILE") else {
         return;
     };
     let mut command = parked_command();
-    command.env("ZERON_TEST_PARKED_CHILD", "1");
+    command.env("ZEREN_TEST_PARKED_CHILD", "1");
     let _ = spawn_prepared(&command, |child| {
         std::fs::write(pid_file, format!("{},{}", child.pid, child.escrow.pid))?;
         // Tell the parent that CreateProcessW returned, without starting the
@@ -255,7 +255,7 @@ fn owner_death_immediately_after_creation_kills_suspended_child() {
             "--exact",
             "process::windows::tests::crash_interval_owner_helper",
         ])
-        .env("ZERON_TEST_CRASH_PID_FILE", &pid_file)
+        .env("ZEREN_TEST_CRASH_PID_FILE", &pid_file)
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null())
@@ -311,7 +311,7 @@ fn owner_death_immediately_after_creation_kills_suspended_child() {
 /// role node plays under a real npm shim) actually received.
 #[test]
 fn batch_inner_helper() {
-    let Some(file) = std::env::var_os("ZERON_TEST_BATCH_ARGS_FILE") else {
+    let Some(file) = std::env::var_os("ZEREN_TEST_BATCH_ARGS_FILE") else {
         return;
     };
     // argv = [test binary, --exact, helper name, forwarded arguments…]
@@ -325,7 +325,7 @@ async fn batch_scripts_spawn_through_cmd_with_literal_arguments() {
     let received = dir.path().join("received.txt");
     // A real shim shape: forward `%*` to an inner program. What that program's
     // C runtime parses is the contract — exactly what node receives under an
-    // npm `.cmd` shim launched by zeron.
+    // npm `.cmd` shim launched by zeren.
     let script = dir.path().join("forward-args.cmd");
     std::fs::write(
         &script,
@@ -345,7 +345,7 @@ async fn batch_scripts_spawn_through_cmd_with_literal_arguments() {
     let mut command = Command::new(&script);
     command
         .args(arguments)
-        .env("ZERON_TEST_BATCH_ARGS_FILE", &received)
+        .env("ZEREN_TEST_BATCH_ARGS_FILE", &received)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null());
@@ -431,7 +431,7 @@ async fn bare_batch_program_resolves_from_child_path() {
 /// Records every argument after argv[0] when spawned by the shim tests.
 #[test]
 fn shim_target_helper() {
-    let Some(file) = std::env::var_os("ZERON_TEST_SHIM_ARGS_FILE") else {
+    let Some(file) = std::env::var_os("ZEREN_TEST_SHIM_ARGS_FILE") else {
         return;
     };
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -451,7 +451,7 @@ const SHIM_HEAD: &str = "@ECHO off\r\nGOTO start\r\n:find_dp0\r\nSET dp0=%~dp0\r
 
 async fn run_recording(mut command: Command, received: &std::path::Path) -> Vec<String> {
     command
-        .env("ZERON_TEST_SHIM_ARGS_FILE", received)
+        .env("ZEREN_TEST_SHIM_ARGS_FILE", received)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null());

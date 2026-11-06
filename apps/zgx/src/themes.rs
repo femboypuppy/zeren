@@ -1,7 +1,7 @@
-//! Themes in the window: the colours Zeron wears, chosen apart from the
+//! Themes in the window: the colours Zeren wears, chosen apart from the
 //! template it runs (docs/themes.md). What a theme is, where each kind comes
 //! from and how the choice is kept are the shared catalogue's
-//! (`zeron_theme::catalog`), which the engine's theme tools use too: this is
+//! (`zeren_theme::catalog`), which the engine's theme tools use too: this is
 //! the window's side of it, handing the list to the scripts and doing what
 //! the Themes page asks.
 //!
@@ -26,9 +26,9 @@ use std::path::PathBuf;
 use std::rc::Rc;
 
 use serde_json::json;
-use zeron_theme::CustomThemeLibrary;
-pub use zeron_theme::catalog::{Choice, TemplateTheme, chosen, choice_of, find_builtin, save_choice};
-use zeron_theme::catalog::{self, describe};
+use zeren_theme::CustomThemeLibrary;
+pub use zeren_theme::catalog::{Choice, TemplateTheme, chosen, choice_of, find_builtin, save_choice};
+use zeren_theme::catalog::{self, describe};
 use zgx_desktop::WindowContext;
 use zgx_script::{ScriptHost, Shared, Value};
 
@@ -112,7 +112,7 @@ pub fn install(_cx: &mut WindowContext, host: &ScriptHost) {
     host.action("themes.remove", move |arg| {
         let Some(dir) = data_dir() else { return };
         if let Err(error) = catalog::remove(&dir, &text(&arg)) {
-            eprintln!("zeron-zgx: themes: {error}");
+            eprintln!("zeren-zgx: themes: {error}");
         }
         publish();
     });
@@ -137,8 +137,8 @@ mod tests {
     use super::*;
     use std::path::Path;
     use serde_json::Value as Json;
-    use zeron_theme::ThemeVariant;
-    use zeron_theme::catalog::{Builtin, Palette, builtin, import, legibility, remove, rename};
+    use zeren_theme::ThemeVariant;
+    use zeren_theme::catalog::{Builtin, Palette, builtin, import, legibility, remove, rename};
 
     /// A variant's palette, as the window is handed it.
     fn palette(v: &ThemeVariant, entry: &str) -> Json {
@@ -233,7 +233,7 @@ mod tests {
 
     // -- Each theme worn (ui/theme_check_fixture.luau) ---------------------
 
-    use zeron_theme::Color;
+    use zeren_theme::Color;
     use zgx_script::testing::TestApp;
 
     /// The roles every theme sets (surfaces and glass, text, hairlines,
@@ -241,17 +241,17 @@ mod tests {
     /// composer and the sidebar's rows), on top of whatever else the mapping
     /// writes.
     const ROLES: &[&str] = &[
-        "zeron.window", "background", "glass.tint", "popover.bg", "surface.sunken", "surface.base", "surface.raised", "surface.overlay",
-        "text.primary", "text.secondary", "text.tertiary", "text.disabled", "border", "border.subtle", "border.strong", "zeron.edge",
-        "hover", "pressed", "selection", "selection.item", "focus.ring", "accent", "accent.hover", "accent.text", "zeron.accents.default",
-        "danger", "warning", "success", "info", "zeron.selected.flat.bg", "zeron.selected.bg", "zeron.menu.tint", "zeron.menu.solid",
-        "zeron.composer.tint", "zeron.composer.solid", "zeron.composer.edge", "zeron.primary.bg", "zeron.primary.text",
-        "zeron.destructive.bg", "zeron.destructive.text", "zeron.diff.added", "zeron.diff.removed", "zeron.git.modified",
-        "zeron.git.added", "zeron.git.deleted", "zeron.pr.open", "zeron.pr.merged", "zeron.status.approval", "zeron.status.dot.done",
-        "zeron.status.failed", "zeron.tone.accent.ink", "zeron.tone.danger.ink", "zeron.tone.success.ink", "zeron.tone.warning.ink",
-        "zeron.tone.info.ink", "zeron.visual.series.teal",
+        "zeren.window", "background", "glass.tint", "popover.bg", "surface.sunken", "surface.base", "surface.raised", "surface.overlay",
+        "text.primary", "text.secondary", "text.tertiary", "text.disabled", "border", "border.subtle", "border.strong", "zeren.edge",
+        "hover", "pressed", "selection", "selection.item", "focus.ring", "accent", "accent.hover", "accent.text", "zeren.accents.default",
+        "danger", "warning", "success", "info", "zeren.selected.flat.bg", "zeren.selected.bg", "zeren.menu.tint", "zeren.menu.solid",
+        "zeren.composer.tint", "zeren.composer.solid", "zeren.composer.edge", "zeren.primary.bg", "zeren.primary.text",
+        "zeren.destructive.bg", "zeren.destructive.text", "zeren.diff.added", "zeren.diff.removed", "zeren.git.modified",
+        "zeren.git.added", "zeren.git.deleted", "zeren.pr.open", "zeren.pr.merged", "zeren.status.approval", "zeren.status.dot.done",
+        "zeren.status.failed", "zeren.tone.accent.ink", "zeren.tone.danger.ink", "zeren.tone.success.ink", "zeren.tone.warning.ink",
+        "zeren.tone.info.ink", "zeren.visual.series.teal",
     ];
-    /// Code's and Markdown's roles (zeron.syntax.*): all of them.
+    /// Code's and Markdown's roles (zeren.syntax.*): all of them.
     const SYNTAX_ROLES: &[&str] = &[
         "text", "keyword", "string", "escape", "regex", "number", "constant", "comment", "function", "macro", "type", "variable",
         "property", "attribute", "label", "operator", "punctuation", "tag", "heading", "link", "url", "emphasis", "strong", "quote",
@@ -261,7 +261,7 @@ mod tests {
     const QUIET: &[&str] = &["comment", "url", "punctuation"];
 
     fn ui() -> PathBuf {
-        std::env::var_os("ZERON_ZGX_TEST_UI").map(PathBuf::from).unwrap_or_else(|| Path::new(env!("CARGO_MANIFEST_DIR")).join("ui"))
+        std::env::var_os("ZEREN_ZGX_TEST_UI").map(PathBuf::from).unwrap_or_else(|| Path::new(env!("CARGO_MANIFEST_DIR")).join("ui"))
     }
 
     struct Rig {
@@ -273,7 +273,7 @@ mod tests {
             let entry = ui().join("theme_check_fixture.luau");
             let app = TestApp::new(|runtime| ScriptHost::new(runtime, entry));
             app.frames(4);
-            let keys: Vec<Json> = ROLES.iter().map(|k| json!(k)).chain(SYNTAX_ROLES.iter().map(|k| json!(format!("zeron.syntax.{k}")))).collect();
+            let keys: Vec<Json> = ROLES.iter().map(|k| json!(k)).chain(SYNTAX_ROLES.iter().map(|k| json!(format!("zeren.syntax.{k}")))).collect();
             app.host.shared("theme_check.keys", Value::Nil).set(json_value(&Json::Array(keys)));
             Rig { app }
         }
@@ -322,7 +322,7 @@ mod tests {
         let mut worn = 0;
         let mut fixes = Vec::new();
         let mut failures = Vec::new();
-        for theme in builtin().into_iter().filter(|b| b.id != "zeron") {
+        for theme in builtin().into_iter().filter(|b| b.id != "zeren") {
             let slots = slots_of(&theme);
             for v in &theme.variants {
                 let kind = if v.appearance.is_dark() { "dark" } else { "light" };
@@ -334,7 +334,7 @@ mod tests {
                 let written = report["written"].as_object().unwrap_or_else(|| panic!("{what}: nothing written: {report}"));
                 // Every role the mapping promises, and every one it wrote,
                 // resolved as written.
-                for role in ROLES.iter().map(|r| r.to_string()).chain(SYNTAX_ROLES.iter().map(|s| format!("zeron.syntax.{s}"))) {
+                for role in ROLES.iter().map(|r| r.to_string()).chain(SYNTAX_ROLES.iter().map(|s| format!("zeren.syntax.{s}"))) {
                     if !written.contains_key(&role) {
                         failures.push(format!("{what}: {role} isn't set"));
                     }
@@ -356,8 +356,8 @@ mod tests {
                     failures.push(format!("{what}: the focus ring isn't the accent's"));
                 }
                 // Legible: on the window and on a menu.
-                let window = color(&resolved["zeron.window"]);
-                let menu = color(&resolved["zeron.menu.solid"]);
+                let window = color(&resolved["zeren.window"]);
+                let menu = color(&resolved["zeren.menu.solid"]);
                 let mut check = |role: &str, on: Color, min: f32| {
                     let c = color(&resolved[role]).contrast(on);
                     if c < min - 0.01 {
@@ -371,18 +371,18 @@ mod tests {
                 }
                 check("accent", window, 3.0);
                 for role in [
-                    "zeron.diff.added", "zeron.diff.removed", "zeron.git.modified", "zeron.git.added", "zeron.git.deleted",
-                    "zeron.pr.open", "zeron.pr.merged", "zeron.status.approval", "zeron.status.failed", "zeron.status.dot.done",
-                    "zeron.tone.accent.ink", "zeron.tone.danger.ink", "zeron.tone.success.ink", "zeron.tone.warning.ink", "zeron.tone.info.ink",
+                    "zeren.diff.added", "zeren.diff.removed", "zeren.git.modified", "zeren.git.added", "zeren.git.deleted",
+                    "zeren.pr.open", "zeren.pr.merged", "zeren.status.approval", "zeren.status.failed", "zeren.status.dot.done",
+                    "zeren.tone.accent.ink", "zeren.tone.danger.ink", "zeren.tone.success.ink", "zeren.tone.warning.ink", "zeren.tone.info.ink",
                 ] {
                     check(role, window, 4.5);
                 }
                 for s in SYNTAX_ROLES {
-                    check(&format!("zeron.syntax.{s}"), window, if QUIET.contains(s) { 3.0 } else { 4.5 });
+                    check(&format!("zeren.syntax.{s}"), window, if QUIET.contains(s) { 3.0 } else { 4.5 });
                 }
-                check("zeron.primary.text", color(&resolved["zeron.primary.bg"]), 4.5);
+                check("zeren.primary.text", color(&resolved["zeren.primary.bg"]), 4.5);
                 check("accent.text", accent, 3.0);
-                check("zeron.destructive.text", color(&resolved["zeron.destructive.bg"]), 3.0);
+                check("zeren.destructive.text", color(&resolved["zeren.destructive.bg"]), 3.0);
                 // The terminal: its text, and its sixteen ANSI colours on the
                 // window and a menu (the two of the background's own shade at
                 // 3:1, the rest as text). A light theme's white is never
@@ -405,7 +405,7 @@ mod tests {
                 }
             }
         }
-        let variants: usize = builtin().iter().filter(|b| b.id != "zeron").map(|b| b.variants.len()).sum();
+        let variants: usize = builtin().iter().filter(|b| b.id != "zeren").map(|b| b.variants.len()).sum();
         assert_eq!(worn, variants);
         // What was moved from the source to stay legible (the deviations).
         eprintln!("{} inks moved to stay legible:\n{}", fixes.len(), fixes.join("\n"));
@@ -416,23 +416,23 @@ mod tests {
     }
 
     #[test]
-    fn each_scheme_wears_its_own_slot_and_an_empty_one_is_zeron_s() {
+    fn each_scheme_wears_its_own_slot_and_an_empty_one_is_zeren_s() {
         let rig = Rig::new();
-        let zeron = rig.wear(&json!({}), "dark");
-        assert_eq!(zeron["names"], json!({ "dark": "theme-dark", "light": "theme-light" }), "the names never change");
+        let zeren = rig.wear(&json!({}), "dark");
+        assert_eq!(zeren["names"], json!({ "dark": "theme-dark", "light": "theme-light" }), "the names never change");
         // Gruvbox for light, Tokyo Night for dark: each scheme its own.
         let slots = json!({ "light": palette(find_builtin("gruvbox").unwrap().variant(false).unwrap(), "gruvbox"),
                             "dark": palette(find_builtin("tokyo-night").unwrap().variant(true).unwrap(), "tokyo-night") });
         let light = rig.wear(&slots, "light");
-        assert!(same(light["resolved"]["zeron.window"].as_str().unwrap(), "#fbf1c7"), "{}", light["resolved"]["zeron.window"]);
+        assert!(same(light["resolved"]["zeren.window"].as_str().unwrap(), "#fbf1c7"), "{}", light["resolved"]["zeren.window"]);
         let dark = rig.wear(&slots, "dark");
-        assert!(same(dark["resolved"]["zeron.window"].as_str().unwrap(), "#1a1b26"));
-        // One with only a dark theme: light is Zeron's, every role as it was.
+        assert!(same(dark["resolved"]["zeren.window"].as_str().unwrap(), "#1a1b26"));
+        // One with only a dark theme: light is Zeren's, every role as it was.
         let dracula = rig.wear(&slots_of(&find_builtin("dracula").unwrap()), "light");
         assert_eq!(dracula["current"], "theme-light");
         let own_light = rig.wear(&json!({}), "light");
-        assert_eq!(dracula["asked"], own_light["asked"], "an empty slot is Zeron's");
-        assert_ne!(rig.wear(&slots_of(&find_builtin("dracula").unwrap()), "dark")["asked"], zeron["asked"]);
+        assert_eq!(dracula["asked"], own_light["asked"], "an empty slot is Zeren's");
+        assert_ne!(rig.wear(&slots_of(&find_builtin("dracula").unwrap()), "dark")["asked"], zeren["asked"]);
     }
 
     /// The terminal's colours zgx gives a terminal shown in the window, as
@@ -444,14 +444,14 @@ mod tests {
     }
 
     #[test]
-    fn zeron_s_own_themes_give_the_terminal_their_colours_dark_light_dark() {
-        // Nothing chosen: each scheme wears Zeron's own, and the terminal
-        // takes Zeron's palette's colours (the host's list), never the
+    fn zeren_s_own_themes_give_the_terminal_their_colours_dark_light_dark() {
+        // Nothing chosen: each scheme wears Zeren's own, and the terminal
+        // takes Zeren's palette's colours (the host's list), never the
         // user's Ghostty ones: a light window's terminal text dark, its
         // whites legible on white.
         let rig = Rig::new();
-        let zeron = builtin().into_iter().find(|b| b.id == "zeron").expect("Zeron's own themes");
-        let list: Vec<Json> = zeron.variants.iter().map(|v| palette(v, "zeron")).collect();
+        let zeren = builtin().into_iter().find(|b| b.id == "zeren").expect("Zeren's own themes");
+        let list: Vec<Json> = zeren.variants.iter().map(|v| palette(v, "zeren")).collect();
         rig.app
             .host
             .shared("themes.library", Value::Nil)
@@ -460,7 +460,7 @@ mod tests {
         for kind in ["dark", "light", "dark"] {
             let report = rig.wear(&json!({}), kind);
             assert_eq!(report["current"], format!("theme-{kind}"));
-            let v = zeron.variant(kind == "dark").unwrap();
+            let v = zeren.variant(kind == "dark").unwrap();
             let window = v.colors.background;
             let (foreground, ansi) = terminal_colors(&rig);
             let foreground = foreground.unwrap_or_else(|| panic!("{kind}: no terminal text colour"));
@@ -478,15 +478,15 @@ mod tests {
     }
 
     #[test]
-    fn wearing_a_theme_and_going_back_restores_zeron_s_colours() {
+    fn wearing_a_theme_and_going_back_restores_zeren_s_colours() {
         let rig = Rig::new();
         for kind in ["dark", "light"] {
             let before = rig.wear(&json!({}), kind);
             let theme = rig.wear(&slots_of(&find_builtin("github").unwrap()), kind);
-            assert_ne!(theme["asked"]["text.primary"], before["asked"]["text.primary"], "GitHub's text isn't Zeron's");
-            assert_ne!(theme["asked"]["zeron.syntax.keyword"], before["asked"]["zeron.syntax.keyword"]);
+            assert_ne!(theme["asked"]["text.primary"], before["asked"]["text.primary"], "GitHub's text isn't Zeren's");
+            assert_ne!(theme["asked"]["zeren.syntax.keyword"], before["asked"]["zeren.syntax.keyword"]);
             let after = rig.wear(&json!({}), kind);
-            assert_eq!(after["asked"], before["asked"], "every role back as Zeron's ({kind})");
+            assert_eq!(after["asked"], before["asked"], "every role back as Zeren's ({kind})");
         }
     }
 }

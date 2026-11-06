@@ -8,9 +8,9 @@ use std::time::Duration;
 use zgx_script::{ScriptHost, testing::TestApp};
 
 fn mount() -> TestApp {
-    // (This checkout's `ui/`, or `ZERON_ZGX_TEST_UI`'s: another copy, to see
+    // (This checkout's `ui/`, or `ZEREN_ZGX_TEST_UI`'s: another copy, to see
     // the test fail on code from before a fix.)
-    let ui = std::env::var_os("ZERON_ZGX_TEST_UI")
+    let ui = std::env::var_os("ZEREN_ZGX_TEST_UI")
         .map(std::path::PathBuf::from)
         .unwrap_or_else(|| std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui"));
     let path = ui.join("shell_fixture.luau");

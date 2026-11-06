@@ -8,7 +8,7 @@
 //!
 //! It shows a package waiting in the templates folder's `.pending/` as the
 //! engine lists it (`ListTemplates`' `pending`, with who signed it, looked
-//! up again while Zeron is still checking).
+//! up again while Zeren is still checking).
 
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
@@ -101,7 +101,7 @@ const KEEP: &str = "keep:";
 /// Template `id` as the keep sheet shows it: its name and description, its
 /// own files' count, the digest you keep (`preview::digest`), and who signed
 /// it if it came from a package. None when it isn't installed (or is
-/// Zeron's own, which needs no keeping).
+/// Zeren's own, which needs no keeping).
 fn keep_item(id: &str) -> Option<Json> {
     let root = super::templates_root()?;
     if id == super::live::BUILTIN || !super::live::plain(id) {
@@ -128,7 +128,7 @@ fn keep_item(id: &str) -> Option<Json> {
 
 /// The keep sheet for template `id` (one in preview): in the window if it's
 /// open, else in a new one. Only its Keep (`templates.decide { keep }`)
-/// gives the template Zeron's powers.
+/// gives the template Zeren's powers.
 pub fn keep(bridge: &Rc<Bridge>, id: &str) {
     if id.is_empty() {
         return;
@@ -168,8 +168,8 @@ pub fn review(bridge: &Rc<Bridge>, pending: &str) {
     let window = bridge.windows.open(options(), move |cx| {
         let Some(bridge) = weak.upgrade() else { return };
         let host = host(cx, &bridge, names.clone(), slot.clone(), gen_.clone(), last_.clone());
-        // (`ZERON_ZGX_TEMPLATE_REVIEW`, development: devtools are this window's.)
-        crate::serve_sheet(cx, host, "template_consent.luau", crate::dev::switch("ZERON_ZGX_TEMPLATE_REVIEW").is_some());
+        // (`ZEREN_ZGX_TEMPLATE_REVIEW`, development: devtools are this window's.)
+        crate::serve_sheet(cx, host, "template_consent.luau", crate::dev::switch("ZEREN_ZGX_TEMPLATE_REVIEW").is_some());
         cx.on_closed(move || {
             OPEN.with(|open| open.borrow_mut().take());
         });
@@ -182,7 +182,7 @@ pub fn review(bridge: &Rc<Bridge>, pending: &str) {
 fn options() -> WindowOptions {
     WindowOptions {
         resizable: false,
-        ..crate::zeron_window(SIZE.0, SIZE.1)
+        ..crate::zeren_window(SIZE.0, SIZE.1)
     }
 }
 
@@ -238,7 +238,7 @@ fn host(
                         super::preview::approve(&id, &hash)
                     })
             };
-            eprintln!("zeron-zgx: templates: {id} {}", if allow { "kept" } else { "not kept (Not now)" });
+            eprintln!("zeren-zgx: templates: {id} {}", if allow { "kept" } else { "not kept (Not now)" });
             match kept {
                 Ok(()) => {
                     if let Some(b) = weak.upgrade() {
@@ -256,7 +256,7 @@ fn host(
             return;
         }
         let name = arg.field("pending").map(text).unwrap_or_default();
-        eprintln!("zeron-zgx: templates: {name} {}", if allow { "allowed" } else { "not allowed (Not now)" });
+        eprintln!("zeren-zgx: templates: {name} {}", if allow { "allowed" } else { "not allowed (Not now)" });
         generation.set(generation.get() + 1);
         out.set(record(last.borrow().as_ref(), true, None));
         let (weak, window, out, pending, generation, last) =
@@ -273,7 +273,7 @@ fn host(
                 })
                 .await {
                     Ok(reply) => params["review"] = reply["review"].clone(),
-                    Err(error) => eprintln!("zeron-zgx: templates: no review for {name}: {error}"),
+                    Err(error) => eprintln!("zeren-zgx: templates: no review for {name}: {error}"),
                 }
             }
             let result = crate::auth::after_setup(|| {
@@ -282,13 +282,13 @@ fn host(
             })
             .await;
             // Allowed in this window: installed as you were shown it, so it
-            // runs with Zeron's powers (its files as installed).
+            // runs with Zeren's powers (its files as installed).
             if let Ok(reply) = &result
                 && let Some(id) = reply["installed"].as_str()
                 && let Some(root) = super::templates_root()
                 && let Err(error) = super::preview::approve(id, &super::preview::digest(&root.join(id)))
             {
-                eprintln!("zeron-zgx: templates: {id} installed, not kept: {error}");
+                eprintln!("zeren-zgx: templates: {id} installed, not kept: {error}");
             }
             if let Some(b) = weak.upgrade() {
                 b.look();
@@ -307,7 +307,7 @@ fn host(
 
 fn said(error: &str) -> String {
     match error {
-        "offline" | "closed" => "Zeron isn't running right now. Try again in a moment.".into(),
+        "offline" | "closed" => "Zeren isn't running right now. Try again in a moment.".into(),
         other => other.to_string(),
     }
 }

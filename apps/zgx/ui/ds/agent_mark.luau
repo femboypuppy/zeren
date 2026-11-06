@@ -2,7 +2,7 @@
 -- agent's rows, the model picker, the composer, the sidebar), the one place
 -- they're drawn, as ds/agent_look decides:
 --
--- - an agent Zeron drives itself: its bundled brand mark (ds.Mark);
+-- - an agent Zeren drives itself: its bundled brand mark (ds.Mark);
 -- - an agent from the ACP registry: the registry's own icon for it, in the
 --   theme's text colour on a quiet tile, or bare in the text's colour round
 --   it;

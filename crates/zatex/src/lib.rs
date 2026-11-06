@@ -1,4 +1,4 @@
-//! zatex — fast, low-memory LaTeX math layout for Zeron.
+//! zatex — fast, low-memory LaTeX math layout for Zeren.
 //!
 //! [`layout`] turns a TeX math string into a [`Formula`]: a width, ascent and
 //! descent plus a flat list of [`Item`]s (glyph ids and rules) in points.

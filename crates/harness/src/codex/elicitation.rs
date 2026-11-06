@@ -5,7 +5,7 @@
 //! answer the server handles, where a JSON-RPC error failed its tool call.
 
 use serde_json::{Map, Value, json};
-use zeron_proto::{UserInputAnswer, UserInputQuestion};
+use zeren_proto::{UserInputAnswer, UserInputQuestion};
 
 enum Kind {
     Text,

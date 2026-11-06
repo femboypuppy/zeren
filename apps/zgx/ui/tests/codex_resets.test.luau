@@ -212,7 +212,7 @@ end)
 test("Codex resets: each refusal says why", function()
 	local app = open()
 	local refusals: { [string]: string } = {
-		offline = "Zeron can't reach the device this account is on.",
+		offline = "Zeren can't reach the device this account is on.",
 		signed_out = "Codex couldn't confirm this login. Sign in again first.",
 		missing = "This account is no longer saved on its device.",
 		failed = "Codex didn't confirm it. Trying again won't use two.",

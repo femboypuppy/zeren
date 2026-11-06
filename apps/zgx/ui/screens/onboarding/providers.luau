@@ -28,7 +28,7 @@ local function now(): agents.Now
 	return agents.now:get() :: agents.Now
 end
 
--- The agents shown: those with a mark (every one Zeron runs but a test rig).
+-- The agents shown: those with a mark (every one Zeren runs but a test rig).
 local function shown(): { agents.Agent }
 	local out = {}
 	for _, a in now().list do
@@ -149,7 +149,7 @@ local function cards(): Node
 	}
 end
 
--- Nothing on this Mac: the agents Zeron can install, a click each; one it
+-- Nothing on this Mac: the agents Zeren can install, a click each; one it
 -- can't says to install it yourself. A row each, keyed, its install under
 -- way read from its row; each brings the rule above it but the first.
 local function install(): Node

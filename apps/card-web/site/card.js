@@ -1,4 +1,4 @@
-// Zeron's member card for the web: a port of apps/zgx/ui/ds/member_card.luau
+// Zeren's member card for the web: a port of apps/zgx/ui/ds/member_card.luau
 // (the native card) to WebGL2, drawing the same picture from the same
 // numbers. The card is 300 by 420 points: layered art, the sky in the
 // intro's characters, paper rising from below under the member's name,
@@ -28,7 +28,7 @@ const PAD = 16;
 const MARGIN = 2; // the card texture's resampling edge, in points
 export const HOLOS = ["aurora", "reverse", "secret", "starlight", "glyph"];
 
-// `zeron.card.*` tokens: the same in either theme (a printed object).
+// `zeren.card.*` tokens: the same in either theme (a printed object).
 const TOKENS = {
   paper: [0xf1, 0xef, 0xe8],
   ink: "#161616",
@@ -563,7 +563,7 @@ export function layoutCard(card) {
   const sz = TOKENS.size;
   // The mark and the number, on the sky.
   const markLine = lineOf(sz.mark);
-  runs.push({ text: "zeron", x: x0, baseline: baselineIn(y0, markLine, sz.mark), size: sz.mark, family: FONT_SANS, weight: 700, color: TOKENS.light });
+  runs.push({ text: "zeren", x: x0, baseline: baselineIn(y0, markLine, sz.mark), size: sz.mark, family: FONT_SANS, weight: 700, color: TOKENS.light });
   const rowH = Math.max(markLine, 22);
   const numW = PAD + monoWidth(number, sz.number, 1);
   const numBox = { x: x1 - numW, y: y0 + (rowH - 22) / 2, w: numW, h: 22, r: 9999, fill: TOKENS.pill };
@@ -669,7 +669,7 @@ export function mountCard(container, card, options = {}) {
   const caption = opts.caption ? captionOf(art) : null;
 
   const canvas = document.createElement("canvas");
-  canvas.className = "zeron-card";
+  canvas.className = "zeren-card";
   canvas.style.display = "block";
   canvas.style.touchAction = "none";
   container.appendChild(canvas);

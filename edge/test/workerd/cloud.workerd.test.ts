@@ -63,7 +63,7 @@ describe("account", () => {
     const second = (await (await call("POST", "/cloud/org1/enable", userBearer(u), {})).json()) as { deviceId: string };
     expect(second.deviceId).toBe(first.deviceId);
     // Enabling provisions nothing: machines are per session.
-    expect((await boatState()).sandboxes.some((s) => s.env.ZERON_RUNNER_ENROLL?.includes(u.userId))).toBe(false);
+    expect((await boatState()).sandboxes.some((s) => s.env.ZEREN_RUNNER_ENROLL?.includes(u.userId))).toBe(false);
     // Cloud is a checkout option, not a device: no registry row.
     expect((await registryRows(u)).some((r) => r.kind === "devices" && r.id === first.deviceId)).toBe(false);
   });
@@ -124,22 +124,22 @@ describe("sessions get their own machines", () => {
     expect(creates[0]!.headers["idempotency-key"]).toMatch(new RegExp(`^${first.deviceId}-g\\d+$`));
     expect(creates[0]!.body).toMatchObject({ noEnv: true, ttlSeconds: 7200, type: "default" });
     expect(sandbox.env).toMatchObject({
-      ZERON_EDGE_URL: "https://edge.test",
-      ZERON_DEVICE_NAME: "Cloud session",
-      ZERON_DEVICE_PLATFORM: "cloud",
-      ZERON_CLOUD_ACCOUNT: accountDeviceId,
-      ZERON_CLOUD_CHAT: "chat-a",
-      ZERON_CLOUD_REPO: "https://github.com/acme/app.git",
-      ZERON_CLOUD_PATH: "/home/user/app",
-      ZERON_CLOUD_BRANCH: "main"
+      ZEREN_EDGE_URL: "https://edge.test",
+      ZEREN_DEVICE_NAME: "Cloud session",
+      ZEREN_DEVICE_PLATFORM: "cloud",
+      ZEREN_CLOUD_ACCOUNT: accountDeviceId,
+      ZEREN_CLOUD_CHAT: "chat-a",
+      ZEREN_CLOUD_REPO: "https://github.com/acme/app.git",
+      ZEREN_CLOUD_PATH: "/home/user/app",
+      ZEREN_CLOUD_BRANCH: "main"
     });
-    expect(sandbox.env.ZERON_RUNNER_ENROLL).toMatch(new RegExp(`^org1\\.${u.userId}\\.${first.deviceId}\\.[A-Za-z0-9_-]{43}$`));
+    expect(sandbox.env.ZEREN_RUNNER_ENROLL).toMatch(new RegExp(`^org1\\.${u.userId}\\.${first.deviceId}\\.[A-Za-z0-9_-]{43}$`));
     await expect
       .poll(async () => (await boatState()).calls.some((c) => c.sandboxId === sandbox.id && c.path.endsWith("/commands")))
       .toBe(true);
     const install = (await boatState()).calls.find((c) => c.sandboxId === sandbox.id && c.path.endsWith("/commands"))!;
-    expect(install.body!.command).toContain(`ZERON_RUNNER_ENROLL='${sandbox.env.ZERON_RUNNER_ENROLL}'`);
-    expect(install.body!.command).toContain(`ZERON_CLOUD_CHAT='chat-a'`);
+    expect(install.body!.command).toContain(`ZEREN_RUNNER_ENROLL='${sandbox.env.ZEREN_RUNNER_ENROLL}'`);
+    expect(install.body!.command).toContain(`ZEREN_CLOUD_CHAT='chat-a'`);
     expect(install.body!.timeoutSeconds).toBe(600);
   });
 
@@ -189,7 +189,7 @@ describe("sessions get their own machines", () => {
     const { spaceId } = await enableCloud(u);
     expect((await createSession(u, "chat-b", spaceId, "bad..branch")).status).toBe(400);
     const session = (await (await createSession(u, "chat-b", spaceId, "feature/x")).json()) as SessionView;
-    expect((await sandboxFor(session.deviceId)).env.ZERON_CLOUD_BRANCH).toBe("feature/x");
+    expect((await sandboxFor(session.deviceId)).env.ZEREN_CLOUD_BRANCH).toBe("feature/x");
   });
 
   it("gives two chats two machines, two devices and two keys", async () => {

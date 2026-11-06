@@ -67,11 +67,11 @@ local function mark(): Node
 		rounded = ui.raw(MARK * 0.25, "a mark tile's radius scales with it"),
 		items = "center",
 		justify = "center",
-		bg = "$zeron.mark.bg",
+		bg = "$zeren.mark.bg",
 		border = 1,
-		border_color = "$zeron.mark.border",
+		border_color = "$zeren.mark.border",
 		shadow = "$shadow.sm",
-		color = "$zeron.card.ink",
+		color = "$zeren.card.ink",
 		ui.svg { src = "assets/icons/github-mark.svg", tint = "currentColor", w = MARK * 0.56, h = MARK * 0.56 },
 	}
 end
@@ -105,7 +105,7 @@ local function status(p: Props): Node
 			text_size = "$font.size.sm",
 			line_height = "$font.line.sm",
 			color = function()
-				return if p.state() == "failed" then "$zeron.tone.danger.ink" else "$text.tertiary"
+				return if p.state() == "failed" then "$zeren.tone.danger.ink" else "$text.tertiary"
 			end,
 		},
 	}
@@ -173,7 +173,7 @@ local function code(p: Props): Node
 		gap = "$space.2",
 		items = "center",
 		rounded = control.RADIUS.sm,
-		bg = "$zeron.secondary.bg",
+		bg = "$zeren.secondary.bg",
 		hover = { bg = "$pressed" },
 		focus = control.ring,
 		on_click = copy,
@@ -223,7 +223,7 @@ local function second(p: Props): Node
 					min_w = 0,
 					gap = "$space.3",
 					ui.column {
-						gap = "$zeron.space.hair",
+						gap = "$zeren.space.hair",
 						ui.text { locale.t("ds.github_block.enter_code"), text_size = "$font.size.md", line_height = "$font.line.md", weight = "$font.weight.medium", color = "$text.primary" },
 						ui.text { locale.t("ds.github_block.approve"), text_size = "$font.size.sm", line_height = "$font.line.sm", color = "$text.tertiary" },
 					},
@@ -275,7 +275,7 @@ local function second(p: Props): Node
 		-- line).
 		return ui.column {
 			w_full = true,
-			ui.div { h = 1, w_full = true, shrink = 0, bg = "$zeron.settings.rule", aria_hidden = true },
+			ui.div { h = 1, w_full = true, shrink = 0, bg = "$zeren.settings.rule", aria_hidden = true },
 			row,
 		}
 	end, { w_full = true, enter = { opacity = { 0, 1 }, duration = 140 }, exit = { opacity = 0, duration = 80 }, mode = "wait" })
@@ -296,7 +296,7 @@ return function(p: Props): Node
 			-- description can't carry.
 			ui.row {
 				w_full = true,
-				min_h = "$zeron.settings.row",
+				min_h = "$zeren.settings.row",
 				px = "$space.4",
 				py = "$space.3",
 				gap = "$space.4",
@@ -310,7 +310,7 @@ return function(p: Props): Node
 					ui.column {
 						grow = 1,
 						min_w = 0,
-						gap = "$zeron.space.hair",
+						gap = "$zeren.space.hair",
 						ui.text { "GitHub", text_size = "$font.size.md", line_height = "$font.line.md", weight = "$font.weight.medium", color = "$text.primary" },
 						status(p),
 					},

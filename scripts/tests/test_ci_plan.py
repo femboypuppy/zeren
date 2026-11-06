@@ -81,7 +81,7 @@ class PlanTests(unittest.TestCase):
         self.assertTrue(plan.plan(files("crates/sync/src/lib.rs", patch="+x"), "full")["android"])
 
     def test_renamed_from_counts(self):
-        f = [{"filename": "docs/x.md", "previous_filename": "apps/ios/Zeron/X.swift", "patch": ""}]
+        f = [{"filename": "docs/x.md", "previous_filename": "apps/ios/Zeren/X.swift", "patch": ""}]
         self.assertTrue(plan.plan(f, "fast")["ios"])
 
     def test_ci_changes_run_everything(self):
@@ -103,7 +103,7 @@ class PlanTests(unittest.TestCase):
 
     def test_version_bumps_select_nothing(self):
         bump = [{"filename": "Cargo.toml", "patch": '@@ -37 +37 @@\n-version = "0.2.126"\n+version = "0.2.127"'},
-                {"filename": "Cargo.lock", "patch": ' name = "zeron-ui"\n-version = "0.2.126"\n+version = "0.2.127"'}]
+                {"filename": "Cargo.lock", "patch": ' name = "zeren-ui"\n-version = "0.2.126"\n+version = "0.2.127"'}]
         self.assertEqual(selected(plan.plan(bump, "full")), set())
         dep = [{"filename": "Cargo.lock",
                 "patch": '-version = "1.0.1"\n+version = "1.0.2"\n-checksum = "aa"\n+checksum = "bb"'}]
@@ -129,7 +129,7 @@ class PlanTests(unittest.TestCase):
         self.assertEqual(flags, {})  # the Linux browser fixture runs nightly
         off, flags = plan.gated(browser, "fast", plan.plan(browser, "fast"), nightly=True)
         self.assertEqual(flags, {"ui": ["browser"]})
-        app = files("crates/mobile/src/lib.rs", "apps/zeron/src/main.rs", patch="+x")
+        app = files("crates/mobile/src/lib.rs", "apps/zeren/src/main.rs", patch="+x")
         off, flags = plan.gated(app, "fast", plan.plan(app, "fast"))
         self.assertNotIn("windows", off)
         self.assertNotIn("ios", off)

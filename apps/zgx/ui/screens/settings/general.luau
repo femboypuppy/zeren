@@ -104,7 +104,7 @@ local function engine_switch(label: Message, read: () -> boolean?, write: (on: b
 		end)
 		return ui.div {
 			opacity = function()
-				return if disabled and disabled() then "$zeron.disabled" else 1
+				return if disabled and disabled() then "$zeren.disabled" else 1
 			end,
 			disabled = function()
 				return disabled ~= nil and disabled()
@@ -177,7 +177,7 @@ local function naming(): Node
 	end)()
 end
 
--- The worktree folder: off, worktrees go where Zeron puts them; on, under
+-- The worktree folder: off, worktrees go where Zeren puts them; on, under
 -- the folder typed (kept even while it's off).
 local folder = ui.state("settings_worktree_folder", "")
 local function custom(): boolean
@@ -306,7 +306,7 @@ function M.view(): Node
 						local dir = w.effectiveDirectory or w.defaultDirectory
 						return if dir
 							then ui.t("settings.general.worktrees.in", { path = dir }):get()
-							else ui.t("settings.general.worktrees.in_zeron"):get()
+							else ui.t("settings.general.worktrees.in_zeren"):get()
 					end,
 					control = engine_switch(ui.t("settings.general.worktrees.label"), function()
 						local w = worktrees:get()

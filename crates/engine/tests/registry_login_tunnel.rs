@@ -17,9 +17,9 @@ use tokio::{
     sync::{Mutex, mpsc},
 };
 use tokio_tungstenite::tungstenite::Message;
-use zeron_engine::{AgentAccounts, AgentAccountsConfig};
-use zeron_preview::{PreviewService, Scope, signaling};
-use zeron_proto::{AgentLoginStatus, HarnessId, RegistryAgent};
+use zeren_engine::{AgentAccounts, AgentAccountsConfig};
+use zeren_preview::{PreviewService, Scope, signaling};
+use zeren_proto::{AgentLoginStatus, HarnessId, RegistryAgent};
 
 struct Token;
 #[async_trait::async_trait]
@@ -119,12 +119,12 @@ fn added() -> RegistryAgent {
         });
         std::fs::write(dir.path().join("fake-login/agent.json"), record.to_string()).unwrap();
         // SAFETY: set once, before either test reads it.
-        unsafe { std::env::set_var("ZERON_AGENTS_DIR", dir.path()) };
+        unsafe { std::env::set_var("ZEREN_AGENTS_DIR", dir.path()) };
         dir
     });
     let _ = dir;
     let agent = RegistryAgent::new("fake-login").unwrap();
-    assert!(zeron_harness::acp_registry::installed(agent));
+    assert!(zeren_harness::acp_registry::installed(agent));
     agent
 }
 
@@ -232,7 +232,7 @@ async fn a_registry_agents_sign_in_publishes_its_callback_for_the_requester_and_
 }
 
 /// The whole way, over WebRTC between two preview services on this machine
-/// (as `zeron-preview`'s login_tunnel_e2e; a network that refuses loopback
+/// (as `zeren-preview`'s login_tunnel_e2e; a network that refuses loopback
 /// WebRTC fails both alike).
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn a_registry_agents_sign_in_finishes_through_the_requesters_browser() {

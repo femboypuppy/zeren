@@ -9,8 +9,8 @@ use std::time::Duration;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 
-use zeron_engine::{Auth, AuthConfig, AuthState};
-use zeron_rpc::{TokenError, TokenSource};
+use zeren_engine::{Auth, AuthConfig, AuthState};
+use zeren_rpc::{TokenError, TokenSource};
 
 // ---------------------------------------------------------------------------
 // Fake JWTs
@@ -359,10 +359,10 @@ async fn a_local_engine_registers_its_signing_key_with_the_sign_ins_ticket() {
     let edge = StubEdge::start().await;
     let dir = tempfile::tempdir().expect("tempdir");
     std::fs::write(dir.path().join("device-id"), "device-local").unwrap();
-    let core = zeron_engine::EngineCore::assemble(
+    let core = zeren_engine::EngineCore::assemble(
         dir.path(),
-        Arc::new(zeron_engine::HarnessRegistry::new()),
-        zeron_engine::HarnessId::Mock,
+        Arc::new(zeren_engine::HarnessRegistry::new()),
+        zeren_engine::HarnessId::Mock,
         None,
     )
     .expect("a local engine");
@@ -661,19 +661,19 @@ async fn twenty_consumers_and_background_loop_share_a_failed_refresh() {
 
 #[tokio::test]
 async fn temporary_token_errors_reach_http_and_websocket_consumers() {
-    use zeron_sync::chat_client::ChatTransport;
+    use zeren_sync::chat_client::ChatTransport;
     let edge = StubEdge::start().await;
     edge.state.drop_refresh.store(true, Ordering::SeqCst);
     let dir = tempfile::tempdir().unwrap();
     let auth = persisted_auth(&edge, dir.path());
-    let edge_config = zeron_engine::EdgeConfig::new(edge.url(), Arc::new(auth.clone()));
+    let edge_config = zeren_engine::EdgeConfig::new(edge.url(), Arc::new(auth.clone()));
 
     let websocket = edge_config.room_url("/registry/org_1/ws").url().await;
     assert!(matches!(
         websocket,
-        Err(zeron_sync::SyncError::TemporarilyUnavailable(_))
+        Err(zeren_sync::SyncError::TemporarilyUnavailable(_))
     ));
-    let transport = zeron_engine::chat2_host::EdgeChatTransport::new(
+    let transport = zeren_engine::chat2_host::EdgeChatTransport::new(
         reqwest::Client::new(),
         edge_config,
         "chat",
@@ -681,11 +681,11 @@ async fn temporary_token_errors_reach_http_and_websocket_consumers() {
     );
     assert!(matches!(
         transport.fetch_rows(0).await,
-        Err(zeron_sync::SyncError::TemporarilyUnavailable(_))
+        Err(zeren_sync::SyncError::TemporarilyUnavailable(_))
     ));
     assert!(matches!(
         auth.list_orgs().await,
-        Err(zeron_engine::EngineError::Token(
+        Err(zeren_engine::EngineError::Token(
             TokenError::TemporarilyUnavailable(_)
         ))
     ));
@@ -885,7 +885,7 @@ async fn loopback_callback_completes_headed_sign_in() {
 
 #[tokio::test]
 async fn sign_in_options_shape_the_authorize_url() {
-    use zeron_engine::{ScreenHint, SignInOptions};
+    use zeren_engine::{ScreenHint, SignInOptions};
     let edge = StubEdge::start().await;
     let dir = tempfile::tempdir().expect("tempdir");
     let auth = Auth::new(workos_config(&edge.url(), dir.path()));

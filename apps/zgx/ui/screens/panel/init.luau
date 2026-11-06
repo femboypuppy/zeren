@@ -1,4 +1,4 @@
--- The session page's right panel: tabs, as Zeron's right panel has them
+-- The session page's right panel: tabs, as Zeren's right panel has them
 -- (crates/ui/src/shell.rs `render_right_tab_strip`, surface_chrome.rs),
 -- each tab a file viewer (the tree and the file, screens/files) or a
 -- terminal (screens/panel/terminal). Opening it shows its empty page,
@@ -105,7 +105,7 @@ do
 	if ok then
 		Terminal = found
 	else
-		print(`zeron-zgx: the panel's terminals didn't load: {found}`)
+		print(`zeren-zgx: the panel's terminals didn't load: {found}`)
 	end
 end
 
@@ -130,7 +130,7 @@ do
 		Lanes = found
 		lanes_card = (require :: any)("@app/screens/chat/lanes")
 	else
-		print(`zeron-zgx: the panel's side chats didn't load: {found}`)
+		print(`zeren-zgx: the panel's side chats didn't load: {found}`)
 	end
 end
 
@@ -151,7 +151,7 @@ do
 	if ok then
 		Browser = found
 	else
-		print(`zeron-zgx: the panel's browser didn't load: {found}`)
+		print(`zeren-zgx: the panel's browser didn't load: {found}`)
 	end
 end
 
@@ -166,7 +166,7 @@ do
 	if ok then
 		Home = found
 	else
-		print(`zeron-zgx: the panel's home didn't load: {found}`)
+		print(`zeren-zgx: the panel's home didn't load: {found}`)
 	end
 end
 
@@ -302,7 +302,7 @@ local function toggle_kind(kind: state.Kind): boolean
 	return true
 end
 
--- The panel open on a tab of `kind` in front (never closing it): Zeron's
+-- The panel open on a tab of `kind` in front (never closing it): Zeren's
 -- `/files` and `/terminal` (the shipping app's add_files_surface,
 -- add_terminal_surface). Whether it acted.
 local function show_kind(kind: state.Kind): boolean
@@ -433,7 +433,7 @@ function M.close_focused_tab(): boolean
 	return true
 end
 
--- The strip where Zeron's is: in the window's top row over the panel (its
+-- The strip where Zeren's is: in the window's top row over the panel (its
 -- title strip, 38 with 4 of top pad: crates/ui/src/theme.rs
 -- TITLEBAR_HEIGHT, TITLEBAR_TOP_PAD), its tabs centred in what's under the
 -- pad, level with the title bar's controls; 8 in from the panel's start,
@@ -512,7 +512,7 @@ function M.open_file(session: any, path: string, project: any?, at: any?)
 	end
 end
 
--- A web link (a chat's, with "Open links in Zeron" on) in `session`'s
+-- A web link (a chat's, with "Open links in Zeren" on) in `session`'s
 -- panel: the browser tab already showing it, else a new one; nil opens an
 -- empty browser tab. The panel opens for the session showing (or, with
 -- `page`, a plugin page's own panel). Whether a tab took it (a session or a
@@ -881,7 +881,7 @@ M.Panel = ui.component(function(props: Props): Node
 				shrink = 0,
 				pl = ui.raw(CHIP_INSET, "as far in as the tile is from its top"),
 				pr = ui.raw(CHIP_INSET, "the tab's inset"),
-				gap = "$zeron.space.tight",
+				gap = "$zeren.space.tight",
 				items = "center",
 				rounded = "$radius.lg",
 				cursor = "pointer",
@@ -890,7 +890,7 @@ M.Panel = ui.component(function(props: Props): Node
 				-- brightening with it.)
 				bg = function(): string
 					if is_active() then
-						return "$zeron.selected.flat.bg"
+						return "$zeren.selected.flat.bg"
 					end
 					return if hovered:get() then "$hover" else "#00000000"
 				end,
@@ -932,10 +932,10 @@ M.Panel = ui.component(function(props: Props): Node
 							h = CHIP_H,
 							pl = ui.raw(CHIP_INSET, "as far in as the tile is from its top"),
 							pr = ui.raw(CHIP_INSET, "the tab's inset"),
-							gap = "$zeron.space.tight",
+							gap = "$zeren.space.tight",
 							items = "center",
 							rounded = "$radius.lg",
-							bg = if is_active() then "$zeron.selected.flat.bg" else "#00000000",
+							bg = if is_active() then "$zeren.selected.flat.bg" else "#00000000",
 							color = if is_active() then "$text.primary" else "$text.secondary",
 							make_tile(),
 							FadeText {
@@ -1094,7 +1094,7 @@ M.Panel = ui.component(function(props: Props): Node
 		end
 		local left = 0
 		-- (The tabs' own gap, the strip's hair.)
-		local gap = (ui.theme.get("zeron.space.hair") :: number?) or 2
+		local gap = (ui.theme.get("zeren.space.hair") :: number?) or 2
 		for i, t in list do
 			local r = chip_refs[t.id]
 			local w = if r then r.width or 0 else 0
@@ -1154,7 +1154,7 @@ M.Panel = ui.component(function(props: Props): Node
 			return pinned_now
 		end
 		local content = strip_content.width or 0
-		local hair = (ui.theme.get("zeron.space.hair") :: number?) or 2
+		local hair = (ui.theme.get("zeren.space.hair") :: number?) or 2
 		local one = (ui.theme.get("space.1") :: number?) or 4
 		local needs = content + (if pinned_now then CHIP_H + hair else 0)
 		local room = view + (if pinned_now then CHIP_H + one else 0)
@@ -1189,17 +1189,17 @@ M.Panel = ui.component(function(props: Props): Node
 			fade_overflow = true,
 			ui.row {
 				ref = strip_content,
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				items = "center",
 				ui.each(tab_list, chip, {
 					key = function(t: Tab): string
 						return t.id
 					end,
 					direction = "row",
-					gap = "$zeron.space.hair",
+					gap = "$zeren.space.hair",
 					animate = motion.layout(SLIDE),
 				}),
-				-- (Only with a tab open, as Zeron's: the empty page is what it
+				-- (Only with a tab open, as Zeren's: the empty page is what it
 				-- opens. Here, after the last tab, while they all fit; pinned at
 				-- the strip's end, outside the scroll, once they don't.)
 				ui.show(function(): boolean
@@ -1405,7 +1405,7 @@ M.Panel = ui.component(function(props: Props): Node
 		if ok then
 			return built
 		end
-		print(`zeron-zgx: a panel tab didn't build: {built}`)
+		print(`zeren-zgx: a panel tab didn't build: {built}`)
 		return ds.EmptyState {
 			icon = "danger-triangle",
 			size = "sm",
@@ -1548,10 +1548,10 @@ M.Panel = ui.component(function(props: Props): Node
 		min_h = 0,
 		relative = true,
 		overflow = "hidden",
-		rounded = "$zeron.inset.radius",
-		bg = "$zeron.inset.bg",
+		rounded = "$zeren.inset.radius",
+		bg = "$zeren.inset.bg",
 		border = 1,
-		border_color = "$zeron.inset.edge",
+		border_color = "$zeren.inset.edge",
 		ui.column { w_full = true, shrink = 0, hidden = closed, strip },
 		panes,
 	}

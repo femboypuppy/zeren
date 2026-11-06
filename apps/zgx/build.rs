@@ -1,12 +1,12 @@
-//! Zeron's version, as `ZERON_VERSION`: the root workspace's
+//! Zeren's version, as `ZEREN_VERSION`: the root workspace's
 //! (`[workspace.package] version` in ../../Cargo.toml). zgx is a workspace of
-//! its own at 0.0.0, so its crate version says nothing of which Zeron this
+//! its own at 0.0.0, so its crate version says nothing of which Zeren this
 //! is. Templates are stamped with it (src/plugins/live.rs), and one made for
-//! another Zeron reads as out of date.
+//! another Zeren reads as out of date.
 //!
-//! And the app's own version, as `ZERON_APP_VERSION`: a beta build's
-//! (`ZERON_BETA_VERSION=0.2.136-beta.1` at build time, the release
-//! workflow's), else Zeron's. `zeron --version` prints it and the updater
+//! And the app's own version, as `ZEREN_APP_VERSION`: a beta build's
+//! (`ZEREN_BETA_VERSION=0.2.136-beta.1` at build time, the release
+//! workflow's), else Zeren's. `zeren --version` prints it and the updater
 //! compares releases with it.
 
 fn main() {
@@ -16,16 +16,16 @@ fn main() {
     let dir = std::env::var("CARGO_MANIFEST_DIR").expect("cargo sets CARGO_MANIFEST_DIR");
     let manifest = std::path::Path::new(&dir).join("../../Cargo.toml");
     println!("cargo:rerun-if-changed={}", manifest.display());
-    println!("cargo:rerun-if-env-changed=ZERON_BETA_VERSION");
+    println!("cargo:rerun-if-env-changed=ZEREN_BETA_VERSION");
     let text = std::fs::read_to_string(&manifest).unwrap_or_default();
     let version = workspace_version(&text).unwrap_or_default();
-    let app = std::env::var("ZERON_BETA_VERSION")
+    let app = std::env::var("ZEREN_BETA_VERSION")
         .ok()
         .map(|v| v.trim().to_owned())
         .filter(|v| !v.is_empty())
         .unwrap_or_else(|| version.clone());
-    println!("cargo:rustc-env=ZERON_VERSION={version}");
-    println!("cargo:rustc-env=ZERON_APP_VERSION={app}");
+    println!("cargo:rustc-env=ZEREN_VERSION={version}");
+    println!("cargo:rustc-env=ZEREN_APP_VERSION={app}");
 }
 
 /// `version = "…"` under `[workspace.package]`.

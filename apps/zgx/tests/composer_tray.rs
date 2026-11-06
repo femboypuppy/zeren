@@ -7,7 +7,7 @@
 //! Read off the scene, where zgx paints it: a token `rounded` with
 //! `rounded_tl`/`rounded_tr` of 0 drew a rounded top regardless (the
 //! refinement lost to the token), so this checks what's painted, not the
-//! props. With Zeron's radii and a template's (Hot Pink: the pill's 36, the
+//! props. With Zeren's radii and a template's (Hot Pink: the pill's 36, the
 //! trays' 24), as ui/composer_place_fixture.luau sets them.
 
 use std::path::PathBuf;
@@ -16,7 +16,7 @@ use zgx::scene::NodeKind;
 use zgx_script::{ScriptHost, Value, testing::TestApp};
 
 fn ui_dir() -> PathBuf {
-    std::env::var_os("ZERON_ZGX_TEST_UI")
+    std::env::var_os("ZEREN_ZGX_TEST_UI")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui"))
 }

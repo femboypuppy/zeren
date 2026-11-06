@@ -63,7 +63,7 @@ function M.Toolbar(props: Props): Node
 	elseif look == "island" then
 		p.shrink = 0
 		glass.style(p, "island")
-		control.contain(p, { radius = "$zeron.island.radius", inset = "$space.1", border = 1 })
+		control.contain(p, { radius = "$zeren.island.radius", inset = "$space.1", border = 1 })
 	end
 	return ui.row(p)
 end
@@ -72,7 +72,7 @@ end
 function M.Group(props: { [number]: Child }): any
 	return {
 		__toolbar_group = true,
-		node = ui.row { gap = "$zeron.space.hair", items = "center", shrink = 0, table.unpack(children(props :: any)) },
+		node = ui.row { gap = "$zeren.space.hair", items = "center", shrink = 0, table.unpack(children(props :: any)) },
 	}
 end
 

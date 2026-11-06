@@ -39,7 +39,7 @@ pub(super) fn session_card_reserve(main: f32, transcript: f32) -> Option<f32> {
 /// moves with the working tree and HEAD.
 #[derive(Default)]
 pub(super) struct SessionDiffs {
-    diffs: Vec<zeron_proto::CheckoutDiff>,
+    diffs: Vec<zeren_proto::CheckoutDiff>,
     /// Device the running watch targets: `None` the connected engine, else
     /// a remote chat's host (diffs are produced where the checkout lives).
     target: Option<Option<String>>,
@@ -56,12 +56,12 @@ pub(super) struct SessionDiffs {
 impl SessionDiffs {
     /// The working-tree diff's checksum for `chat`: a branch capture is
     /// stale once it moves.
-    fn checksum(&self, chat: &zeron_proto::Chat) -> Option<String> {
+    fn checksum(&self, chat: &zeren_proto::Chat) -> Option<String> {
         crate::changes::resolve_diff(&self.diffs, chat).map(|diff| diff.checksum.clone())
     }
 
     /// The branch's line totals over its base; `None` while clean or unknown.
-    fn totals(&self, chat: &zeron_proto::Chat) -> Option<(u32, u32)> {
+    fn totals(&self, chat: &zeren_proto::Chat) -> Option<(u32, u32)> {
         let context = format!("{}|{}", chat.id, chat.cwd.as_deref()?);
         self.branch
             .as_ref()
@@ -75,7 +75,7 @@ impl SessionDiffs {
 /// `WatchPreviews` stream the browser's start page lists, kept without it.
 #[derive(Default)]
 pub(super) struct SessionPreviews {
-    snapshot: zeron_proto::PreviewSnapshot,
+    snapshot: zeren_proto::PreviewSnapshot,
     /// The chat the running watch follows.
     chat: Option<String>,
     _watch: Option<Task<()>>,
@@ -207,7 +207,7 @@ impl Shell {
                 {
                     while let Some(value) = rx.recv().await {
                         let Ok(snapshot) =
-                            serde_json::from_value::<zeron_proto::PreviewSnapshot>(value)
+                            serde_json::from_value::<zeren_proto::PreviewSnapshot>(value)
                         else {
                             continue;
                         };
@@ -240,7 +240,7 @@ impl Shell {
     /// and working-tree checksum). The base is the repo's default branch, as
     /// the Changes pane presets it; the last totals stay while a re-capture
     /// runs.
-    fn ensure_branch_totals(&mut self, chat: &zeron_proto::Chat, cx: &mut Context<Self>) {
+    fn ensure_branch_totals(&mut self, chat: &zeren_proto::Chat, cx: &mut Context<Self>) {
         let Some(cwd) = chat.cwd.clone() else {
             return;
         };
@@ -304,7 +304,7 @@ impl Shell {
                         .await
                         .ok()
                         .and_then(|value| {
-                            serde_json::from_value::<zeron_proto::CheckoutDiff>(value).ok()
+                            serde_json::from_value::<zeren_proto::CheckoutDiff>(value).ok()
                         })
                 }
                 None => None,
@@ -641,7 +641,7 @@ impl Shell {
         )
     }
 
-    /// The ports card: a row per server this chat can preview (one a Zeron
+    /// The ports card: a row per server this chat can preview (one a Zeren
     /// agent or terminal started in its checkout, or one this chat's agent or
     /// terminals started anywhere), opening it in a browser tab: the first
     /// [`PORTS_INITIAL`], then a page more per "Show more", scrolling past
@@ -789,7 +789,7 @@ impl Shell {
     }
 
     /// The Actions section: a row per project action (click runs it; the
-    /// gear edits it), imports from zeron.json, and Add action.
+    /// gear edits it), imports from zeren.json, and Add action.
     fn render_session_info_actions(
         &mut self,
         theme: &Theme,

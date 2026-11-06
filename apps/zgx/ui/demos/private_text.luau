@@ -7,7 +7,7 @@ local ds = require("@ds")
 local PEOPLE = {
 	{ seed = "mara", name = "Mara Okafor", email = "mara@halcyon.dev" },
 	{ seed = "theo", name = "Theo Lindqvist", email = "theo.lindqvist@halcyon.dev" },
-	{ seed = "ines", name = "Ines Duarte", email = "ines_duarte+zeron@northwind.io" },
+	{ seed = "ines", name = "Ines Duarte", email = "ines_duarte+zeren@northwind.io" },
 }
 
 return {

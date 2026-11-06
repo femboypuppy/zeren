@@ -2,7 +2,7 @@ use super::*;
 use gpui::{
     AnyWindowHandle, Entity, MouseButton, Pixels, PlatformInput, Point, WindowHandle, point,
 };
-use zeron_ui::browser::BrowserSurface;
+use zeren_ui::browser::BrowserSurface;
 
 /// The first software-rendered frame can take longer than the fixture's
 /// initial pause on a loaded runner. Yield to GPUI until X11 maps the window;
@@ -10,8 +10,8 @@ use zeron_ui::browser::BrowserSurface;
 pub(super) async fn wait_for_visible_window(cx: &mut AsyncApp) -> anyhow::Result<()> {
     // Wayland captures the already-mapped nested compositor's X11 window or
     // its only output.
-    if std::env::var("ZERON_BROWSER_CAPTURE_WINDOW").is_ok_and(|id| !id.is_empty())
-        || std::env::var_os("ZERON_BROWSER_CAPTURE_COMMAND").is_some()
+    if std::env::var("ZEREN_BROWSER_CAPTURE_WINDOW").is_ok_and(|id| !id.is_empty())
+        || std::env::var_os("ZEREN_BROWSER_CAPTURE_COMMAND").is_some()
     {
         return Ok(());
     }
@@ -59,7 +59,7 @@ pub(super) fn dispatch(
     event: PlatformInput,
     cx: &mut AsyncApp,
 ) -> anyhow::Result<()> {
-    if std::env::var_os("ZERON_BROWSER_NATIVE_POINTER").is_some() {
+    if std::env::var_os("ZEREN_BROWSER_NATIVE_POINTER").is_some() {
         let pointer = match &event {
             PlatformInput::MouseDown(e) => Some((e.position, Some(("mousedown", e.button)))),
             PlatformInput::MouseUp(e) => Some((e.position, Some(("mouseup", e.button)))),
@@ -67,7 +67,7 @@ pub(super) fn dispatch(
             _ => None,
         };
         if let Some((position, action)) = pointer {
-            let id = if let Ok(id) = std::env::var("ZERON_BROWSER_CAPTURE_WINDOW") {
+            let id = if let Ok(id) = std::env::var("ZEREN_BROWSER_CAPTURE_WINDOW") {
                 id
             } else {
                 let ids = std::process::Command::new("xdotool")
@@ -141,7 +141,7 @@ fn click(
 /// shapes under a CSS-animated card. `window.benchFrames` counts its frames.
 const BENCH_CANVAS: &str = "document.body.innerHTML='';document.body.style.margin='0';\
 let c=document.createElement('canvas');c.style='position:fixed;inset:0;width:100vw;height:100vh';\
-let card=document.createElement('div');card.textContent='Zeron';\
+let card=document.createElement('div');card.textContent='Zeren';\
 card.style='position:fixed;left:40%;top:40%;padding:24px 48px;font:600 32px system-ui;color:#fff;background:#29483bcc;border-radius:16px;box-shadow:0 12px 40px #0008;animation:spin 2s linear infinite';\
 let style=document.createElement('style');style.textContent='@keyframes spin{to{transform:rotate(360deg)}}';\
 document.head.append(style);document.body.append(c,card);let g=c.getContext('2d');window.benchFrames=0;\
@@ -406,7 +406,7 @@ async fn fresh_page(
 
 /// Runs `script` and measures `seconds` of the page after `warmup`: its frame
 /// rate when the script counts frames, when GPUI painted each new frame, the
-/// bytes copied to show them, and CPU, memory and GPU memory, apart for Zeron
+/// bytes copied to show them, and CPU, memory and GPU memory, apart for Zeren
 /// and the engine.
 async fn scenario(
     page: &Entity<BrowserSurface>,
@@ -424,10 +424,10 @@ async fn scenario(
         b.fixture_linux_record(true);
         b.fixture_linux_painted()
     });
-    let (zeron_before, engine_before) = (cpu_seconds(&[me]), cpu_seconds(&engine));
+    let (zeren_before, engine_before) = (cpu_seconds(&[me]), cpu_seconds(&engine));
     let start = std::time::Instant::now();
     pause(cx, (seconds * 1000.) as u64).await;
-    let (zeron_after, engine_after) = (cpu_seconds(&[me]), cpu_seconds(&engine));
+    let (zeren_after, engine_after) = (cpu_seconds(&[me]), cpu_seconds(&engine));
     let elapsed = start.elapsed().as_secs_f64();
     let (painted, times) = page.update(cx, |b, _| {
         (b.fixture_linux_painted(), b.fixture_linux_record(false))
@@ -446,11 +446,11 @@ async fn scenario(
         "shownFps": shown / elapsed,
         "uploadedPerFrame": per_frame(painted.1 - painted_before.1),
         "copiedPerFrame": per_frame(painted.2 - painted_before.2),
-        "zeronCpu": (zeron_after - zeron_before) / elapsed * 100.,
+        "zerenCpu": (zeren_after - zeren_before) / elapsed * 100.,
         "engineCpu": (engine_after - engine_before) / elapsed * 100.,
-        "zeronPssMiB": pss_mib(&[me]),
+        "zerenPssMiB": pss_mib(&[me]),
         "enginePssMiB": pss_mib(&engine),
-        "zeronGpuMiB": gpu.as_ref().map(|gpu| gpu[0]),
+        "zerenGpuMiB": gpu.as_ref().map(|gpu| gpu[0]),
         "engineGpuMiB": gpu.as_ref().map(|gpu| gpu[1]),
         "engineProcesses": engine.len(),
         "intervalsMs": intervals(&times),
@@ -497,11 +497,11 @@ async fn press_latency(
     Ok(serde_json::json!({ "samplesMs": latencies }))
 }
 
-/// `ZERON_BROWSER_BENCH=<seconds>`: measures this run's engine and frame path
+/// `ZEREN_BROWSER_BENCH=<seconds>`: measures this run's engine and frame path
 /// on pages that repaint all of a large viewport every frame (a 2D canvas,
 /// WebGL 2, scrolling) and only a small part of it (a CSS spinner), a 60 fps
-/// video when `ZERON_BROWSER_BENCH_VIDEO` names an MP4, how long a press takes
-/// to show, and what an idle page costs. `ZERON_BROWSER_BENCH_WIDTH` sets the
+/// video when `ZEREN_BROWSER_BENCH_VIDEO` names an MP4, how long a press takes
+/// to show, and what an idle page costs. `ZEREN_BROWSER_BENCH_WIDTH` sets the
 /// browser's width in logical pixels. Writes `bench.json` and a capture of
 /// each page.
 pub async fn bench(
@@ -512,14 +512,14 @@ pub async fn bench(
     seconds: f64,
     cx: &mut AsyncApp,
 ) -> anyhow::Result<()> {
-    let width = std::env::var("ZERON_BROWSER_BENCH_WIDTH")
+    let width = std::env::var("ZEREN_BROWSER_BENCH_WIDTH")
         .ok()
         .and_then(|w| w.parse().ok())
         .unwrap_or(1400.);
     window.update(cx, |s, _, cx| s.fixture_resize_browser(width, cx))?;
     pause(cx, 1000).await;
     let mut scenarios = serde_json::Map::new();
-    let video = std::env::var_os("ZERON_BROWSER_BENCH_VIDEO").is_some();
+    let video = std::env::var_os("ZEREN_BROWSER_BENCH_VIDEO").is_some();
     for (name, script, counted) in [
         ("canvas", BENCH_CANVAS, true),
         ("webgl", BENCH_WEBGL, true),
@@ -624,7 +624,7 @@ pub async fn exercise(
         typed == "hello linux",
         "GPUI keyboard input did not reach WebKit: {typed}"
     );
-    if let Ok(id) = std::env::var("ZERON_BROWSER_CAPTURE_WINDOW") {
+    if let Ok(id) = std::env::var("ZEREN_BROWSER_CAPTURE_WINDOW") {
         let scale = AnyWindowHandle::from(window).update(cx, |_, w, _| w.scale_factor())?;
         let x = ((f32::from(bounds.origin.x) + input[0].as_f64().unwrap() as f32) * scale) as i32;
         let y = ((f32::from(bounds.origin.y) + input[1].as_f64().unwrap() as f32) * scale) as i32;
@@ -644,8 +644,8 @@ pub async fn exercise(
         eval(&page,"(()=>{let e=document.getElementById('browser-input');e.setSelectionRange(e.value.length,e.value.length);return true})()",cx).await?;
     }
     // Compositors give an unfocused window no clipboard: local runs on a hidden
-    // workspace (`ZERON_BROWSER_FIXTURE_UNFOCUSED`) type that text instead.
-    let clipboard = std::env::var_os("ZERON_BROWSER_FIXTURE_UNFOCUSED").is_none();
+    // workspace (`ZEREN_BROWSER_FIXTURE_UNFOCUSED`) type that text instead.
+    let clipboard = std::env::var_os("ZEREN_BROWSER_FIXTURE_UNFOCUSED").is_none();
     if clipboard {
         cx.update(|cx| {
             cx.write_to_clipboard(gpui::ClipboardItem::new_string(" — café 日本語".into()))
@@ -956,7 +956,7 @@ pub async fn exercise(
             "a page shown again gets no vblanks (last {since:?} ms ago)"
         );
     }
-    cx.update(|cx| appearance::set_surface(zeron_theme::SurfacePreference::Frosted, cx));
+    cx.update(|cx| appearance::set_surface(zeren_theme::SurfacePreference::Frosted, cx));
     capture_frame(window, output, "browser-blur-baseline-dark", cx).await?;
     window.update(cx, |s, _, cx| s.fixture_browser_menu(true, cx))?;
     pause(cx, 700).await;
@@ -1000,7 +1000,7 @@ pub async fn exercise(
     .await?;
     pause(cx, 300).await;
     capture_frame(window, output, "browser-blur-solid-light", cx).await?;
-    cx.update(|cx| appearance::set_surface(zeron_theme::SurfacePreference::Opaque, cx));
+    cx.update(|cx| appearance::set_surface(zeren_theme::SurfacePreference::Opaque, cx));
     pause(cx, 300).await;
     capture_frame(window, output, "browser-menu-opaque", cx).await?;
     let bounds = page.read_with(cx, |b, _| b.fixture_linux_bounds());
@@ -1016,7 +1016,7 @@ pub async fn exercise(
     window.update(cx, |s, _, cx| s.fixture_browser_menu(false, cx))?;
     cx.update(|cx| {
         appearance::set_mode(appearance::AppearanceMode::Dark, cx);
-        appearance::set_surface(zeron_theme::SurfacePreference::Frosted, cx);
+        appearance::set_surface(zeren_theme::SurfacePreference::Frosted, cx);
     });
     pause(cx, 300).await;
     let frames = eval(&page, "window.browserFrames", cx)

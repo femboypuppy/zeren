@@ -7,7 +7,7 @@
 //   B   27893  test user U2
 //
 // Each engine has its own data dir and HOME (HOME, CLAUDE_CONFIG_DIR,
-// CODEX_HOME) under $ZERON_RIG_STATE, and signs in against staging as a
+// CODEX_HOME) under $ZEREN_RIG_STATE, and signs in against staging as a
 // throwaway WorkOS test-env user, headlessly (playwright-core + system Chrome,
 // a fresh profile: never the user's Chrome, which signs in as the real user).
 // After sign-in the engine is restarted once, as zgx does
@@ -30,18 +30,18 @@ const log = (...a) => console.error("rig:", ...a);
 // -- engines ------------------------------------------------------------------
 
 function cleanEnv() {
-  // Never inherit the engine this runs under (ZERON_IPC_PORT=27654,
-  // ZERON_DATA_DIR, ZERON_APP, …).
+  // Never inherit the engine this runs under (ZEREN_IPC_PORT=27654,
+  // ZEREN_DATA_DIR, ZEREN_APP, …).
   const env = {};
   for (const [k, v] of Object.entries(process.env)) {
-    if (!/^(ZERON|COMET)_/.test(k)) env[k] = v;
+    if (!/^(ZEREN|COMET)_/.test(k)) env[k] = v;
   }
   return env;
 }
 
 function start(e) {
   guard(e.port, e.data);
-  if (!existsSync(BIN)) throw new Error(`${BIN} isn't built (cargo build -p zeron --bin zeron-engine)`);
+  if (!existsSync(BIN)) throw new Error(`${BIN} isn't built (cargo build -p zeren --bin zeren-engine)`);
   const busy = listeners(e.port);
   if (busy.length) throw new Error(`port ${e.port} is held by pid ${busy.join(",")} (${commandOf(busy[0])}), not the rig's ${e.name}`);
   for (const dir of [e.root, e.data, join(e.home, ".claude"), join(e.home, ".codex")]) ensureDir(dir);
@@ -55,12 +55,12 @@ function start(e) {
       HOME: e.home,
       CLAUDE_CONFIG_DIR: join(e.home, ".claude"),
       CODEX_HOME: join(e.home, ".codex"),
-      ZERON_DATA_DIR: e.data,
-      ZERON_IPC_PORT: String(e.port),
-      ZERON_EDGE_URL: STAGING.edge,
-      ZERON_WORKOS_CLIENT_ID: STAGING.client,
-      ZERON_CALLBACK_PORT: String(STAGING.callbackPort),
-      ZERON_AUTO_UPDATE: "0",
+      ZEREN_DATA_DIR: e.data,
+      ZEREN_IPC_PORT: String(e.port),
+      ZEREN_EDGE_URL: STAGING.edge,
+      ZEREN_WORKOS_CLIENT_ID: STAGING.client,
+      ZEREN_CALLBACK_PORT: String(STAGING.callbackPort),
+      ZEREN_AUTO_UPDATE: "0",
     },
   });
   writePrivate(e.pidFile, String(child.pid));
@@ -85,7 +85,7 @@ async function waitReady(e, timeoutMs = 90000) {
   while (Date.now() < until) {
     const pid = readPid(e);
     if (pid && !alive(pid)) {
-      throw new Error(`${e.name}: engine pid ${pid} exited.\n--- engine.out ---\n${tail(join(e.root, "engine.out"))}\n--- logs/zeron-engine.log ---\n${tail(join(e.data, "logs/zeron-engine.log"))}`);
+      throw new Error(`${e.name}: engine pid ${pid} exited.\n--- engine.out ---\n${tail(join(e.root, "engine.out"))}\n--- logs/zeren-engine.log ---\n${tail(join(e.data, "logs/zeren-engine.log"))}`);
     }
     try {
       const info = await ipcCall(e, "EngineInfo", {}, 5000);
@@ -105,7 +105,7 @@ async function ensureRunning(e) {
   if (pid && held.includes(pid)) return waitReady(e);
   if (pid && !held.length) return waitReady(e); // still starting
   if (held.length) {
-    throw new Error(`port ${e.port} is held by pid ${held.join(",")} (${commandOf(held[0])}), which the rig didn't start; leaving it alone (ZERON_RIG_PORT_${e.name}=<port> ./up.sh moves ${e.name})`);
+    throw new Error(`port ${e.port} is held by pid ${held.join(",")} (${commandOf(held[0])}), which the rig didn't start; leaving it alone (ZEREN_RIG_PORT_${e.name}=<port> ./up.sh moves ${e.name})`);
   }
   if (!pid) forgetPid(e);
   start(e);
@@ -122,12 +122,12 @@ async function stop(e) {
     await ipcCall(e, "StopEngine", {}, 5000);
   } catch {}
   for (let i = 0; i < 60 && alive(pid); i++) await sleep(500);
-  if (alive(pid) && commandOf(pid).includes("zeron-engine")) {
+  if (alive(pid) && commandOf(pid).includes("zeren-engine")) {
     log(`${e.name}: pid ${pid} didn't stop on StopEngine; SIGTERM`);
     process.kill(pid, "SIGTERM");
     for (let i = 0; i < 30 && alive(pid); i++) await sleep(500);
   }
-  if (alive(pid) && commandOf(pid).includes("zeron-engine")) {
+  if (alive(pid) && commandOf(pid).includes("zeren-engine")) {
     log(`${e.name}: pid ${pid} still up; SIGKILL`);
     process.kill(pid, "SIGKILL");
     for (let i = 0; i < 20 && alive(pid); i++) await sleep(250);
@@ -147,7 +147,7 @@ async function restart(e) {
 
 // -- test users (WorkOS test env) ----------------------------------------------
 
-const WORKOS_KEY_FILE = join(homedir(), ".config/zeron-staging/workos-api-key");
+const WORKOS_KEY_FILE = join(homedir(), ".config/zeren-staging/workos-api-key");
 
 async function workos(method, path, body) {
   const key = readFileSync(WORKOS_KEY_FILE, "utf8").trim();
@@ -328,8 +328,8 @@ async function bringUp(e) {
     // run load_or_create_key, make two keys, and the registration record
     // can end up naming the key that lost the file write (registered=false
     // until the next restart). Making the key now, before that start,
-    // sidesteps it. ZERON_RIG_KEY_RACE=1 skips this to reproduce it.
-    if (process.env.ZERON_RIG_KEY_RACE !== "1") await ipcCall(e, "PluginSigningKey");
+    // sidesteps it. ZEREN_RIG_KEY_RACE=1 skips this to reproduce it.
+    if (process.env.ZEREN_RIG_KEY_RACE !== "1") await ipcCall(e, "PluginSigningKey");
     log(`${e.name}: signed in on a local workspace; starting it again to sync`);
     info = await restart(e);
     s = await ipcFirst(e, "AuthStatus");

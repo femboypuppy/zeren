@@ -1,4 +1,4 @@
--- Zeron's Git plugin (plugins-builtin/git) in a plugin tab's place, as the
+-- Zeren's Git plugin (plugins-builtin/git) in a plugin tab's place, as the
 -- panel draws one, with the design system set up as the app sets it up:
 -- for its tests (src/plugins/examples_tests.rs) and its pictures. The
 -- host plays the device's Git service (`plugin.git.service_call`) and
@@ -137,8 +137,8 @@ end, function(): Node
 		w_full = true,
 		h_full = true,
 		items = "center",
-		theme = `zeron-{scheme}`,
-		bg = "$zeron.window",
+		theme = `zeren-{scheme}`,
+		bg = "$zeren.window",
 		-- (The chat's panel, as screens/panel provides it to its tabs.)
 		provide = { session = "s1", panel = "fixture-panel" },
 		inner,

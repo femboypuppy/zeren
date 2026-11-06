@@ -28,10 +28,10 @@ M.REST = 81
 -- Its sides' room from the page's edges.
 M.SIDES = ui.raw(32, "the composer's room from the page's edges")
 
--- A chat's head: the height of a code pane's (`zeron.files.head`), so the two stand
+-- A chat's head: the height of a code pane's (`zeren.files.head`), so the two stand
 -- level side by side.
 function M.head(): number
-	return (ui.theme.get("zeron.files.head") :: number?) or 40
+	return (ui.theme.get("zeren.files.head") :: number?) or 40
 end
 
 function M.page_pad(): any

@@ -1,7 +1,7 @@
 -- What there is to update, wherever: on the top bar, beside the panel toggle,
 -- a button that only shows when there's something, wearing the marks of what's
 -- waiting (three at most) and the download glyph; pressed, the list, by device,
--- each with what it can do. Zeron itself is in it, this Mac's (`about`) and any
+-- each with what it can do. Zeren itself is in it, this Mac's (`about`) and any
 -- other device's (src/updates.rs), and so is every agent on every device.
 --
 --   Updates.Button {}    the button and its panel
@@ -52,7 +52,7 @@ local DIALOG_GONE_MS = 150
 local agents = ui.shared("updates", { rows = {} })
 local about = ui.shared("about", { app_version = "", available = false })
 
--- A restart to update asked for, kept across it: this Mac's Zeron should come
+-- A restart to update asked for, kept across it: this Mac's Zeren should come
 -- back on another version, and if it doesn't, it says so rather than offering
 -- the same update as though nothing had happened.
 local restarted_from = ui.persist("shell_update_restarted_from", nil :: string?)
@@ -112,9 +112,9 @@ local function skip(list: { any })
 	}
 end
 
--- This Mac's Zeron, as About & updates has it: nothing unless it can update
+-- This Mac's Zeren, as About & updates has it: nothing unless it can update
 -- itself and a release is there for it.
-local function zeron_here(): any?
+local function zeren_here(): any?
 	local a: any = about:get()
 	if not a then
 		return nil
@@ -123,12 +123,12 @@ local function zeron_here(): any?
 	-- window only has to reopen on it.
 	if a.moved_on_to then
 		return {
-			id = "here:zeron",
+			id = "here:zeren",
 			device = "",
 			device_name = "",
 			here = true,
 			connected = true,
-			kind = "zeron",
+			kind = "zeren",
 			installed = a.app_version,
 			latest = a.moved_on_to,
 			phase = "ready",
@@ -144,12 +144,12 @@ local function zeron_here(): any?
 		return nil
 	end
 	local row: any = {
-		id = "here:zeron",
+		id = "here:zeren",
 		device = "",
 		device_name = "",
 		here = true,
 		connected = true,
-		kind = "zeron",
+		kind = "zeren",
 		installed = a.app_version,
 		latest = a.flow_version or a.latest,
 		phase = if flow == "downloading"
@@ -168,7 +168,7 @@ local function zeron_here(): any?
 	return row
 end
 
--- Everything there is to say: this Mac's Zeron, others', then the agents.
+-- Everything there is to say: this Mac's Zeren, others', then the agents.
 local rows = ui.computed(function(): { any }
 	local out: { any } = {}
 	local passed = skipped:get()
@@ -178,7 +178,7 @@ local rows = ui.computed(function(): { any }
 			table.insert(out, r)
 		end
 	end
-	local here = zeron_here()
+	local here = zeren_here()
 	if here then
 		add(here)
 	end
@@ -193,13 +193,13 @@ local function shown(): boolean
 	return #rows:get() > 0
 end
 
--- What the stack shows: each thing once (Zeron on three devices is one Zeron),
+-- What the stack shows: each thing once (Zeren on three devices is one Zeren),
 -- three at most.
 local marks = ui.computed(function(): { any }
 	local out: { any } = {}
 	local seen: { [string]: boolean } = {}
 	for _, r in rows:get() do
-		local what = if r.kind == "zeron" then "zeron" else r.harness or r.id
+		local what = if r.kind == "zeren" then "zeren" else r.harness or r.id
 		if not seen[what] then
 			seen[what] = true
 			table.insert(out, r)
@@ -236,9 +236,9 @@ end
 
 -- A row's mark on its tile, whatever it's on.
 local function mark_of(r: any, size: number, bare: boolean?): Node
-	if r.kind == "zeron" then
+	if r.kind == "zeren" then
 		if bare then
-			return ui.svg { src = "assets/icons/zeron-mark.svg", w = size, h = size, shrink = 0 }
+			return ui.svg { src = "assets/icons/zeren-mark.svg", w = size, h = size, shrink = 0 }
 		end
 		-- (Its logo on the white tile the agents' marks wear.)
 		return ui.row {
@@ -248,11 +248,11 @@ local function mark_of(r: any, size: number, bare: boolean?): Node
 			items = "center",
 			justify = "center",
 			rounded = ui.raw(size * 0.25, "as a mark's tile"),
-			bg = "$zeron.mark.bg",
+			bg = "$zeren.mark.bg",
 			border = 1,
-			border_color = "$zeron.mark.border",
+			border_color = "$zeren.mark.border",
 			shadow = "$shadow.sm",
-			ui.svg { src = "assets/icons/zeron-mark.svg", w = size * 0.62, h = size * 0.62, shrink = 0 },
+			ui.svg { src = "assets/icons/zeren-mark.svg", w = size * 0.62, h = size * 0.62, shrink = 0 },
 		}
 	end
 	return ds.AgentMark {
@@ -266,10 +266,10 @@ local function mark_of(r: any, size: number, bare: boolean?): Node
 end
 
 local function name_of(r: any): string
-	return if r.kind == "zeron" then "Zeron" else r.name or ""
+	return if r.kind == "zeren" then "Zeren" else r.name or ""
 end
 
--- Running chats on its device: updating its Zeron restarts its engine, which
+-- Running chats on its device: updating its Zeren restarts its engine, which
 -- stops them, and they carry on after.
 local function running_on(device: string, here: boolean): number
 	local n = 0
@@ -314,7 +314,7 @@ local function line_of(r: any): string
 		then `{r.installed} → {r.latest}`
 		elseif r.latest then locale.s("shell.updates.version", { version = r.latest })
 		else locale.s("shell.updates.available")
-	if r.kind == "zeron" and not r.here then
+	if r.kind == "zeren" and not r.here then
 		if r.why_not then
 			return r.why_not
 		end
@@ -332,7 +332,7 @@ end
 local function label_of(r: any): string
 	local a = r.action
 	if a == "update" then
-		if r.kind == "zeron" and not r.here and running_on(r.device, false) > 0 then
+		if r.kind == "zeren" and not r.here and running_on(r.device, false) > 0 then
 			return locale.s("shell.updates.update_anyway")
 		end
 		return locale.s("shell.updates.update")
@@ -375,7 +375,7 @@ local function act(r: any, close: () -> ())
 		return
 	end
 	local name = name_of(r)
-	if r.kind == "zeron" and r.here then
+	if r.kind == "zeren" and r.here then
 		if a == "restart" then
 			local about_now: any = about:peek()
 			asked_this_run = true
@@ -386,8 +386,8 @@ local function act(r: any, close: () -> ())
 			restarted_from:set(nil)
 			failed(name, err)
 		end)
-	elseif r.kind == "zeron" then
-		ui.call("updates.apply_zeron", { device = r.device }):after(function() end, function(err: any)
+	elseif r.kind == "zeren" then
+		ui.call("updates.apply_zeren", { device = r.device }):after(function() end, function(err: any)
 			failed(name, err)
 		end)
 	else
@@ -509,7 +509,7 @@ local function signature(): string
 			r.installed or "",
 			r.latest or "",
 			tostring(r.connected),
-			tostring(if r.kind == "zeron" and not r.here then running_on(r.device, false) else 0),
+			tostring(if r.kind == "zeren" and not r.here then running_on(r.device, false) else 0),
 		}, "\0"))
 	end
 	return table.concat(parts, "\n")
@@ -518,7 +518,7 @@ end
 -- What Update all would do, now: what it updates, what running chats that
 -- stops, and what it can't reach and why.
 local function plan(list: { any }): any
-	local out: any = { agents = {}, zerons = {}, here = nil, chats = 0, skipped = {} }
+	local out: any = { agents = {}, zerens = {}, here = nil, chats = 0, skipped = {} }
 	for _, r in list do
 		local go = r.connected and r.action == "update"
 		if go and r.kind == "agent" then
@@ -526,13 +526,13 @@ local function plan(list: { any }): any
 		elseif go and r.here then
 			out.here = r
 		elseif go then
-			table.insert(out.zerons, r)
+			table.insert(out.zerens, r)
 			out.chats += running_on(r.device, false)
 		elseif r.phase == "available" and not r.connected then
 			table.insert(out.skipped, { r = r, why = locale.s("shell.updates.offline") })
 		elseif r.phase == "available" and r.action == "steps" then
 			table.insert(out.skipped, { r = r, why = locale.s("shell.updates.manual") })
-		elseif r.phase == "available" and r.kind == "zeron" and (r.action == nil or r.action == "copy") then
+		elseif r.phase == "available" and r.kind == "zeren" and (r.action == nil or r.action == "copy") then
 			table.insert(out.skipped, { r = r, why = r.why_not or locale.s("shell.updates.on_that_device") })
 		end
 	end
@@ -540,14 +540,14 @@ local function plan(list: { any }): any
 end
 
 -- Everything it can do, in the order that strands nothing: agents, other
--- devices' Zeron, then this Mac's, which ends by asking to restart.
+-- devices' Zeren, then this Mac's, which ends by asking to restart.
 local function update_all()
 	local p = plan(rows:peek())
 	local function close() end
 	for _, r in p.agents do
 		act(r, close)
 	end
-	for _, r in p.zerons do
+	for _, r in p.zerens do
 		act(r, close)
 	end
 	if p.here then
@@ -557,7 +557,7 @@ end
 
 local function can_update_all(): boolean
 	local p = plan(rows:get())
-	return #p.agents + #p.zerons + (if p.here then 1 else 0) > 1
+	return #p.agents + #p.zerens + (if p.here then 1 else 0) > 1
 end
 
 -- A line of Update all's list: its mark, its name, and on the far side what it
@@ -613,7 +613,7 @@ end
 local function review_list(): Node
 	local p = plan(rows:peek())
 	local going: { any } = {}
-	for _, list in { p.agents, p.zerons } do
+	for _, list in { p.agents, p.zerens } do
 		for _, r in list do
 			table.insert(going, r)
 		end
@@ -681,9 +681,9 @@ local function review(open: any): Node
 		title = ui.t("shell.updates.all_title"),
 		body = function(): string
 			local p = plan(rows:get())
-			local n = #p.agents + #p.zerons + (if p.here then 1 else 0)
+			local n = #p.agents + #p.zerens + (if p.here then 1 else 0)
 			local devices: { [string]: boolean } = {}
-			for _, list in { p.agents, p.zerons } do
+			for _, list in { p.agents, p.zerens } do
 				for _, r in list do
 					devices[if r.here then "" else r.device] = true
 				end
@@ -857,8 +857,8 @@ local function tile(at: number): Node
 		w = TILE,
 		h = TILE,
 		if behind
-			then ui.svg { src = CRESCENT, tint = "$zeron.mark.bg", absolute = true, left = 0, top = 0, w = TILE, h = TILE }
-			else ui.div { absolute = true, left = 0, top = 0, w = TILE, h = TILE, rounded = "$radius.full", bg = "$zeron.mark.bg" },
+			then ui.svg { src = CRESCENT, tint = "$zeren.mark.bg", absolute = true, left = 0, top = 0, w = TILE, h = TILE }
+			else ui.div { absolute = true, left = 0, top = 0, w = TILE, h = TILE, rounded = "$radius.full", bg = "$zeren.mark.bg" },
 		ui.row {
 			absolute = true,
 			left = if behind then MARK_NUDGE else 0,
@@ -915,7 +915,7 @@ M.Button = ui.component(function(): Node
 			pointer_events = "auto",
 			bg = function(): string
 				if open:get() then
-					return "$zeron.selected.flat.bg"
+					return "$zeren.selected.flat.bg"
 				end
 				return if hovered:get() then "$hover" else "#00000000"
 			end,

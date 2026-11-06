@@ -194,6 +194,6 @@ return ui.scroll {
 	w_full = true,
 	h_full = true,
 	-- (The window's own opaque ground, as the gallery's stage draws it.)
-	bg = "$zeron.window",
+	bg = "$zeren.window",
 	ui.column { w_full = true, px = "$space.6", py = "$space.6", providers.view() },
 }

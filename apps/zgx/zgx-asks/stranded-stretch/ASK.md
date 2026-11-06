@@ -6,11 +6,11 @@
 
 **Repro:** `repro.rs`: drop it into `crates/zgx/tests/` and run `cargo test --test repro`. It fails with the list stuck at -52.4.
 
-**Not the cause in Settings, as far as Zeron could find:** Settings has no horizontal scroller, so this exact path can't happen there. A headless fuzz ran 40 seeds × 40 gestures on Zeron's shell fixture, with every axis vertical. It fed well-formed AppKit phase sequences (MayBegin/Cancelled, momentum starting within and after 50 ms) through a copy of the desktop host's `Trackpad` machine. It mixed in resizes, page changes, reloads and leaving and reopening Settings mid-gesture. The nav never stayed out of place. A lost `Ended` leaves a stretch held, but the next gesture's `Ended` releases it.
+**Not the cause in Settings, as far as Zeren could find:** Settings has no horizontal scroller, so this exact path can't happen there. A headless fuzz ran 40 seeds × 40 gestures on Zeren's shell fixture, with every axis vertical. It fed well-formed AppKit phase sequences (MayBegin/Cancelled, momentum starting within and after 50 ms) through a copy of the desktop host's `Trackpad` machine. It mixed in resizes, page changes, reloads and leaving and reopening Settings mid-gesture. The nav never stayed out of place. A lost `Ended` leaves a stretch held, but the next gesture's `Ended` releases it.
 
 **Ask:**
 1. On `Ended`/`MomentumEnded`, spring back every stretched view, not only `active`. Or, when `after_scroll` moves `active` to another view, release the one it leaves.
 2. Never keep a stretch on a view that can't scroll: when `limit()` becomes 0 and no gesture holds it, spring back.
-3. If (1) and (2) don't explain Zeron's report: a way to see a view's stretch (`zgx inspect`: `shown`/`pushed`/`active` per scroll view), so the next stuck nav can be told apart from an offset past its range.
+3. If (1) and (2) don't explain Zeren's report: a way to see a view's stretch (`zgx inspect`: `shown`/`pushed`/`active` per scroll view), so the next stuck nav can be told apart from an offset past its range.
 
-**Seen on:** zgx `aaa304eb2` (Zeron's pin), macOS, Nov 2.
+**Seen on:** zgx `aaa304eb2` (Zeren's pin), macOS, Nov 2.

@@ -1,4 +1,4 @@
--- A project's files as a tree: Zeron's file panel (crates/ui/src/files),
+-- A project's files as a tree: Zeren's file panel (crates/ui/src/files),
 -- and a step past it.
 --
 -- One virtualized list, however many files: only the rows in view are
@@ -8,7 +8,7 @@
 -- folder of ten thousand moves only the rows that can show; the rest stand
 -- in as one.
 --
--- Each row: a chevron (folders), the file's icon (Zeron's Symbols set), its
+-- Each row: a chevron (folders), the file's icon (Zeren's Symbols set), its
 -- name fading out where it doesn't fit, and at its end its git status: a
 -- letter in the status's hue (M, A, U, R, D, C), its name in the same ink;
 -- a folder, a dot for the most pressing thing inside it. What git ignores
@@ -91,7 +91,7 @@ export type Model = {
 
 -- Geometry: a row (its wash a point in from each edge, so washes never
 -- touch unless they're one selection), its inset from the panel's edge,
--- each level's indent (Zeron's), the chevron's slot and the icon.
+-- each level's indent (Zeren's), the chevron's slot and the icon.
 local ROW = 26
 local PAD_PANE = 8
 -- A 28 control's room in the 40 head band.
@@ -659,7 +659,7 @@ function M.float_inset(): number
 end
 -- Its head's height, floating: the filter's and that inset either side.
 function M.float_head(): number
-	return (ui.theme.get("zeron.icon_button.lg") :: number? or 28) + 2 * M.float_inset()
+	return (ui.theme.get("zeren.icon_button.lg") :: number? or 28) + 2 * M.float_inset()
 end
 M.FLOAT_CORNER = FLOAT_CORNER
 
@@ -1943,7 +1943,7 @@ local function component(props: Props): Node
 				for level = d - 1, 0, -1 do
 					local p = nodes[i].parent
 					local x = PAD + INSET + level * INDENT + CHEV / 2
-					local ink = if p == here then "$zeron.files.guide" else "$zeron.tree"
+					local ink = if p == here then "$zeren.files.guide" else "$zeren.tree"
 					local lastk = last_kid(i)
 					if i == id then
 						if lastk then
@@ -1973,7 +1973,7 @@ local function component(props: Props): Node
 			end
 			local st = if n.dir then nil else n.status
 			if st then
-				return `$zeron.git.{st}`
+				return `$zeren.git.{st}`
 			end
 			return if strong() then "$text.primary" else "$text.secondary"
 		end
@@ -1991,7 +1991,7 @@ local function component(props: Props): Node
 					-- (A span's weight takes a number, not a token: the theme's
 					-- medium, read as a number.)
 					spans[#spans + 1] = if run_on
-						then ui.span { run, literal = true, color = "$zeron.match.ink", bg = "$zeron.match.wash", weight = MATCH_WEIGHT }
+						then ui.span { run, literal = true, color = "$zeren.match.ink", bg = "$zeren.match.wash", weight = MATCH_WEIGHT }
 						else ui.span { run, literal = true }
 				end
 				run = ""
@@ -2052,7 +2052,7 @@ local function component(props: Props): Node
 				items = "center",
 				justify = "center",
 				tooltip = locale.s(HOLDS[r]),
-				ui.div { w = 6, h = 6, rounded = "$radius.full", bg = `$zeron.git.{r}`, opacity = 0.9 },
+				ui.div { w = 6, h = 6, rounded = "$radius.full", bg = `$zeren.git.{r}`, opacity = 0.9 },
 			}
 		end
 		local st = n.status
@@ -2067,7 +2067,7 @@ local function component(props: Props): Node
 			align = "center",
 			text_size = "$font.size.xs",
 			weight = "$font.weight.semibold",
-			color = `$zeron.git.{st}`,
+			color = `$zeren.git.{st}`,
 			tabular = true,
 		}
 	end
@@ -2231,16 +2231,16 @@ local function component(props: Props): Node
 			end,
 			bg = function(): string
 				if drop_at:get() == id then
-					return "$zeron.files.drop"
+					return "$zeren.files.drop"
 				end
 				if sel() then
-					return if focused:get() then "$zeron.selected.flat.bg" else "$hover"
+					return if focused:get() then "$zeren.selected.flat.bg" else "$hover"
 				end
 				if active:get() == n.path then
 					return "$hover"
 				end
 				if in_drop(id) then
-					return "$zeron.files.drop"
+					return "$zeren.files.drop"
 				end
 				return if hovered:get() then "$hover" else "#00000000"
 			end,
@@ -2254,7 +2254,7 @@ local function component(props: Props): Node
 			top = 0,
 			h = ROW,
 			items = "center",
-			gap = "$zeron.space.tight",
+			gap = "$zeren.space.tight",
 			opacity = if n.ignored then 0.5 else 1,
 			ui.row {
 				shrink = 0,
@@ -2361,7 +2361,7 @@ local function component(props: Props): Node
 				local card: ContainerProps = {
 					h = ROW,
 					px = "$space.2",
-					gap = "$zeron.space.tight",
+					gap = "$zeren.space.tight",
 					items = "center",
 					rounded = "$radius.md",
 					FileIcon { name = first.name, dir = first.dir, size = ICON },
@@ -2553,7 +2553,7 @@ local function component(props: Props): Node
 				top = 0,
 				h = ROW,
 				items = "center",
-				gap = "$zeron.space.tight",
+				gap = "$zeren.space.tight",
 				ui.row {
 					shrink = 0,
 					items = "center",
@@ -2778,13 +2778,13 @@ local function component(props: Props): Node
 			min_w = 0,
 			-- (As tall as the tools beside it; on its own, the row less its
 			-- air.)
-			h = if as_band then "$zeron.icon_button.lg" else nil,
+			h = if as_band then "$zeren.icon_button.lg" else nil,
 			h_full = if as_band then nil else true,
 			px = "$space.2",
 			gap = "$space.2",
 			items = "center",
 			rounded = if as_band then ui.raw(control.nest(if floating then FLOAT_CORNER else "$radius.xl", 1, BAND_ROOM), "concentric with the pane: its corner less its edge and the band's room") else "$radius.md",
-			bg = "$zeron.secondary.bg",
+			bg = "$zeren.secondary.bg",
 			color = "$text.tertiary",
 			Icon { name = "search", size = 14 },
 			ui.input(EditorMenu.on({
@@ -2867,7 +2867,7 @@ local function component(props: Props): Node
 		-- Its tools, a pair.
 		ui.row {
 			hook = if props.hooks then props.hooks.tools else nil,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			items = "center",
 			shrink = 0,
 			tool("ds.file_tree.show_ignored_files", function(): Icon.Name
@@ -2914,9 +2914,9 @@ local function component(props: Props): Node
 			h = 24,
 			px = "$space.2",
 			rounded = "$radius.lg",
-			bg = "$zeron.secondary.bg",
-			hover = { bg = "$zeron.secondary.hover" },
-			active = { bg = "$zeron.secondary.active" },
+			bg = "$zeren.secondary.bg",
+			hover = { bg = "$zeren.secondary.hover" },
+			active = { bg = "$zeren.secondary.active" },
 			on_click = function()
 				filter:set("")
 			end,
@@ -2943,7 +2943,7 @@ local function component(props: Props): Node
 		px = "$space.2",
 		py = "$space.1",
 		rounded = "$radius.sm",
-		bg = "$zeron.menu.solid",
+		bg = "$zeren.menu.solid",
 		border = 1,
 		border_color = "$danger",
 		shadow = "$shadow.md",

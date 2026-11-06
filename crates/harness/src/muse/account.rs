@@ -4,7 +4,7 @@
 //! handshake opts into `experimentalApi`.
 //!
 //! Muse owns its tokens end to end — it mints, refreshes and locks its own
-//! credential store across processes — so zeron only asks; it never reads,
+//! credential store across processes — so zeren only asks; it never reads,
 //! copies or refreshes a token. Which store Muse uses is the caller's
 //! environment (see the engine's agent accounts: one config root per account,
 //! file-backed).
@@ -80,19 +80,19 @@ pub struct MuseUsage {
 impl MuseUsage {
     /// The meters as the accounts page shows them: the current window, then
     /// the week; over-quota percentages pin at full.
-    pub fn windows(&self) -> Vec<zeron_proto::AgentUsageWindow> {
+    pub fn windows(&self) -> Vec<zeren_proto::AgentUsageWindow> {
         let resets = |ms: Option<i64>| ms.and_then(chrono::DateTime::from_timestamp_millis);
         let fraction = |percent: f64| (percent / 100.0).clamp(0.0, 1.0) as f32;
         vec![
-            zeron_proto::AgentUsageWindow {
-                label: zeron_proto::plan_usage::codex_window_label(
+            zeren_proto::AgentUsageWindow {
+                label: zeren_proto::plan_usage::codex_window_label(
                     self.window.duration_mins.unwrap_or(0) * 60,
                 )
                 .to_string(),
                 used_fraction: fraction(self.window.used_percent),
                 resets_at: resets(self.window.resets_at_ms),
             },
-            zeron_proto::AgentUsageWindow {
+            zeren_proto::AgentUsageWindow {
                 label: "Week".into(),
                 used_fraction: fraction(self.weekly.used_percent),
                 resets_at: resets(self.weekly.resets_at_ms),
@@ -222,15 +222,15 @@ impl DeviceLogin {
                     Ok(Inbound::Notification { method, params })
                         if method == "account/loginCompleted" =>
                     {
-                        tracing::info!(target: "zeron_harness::muse", outcome = ?params.get("outcome"), message = ?params.get("message"), "Muse sign-in completed");
+                        tracing::info!(target: "zeren_harness::muse", outcome = ?params.get("outcome"), message = ?params.get("message"), "Muse sign-in completed");
                         return Ok(params);
                     }
                     Ok(Inbound::Notification { method, .. }) => {
-                        tracing::info!(target: "zeron_harness::muse", %method, "Muse sign-in host notification");
+                        tracing::info!(target: "zeren_harness::muse", %method, "Muse sign-in host notification");
                     }
                     Ok(_) => {}
                     Err(error) => {
-                        tracing::warn!(target: "zeron_harness::muse", %error, stderr = ?host.tail.snapshot(), "Muse sign-in host failed");
+                        tracing::warn!(target: "zeren_harness::muse", %error, stderr = ?host.tail.snapshot(), "Muse sign-in host failed");
                         return Err(error.to_string());
                     }
                 }

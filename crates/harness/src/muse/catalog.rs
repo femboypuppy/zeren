@@ -1,11 +1,11 @@
 //! `model/list` → [`Model`]s, and the reasoning tiers both ways.
 use serde_json::Value;
-use zeron_proto::{Model, ReasoningLevel};
+use zeren_proto::{Model, ReasoningLevel};
 
 use super::normalize::string;
 
-/// Muse's tier for a Zeron reasoning level (its closed vocabulary also has
-/// `none`, which no Zeron level selects). Levels Muse has no tier for
+/// Muse's tier for a Zeren reasoning level (its closed vocabulary also has
+/// `none`, which no Zeren level selects). Levels Muse has no tier for
 /// (`ultracode`, `ultrathink`) leave the model's default.
 pub(super) fn effort(level: Option<ReasoningLevel>) -> Option<&'static str> {
     Some(match level? {

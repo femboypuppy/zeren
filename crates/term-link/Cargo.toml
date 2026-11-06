@@ -1,5 +1,5 @@
 [package]
-name = "zeron-term-link"
+name = "zeren-term-link"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -11,9 +11,9 @@ publish.workspace = true
 # each other and the relay when they can't — switching mid-session with no
 # gap, no repeat and no lost keystroke.
 [dependencies]
-zeron-proto.workspace = true
-zeron-rpc.workspace = true
-zeron-preview.workspace = true
+zeren-proto.workspace = true
+zeren-rpc.workspace = true
+zeren-preview.workspace = true
 tokio.workspace = true
 futures.workspace = true
 async-trait.workspace = true

@@ -50,7 +50,7 @@ impl Rig {
         let dir = self.dir.path().join(format!("snap-{version}"));
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("service.luau"), source).unwrap();
-        std::fs::write(dir.join("zeron.luau"), crate::plugins::scaffold::SDK).unwrap();
+        std::fs::write(dir.join("zeren.luau"), crate::plugins::scaffold::SDK).unwrap();
         Plan {
             plugin: "svc".into(),
             name: "Svc".into(),
@@ -90,27 +90,27 @@ async fn until(what: &str, check: impl Fn() -> bool) {
 }
 
 const V1: &str = r#"
-local zeron = require("./zeron")("svc")
-zeron.serve("version", function() return "v1" end, { safe = true })
-zeron.serve("slow", function()
-	zeron.sleep(0.4):await()
+local zeren = require("./zeren")("svc")
+zeren.serve("version", function() return "v1" end, { safe = true })
+zeren.serve("slow", function()
+	zeren.sleep(0.4):await()
 	return "slow v1"
 end)
-zeron.serve("echo", function(args)
-	return zeron.run("echo", { args.word }):await().stdout
+zeren.serve("echo", function(args)
+	return zeren.run("echo", { args.word }):await().stdout
 end)
-zeron.serve("ls", function()
-	return zeron.run("ls", { "/" }):await()
+zeren.serve("ls", function()
+	return zeren.run("ls", { "/" }):await()
 end)
-zeron.serve("ping", function(args)
-	zeron.emit("pinged", { n = args.n })
-	return zeron.notify({ title = "Pinged" }):await()
+zeren.serve("ping", function(args)
+	zeren.emit("pinged", { n = args.n })
+	return zeren.notify({ title = "Pinged" }):await()
 end)
 "#;
 
 const V2: &str = r#"
-local zeron = require("./zeron")("svc")
-zeron.serve("version", function() return "v2" end, { safe = true })
+local zeren = require("./zeren")("svc")
+zeren.serve("version", function() return "v2" end, { safe = true })
 "#;
 
 #[tokio::test]
@@ -196,9 +196,9 @@ async fn turned_off_it_stops() {
 }
 
 const FLAKY: &str = r#"
-local zeron = require("./zeron")("svc")
+local zeren = require("./zeren")("svc")
 local function crash_once(name)
-	local seen = zeron.store(name, false)
+	local seen = zeren.store(name, false)
 	if not seen:get() then
 		seen:set(true)
 		local t = {}
@@ -206,9 +206,9 @@ local function crash_once(name)
 	end
 	return name .. " ran"
 end
-zeron.serve("safe", function() return crash_once("safe") end, { safe = true })
-zeron.serve("unsafe", function() return crash_once("unsafe") end)
-zeron.serve("fails", function() error("nope", 0) end, { safe = true })
+zeren.serve("safe", function() return crash_once("safe") end, { safe = true })
+zeren.serve("unsafe", function() return crash_once("unsafe") end)
+zeren.serve("fails", function() error("nope", 0) end, { safe = true })
 "#;
 
 fn small() -> Config {
@@ -286,12 +286,12 @@ async fn emits_and_notifications_go_through_the_host() {
 }
 
 const TICKS: &str = r#"
-local zeron = require("./zeron")("svc")
-zeron.every(30, function()
-	local n = zeron.store("ticks", 0)
+local zeren = require("./zeren")("svc")
+zeren.every(30, function()
+	local n = zeren.store("ticks", 0)
 	n:set(n:get() + 1)
 end)
-zeron.serve("ticks", function() return zeron.store("ticks", 0):get() end)
+zeren.serve("ticks", function() return zeren.store("ticks", 0):get() end)
 "#;
 
 #[tokio::test]
@@ -317,16 +317,16 @@ async fn a_timer_starts_a_stopped_service() {
 }
 
 const WATCHER: &str = r#"
-local zeron = require("./zeron")("svc")
+local zeren = require("./zeren")("svc")
 local stop: (() -> ())? = nil
-zeron.serve("watch", function(args)
-	stop = zeron.watch({ args.folder }, function(changed)
+zeren.serve("watch", function(args)
+	stop = zeren.watch({ args.folder }, function(changed)
 		local paths = changed[args.folder]
-		zeron.emit("changed", { all = paths == true, paths = if paths == true then {} else paths })
+		zeren.emit("changed", { all = paths == true, paths = if paths == true then {} else paths })
 	end, { quiet = args.quiet })
 	return true
 end)
-zeron.serve("unwatch", function()
+zeren.serve("unwatch", function()
 	if stop then stop() end
 	return true
 end)
@@ -413,8 +413,8 @@ async fn a_bytecode_file_is_refused() {
     let plan = r.plan(
         "1.0.0",
         r#"
-local zeron = require("./zeron")("svc")
-zeron.serve("evil", function() return require("./evil") end)
+local zeren = require("./zeren")("svc")
+zeren.serve("evil", function() return require("./evil") end)
 "#,
         &["service"],
     );
@@ -429,9 +429,9 @@ zeron.serve("evil", function() return require("./evil") end)
 }
 
 const FETCHER: &str = r#"
-local zeron = require("./zeron")("svc")
-zeron.serve("get", function(args)
-	local r = zeron.fetch(args.url, { headers = args.headers }):await()
+local zeren = require("./zeren")("svc")
+zeren.serve("get", function(args)
+	local r = zeren.fetch(args.url, { headers = args.headers }):await()
 	return r.status
 end)
 "#;

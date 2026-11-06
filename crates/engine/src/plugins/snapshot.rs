@@ -33,7 +33,7 @@ pub fn ensure(
     plugins_dir: &Path,
     id: &str,
     // The plugin's own folder, copied from: `<data>/plugins/<id>` for yours,
-    // the app's folder of them for Zeron's own (never under `plugins_dir`).
+    // the app's folder of them for Zeren's own (never under `plugins_dir`).
     source: &Path,
     hash: &str,
     manifest_bytes: &[u8],
@@ -61,8 +61,8 @@ pub fn ensure(
     let result = (|| -> Result<(), String> {
         std::fs::create_dir_all(&temp).map_err(|e| e.to_string())?;
         for (rel, expected) in files {
-            let from = zeron_plugin_guard::path::join(source, rel)?;
-            let to = zeron_plugin_guard::path::join(&temp, rel)?;
+            let from = zeren_plugin_guard::path::join(source, rel)?;
+            let to = zeren_plugin_guard::path::join(&temp, rel)?;
             if let Some(dir) = to.parent() {
                 std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
             }
@@ -381,7 +381,7 @@ mod tests {
         let files = focus(plugins);
         let hash = "0123456789abcdef0000";
         let target = snapshot_dir(plugins, "focus", hash);
-        // Planted before Zeron ever made it: different code, and a file more.
+        // Planted before Zeren ever made it: different code, and a file more.
         std::fs::create_dir_all(target.join("lib")).unwrap();
         std::fs::write(target.join("init.luau"), "evil").unwrap();
         std::fs::write(target.join("lib/x.luau"), "b").unwrap();

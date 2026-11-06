@@ -1,5 +1,5 @@
 -- Themes as src/themes.rs lists them, for fixtures (ui/themes_fixture.luau,
--- ui/templates_fixture.luau, the gallery's Themes page): a few of Zeron's
+-- ui/templates_fixture.luau, the gallery's Themes page): a few of Zeren's
 -- built in, their seeds as crates/theme builtins.rs has them; Ledger's own
 -- (a template's theme.luau, dark only); and what src/themes.rs makes of
 -- tests/fixtures/themes/Harbor Night.json.
@@ -7,8 +7,8 @@
 local M = {}
 
 M.BUILTIN = {
-	{ id = "zeron-light", name = "Zeron Light", kind = "light", background = "#ffffff", raised = "#ededf0", text = "#303035", muted = "#62626a", faint = "#797981", accent = "#5b43e8", danger = "#dc2626", warning = "#a16207", success = "#15803d", syntax = { "#6b7280", "#5b43e8", "#15803d", "#a16207", "#7e22ce", "#2563eb", "#be185d", "#303035", "#52525b", "#be185d", "#0e7490", "#b91c1c" }, entry = "zeron" },
-	{ id = "zeron-dark", name = "Zeron Dark", kind = "dark", background = "#060606", raised = "#343438", text = "#e8e8ea", muted = "#a9a9ae", faint = "#85858a", accent = "#8b7cf6", danger = "#f87171", warning = "#facc15", success = "#34d399", syntax = { "#92929a", "#8b7cf6", "#34d399", "#facc15", "#c084fc", "#60a5fa", "#f472b6", "#e8e8ea", "#a1a1aa", "#f472b6", "#22d3ee", "#f87171" }, entry = "zeron" },
+	{ id = "zeren-light", name = "Zeren Light", kind = "light", background = "#ffffff", raised = "#ededf0", text = "#303035", muted = "#62626a", faint = "#797981", accent = "#5b43e8", danger = "#dc2626", warning = "#a16207", success = "#15803d", syntax = { "#6b7280", "#5b43e8", "#15803d", "#a16207", "#7e22ce", "#2563eb", "#be185d", "#303035", "#52525b", "#be185d", "#0e7490", "#b91c1c" }, entry = "zeren" },
+	{ id = "zeren-dark", name = "Zeren Dark", kind = "dark", background = "#060606", raised = "#343438", text = "#e8e8ea", muted = "#a9a9ae", faint = "#85858a", accent = "#8b7cf6", danger = "#f87171", warning = "#facc15", success = "#34d399", syntax = { "#92929a", "#8b7cf6", "#34d399", "#facc15", "#c084fc", "#60a5fa", "#f472b6", "#e8e8ea", "#a1a1aa", "#f472b6", "#22d3ee", "#f87171" }, entry = "zeren" },
 	{ id = "gruvbox-light", name = "Gruvbox Light", kind = "light", background = "#fbf1c7", raised = "#d5c4a1", text = "#3c3836", muted = "#665c54", faint = "#7c6f64", accent = "#076678", danger = "#9d0006", warning = "#b57614", success = "#79740e", syntax = { "#928374", "#9d0006", "#79740e", "#8f3f71", "#b57614", "#076678", "#427b58", "#3c3836", "#665c54", "#9d0006", "#af3a03", "#cc241d" }, entry = "gruvbox" },
 	{ id = "gruvbox-dark", name = "Gruvbox Dark", kind = "dark", background = "#282828", raised = "#504945", text = "#ebdbb2", muted = "#bdae93", faint = "#928374", accent = "#8ec07c", danger = "#fb4934", warning = "#fabd2f", success = "#b8bb26", syntax = { "#928374", "#fb4934", "#b8bb26", "#d3869b", "#fabd2f", "#83a598", "#8ec07c", "#ebdbb2", "#bdae93", "#fb4934", "#fe8019", "#fb4934" }, entry = "gruvbox" },
 	{ id = "github-light", name = "GitHub Light", kind = "light", background = "#ffffff", raised = "#d0d7de", text = "#1f2328", muted = "#656d76", faint = "#818b98", accent = "#0969da", danger = "#cf222e", warning = "#9a6700", success = "#1a7f37", syntax = { "#6e7781", "#cf222e", "#0a3069", "#0550ae", "#953800", "#8250df", "#116329", "#1f2328", "#57606a", "#116329", "#953800", "#cf222e" }, entry = "github" },
@@ -19,7 +19,7 @@ M.BUILTIN = {
 }
 
 M.ENTRIES = {
-	{ id = "zeron", name = "Zeron", source = "builtin", variants = { "zeron-light", "zeron-dark" } },
+	{ id = "zeren", name = "Zeren", source = "builtin", variants = { "zeren-light", "zeren-dark" } },
 	{ id = "gruvbox", name = "Gruvbox", source = "builtin", variants = { "gruvbox-light", "gruvbox-dark" } },
 	{ id = "github", name = "GitHub", source = "builtin", variants = { "github-light", "github-dark" } },
 	{ id = "dracula", name = "Dracula", source = "builtin", variants = { "dracula" } },

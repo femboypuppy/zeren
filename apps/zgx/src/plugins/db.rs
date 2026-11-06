@@ -1,8 +1,8 @@
-//! Each plugin's database (`zeron.db`): a SQLite file of its own, beside its
+//! Each plugin's database (`zeren.db`): a SQLite file of its own, beside its
 //! storage (`<data>/plugins/.storage/<id>.sqlite3`; removing the plugin
 //! removes it, the engine's `RemovePlugin`). No permission: it's the
 //! plugin's alone, as its storage is. For a cache, an index, a history:
-//! anything past what `zeron.store`'s one small JSON file holds.
+//! anything past what `zeren.store`'s one small JSON file holds.
 //!
 //!   { op = "exec", sql, params? }   → { changes, last_id }
 //!     (no params: a script of several statements, a schema)
@@ -65,7 +65,7 @@ fn open(path: &Path) -> Result<Arc<Mutex<Connection>>, String> {
 
 /// Pragmas a plugin may set (how its own tables behave); any other pragma
 /// only read. `max_page_count`, `journal_mode`, `page_size`,
-/// `writable_schema`, … stay as Zeron set them (R29).
+/// `writable_schema`, … stay as Zeren set them (R29).
 const SETTABLE_PRAGMAS: &[&str] =
     &["user_version", "application_id", "foreign_keys", "defer_foreign_keys", "recursive_triggers", "case_sensitive_like", "busy_timeout", "cache_size"];
 
@@ -182,7 +182,7 @@ mod tests {
         assert_eq!(path_in(Path::new("/x"), "github").unwrap(), Path::new("/x/github.sqlite3"));
     }
 
-    /// R29: the size limit is Zeron's, not the plugin's to lift (it was
+    /// R29: the size limit is Zeren's, not the plugin's to lift (it was
     /// one `PRAGMA max_page_count` away), and VACUUM INTO writes no file.
     #[test]
     fn a_plugin_cant_lift_its_limits() {

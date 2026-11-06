@@ -74,7 +74,7 @@ return {
 					badge.Tag { "frontend", hue = "violet", on_remove = function() end },
 					badge.Tag { "design-system", hue = "emerald", on_remove = function() end },
 					badge.Tag { "bug", hue = "red" },
-					badge.Tag { "zeron/primitives", icon = "git-branch" },
+					badge.Tag { "zeren/primitives", icon = "git-branch" },
 					badge.Tag { "small", size = "sm", on_remove = function() end }
 				),
 				kit.row(table.unpack(filter_tags))

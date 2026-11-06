@@ -3,17 +3,17 @@
 //! tool must still finish and its real result must reach the agent — then
 //! the steer is answered.
 //!
-//! ZERON_TEST_HARNESS=claude cargo test -p zeron-engine --test steer_tool_live -- --ignored --nocapture
+//! ZEREN_TEST_HARNESS=claude cargo test -p zeren-engine --test steer_tool_live -- --ignored --nocapture
 use std::{
     sync::Arc,
     time::{Duration, Instant},
 };
-use zeron_doc::{MessagePart, MessageRole, SessionCommandPayload, SessionMessageEntry};
-use zeron_engine::{EngineCore, HarnessRegistry};
-use zeron_harness::{
+use zeren_doc::{MessagePart, MessageRole, SessionCommandPayload, SessionMessageEntry};
+use zeren_engine::{EngineCore, HarnessRegistry};
+use zeren_harness::{
     AcpHarness, ClaudeHarness, CodexHarness, CursorHarness, Harness, OpencodeHarness,
 };
-use zeron_proto::{ChatConfig, McpServer, RunRequest, SandboxLevel, SessionStatus};
+use zeren_proto::{ChatConfig, McpServer, RunRequest, SandboxLevel, SessionStatus};
 
 const CHAT: &str = "steer-tool";
 
@@ -53,7 +53,7 @@ fn harness(name: &str) -> Arc<dyn Harness> {
         "grok" => Arc::new(AcpHarness::grok()),
         "devin" => Arc::new(AcpHarness::devin()),
         "hermes" => Arc::new(AcpHarness::hermes()),
-        "pi" => Arc::new(zeron_harness::PiHarness::new()),
+        "pi" => Arc::new(zeren_harness::PiHarness::new()),
         "antigravity" => Arc::new(AcpHarness::antigravity()),
         _ => panic!("unknown harness {name}"),
     }
@@ -88,8 +88,8 @@ fn dump(entries: &[SessionMessageEntry]) -> String {
 #[tokio::test]
 #[ignore = "uses real model quota; select the harness explicitly"]
 async fn steering_never_aborts_a_running_tool() {
-    let name = std::env::var("ZERON_TEST_HARNESS").expect("select harness");
-    let model = std::env::var("ZERON_TEST_MODEL").ok();
+    let name = std::env::var("ZEREN_TEST_HARNESS").expect("select harness");
+    let model = std::env::var("ZEREN_TEST_MODEL").ok();
     let harness = harness(&name);
     let id = harness.id();
     let dir = tempfile::tempdir().unwrap();

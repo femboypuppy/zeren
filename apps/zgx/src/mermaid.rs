@@ -87,7 +87,7 @@ fn cache_dir() -> PathBuf {
     } else {
         std::env::var_os("XDG_CACHE_HOME").map(PathBuf::from).or_else(|| home.map(|h| h.join(".cache")))
     };
-    cache.unwrap_or_else(std::env::temp_dir).join("zeron-zgx/mermaid")
+    cache.unwrap_or_else(std::env::temp_dir).join("zeren-zgx/mermaid")
 }
 
 /// `work` on a thread of its own, its answer awaited here (None only if it
@@ -195,7 +195,7 @@ impl Request {
     }
 }
 
-/// Zeron's diagram style (the shipping app's `Palette`): the canvas left
+/// Zeren's diagram style (the shipping app's `Palette`): the canvas left
 /// clear so the diagram sits on its fence body; `canvas` is that body's
 /// opaque approximation, used where the engine needs a solid mask (edge
 /// label pills, hollow markers) and as the lightbox's plate.
@@ -499,7 +499,7 @@ fn on_plate(svg: &str, w: f32, h: f32, fill: &str) -> String {
     }
 }
 
-/// The shipping app's `mermaid::render`: the source as SVG in Zeron's style.
+/// The shipping app's `mermaid::render`: the source as SVG in Zeren's style.
 pub fn render(source: &str, palette: &Palette) -> Result<String, String> {
     if source.trim().is_empty() {
         return Err("Diagram is empty".into());
@@ -674,7 +674,7 @@ mod tests {
 
     const FLOWCHART: &str = "flowchart TD\n  A[Start] --> B{Ready?}\n  B -->|yes| C[Ship it]\n  B -->|no| D[Fix]\n  D --> B";
     const SEQUENCE: &str =
-        "sequenceDiagram\n  participant U as User\n  participant Z as Zeron\n  U->>Z: Ask\n  Z-->>U: Answer\n  Note over U,Z: Both ways";
+        "sequenceDiagram\n  participant U as User\n  participant Z as Zeren\n  U->>Z: Ask\n  Z-->>U: Answer\n  Note over U,Z: Both ways";
 
     fn request(source: &str, dark: bool) -> Request {
         let colors = if dark {

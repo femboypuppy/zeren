@@ -1,8 +1,8 @@
 //! Direct terminal links: the protocol and both ends live in
-//! `zeron-term-link` (the phone speaks it too); this is the host's
+//! `zeren-term-link` (the phone speaks it too); this is the host's
 //! `terminal/{id}` stream service over this engine's PTYs.
 
-pub use zeron_term_link::link::*;
+pub use zeren_term_link::link::*;
 
 use super::Terminals;
 
@@ -11,7 +11,7 @@ impl HostTerminals for Terminals {
         &self,
         terminal_id: &str,
         after_seq: u64,
-    ) -> Result<tokio::sync::mpsc::UnboundedReceiver<zeron_proto::TerminalEvent>, String> {
+    ) -> Result<tokio::sync::mpsc::UnboundedReceiver<zeren_proto::TerminalEvent>, String> {
         Terminals::subscribe(self, terminal_id, Some(after_seq)).map_err(|e| e.to_string())
     }
     fn write_sequenced(
@@ -45,19 +45,19 @@ impl Service {
 
 /// Whether `peer` may attach to this device's terminals.
 fn peer_allowed(peer: Option<&str>) -> bool {
-    peer.is_some_and(|peer| !zeron_proto::is_cloud_device(peer, ""))
+    peer.is_some_and(|peer| !zeren_proto::is_cloud_device(peer, ""))
 }
 
 #[async_trait::async_trait]
-impl zeron_preview::mux::Connector for Service {
-    async fn connect(&self, service: &str) -> anyhow::Result<zeron_preview::mux::BoxIo> {
+impl zeren_preview::mux::Connector for Service {
+    async fn connect(&self, service: &str) -> anyhow::Result<zeren_preview::mux::BoxIo> {
         self.connect_from(None, service).await
     }
     async fn connect_from(
         &self,
         peer: Option<&str>,
         service: &str,
-    ) -> anyhow::Result<zeron_preview::mux::BoxIo> {
+    ) -> anyhow::Result<zeren_preview::mux::BoxIo> {
         anyhow::ensure!(
             peer_allowed(peer),
             "terminals here are only reachable from the owner's devices"
@@ -79,7 +79,7 @@ mod tests {
     use base64::Engine as _;
     use base64::engine::general_purpose::STANDARD as BASE64;
     use std::time::Duration;
-    use zeron_proto::TerminalEvent;
+    use zeren_proto::TerminalEvent;
 
     fn text(events: &[TerminalEvent]) -> String {
         let mut out = Vec::new();
@@ -280,7 +280,7 @@ mod tests {
         assert!(peer_allowed(Some("laptop-device")));
         assert!(!peer_allowed(None), "no anonymous links");
         assert!(
-            !peer_allowed(Some(&format!("{}abc", zeron_proto::CLOUD_DEVICE_PREFIX))),
+            !peer_allowed(Some(&format!("{}abc", zeren_proto::CLOUD_DEVICE_PREFIX))),
             "a Cloud machine must not reach a shell here"
         );
     }

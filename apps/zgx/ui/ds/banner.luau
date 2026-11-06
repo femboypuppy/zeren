@@ -76,7 +76,7 @@ local function glyph(props: Props, size: number): Node
 	local tone: Tone = props.tone or "info"
 	return ui.div {
 		shrink = 0,
-		color = if tone == "neutral" then "$text.secondary" else `$zeron.tone.{tone}.ink`,
+		color = if tone == "neutral" then "$text.secondary" else `$zeren.tone.{tone}.ink`,
 		Icon { name = props.icon or GLYPH[tone], size = size },
 	}
 end
@@ -86,8 +86,8 @@ end
 local function frame(row: { [any]: any }, tone: Tone, edge: boolean): Node
 	row.role = if tone == "danger" or tone == "warning" then "alert" else "status"
 	row.w_full = true
-	row.bg = `$zeron.tone.{tone}.wash`
-	row.border_color = `$zeron.tone.{tone}.edge`
+	row.bg = `$zeren.tone.{tone}.wash`
+	row.border_color = `$zeren.tone.{tone}.edge`
 	if edge then
 		row.border_sides = { 0, 0, 1, 0 }
 	else
@@ -107,7 +107,7 @@ function M.Callout(props: Props): Node
 	local text = ui.column {
 		grow = 1,
 		min_w = 0,
-		gap = "$zeron.space.hair",
+		gap = "$zeren.space.hair",
 		ui.text {
 			props.title,
 			text_size = "$font.size.md",
@@ -153,7 +153,7 @@ function M.Callout(props: Props): Node
 			then ui.div {
 				-- In the corner: as far from the top as from the end, concentric.
 				mt = ui.raw(-4, "as far from the top as from the end"),
-				theme = { zeron = { icon_button = { radius = control.nest("$radius.xl", 1, "$space.2") } } },
+				theme = { zeren = { icon_button = { radius = control.nest("$radius.xl", 1, "$space.2") } } },
 				dismiss,
 			}
 			else nil,

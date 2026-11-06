@@ -1,6 +1,6 @@
 --!strict
 -- The panel home's branch row, Git's part of it: what the branch adds over
--- its base, `+N −M`, at the row's end (core's `slot:zeron.panel.branch`,
+-- its base, `+N −M`, at the row's end (core's `slot:zeren.panel.branch`,
 -- which provides `panel_branch`: { session, device, cwd, branch }). A
 -- click opens the Changes tab at the Branch scope. Asked of the service on
 -- the session's device (`branch_totals`) as the home shows the session, and
@@ -12,14 +12,14 @@ local PanelHome = require("@ds/panel_home")
 local Tooltip = require("@ds/tooltip")
 local control = require("@ds/control")
 
-return function(zeron: any, Repo: any)
+return function(zeren: any, Repo: any)
 	-- Each session's totals as last heard, by session and folder (kept
 	-- while the window is: the home shows them at once when it's back).
 	local heard = ui.state("git.branch_totals", {} :: { [string]: any })
 
 	return function(): Node
-		local branch = zeron.live("panel_branch")
-		local panel = zeron.context("panel")
+		local branch = zeren.live("panel_branch")
+		local panel = zeren.context("panel")
 		local first = branch()
 		local session = first and first.session
 		if type(session) ~= "string" then
@@ -36,14 +36,14 @@ return function(zeron: any, Repo: any)
 			if type(b) ~= "table" or not b.cwd or (b.branch or "") == "" then
 				return
 			end
-			local record = zeron.context_of("session", b.session)
+			local record = zeren.context_of("session", b.session)
 			local key = `{b.session}|{b.cwd}|{b.branch}|{b.device or ""}|{record.status or ""}`
 			if key == asked then
 				return
 			end
 			asked = key
 			local slot = slot_of(b) :: string
-			zeron.service(b.device):call("branch_totals", { cwd = b.cwd }, { timeout = 60 }):after(function(t: any)
+			zeren.service(b.device):call("branch_totals", { cwd = b.cwd }, { timeout = 60 }):after(function(t: any)
 				if asked ~= key then
 					return
 				end
@@ -70,9 +70,9 @@ return function(zeron: any, Repo: any)
 			role = "button",
 			label = function(): string
 				local t = totals() or { adds = 0, dels = 0 }
-				return zeron.s("home.diff_label", { adds = t.adds, dels = t.dels })
+				return zeren.s("home.diff_label", { adds = t.adds, dels = t.dels })
 			end,
-			tooltip = Tooltip { zeron.t("home.branch_changes") },
+			tooltip = Tooltip { zeren.t("home.branch_changes") },
 			focusable = true,
 			cursor = "pointer",
 			shrink = 0,
@@ -105,7 +105,7 @@ return function(zeron: any, Repo: any)
 				font = "$font.mono",
 				tabular = true,
 				text_size = "$font.size.xs",
-				color = "$zeron.diff.added",
+				color = "$zeren.diff.added",
 			},
 			ui.text {
 				function(): string
@@ -116,7 +116,7 @@ return function(zeron: any, Repo: any)
 				font = "$font.mono",
 				tabular = true,
 				text_size = "$font.size.xs",
-				color = "$zeron.diff.removed",
+				color = "$zeren.diff.removed",
 			},
 		})
 	end

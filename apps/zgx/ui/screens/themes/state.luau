@@ -1,9 +1,9 @@
 --!strict
--- Themes, as the host lists them (src/themes.rs): Zeron's built in, each
+-- Themes, as the host lists them (src/themes.rs): Zeren's built in, each
 -- template's own, and your imported VS Code colour themes, with the one
 -- chosen for each scheme. A theme is only colours, so it's worn over any
 -- template (ds/palettes, ds/tokens): a scheme with none chosen wears the
--- running template's own theme, else Zeron's.
+-- running template's own theme, else Zeren's.
 --
 --   state.entries:get()       every theme ({ Entry }), built in first
 --   state.ready()             whether the host has listed them
@@ -92,7 +92,7 @@ local function template_theme(): Entry?
 end
 
 -- What scheme `kind` wears now: the theme chosen for it, else the running
--- template's own, else Zeron's.
+-- template's own, else Zeren's.
 function M.worn(kind: string): string
 	local chosen = (palettes.library():get().chosen or {})[kind]
 	local p = palettes.find(chosen)
@@ -101,7 +101,7 @@ function M.worn(kind: string): string
 	end
 	local own = template_theme()
 	local suggested = if own then M.has(own, kind) else nil
-	return suggested or `zeron-{kind}`
+	return suggested or `zeren-{kind}`
 end
 
 function M.showing(): { string }
@@ -205,18 +205,18 @@ function M.remove(id: string)
 	M.host.remove(id)
 end
 
--- Each variant's swatch theme: its palette over Zeron's theme of its
--- scheme, registered once a change (Zeron's own are worn as they are).
+-- Each variant's swatch theme: its palette over Zeren's theme of its
+-- scheme, registered once a change (Zeren's own are worn as they are).
 local registered: { [string]: string } = {}
 local function swatch_theme(p: palettes.Palette): string
-	if p.id == "zeron-light" or p.id == "zeron-dark" then
+	if p.id == "zeren-light" or p.id == "zeren-dark" then
 		return p.id
 	end
 	local name = `swatch-{p.id}`
 	local stamp = `{p.background}|{p.text}|{p.accent}|{table.concat(p.syntax or {}, ",")}`
 	if registered[name] ~= stamp then
 		registered[name] = stamp
-		ui.theme.register { name = name, type = p.kind :: any, extends = `zeron-{p.kind}`, tokens = palettes.tokens(table.clone(p)) }
+		ui.theme.register { name = name, type = p.kind :: any, extends = `zeren-{p.kind}`, tokens = palettes.tokens(table.clone(p)) }
 	end
 	return name
 end

@@ -1,5 +1,5 @@
 //! The WPE engine's protocol pieces, and the real helper this build embeds:
-//! `cargo test -p zeron-ui wpe -- --include-ignored` with WPE WebKit
+//! `cargo test -p zeren-ui wpe -- --include-ignored` with WPE WebKit
 //! installed. The helper renders offscreen, so no display is needed.
 use super::super::{
     BrowserData, Engine, Link, NativePage, Presentation, Route, Startup, Worker, extract_helper,
@@ -19,7 +19,7 @@ fn memfd(bytes: &[u8], seal: bool) -> OwnedFd {
     // SAFETY: plain memfd_create/fcntl on descriptors this test owns.
     unsafe {
         let fd = libc::memfd_create(
-            c"zeron-test".as_ptr(),
+            c"zeren-test".as_ptr(),
             libc::MFD_CLOEXEC | libc::MFD_ALLOW_SEALING,
         );
         assert!(fd >= 0, "memfd_create: {}", io::Error::last_os_error());
@@ -267,7 +267,7 @@ fn unpainted_frames_merge_damage_and_return_their_buffers() {
     );
     surface.push_frame(frame(1, &[]), &outbox, 9);
     assert!(commands(&rx).is_empty());
-    // A buffer Zeron rejected still goes back.
+    // A buffer Zeren rejected still goes back.
     surface.push_frame(frame(7, &[]), &outbox, 9);
     surface.push_frame(frame(1, &[]), &outbox, 9);
     assert_eq!(
@@ -686,7 +686,7 @@ impl Driver {
     }
 }
 
-/// Render nodes to try for the GPU path, the one in `ZERON_TEST_RENDER_NODE`
+/// Render nodes to try for the GPU path, the one in `ZEREN_TEST_RENDER_NODE`
 /// first.
 fn render_nodes() -> Vec<PathBuf> {
     let mut nodes: Vec<PathBuf> = std::fs::read_dir("/dev/dri")
@@ -700,7 +700,7 @@ fn render_nodes() -> Vec<PathBuf> {
         })
         .collect();
     nodes.sort();
-    if let Some(node) = std::env::var_os("ZERON_TEST_RENDER_NODE") {
+    if let Some(node) = std::env::var_os("ZEREN_TEST_RENDER_NODE") {
         nodes.insert(0, node.into());
     }
     nodes
@@ -714,7 +714,7 @@ fn target(node: &std::path::Path, modifiers: &[u64]) -> gpui::DmabufTarget {
 }
 
 /// The layouts WebKit renders into on `node`, as the helper reports them when
-/// Zeron imports none: `None` when it cannot render there at all.
+/// Zeren imports none: `None` when it cannot render there at all.
 fn renderable(node: &std::path::Path) -> Option<Vec<u64>> {
     let helper = tempfile::tempdir().unwrap();
     let executable = extract_helper(helper.path(), "wpe", HELPER).unwrap();
@@ -753,7 +753,7 @@ fn wpe_renders_pages_into_shared_memory() {
 }
 
 /// Each GPU WebKit renders on shares pages in every layout it renders into,
-/// and reads them back, through GL, when Zeron imports none of them: GBM
+/// and reads them back, through GL, when Zeren imports none of them: GBM
 /// cannot map NVIDIA's tiled layouts, and NVIDIA cannot render linear ones.
 #[test]
 #[ignore = "requires the WPE WebKit runtime and a GPU"]
@@ -791,10 +791,10 @@ fn wpe_renders_pages_on_each_gpu_in_each_layout() {
     eprintln!("dma-buf frames:\n{}", rendered.join("\n"));
 }
 
-/// The GPU path, with every layout shared: on `ZERON_TEST_RENDER_NODE`, or
+/// The GPU path, with every layout shared: on `ZEREN_TEST_RENDER_NODE`, or
 /// else on the first GPU WebKit renders on.
 fn test_gpu() -> Option<gpui::DmabufTarget> {
-    let nodes = match std::env::var_os("ZERON_TEST_RENDER_NODE") {
+    let nodes = match std::env::var_os("ZEREN_TEST_RENDER_NODE") {
         Some(node) => vec![PathBuf::from(node)],
         None => render_nodes(),
     };
@@ -863,7 +863,7 @@ fn a_helper_that_dies_at_startup_fails_at_once() {
 }
 
 #[test]
-fn a_helper_zeron_cannot_read_is_stopped_and_replaced() {
+fn a_helper_zeren_cannot_read_is_stopped_and_replaced() {
     let dir = tempfile::tempdir().unwrap();
     // A packet past the protocol's limit, then writes until the socket fills
     // up and blocks the helper.
@@ -877,7 +877,7 @@ fn a_helper_zeron_cannot_read_is_stopped_and_replaced() {
         ..Default::default()
     };
     let first = data.worker(None).unwrap();
-    // Zeron hangs up, so the helper exits instead of blocking on its socket.
+    // Zeren hangs up, so the helper exits instead of blocking on its socket.
     let deadline = Instant::now() + Duration::from_secs(5);
     while first.child.lock().unwrap().try_wait().unwrap().is_none() {
         assert!(
@@ -971,7 +971,7 @@ fn a_page_shown_again_restarts_the_vblanks_hiding_stopped() {
 
 #[test]
 #[ignore = "requires the WPE WebKit runtime"]
-fn wpe_pages_never_outgrow_the_frames_zeron_takes() {
+fn wpe_pages_never_outgrow_the_frames_zeren_takes() {
     let mut driver = Driver::start(test_gpu());
     let page = driver.first();
     driver.load(page, "/animated");
@@ -1044,7 +1044,7 @@ fn wpe_takes_keyboard_pointer_scroll_and_clipboard_input() {
     driver.until("typing", |d| {
         d.eval(page, "document.getElementById('i').value") == "hi"
     });
-    // Ctrl+V pastes what Zeron shared; Ctrl+A, Ctrl+C copy back to Zeron.
+    // Ctrl+V pastes what Zeren shared; Ctrl+A, Ctrl+C copy back to Zeren.
     driver.send(page, json!({"cmd": "clipboard", "text": " — café 日本語"}));
     driver.key(page, "v", 4);
     driver.until("paste", |d| {
@@ -1136,7 +1136,7 @@ fn wpe_renders_a_page_opened_after_the_last_one_closed() {
 }
 
 /// Resizing reallocates WebKit's buffers; the ones it drops are forgotten
-/// rather than kept alive (and pinned on the GPU) by the helper or Zeron.
+/// rather than kept alive (and pinned on the GPU) by the helper or Zeren.
 #[test]
 #[ignore = "requires the WPE WebKit runtime and a GPU"]
 fn wpe_resizes_release_the_buffers_they_replace() {

@@ -246,7 +246,7 @@ export type LanesProps = {
 	options: (() -> { ContextMenu.Entry }?)?,
 	-- A "+" on each group's header under the pointer, as the sidebar's
 	-- project headers have: `new_label` names it ("New side chat in
-	-- zeron"), and `on_new` is handed the header's groups, the outermost
+	-- zeren"), and `on_new` is handed the header's groups, the outermost
 	-- first and its own last (a project's, a device's, or both). Nil, none.
 	on_new: ((groups: { LaneGroup }) -> ())?,
 	new_label: ((group: LaneGroup) -> string)?,
@@ -921,7 +921,7 @@ function M.Lanes(props: LanesProps): Node
 				if not (el and at) then
 					return
 				end
-				local menu_w = (ui.theme.get("zeron.menu.width") :: number?) or 232
+				local menu_w = (ui.theme.get("zeren.menu.width") :: number?) or 232
 				local x, y, w, h = el.x or 0, el.y or 0, el.width or 0, el.height or 0
 				at(x + w - menu_w, y + h + 4)
 			end,
@@ -931,7 +931,7 @@ function M.Lanes(props: LanesProps): Node
 		id = props.id,
 		class = "panel-home-fold",
 		w_full = true,
-		gap = "$zeron.list.gap",
+		gap = "$zeren.list.gap",
 		SessionRow.Section {
 			title = props.label :: any,
 			open = props.open,

@@ -21,10 +21,10 @@ use std::sync::{Arc, Mutex, OnceLock};
 use std::thread;
 use std::time::Instant;
 
-use zeron_doc::parts::MessagePart;
-use zeron_doc::parts::MessageStatus;
-use zeron_doc::schema::{MessageRole, SessionMessageEntry};
-use zeron_text::WidthCache;
+use zeren_doc::parts::MessagePart;
+use zeren_doc::parts::MessageStatus;
+use zeren_doc::schema::{MessageRole, SessionMessageEntry};
+use zeren_text::WidthCache;
 
 use display::{DisplayBuilder, MathFace, RowDisplay};
 use markdown::{Ctx, MathFailures, MathSettings, Px};
@@ -52,15 +52,15 @@ struct MeasurerBridge {
     styles: Arc<Mutex<HashMap<u16, StyleDesc>>>,
 }
 
-impl zeron_text::FallbackMeasurer for MeasurerBridge {
-    fn measure(&self, style: zeron_text::StyleId, text: &str) -> f32 {
+impl zeren_text::FallbackMeasurer for MeasurerBridge {
+    fn measure(&self, style: zeren_text::StyleId, text: &str) -> f32 {
         let Some(desc) = self.styles.lock().unwrap().get(&style.0).cloned() else {
             return 0.0;
         };
         self.platform.measure(desc.face, desc.size, desc.ligatures, text.to_owned())
     }
 
-    fn measure_run(&self, style: zeron_text::StyleId, text: &str, advances: &mut Vec<f32>) -> bool {
+    fn measure_run(&self, style: zeren_text::StyleId, text: &str, advances: &mut Vec<f32>) -> bool {
         let Some(desc) = self.styles.lock().unwrap().get(&style.0).cloned() else {
             return false;
         };
@@ -81,7 +81,7 @@ pub(crate) fn typography(text: &TextSystem) -> Typography {
         Arc::new(MeasurerBridge {
             platform,
             styles: styles.clone(),
-        }) as Arc<dyn zeron_text::FallbackMeasurer>
+        }) as Arc<dyn zeren_text::FallbackMeasurer>
     });
     Typography::new(&text.faces, fallback, styles)
 }
@@ -320,20 +320,20 @@ pub(crate) const FIXTURE: &str = include_str!("fixture.md");
 pub fn debug_line_starts(text_system: Arc<TextSystem>, face: FaceRole, size: f32, width: f32, text: String) -> Vec<u32> {
     let styles = Arc::new(Mutex::new(HashMap::new()));
     let fallback = text_system.measurer.clone().map(|platform| {
-        Arc::new(MeasurerBridge { platform, styles: styles.clone() }) as Arc<dyn zeron_text::FallbackMeasurer>
+        Arc::new(MeasurerBridge { platform, styles: styles.clone() }) as Arc<dyn zeren_text::FallbackMeasurer>
     });
     let mut typo = Typography::new(&text_system.faces, fallback, styles);
     let (family, weight, italic) = style::decompose(face);
     let style = typo.style(family, weight, italic, size);
-    let spans = [zeron_text::Span::new(0..text.len(), style.id)];
-    let p = zeron_text::prepare(
+    let spans = [zeren_text::Span::new(0..text.len(), style.id)];
+    let p = zeren_text::prepare(
         &typo.book,
         &mut WidthCache::new(),
         &text,
         if text.is_empty() { &[] } else { &spans },
-        &zeron_text::PrepareOptions {
-            white_space: zeron_text::WhiteSpace::PreWrap,
-            overflow_wrap: zeron_text::OverflowWrap::Anywhere,
+        &zeren_text::PrepareOptions {
+            white_space: zeren_text::WhiteSpace::PreWrap,
+            overflow_wrap: zeren_text::OverflowWrap::Anywhere,
             ..Default::default()
         },
     );
@@ -370,7 +370,7 @@ pub struct TranscriptView {
     tx: Mutex<Sender<Msg>>,
     shared: Arc<Shared>,
     /// Live session subscription (Rust→Rust; rows never cross FFI).
-    watch: Mutex<Option<zeron_client::SnapshotWatch>>,
+    watch: Mutex<Option<zeren_client::SnapshotWatch>>,
     /// A subagent's transcript being followed instead.
     subagent: Mutex<Option<crate::client_ffi::companions::SubagentFollow>>,
     visuals: Arc<crate::visual::VisualHub>,
@@ -379,7 +379,7 @@ pub struct TranscriptView {
 /// Feeds a followed subagent's transcript to the layout worker.
 struct SubagentInput(Mutex<Sender<Msg>>);
 
-impl zeron_client::SubagentSink for SubagentInput {
+impl zeren_client::SubagentSink for SubagentInput {
     fn transcript(&self, entries: Vec<Arc<SessionMessageEntry>>) {
         let live = entries.last().is_some_and(|e| e.status == Some(MessageStatus::Streaming));
         let input = TranscriptInput {
@@ -414,7 +414,7 @@ impl TranscriptView {
         let worker_shared = shared.clone();
         let worker_visuals = visuals.clone();
         thread::Builder::new()
-            .name("zeron-layout".into())
+            .name("zeren-layout".into())
             // Math layout recurses per nesting level; a debug build needs
             // about 1.5 MB at zatex's depth limit (see `Options::max_depth`).
             .stack_size(8 << 20)

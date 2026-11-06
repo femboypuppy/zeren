@@ -1,5 +1,5 @@
-//! Observe only this user's listeners, and attribute each to the Zeron agent
-//! run or terminal that started it (see [`zeron_proto::ORIGIN_ENV`]). HTTP probes
+//! Observe only this user's listeners, and attribute each to the Zeren agent
+//! run or terminal that started it (see [`zeren_proto::ORIGIN_ENV`]). HTTP probes
 //! run only after that origin is established and commands performing
 //! authentication have been excluded.
 use std::{
@@ -9,7 +9,7 @@ use std::{
     time::Duration,
 };
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use zeron_proto::ORIGIN_ENV;
+use zeren_proto::ORIGIN_ENV;
 
 #[derive(Debug, Clone)]
 pub struct Listener {
@@ -19,9 +19,9 @@ pub struct Listener {
     pub args: Vec<String>,
     pub started_at: u64,
     pub address: SocketAddr,
-    /// Started, directly or through any ancestor, by a Zeron agent run or
+    /// Started, directly or through any ancestor, by a Zeren agent run or
     /// terminal.
-    pub zeron_owned: bool,
+    pub zeren_owned: bool,
     /// What started it: the origin marker's value (`chat:…`, `terminal:…`).
     pub origin: Option<String>,
     /// The chat that owns [`Self::origin`], once resolved against the chats
@@ -36,7 +36,7 @@ pub struct Listener {
 
 /// What an engine sets on an agent's sign-in (the file its browser's page
 /// is recorded in): a listener under it is that sign-in's callback.
-pub const SIGN_IN_ENV: &str = "ZERON_LOGIN_URL_FILE";
+pub const SIGN_IN_ENV: &str = "ZEREN_LOGIN_URL_FILE";
 
 impl Listener {
     pub fn belongs_to(&self, root: &Path) -> bool {
@@ -234,7 +234,7 @@ impl Origins {
         for listener in listeners.iter_mut() {
             let (origin, signing_in) = self.resolve(listener.pid, processes, &mut read);
             listener.signing_in = signing_in;
-            listener.zeron_owned = origin.is_some();
+            listener.zeren_owned = origin.is_some();
             listener.origin = origin.filter(|origin| !origin.is_empty());
         }
         let alive: HashSet<_> = processes
@@ -387,7 +387,7 @@ pub fn listeners(origins: &mut Origins) -> Option<Vec<Listener>> {
                 args: args.clone(),
                 started_at,
                 address,
-                zeron_owned: false,
+                zeren_owned: false,
                 origin: None,
                 chat_id: None,
                 signing_in: false,
@@ -646,7 +646,7 @@ pub fn listeners(origins: &mut Origins) -> Option<Vec<Listener>> {
                 args: args.clone(),
                 started_at: process.started_at,
                 address,
-                zeron_owned: false,
+                zeren_owned: false,
                 origin: None,
                 chat_id: None,
                 signing_in: false,
@@ -680,7 +680,7 @@ mod tests {
             args: args.iter().map(|arg| (*arg).into()).collect(),
             started_at: 1,
             address: "127.0.0.1:3000".parse().unwrap(),
-            zeron_owned: true,
+            zeren_owned: true,
             origin: Some("chat:chat".into()),
             chat_id: Some("chat".into()),
             signing_in: false,
@@ -729,7 +729,7 @@ mod tests {
             args: Vec::new(),
             started_at: 0,
             address: "127.0.0.1:3000".parse().unwrap(),
-            zeron_owned: false,
+            zeren_owned: false,
             origin: None,
             chat_id: None,
             signing_in: false,
@@ -790,18 +790,18 @@ mod tests {
         let mut read = |pid: u32| {
             reads.borrow_mut().push(pid);
             Some(match pid {
-                100 => environment(&["PATH=/bin", "ZERON_ORIGIN=chat:a"]),
-                101 => environment(&["PATH=/bin", "ZERON_ORIGIN=terminal:b"]),
+                100 => environment(&["PATH=/bin", "ZEREN_ORIGIN=chat:a"]),
+                101 => environment(&["PATH=/bin", "ZEREN_ORIGIN=terminal:b"]),
                 _ => environment(&["PATH=/bin"]),
             })
         };
         let mut origins = Origins::default();
         let mut listeners = vec![listener_of(102), listener_of(200), listener_of(300)];
         origins.attribute(&mut listeners, &processes, &mut read);
-        assert!(listeners[0].zeron_owned);
+        assert!(listeners[0].zeren_owned);
         assert_eq!(listeners[0].origin.as_deref(), Some("terminal:b"));
-        assert!(!listeners[1].zeron_owned);
-        assert!(!listeners[2].zeron_owned);
+        assert!(!listeners[1].zeren_owned);
+        assert!(!listeners[2].zeren_owned);
         assert!(
             !reads.borrow().contains(&engine),
             "the engine's own environment is never consulted"
@@ -822,11 +822,11 @@ mod tests {
         );
         let mut listeners = vec![listener_of(102)];
         origins.attribute(&mut listeners, &recycled, &mut read);
-        assert!(!listeners[0].zeron_owned);
+        assert!(!listeners[0].zeren_owned);
     }
     #[test]
     fn an_agents_sign_in_is_never_probed() {
-        // A chat's engine (zeron-owned, chat:a) runs an agent's sign-in
+        // A chat's engine (zeren-owned, chat:a) runs an agent's sign-in
         // (the marker on it); the agent's callback server is its child.
         let processes: HashMap<u32, Process> = [
             (100, Process { parent: 1, started_at: 1 }),
@@ -837,18 +837,18 @@ mod tests {
         .into();
         let read = |pid: u32| {
             Some(match pid {
-                100 => environment(&["ZERON_ORIGIN=chat:a"]),
-                101 => environment(&["ZERON_LOGIN_URL_FILE=/tmp/x/browser-url"]),
+                100 => environment(&["ZEREN_ORIGIN=chat:a"]),
+                101 => environment(&["ZEREN_LOGIN_URL_FILE=/tmp/x/browser-url"]),
                 _ => environment(&["PATH=/bin"]),
             })
         };
         let mut origins = Origins::default();
         let mut listeners = vec![listener_of(102), listener_of(103)];
         origins.attribute(&mut listeners, &processes, read);
-        assert!(listeners[0].zeron_owned && listeners[0].signing_in, "the sign-in's callback");
-        assert!(listeners[1].zeron_owned && !listeners[1].signing_in, "a dev server beside it");
-        assert!(has_variable(&environment(&["A=1", "ZERON_LOGIN_URL_FILE="]), SIGN_IN_ENV));
-        assert!(!has_variable(&environment(&["XZERON_LOGIN_URL_FILE=1"]), SIGN_IN_ENV));
+        assert!(listeners[0].zeren_owned && listeners[0].signing_in, "the sign-in's callback");
+        assert!(listeners[1].zeren_owned && !listeners[1].signing_in, "a dev server beside it");
+        assert!(has_variable(&environment(&["A=1", "ZEREN_LOGIN_URL_FILE="]), SIGN_IN_ENV));
+        assert!(!has_variable(&environment(&["XZEREN_LOGIN_URL_FILE=1"]), SIGN_IN_ENV));
     }
     #[test]
     fn an_unreadable_environment_is_retried_not_remembered() {
@@ -863,21 +863,21 @@ mod tests {
         let mut origins = Origins::default();
         let mut listeners = vec![listener_of(100)];
         origins.attribute(&mut listeners, &processes, |_| None);
-        assert!(!listeners[0].zeron_owned);
+        assert!(!listeners[0].zeren_owned);
         origins.attribute(&mut listeners, &processes, |_| {
-            Some(environment(&["ZERON_ORIGIN=chat:c"]))
+            Some(environment(&["ZEREN_ORIGIN=chat:c"]))
         });
         assert_eq!(listeners[0].origin.as_deref(), Some("chat:c"));
     }
     #[test]
     fn origin_marker_matches_the_whole_name() {
         assert_eq!(
-            origin_marker(&environment(&["XZERON_ORIGIN=no", "ZERON_ORIGIN=yes"])),
+            origin_marker(&environment(&["XZEREN_ORIGIN=no", "ZEREN_ORIGIN=yes"])),
             Some("yes".into())
         );
-        assert_eq!(origin_marker(&environment(&["ZERON_ORIGIN_X=no"])), None);
+        assert_eq!(origin_marker(&environment(&["ZEREN_ORIGIN_X=no"])), None);
         assert_eq!(
-            origin_marker(&environment(&["ZERON_ORIGIN="])),
+            origin_marker(&environment(&["ZEREN_ORIGIN="])),
             Some(String::new())
         );
     }
@@ -885,7 +885,7 @@ mod tests {
     fn procargs_environment_skips_the_exec_path_and_arguments() {
         let mut buffer = 2i32.to_ne_bytes().to_vec();
         buffer.extend_from_slice(
-            b"/usr/bin/node\0\0\0\0node\0ZERON_ORIGIN=argv\0A=1\0ZERON_ORIGIN=env\0\0junk",
+            b"/usr/bin/node\0\0\0\0node\0ZEREN_ORIGIN=argv\0A=1\0ZEREN_ORIGIN=env\0\0junk",
         );
         let environment = procargs_environment(&buffer).unwrap();
         assert_eq!(origin_marker(&environment), Some("env".into()));

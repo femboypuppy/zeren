@@ -8,16 +8,16 @@
 //! file at dial time, so they keep working across engine restarts.
 //!
 //! Client resolution order ([`client_tokens`]): the file named by
-//! `$ZERON_IPC_TOKEN_FILE` alone when set (what the engine hands the `zeron
-//! mcp` servers it injects into agents), else `$ZERON_IPC_TOKEN` (explicit
+//! `$ZEREN_IPC_TOKEN_FILE` alone when set (what the engine hands the `zeren
+//! mcp` servers it injects into agents), else `$ZEREN_IPC_TOKEN` (explicit
 //! value), then `{data_dir}/ipc-token`.
 //! In-process (in-memory) transports never see any of this.
 //!
 //! Two tokens, two authorities ([`crate::Caller`]): the full token
 //! (`ipc-token`) is the app's and the CLI's; the agent-scoped token
-//! (`ipc-token-agent`) is what the engine hands the `zeron mcp` servers it
+//! (`ipc-token-agent`) is what the engine hands the `zeren mcp` servers it
 //! injects into agents' runs, and the server answers it only the methods
-//! [`crate::agent_allowed`] lists. A client given `$ZERON_IPC_TOKEN_FILE`
+//! [`crate::agent_allowed`] lists. A client given `$ZEREN_IPC_TOKEN_FILE`
 //! uses that file alone: it never falls back to the full token.
 
 use std::io::{self, Write};
@@ -26,14 +26,14 @@ use std::path::{Path, PathBuf};
 /// File name of the token inside the engine's data dir.
 pub const TOKEN_FILE_NAME: &str = "ipc-token";
 /// Explicit token value for a client (wins over every file).
-pub const TOKEN_ENV: &str = "ZERON_IPC_TOKEN";
-/// Path of a token file for a client (the engine injects this into `zeron mcp`).
-pub const TOKEN_FILE_ENV: &str = "ZERON_IPC_TOKEN_FILE";
+pub const TOKEN_ENV: &str = "ZEREN_IPC_TOKEN";
+/// Path of a token file for a client (the engine injects this into `zeren mcp`).
+pub const TOKEN_FILE_ENV: &str = "ZEREN_IPC_TOKEN_FILE";
 /// File name of the agent-scoped token inside the engine's data dir.
 pub const AGENT_TOKEN_FILE_NAME: &str = "ipc-token-agent";
 /// Handshake header naming the chat an agent's MCP server serves: claimed,
 /// for the record only ([`crate::Caller::Agent`]).
-pub const CHAT_HEADER: &str = "x-zeron-chat";
+pub const CHAT_HEADER: &str = "x-zeren-chat";
 
 /// `{data_dir}/ipc-token`.
 pub fn token_path(data_dir: &Path) -> PathBuf {
@@ -94,7 +94,7 @@ pub fn issue_token(data_dir: &Path) -> io::Result<String> {
 /// a torn write.
 ///
 /// Windows has no mode bits: the file inherits the ACL of the data dir
-/// (`%LOCALAPPDATA%\Zeron` — owner, SYSTEM and Administrators only by
+/// (`%LOCALAPPDATA%\Zeren` — owner, SYSTEM and Administrators only by
 /// default), the same protection `session.json` relies on there.
 pub fn write_token(path: &Path, token: &str) -> io::Result<()> {
     let dir = path
@@ -142,8 +142,8 @@ pub fn read_token(path: &Path) -> io::Result<Option<String>> {
 }
 
 /// Every token a client should try, best first, deduplicated: the
-/// `$ZERON_IPC_TOKEN_FILE` file alone when it's set (an agent's MCP server),
-/// else the `$ZERON_IPC_TOKEN` value, then `{data_dir}/ipc-token`. Read at call time — after an engine restart the
+/// `$ZEREN_IPC_TOKEN_FILE` file alone when it's set (an agent's MCP server),
+/// else the `$ZEREN_IPC_TOKEN` value, then `{data_dir}/ipc-token`. Read at call time — after an engine restart the
 /// file already holds the new token. Empty when nothing is configured (an
 /// older engine that predates IPC auth still accepts a bare dial).
 pub fn client_tokens(data_dir: Option<&Path>) -> Vec<String> {
@@ -169,7 +169,7 @@ pub fn client_tokens(data_dir: Option<&Path>) -> Vec<String> {
     tokens
 }
 
-/// The tokens an agent's MCP server tries: the `$ZERON_IPC_TOKEN_FILE` file
+/// The tokens an agent's MCP server tries: the `$ZEREN_IPC_TOKEN_FILE` file
 /// when set, else `{data_dir}/ipc-token-agent`. Never the full token.
 pub fn agent_client_tokens(data_dir: Option<&Path>) -> Vec<String> {
     let file = std::env::var_os(TOKEN_FILE_ENV)

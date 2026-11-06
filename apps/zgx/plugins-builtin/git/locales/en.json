@@ -169,7 +169,7 @@
     },
     "not_installed": {
       "title": "Git isn't on {device}",
-      "body": "Update Zeron there: Git comes with it."
+      "body": "Update Zeren there: Git comes with it."
     },
     "off": {
       "title": "Git is off on {device}",
@@ -181,23 +181,23 @@
     },
     "version_mismatch": {
       "title": "Another version of Git is on {device}",
-      "body": "Update Zeron on both devices so they match."
+      "body": "Update Zeren on both devices so they match."
     },
     "other_author": {
       "title": "Another Git plugin is on {device}",
-      "body": "Someone else's plugin there has the same name. Remove it there to use Zeron's."
+      "body": "Someone else's plugin there has the same name. Remove it there to use Zeren's."
     },
     "no_service": {
       "title": "Git can't run on {device}",
-      "body": "Its version has no service. Update Zeron there."
+      "body": "Its version has no service. Update Zeren there."
     },
     "not_loaded": {
       "title": "Git didn't start on {device}",
       "body": "Its service failed to load. Settings → Plugins there says why."
     },
     "old_engine": {
-      "title": "A newer Zeron is needed on {device}",
-      "body": "Update Zeron there to use Git with this chat."
+      "title": "A newer Zeren is needed on {device}",
+      "body": "Update Zeren there to use Git with this chat."
     },
     "interrupted": {
       "title": "Git stopped on {device}",

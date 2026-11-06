@@ -201,7 +201,7 @@ fn the_shortcuts_reach_their_commands_from_any_focus() {
         // ⌘R the panel, closed and open again.
         press(&mut w, "cmd+r", "shell.toggle_files", false, &|w| w.app.bounds("#shell-files").width == 0.);
         press(&mut w, "cmd+r", "shell.toggle_files", true, &|w| w.app.bounds("#shell-files").width > 0.);
-        // ⌃Tab the next session, ⌃⇧Tab back. (In the panel, Zeron's cycle
+        // ⌃Tab the next session, ⌃⇧Tab back. (In the panel, Zeren's cycle
         // its tabs instead: not the editor's.)
         if !matches!(at, Focus::Editor) {
             press(&mut w, "ctrl+tab", "shell.next_session", false, &|w| w.route() != session);
@@ -265,7 +265,7 @@ fn command_w_closes_the_panels_tab_then_the_chats_tab_and_only_then_the_window()
 }
 
 /// ⌘1–9 open the sidebar's sessions as it shows them, top to bottom
-/// (Zeron's jumps); a folded list's sessions are out of reach, and a digit
+/// (Zeren's jumps); a folded list's sessions are out of reach, and a digit
 /// past the last does nothing.
 #[test]
 fn command_digits_jump_to_the_sidebars_sessions_in_order() {

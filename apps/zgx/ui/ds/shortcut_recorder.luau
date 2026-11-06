@@ -5,7 +5,7 @@
 -- with Control, Option or Command held, as the shipping app takes them).
 -- Escape, or leaving it, puts it back as it was; Delete takes it off where
 -- the setting may have none (`clearable`). Combinations are written as
--- Zeron writes them: `ctrl+alt+space`, "" for none.
+-- Zeren writes them: `ctrl+alt+space`, "" for none.
 --
 --   ShortcutRecorder { value = function() return combo end, label = "Global shortcut",
 --     on_change = function(combo) … end }

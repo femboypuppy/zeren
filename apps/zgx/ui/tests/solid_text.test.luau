@@ -1,4 +1,4 @@
--- Zeron's light theme on its solid window: muted text darkens to stay legible
+-- Zeren's light theme on its solid window: muted text darkens to stay legible
 -- there, glass keeps its own tones, and the dark theme is untouched. Driven
 -- through Settings on the shell in ui/shell_fixture.luau.
 
@@ -32,8 +32,8 @@ test("light: muted text is the solid window's when opaque, and glass's when fros
 	app:click(`{PAGE} >> role:switch "Frosted glass"`)
 	app:frames(10)
 	local secondary, tertiary = muted(app)
-	expect(secondary).to_be("$zeron.solid.secondary")
-	expect(tertiary).to_be("$zeron.solid.tertiary")
+	expect(secondary).to_be("$zeren.solid.secondary")
+	expect(tertiary).to_be("$zeren.solid.tertiary")
 	app:click(`{PAGE} >> role:switch "Frosted glass"`)
 	app:frames(10)
 	expect(muted(app)).to_be(nil)

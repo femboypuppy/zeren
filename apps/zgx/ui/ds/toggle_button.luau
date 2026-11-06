@@ -20,7 +20,7 @@ local recipe = ui.variants {
 		items = "center",
 		justify = "center",
 		p = 0,
-		rounded = "$zeron.icon_button.radius",
+		rounded = "$zeren.icon_button.radius",
 		bg = "#00000000",
 		cursor = "pointer",
 		hover = { bg = "$hover", color = "$text.primary" },
@@ -29,9 +29,9 @@ local recipe = ui.variants {
 	},
 	variants = {
 		size = {
-			sm = { w = "$zeron.icon_button.sm", h = "$zeron.icon_button.sm", text_size = "$font.size.sm" },
-			md = { w = "$zeron.icon_button.md", h = "$zeron.icon_button.md", text_size = "$font.size.md" },
-			lg = { w = "$zeron.icon_button.lg", h = "$zeron.icon_button.lg", text_size = "$font.size.md" },
+			sm = { w = "$zeren.icon_button.sm", h = "$zeren.icon_button.sm", text_size = "$font.size.sm" },
+			md = { w = "$zeren.icon_button.md", h = "$zeren.icon_button.md", text_size = "$font.size.md" },
+			lg = { w = "$zeren.icon_button.lg", h = "$zeren.icon_button.lg", text_size = "$font.size.md" },
 		},
 		tone = {
 			normal = { color = "$text.secondary" },
@@ -43,10 +43,10 @@ local recipe = ui.variants {
 	compound = {
 		{
 			on = true,
-			bg = "$zeron.selected.flat.bg",
+			bg = "$zeren.selected.flat.bg",
 			color = "$text.primary",
-			hover = { bg = "$zeron.selected.flat.bg" },
-			active = { bg = "$zeron.selected.flat.bg" },
+			hover = { bg = "$zeren.selected.flat.bg" },
+			active = { bg = "$zeren.selected.flat.bg" },
 		},
 	},
 	defaults = { size = "md", tone = "normal", on = false },

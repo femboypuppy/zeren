@@ -1,4 +1,4 @@
--- A project's files and the one they show, as one pane: Zeron's files
+-- A project's files and the one they show, as one pane: Zeren's files
 -- panel beside its editor (crates/ui/src/shell/files_panel.rs), here one
 -- surface. The tree at the left, the file beside it, and one band across
 -- the top of both: the tree's filter and tools in its first part, the
@@ -64,9 +64,9 @@ M.keys = KEYS
 
 local made = ui.component(function(props: Props): Node
 	local shown = props.shown
-	local tree_w = props.width or num("zeron.files.tree", 288)
-	local head_h = num(if props.head == "stack" then "zeron.files.stack" else "zeron.files.head", 40)
-	local square = num("zeron.icon_button.lg", 28)
+	local tree_w = props.width or num("zeren.files.tree", 288)
+	local head_h = num(if props.head == "stack" then "zeren.files.stack" else "zeren.files.head", 40)
+	local square = num("zeren.icon_button.lg", 28)
 	local pad = num("space.2", 8)
 	-- Room the heads keep at their start: the inset, the toggle, a step.
 	local lead_w = pad + square + pad

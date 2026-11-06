@@ -43,7 +43,7 @@ local function mark(name: string): Node
 		items = "center",
 		justify = "center",
 		rounded = ui.raw(MARK * 0.25, "a mark tile's radius scales with it"),
-		bg = "$zeron.secondary.bg",
+		bg = "$zeren.secondary.bg",
 		ui.text { string.upper(string.sub(name, 1, 1)), text_size = "$font.size.md", weight = "$font.weight.medium", color = "$text.secondary" },
 	}
 end
@@ -54,7 +54,7 @@ local function words(o: Org, picked: (() -> boolean)?): Node
 	return ui.column {
 		grow = 1,
 		min_w = 0,
-		gap = "$zeron.space.hair",
+		gap = "$zeren.space.hair",
 		FadeText {
 			o.name,
 			text_size = "$font.size.md",
@@ -77,7 +77,7 @@ end
 -- corners the card's less its edge and that inset (concentric).
 local function shape(props: { [any]: any }, wash: (() -> string)?, kids: { Node }): Node
 	props.w_full = true
-	props.min_h = "$zeron.settings.row"
+	props.min_h = "$zeren.settings.row"
 	props.px = "$space.4"
 	props.py = "$space.3"
 	props.gap = "$space.3"
@@ -125,7 +125,7 @@ local OrgRow = ui.component(function(props: OrgProps): Node
 		label = props.org.name,
 		focusable = true,
 		cursor = "pointer",
-		focus = { outline = "$zeron.focus.width", outline_color = "$zeron.focus.ring", outline_offset = -2 },
+		focus = { outline = "$zeren.focus.width", outline_color = "$zeren.focus.ring", outline_offset = -2 },
 		on_hover = function(inside: boolean)
 			hovered:set(inside)
 		end,

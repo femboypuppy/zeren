@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""File icons for the design system: Zeron's Symbols set (crates/ui/assets/
+"""File icons for the design system: Zeren's Symbols set (crates/ui/assets/
 file-icons, miguelsolorio/vscode-symbols, MIT) copied under ui/assets/
 icons/files/, each twice (as drawn for light, and with its darker accents
-lifted for dark, as Zeron's `dark_icon_svg` does), and the theme's lookup
-tables written as ui/ds/file_icons_map.luau. Run it again when Zeron's set
+lifted for dark, as Zeren's `dark_icon_svg` does), and the theme's lookup
+tables written as ui/ds/file_icons_map.luau. Run it again when Zeren's set
 changes:
 
     python3 apps/zgx/tools/file_icons.py
@@ -22,7 +22,7 @@ MANIFEST = os.path.join(ROOT, "crates", "ui", "src", "file-icons.json")
 OUT_ASSETS = os.path.join(ZGX, "ui", "assets", "icons", "files")
 OUT_MAP = os.path.join(ZGX, "ui", "ds", "file_icons_map.luau")
 
-# Zeron's lift for dark (file_icons.rs `dark_icon_svg`).
+# Zeren's lift for dark (file_icons.rs `dark_icon_svg`).
 LIFT = [
     ("#64748B", "#CBD5E1"),
     ("#71717A", "#D4D4D8"),
@@ -73,7 +73,7 @@ def main():
         return {k: ids[v] for k, v in table.items() if v in ids}
 
     with open(OUT_MAP, "w") as f:
-        f.write("-- Written by tools/file_icons.py from Zeron's Symbols theme\n")
+        f.write("-- Written by tools/file_icons.py from Zeren's Symbols theme\n")
         f.write("-- (crates/ui/src/file-icons.json). Don't edit; run the script again.\n")
         f.write("-- Each name is an icon's path under assets/icons/files/<light|dark>/.\n\n")
         f.write("return {\n")

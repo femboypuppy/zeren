@@ -28,7 +28,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
-use zeron_proto::{Chat, ChatConfig, Device, MAX_SIDEBAR_PINS, Session, SidebarPreferences, Space};
+use zeren_proto::{Chat, ChatConfig, Device, MAX_SIDEBAR_PINS, Session, SidebarPreferences, Space};
 
 use crate::schema::DocError;
 use crate::workspace::{DeletedSpace, WorkspaceState};
@@ -459,7 +459,7 @@ struct PersistedState {
 }
 
 /// The local registry replica. Pure data — no I/O, no async; the transport
-/// (`zeron_sync::RegistryClient`) and the engine host drive it under a lock.
+/// (`zeren_sync::RegistryClient`) and the engine host drive it under a lock.
 pub struct RegistryDoc {
     device_id: String,
     /// kind → id → row (server truth).
@@ -1179,7 +1179,7 @@ impl RegistryDoc {
 
     /// LWW picture set from any device, whole (emoji, image and hue in one
     /// field); `None` clears back to the default tile. `false` when no row.
-    pub fn set_space_icon(&mut self, space_id: &str, icon: Option<&zeron_proto::SpaceIcon>) -> Result<bool, DocError> {
+    pub fn set_space_icon(&mut self, space_id: &str, icon: Option<&zeren_proto::SpaceIcon>) -> Result<bool, DocError> {
         if !self.row_exists(KIND_SPACES, space_id) {
             return Ok(false);
         }
@@ -1289,7 +1289,7 @@ impl RegistryDoc {
                 chat.room_gen.map(|g| json!(g)).unwrap_or(Value::Null),
             ),
             ("parentChatId", opt_str(chat.parent_chat_id.as_deref())),
-            ("childKind", opt_str(chat.child_kind.map(zeron_proto::ChildKind::as_str))),
+            ("childKind", opt_str(chat.child_kind.map(zeren_proto::ChildKind::as_str))),
         ]);
         self.write(KIND_CHATS, &chat.id.clone(), OpKind::Upsert, set);
         Ok(())
@@ -1424,7 +1424,7 @@ impl RegistryDoc {
     pub fn set_chat_source_context(
         &mut self,
         chat_id: &str,
-        context: &zeron_proto::ConversationSourceContext,
+        context: &zeren_proto::ConversationSourceContext,
     ) -> Result<bool, DocError> {
         if !self.row_exists(KIND_CHATS, chat_id) {
             return Ok(false);
@@ -1613,7 +1613,7 @@ impl RegistryDoc {
             .filter(|(id, _)| !known.contains(id))
             .collect();
         for (id, _) in &removed {
-            self.change_sidebar_pin(&zeron_proto::SidebarPinChange::Unpin {
+            self.change_sidebar_pin(&zeren_proto::SidebarPinChange::Unpin {
                 session_id: id.clone(),
             })?;
         }
@@ -1736,7 +1736,7 @@ impl RegistryDoc {
                     ("parentChatId", opt_str(chat.parent_chat_id.as_deref())),
                     ("lastSeenAt", opt_ms(chat.last_seen_at)),
                     ("parentChatId", opt_str(chat.parent_chat_id.as_deref())),
-                    ("childKind", opt_str(chat.child_kind.map(zeron_proto::ChildKind::as_str))),
+                    ("childKind", opt_str(chat.child_kind.map(zeren_proto::ChildKind::as_str))),
                 ]),
             );
         }
@@ -1839,7 +1839,7 @@ fn row_to<T: serde::de::DeserializeOwned>(row: &RegistryRow) -> Option<T> {
 }
 
 // SessionStatus needs to serialize to the same strings the loro doc used
-// ("idle"/"working"/…) — zeron_proto's serde derives already use camelCase;
+// ("idle"/"working"/…) — zeren_proto's serde derives already use camelCase;
 // the compile-time check lives in the tests below.
 
 #[cfg(test)]

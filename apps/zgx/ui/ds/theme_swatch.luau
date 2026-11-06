@@ -22,7 +22,7 @@ local function half(props: Props, i: number): Node
 		return ui.div { w = width, h = 3, shrink = 0, rounded = "$radius.sm", bg = color }
 	end
 	local dots: { Node } = {}
-	for _, color in { "$accent", "$zeron.syntax.keyword", "$zeron.syntax.string", "$zeron.syntax.function" } do
+	for _, color in { "$accent", "$zeren.syntax.keyword", "$zeren.syntax.string", "$zeren.syntax.function" } do
 		table.insert(dots, ui.div { w = 4, h = 4, shrink = 0, rounded = "$radius.sm", bg = color })
 	end
 	return ui.show(
@@ -31,7 +31,7 @@ local function half(props: Props, i: number): Node
 		end,
 		ui.column {
 			theme = function(): string
-				return props.themes()[i] or "zeron-dark"
+				return props.themes()[i] or "zeren-dark"
 			end,
 			-- (Inside the box's 1pt edge, the halves sharing it.)
 			w = function(): number
@@ -39,16 +39,16 @@ local function half(props: Props, i: number): Node
 			end,
 			shrink = 0,
 			h_full = true,
-			bg = "$zeron.window",
+			bg = "$zeren.window",
 			class = if props.class then `{props.class}-half` else nil,
 			ui.div { w_full = true, h = 6, shrink = 0, bg = "$popover.bg" },
 			ui.column {
-				p = "$zeron.space.hair",
-				gap = "$zeron.space.hair",
+				p = "$zeren.space.hair",
+				gap = "$zeren.space.hair",
 				pt = "$space.1",
 				bar("$text.primary", "70%"),
 				bar("$text.secondary", "45%"),
-				ui.row { gap = "$zeron.space.hair", pt = "$zeron.space.hair", table.unpack(dots) },
+				ui.row { gap = "$zeren.space.hair", pt = "$zeren.space.hair", table.unpack(dots) },
 			},
 		}
 	)
@@ -62,7 +62,7 @@ function M.Swatch(props: Props): Node
 		rounded = "$radius.md",
 		overflow = "hidden",
 		border = 1,
-		border_color = "$zeron.settings.edge",
+		border_color = "$zeren.settings.edge",
 		aria_hidden = true,
 		class = props.class,
 		half(props, 1),

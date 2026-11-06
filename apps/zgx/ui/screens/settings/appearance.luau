@@ -1,4 +1,4 @@
--- Settings → Appearance: how Zeron looks on this Mac, the shell's own
+-- Settings → Appearance: how Zeren looks on this Mac, the shell's own
 -- look (screens/shell/appearance: the scheme, which setup chose too; a new
 -- chat's wallpaper and its effect), the theme each scheme wears (a quick
 -- pick; every theme is on the Themes page, screens/themes) and the window's
@@ -123,7 +123,7 @@ local function thumbnail(): Node
 		overflow = "hidden",
 		border = 1,
 		border_color = "$border",
-		bg = "$zeron.secondary.bg",
+		bg = "$zeren.secondary.bg",
 		ui.presence(function(): string
 			local image = appearance.image:get()
 			return if image then image.path else ""
@@ -186,7 +186,7 @@ local function adjust_dialog(): Node
 				relative = true,
 				rounded = "$radius.lg",
 				overflow = "hidden",
-				bg = "$zeron.secondary.bg",
+				bg = "$zeren.secondary.bg",
 				cursor = "grab",
 				role = "img",
 				label = ui.t("settings.appearance.wallpaper.adjust.preview"),
@@ -354,7 +354,7 @@ function M.view(): Node
 					},
 				}),
 				theme_rows(),
-				-- The accent: the theme's own, or one of Zeron's presets, the
+				-- The accent: the theme's own, or one of Zeren's presets, the
 				-- whole window wearing it (ds.look).
 				row("accent", {
 					label = ui.t("settings.appearance.accent.label"),
@@ -503,7 +503,7 @@ function M.view(): Node
 		},
 		-- What a new chat opens on: nothing, your picture (the shipping
 		-- app's one image, screens/settings/wallpaper), or what a plugin
-		-- draws there; and Zeron's effect over it.
+		-- draws there; and Zeren's effect over it.
 		ds.Settings.Section {
 			title = ui.t("settings.appearance.new_chat"),
 			description = ui.t("settings.appearance.new_chat_description"),
@@ -614,7 +614,7 @@ function M.view(): Node
 								},
 							},
 						})),
-						-- Zeron's effect over your picture (production's list, each
+						-- Zeren's effect over your picture (production's list, each
 						-- saying what it does). A plugin's has its own, on its page.
 						later(function(): boolean
 							return appearance.provider:get() == nil and appearance.wallpaper:get() == "image"

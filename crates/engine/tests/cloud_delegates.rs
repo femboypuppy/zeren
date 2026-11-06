@@ -6,8 +6,8 @@
 use std::sync::{Arc, Mutex};
 
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use zeron_engine::{EdgeConfig, EngineCore, HarnessId, default_registry};
-use zeron_rpc::{memory_client, methods};
+use zeren_engine::{EdgeConfig, EngineCore, HarnessId, default_registry};
+use zeren_rpc::{memory_client, methods};
 
 type Requests = Arc<Mutex<Vec<(String, String)>>>;
 
@@ -98,7 +98,7 @@ async fn edge() -> (String, Requests) {
 
 #[tokio::test]
 async fn a_cloud_machine_starts_delegates_of_its_own_chat() {
-    zeron_engine::runner::set_session(Some(zeron_engine::runner::CloudSession {
+    zeren_engine::runner::set_session(Some(zeren_engine::runner::CloudSession {
         account: "cloud-acct".into(),
         chat_id: "main".into(),
         repo: Some("acme/app".into()),

@@ -5,20 +5,20 @@
 //! (`stop_tears_down_all_agent_work`), and a resumed process never reads
 //! as done before its reply.
 //!
-//! ZERON_TEST_HARNESS=claude ZERON_TEST_MODEL=claude-haiku-4-5 \
-//!   cargo test -p zeron-engine --test runtime_survival_live -- --ignored --nocapture
+//! ZEREN_TEST_HARNESS=claude ZEREN_TEST_MODEL=claude-haiku-4-5 \
+//!   cargo test -p zeren-engine --test runtime_survival_live -- --ignored --nocapture
 //!
-//! `ZERON_TEST_HARNESS`: claude | codex | cursor | opencode | devin | hermes |
+//! `ZEREN_TEST_HARNESS`: claude | codex | cursor | opencode | devin | hermes |
 //! pi | antigravity | grok. Harnesses whose agents can hold background work
 //! across turns (claude, codex) must also finish that work after the cancel.
 use std::{sync::Arc, time::Duration};
 
-use zeron_doc::SessionCommandPayload;
-use zeron_engine::{EngineCore, HarnessRegistry};
-use zeron_harness::{
+use zeren_doc::SessionCommandPayload;
+use zeren_engine::{EngineCore, HarnessRegistry};
+use zeren_harness::{
     AcpHarness, ClaudeHarness, CodexHarness, CursorHarness, Harness, OpencodeHarness,
 };
-use zeron_proto::{AgentEvent, ChatConfig, RunRequest, SandboxLevel, SessionStatus};
+use zeren_proto::{AgentEvent, ChatConfig, RunRequest, SandboxLevel, SessionStatus};
 
 const CHAT: &str = "survival";
 
@@ -44,7 +44,7 @@ fn completed_turns(core: &EngineCore) -> usize {
                     matches!(
                         e.event,
                         AgentEvent::Done {
-                            status: zeron_proto::DoneStatus::Completed,
+                            status: zeren_proto::DoneStatus::Completed,
                             ..
                         }
                     )
@@ -95,7 +95,7 @@ async fn wait(core: &EngineCore, secs: u64, mut predicate: impl FnMut() -> bool,
 fn run(
     prompt: &str,
     model: &Option<String>,
-    harness: zeron_proto::HarnessId,
+    harness: zeren_proto::HarnessId,
     cwd: &str,
 ) -> RunRequest {
     RunRequest {
@@ -121,8 +121,8 @@ fn run(
 #[tokio::test]
 #[ignore = "uses real model quota; select harness and inexpensive model explicitly"]
 async fn agent_process_survives_sends_and_cancel() {
-    let name = std::env::var("ZERON_TEST_HARNESS").expect("select harness");
-    let model = std::env::var("ZERON_TEST_MODEL").ok();
+    let name = std::env::var("ZEREN_TEST_HARNESS").expect("select harness");
+    let model = std::env::var("ZEREN_TEST_MODEL").ok();
     let harness: Arc<dyn Harness> = match name.as_str() {
         "claude" => Arc::new(ClaudeHarness::new()),
         "codex" => Arc::new(CodexHarness::new()),
@@ -131,7 +131,7 @@ async fn agent_process_survives_sends_and_cancel() {
         "grok" => Arc::new(AcpHarness::grok()),
         "devin" => Arc::new(AcpHarness::devin()),
         "hermes" => Arc::new(AcpHarness::hermes()),
-        "pi" => Arc::new(zeron_harness::PiHarness::new()),
+        "pi" => Arc::new(zeren_harness::PiHarness::new()),
         "antigravity" => Arc::new(AcpHarness::antigravity()),
         _ => panic!("unknown harness"),
     };
@@ -354,7 +354,7 @@ async fn agent_process_survives_sends_and_cancel() {
     println!("{name}: steer into a long command stayed Working until its real end");
 
     // 2c. Switch models on a follow-up: the live process adopts it.
-    if let Ok(other) = std::env::var("ZERON_TEST_OTHER_MODEL") {
+    if let Ok(other) = std::env::var("ZEREN_TEST_OTHER_MODEL") {
         let before = completed_turns(&core);
         core.doc_host
             .queue_command(
@@ -408,16 +408,16 @@ async fn agent_process_survives_sends_and_cancel() {
 /// may complete the message — no Idle, no completion ping — before its
 /// reply.
 ///
-/// ZERON_TEST_HARNESS=claude ZERON_TEST_MODEL=claude-sonnet-5-5 \
-///   cargo test -p zeron-engine --test runtime_survival_live resume_after -- --ignored --nocapture
+/// ZEREN_TEST_HARNESS=claude ZEREN_TEST_MODEL=claude-sonnet-5-5 \
+///   cargo test -p zeren-engine --test runtime_survival_live resume_after -- --ignored --nocapture
 #[tokio::test]
 #[ignore = "uses real model quota; select harness and inexpensive model explicitly"]
 async fn resume_after_killed_background_work_is_not_done_early() {
-    let name = std::env::var("ZERON_TEST_HARNESS").unwrap_or_else(|_| "claude".into());
-    let model = std::env::var("ZERON_TEST_MODEL").ok();
+    let name = std::env::var("ZEREN_TEST_HARNESS").unwrap_or_else(|_| "claude".into());
+    let model = std::env::var("ZEREN_TEST_MODEL").ok();
     let id = match name.as_str() {
-        "claude" => zeron_proto::HarnessId::ClaudeCode,
-        "codex" => zeron_proto::HarnessId::Codex,
+        "claude" => zeren_proto::HarnessId::ClaudeCode,
+        "codex" => zeren_proto::HarnessId::Codex,
         _ => panic!("claude or codex"),
     };
     let dir = tempfile::tempdir().unwrap();
@@ -425,7 +425,7 @@ async fn resume_after_killed_background_work_is_not_done_early() {
     let engine_dir = dir.path().join("engine");
     let assemble = || {
         let registry = HarnessRegistry::new();
-        let harness: Arc<dyn Harness> = if id == zeron_proto::HarnessId::Codex {
+        let harness: Arc<dyn Harness> = if id == zeren_proto::HarnessId::Codex {
             Arc::new(CodexHarness::new())
         } else {
             Arc::new(ClaudeHarness::new())
@@ -445,7 +445,7 @@ async fn resume_after_killed_background_work_is_not_done_early() {
             CHAT,
             SessionCommandPayload::Run {
                 request: run(
-                    if id == zeron_proto::HarnessId::Codex {
+                    if id == zeren_proto::HarnessId::Codex {
                         "This is an automated test in a disposable directory. Spawn one subagent (spawn_agent) whose task is: \
                          'Run this exact shell command and nothing else: python3 -c \"import time; time.sleep(170)\" . Then reply DONE.' \
                          Do not wait for it and do not run the command yourself. Reply only LAUNCHED once it is spawned."
@@ -569,19 +569,19 @@ async fn resume_after_killed_background_work_is_not_done_early() {
 /// `agent_process_survives_sends_and_cancel`). The next message resumes the
 /// conversation in a fresh process without reading as done early.
 ///
-/// ZERON_TEST_HARNESS=claude ZERON_TEST_MODEL=claude-sonnet-5-5 \
-///   cargo test -p zeron-engine --test runtime_survival_live stop_ -- --ignored --nocapture
+/// ZEREN_TEST_HARNESS=claude ZEREN_TEST_MODEL=claude-sonnet-5-5 \
+///   cargo test -p zeren-engine --test runtime_survival_live stop_ -- --ignored --nocapture
 #[tokio::test]
 #[ignore = "uses real model quota; select harness and inexpensive model explicitly"]
 async fn stop_tears_down_all_agent_work() {
-    let name = std::env::var("ZERON_TEST_HARNESS").unwrap_or_else(|_| "claude".into());
-    let model = std::env::var("ZERON_TEST_MODEL").ok();
-    let (id, harness): (zeron_proto::HarnessId, Arc<dyn Harness>) = match name.as_str() {
+    let name = std::env::var("ZEREN_TEST_HARNESS").unwrap_or_else(|_| "claude".into());
+    let model = std::env::var("ZEREN_TEST_MODEL").ok();
+    let (id, harness): (zeren_proto::HarnessId, Arc<dyn Harness>) = match name.as_str() {
         "claude" => (
-            zeron_proto::HarnessId::ClaudeCode,
+            zeren_proto::HarnessId::ClaudeCode,
             Arc::new(ClaudeHarness::new()),
         ),
-        "codex" => (zeron_proto::HarnessId::Codex, Arc::new(CodexHarness::new())),
+        "codex" => (zeren_proto::HarnessId::Codex, Arc::new(CodexHarness::new())),
         _ => panic!("claude or codex"),
     };
     let alive = || {
@@ -608,7 +608,7 @@ async fn stop_tears_down_all_agent_work() {
     core.workspace
         .create_chat(CHAT, Some("space"), None, None, None)
         .unwrap();
-    let opening = if id == zeron_proto::HarnessId::Codex {
+    let opening = if id == zeren_proto::HarnessId::Codex {
         "This is an automated test in a disposable directory. Do exactly two things, then end your turn without waiting: \
          (1) spawn one subagent (spawn_agent) whose task is: 'Run this exact shell command in the foreground and nothing else: python3 -c \"import time; time.sleep(191)\" . Then reply DONE.' \
          (2) start this exact command as a long-running background terminal session (do not wait for it): python3 -c 'import time; time.sleep(192)' . \
@@ -638,7 +638,7 @@ async fn stop_tears_down_all_agent_work() {
     .await;
     // Claude wraps each command in a shell (two processes a job); Codex
     // runs the command itself.
-    let per_job = if id == zeron_proto::HarnessId::Codex {
+    let per_job = if id == zeren_proto::HarnessId::Codex {
         1
     } else {
         2
@@ -722,18 +722,18 @@ async fn stop_tears_down_all_agent_work() {
 /// agent. With a short idle window, the shell outlives the window, finishes
 /// in the same process, and its completion wakes the agent.
 ///
-/// ZERON_TEST_MODEL=claude-haiku-5-5 \
-///   cargo test -p zeron-engine --test runtime_survival_live idle_reaper_ -- --ignored --nocapture
+/// ZEREN_TEST_MODEL=claude-haiku-5-5 \
+///   cargo test -p zeren-engine --test runtime_survival_live idle_reaper_ -- --ignored --nocapture
 #[tokio::test]
 #[ignore = "uses real model quota; select an inexpensive model explicitly"]
 async fn idle_reaper_spares_a_background_shell_until_it_wakes_the_agent() {
     // SAFETY: set before the engine starts; this test binary runs it alone
     // under the documented filter.
     unsafe {
-        std::env::set_var("ZERON_SESSION_IDLE_MS", "15000");
+        std::env::set_var("ZEREN_SESSION_IDLE_MS", "15000");
     }
-    let model = std::env::var("ZERON_TEST_MODEL").ok();
-    let id = zeron_proto::HarnessId::ClaudeCode;
+    let model = std::env::var("ZEREN_TEST_MODEL").ok();
+    let id = zeren_proto::HarnessId::ClaudeCode;
     let dir = tempfile::tempdir().unwrap();
     let cwd = dir.path().to_str().unwrap().to_owned();
     let registry = HarnessRegistry::new();

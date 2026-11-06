@@ -2,7 +2,7 @@
 //! into a real `app/<version>/` layout, plays both the old and the new engine. It
 //! really replaces itself with the new binary, really gets killed by the watchdog,
 //! and really crashes (`abort`) at each step. The test plays the service manager,
-//! starting `app/current/zeron` until the update has settled.
+//! starting `app/current/zeren` until the update has settled.
 //!
 //! The databases here are plain files, since only their bytes matter to the backup.
 
@@ -10,7 +10,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{Duration, Instant};
 
-use zeron_update::transaction::{self, BootOptions, Layout, Phase, RestartMode};
+use zeren_update::transaction::{self, BootOptions, Layout, Phase, RestartMode};
 
 const DATA_ENV: &str = "FAKE_ENGINE_DATA";
 const ORIGINAL: &str = "original";
@@ -23,16 +23,16 @@ fn this_version() -> String {
     // On Windows: a trial is told where it's installed; once there, a file says.
     #[cfg(windows)]
     {
-        if std::env::var_os(zeron_update::INSTALLED_AT_ENV).is_some() {
+        if std::env::var_os(zeren_update::INSTALLED_AT_ENV).is_some() {
             return "2.0.0".into();
         }
-        std::fs::read_to_string(dir.join("zeron-version")).unwrap_or_else(|_| "1.0.0".into())
+        std::fs::read_to_string(dir.join("zeren-version")).unwrap_or_else(|_| "1.0.0".into())
     }
     // A macOS bundle says in its Info.plist; a versioned folder is its name.
     #[cfg(unix)]
     {
         if dir.ends_with("Contents/MacOS") {
-            return zeron_update::bundle_app_version(dir.parent().unwrap().parent().unwrap())
+            return zeren_update::bundle_app_version(dir.parent().unwrap().parent().unwrap())
                 .unwrap();
         }
         dir.file_name().unwrap().to_str().unwrap().to_owned()
@@ -111,7 +111,7 @@ fn fake_engine() {
 
 #[test]
 fn fake_watchdog() {
-    if std::env::var_os("ZERON_UPDATE_WATCH_ID").is_none() {
+    if std::env::var_os("ZEREN_UPDATE_WATCH_ID").is_none() {
         return;
     }
     transaction::run_watchdog().unwrap();
@@ -137,7 +137,7 @@ fn write_bundle(bundle: &Path, version: &str, behavior: &str) {
     let dir = bundle.join("Contents/MacOS");
     std::fs::create_dir_all(&dir).unwrap();
     let exe = std::env::current_exe().unwrap();
-    std::fs::copy(&exe, dir.join("zeron")).unwrap();
+    std::fs::copy(&exe, dir.join("zeren")).unwrap();
     std::fs::write(dir.join("behavior"), behavior).unwrap();
     std::fs::write(
         bundle.join("Contents/Info.plist"),
@@ -150,7 +150,7 @@ impl Rig {
     fn new(behavior: &str) -> Self {
         let dir = tempfile::tempdir().unwrap();
         let root = std::fs::canonicalize(dir.path()).unwrap();
-        let data = root.join(".zeron");
+        let data = root.join(".zeren");
         let app = data.join("app");
         let rig = Self { _dir: dir, data, app, mac: None, windows: None };
         std::fs::create_dir_all(docs(&rig.data).parent().unwrap()).unwrap();
@@ -167,20 +167,20 @@ impl Rig {
         rig
     }
 
-    /// The same, as a Windows install: `zeron.exe`, and the new one in a folder of
+    /// The same, as a Windows install: `zeren.exe`, and the new one in a folder of
     /// its own inside the installation's.
     #[cfg(windows)]
     fn new_windows(behavior: &str) -> Self {
         let mut rig = Self::new(behavior);
-        let directory = rig.data.parent().unwrap().join("Zeron");
-        let incoming = directory.join(".zeron-update-test");
+        let directory = rig.data.parent().unwrap().join("Zeren");
+        let incoming = directory.join(".zeren-update-test");
         std::fs::create_dir_all(&incoming).unwrap();
         let exe = std::env::current_exe().unwrap();
-        std::fs::copy(&exe, directory.join("zeron.exe")).unwrap();
-        std::fs::copy(&exe, incoming.join("zeron.exe")).unwrap();
+        std::fs::copy(&exe, directory.join("zeren.exe")).unwrap();
+        std::fs::copy(&exe, incoming.join("zeren.exe")).unwrap();
         std::fs::write(directory.join("behavior"), "ok").unwrap();
         std::fs::write(incoming.join("behavior"), behavior).unwrap();
-        rig.windows = Some((directory, incoming.join("zeron.exe")));
+        rig.windows = Some((directory, incoming.join("zeren.exe")));
         rig
     }
 
@@ -189,8 +189,8 @@ impl Rig {
         let mut rig = Self::new(behavior);
         let applications = rig.data.parent().unwrap().join("Applications");
         let mac = MacRig {
-            bundle: applications.join("Zeron.app"),
-            incoming: applications.join(".Zeron.app.new-test"),
+            bundle: applications.join("Zeren.app"),
+            incoming: applications.join(".Zeren.app.new-test"),
         };
         write_bundle(&mac.bundle, "1.0.0", "ok");
         write_bundle(&mac.incoming, "2.0.0", behavior);
@@ -221,7 +221,7 @@ impl Rig {
         let exe = std::env::current_exe().unwrap();
         // A copy, not a hard link: which name a process's image goes by decides
         // things here, and links to one file across installs muddle that.
-        std::fs::copy(&exe, dir.join("zeron")).unwrap();
+        std::fs::copy(&exe, dir.join("zeren")).unwrap();
         std::fs::write(dir.join("behavior"), behavior).unwrap();
     }
 
@@ -253,18 +253,18 @@ impl Rig {
     /// `current` is at that moment.
     fn start(&self, crash_at: Option<&str>) -> std::process::ExitStatus {
         let installed = match (&self.mac, &self.windows) {
-            (Some(mac), _) => mac.bundle.join("Contents/MacOS/zeron"),
-            (_, Some((directory, _))) => directory.join("zeron.exe"),
-            _ => self.app.join("current/zeron"),
+            (Some(mac), _) => mac.bundle.join("Contents/MacOS/zeren"),
+            (_, Some((directory, _))) => directory.join("zeren.exe"),
+            _ => self.app.join("current/zeren"),
         };
         let mut command = Command::new(installed);
         command
             .args(["--exact", "fake_engine", "--test-threads=1", "--nocapture"])
             .env(DATA_ENV, &self.data)
-            .env_remove("ZERON_UPDATE_CRASH_AT")
+            .env_remove("ZEREN_UPDATE_CRASH_AT")
             .stdout(std::process::Stdio::null());
         if let Some(step) = crash_at {
-            command.env("ZERON_UPDATE_CRASH_AT", step);
+            command.env("ZEREN_UPDATE_CRASH_AT", step);
         }
         let status = command.status().unwrap();
         eprintln!("start ({crash_at:?}) ended {status:?}, phase {:?}", transaction::read(&self.data).map(|t| t.phase));
@@ -289,11 +289,11 @@ impl Rig {
 
     fn current(&self) -> String {
         if let Some((directory, _)) = &self.windows {
-            return std::fs::read_to_string(directory.join("zeron-version"))
+            return std::fs::read_to_string(directory.join("zeren-version"))
                 .unwrap_or_else(|_| "1.0.0".into());
         }
         if let Some(mac) = &self.mac {
-            return zeron_update::bundle_app_version(&mac.bundle).unwrap();
+            return zeren_update::bundle_app_version(&mac.bundle).unwrap();
         }
         let target = std::fs::read_link(self.app.join("current")).unwrap();
         target.file_name().unwrap().to_str().unwrap().to_owned()
@@ -332,7 +332,7 @@ impl Rig {
                 .unwrap()
                 .flatten()
                 .map(|entry| entry.file_name().to_string_lossy().into_owned())
-                .filter(|name| name != "Zeron.app")
+                .filter(|name| name != "Zeren.app")
                 .collect()
         };
         // What the engine does a moment after committing: at the commit itself
@@ -383,7 +383,7 @@ mod versioned {
         let id = rig.request(Rig::service(), 60);
         rig.run_until_settled();
         rig.assert_updated(&id);
-        assert_eq!(rig.record().report().state, zeron_update::UpdateState::Updated);
+        assert_eq!(rig.record().report().state, zeren_update::UpdateState::Updated);
     }
 
     #[test]
@@ -392,7 +392,7 @@ mod versioned {
         let id = rig.request(Rig::service(), 60);
         rig.run_until_settled();
         rig.assert_back_on_the_old_version(&id, Phase::RolledBack);
-        assert_eq!(rig.record().report().state, zeron_update::UpdateState::RolledBack);
+        assert_eq!(rig.record().report().state, zeren_update::UpdateState::RolledBack);
     }
 
     /// A clean exit is still a failed trial, whatever a service manager makes of it.
@@ -563,7 +563,7 @@ mod versioned {
         std::fs::remove_dir_all(rig.app.join("2.0.0")).unwrap();
         rig.run_until_settled();
         rig.assert_back_on_the_old_version(&id, Phase::Failed);
-        assert_eq!(rig.record().report().state, zeron_update::UpdateState::Failed);
+        assert_eq!(rig.record().report().state, zeren_update::UpdateState::Failed);
     }
 
     /// A binary that can't even be started: it never ran, so nothing was restored
@@ -573,7 +573,7 @@ mod versioned {
         use std::os::unix::fs::PermissionsExt as _;
         let rig = Rig::new("ok");
         let id = rig.request(Rig::service(), 60);
-        let broken = rig.app.join("2.0.0/zeron");
+        let broken = rig.app.join("2.0.0/zeren");
         std::fs::remove_file(&broken).unwrap();
         std::fs::write(&broken, "not a program").unwrap();
         std::fs::set_permissions(&broken, std::fs::Permissions::from_mode(0o644)).unwrap();
@@ -719,8 +719,8 @@ mod mac {
     fn a_bundle_in_use_is_kept_until_nothing_runs_from_it() {
         let dir = tempfile::tempdir().unwrap();
         let root = std::fs::canonicalize(dir.path()).unwrap();
-        let bundle = root.join("Zeron.app");
-        let retired = root.join(".Zeron.app.old-123");
+        let bundle = root.join("Zeren.app");
+        let retired = root.join(".Zeren.app.old-123");
         std::fs::create_dir_all(&bundle).unwrap();
         std::fs::create_dir_all(retired.join("Contents/MacOS")).unwrap();
         let sleeper = retired.join("Contents/MacOS/sleeper");
@@ -733,14 +733,14 @@ mod mac {
         }
         let mut running = Command::new(&sleeper).spawn().unwrap();
         std::thread::sleep(Duration::from_millis(200));
-        assert!(zeron_update::process_runs_from(&retired));
-        zeron_update::prune_retired_mac_bundles(&bundle);
+        assert!(zeren_update::process_runs_from(&retired));
+        zeren_update::prune_retired_mac_bundles(&bundle);
         assert!(retired.exists(), "deleted from under a running process");
 
         running.kill().unwrap();
         running.wait().unwrap();
-        assert!(!zeron_update::process_runs_from(&retired));
-        zeron_update::prune_retired_mac_bundles(&bundle);
+        assert!(!zeren_update::process_runs_from(&retired));
+        zeren_update::prune_retired_mac_bundles(&bundle);
         assert!(!retired.exists(), "left behind once nothing ran from it");
         assert!(bundle.exists());
     }

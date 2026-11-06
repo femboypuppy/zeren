@@ -1,5 +1,5 @@
 -- Each time a settings page opens, a visit (screens/visits, as setup's
--- steps have them): what a page asks Zeron as it opens (your profile, the
+-- steps have them): what a page asks Zeren as it opens (your profile, the
 -- members, this Mac's git settings) is asked once a visit, not again as a
 -- hot reload builds the page again.
 --

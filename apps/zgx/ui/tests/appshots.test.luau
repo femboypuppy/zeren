@@ -126,7 +126,7 @@ end
 test("Settings → Appshots says what each permission needs, and nothing once granted", function()
 	local app = settings { platform = true, enabled = true, shortcut_ready = true, capture = "missing", text = "missing" }
 	local page = app:tree("#settings-page")
-	for _, words in { "Capture Appshots", "Capture sound", "Global shortcut", "Destination", "Window capture", "Application text", "Allow window capture", "Enable text capture", "Check again", "macOS asks for these for the app that opened Zeron" } do
+	for _, words in { "Capture Appshots", "Capture sound", "Global shortcut", "Destination", "Window capture", "Application text", "Allow window capture", "Enable text capture", "Check again", "macOS asks for these for the app that opened Zeren" } do
 		expect(if page:find(words, 1, true) then words else `missing: {words}`).to_be(words)
 	end
 	expect(page:find("⌃⌥Space", 1, true) ~= nil).to_be(true)

@@ -13,9 +13,9 @@ export const REPO = resolve(RIG_DIR, "../../../..");
 
 /** All runtime state (data dirs, homes, PIDs, users, passwords). */
 export const STATE =
-  process.env.ZERON_RIG_STATE || join(tmpdir(), "zeron-rig");
+  process.env.ZEREN_RIG_STATE || join(tmpdir(), "zeren-rig");
 
-export const BIN = process.env.ZERON_RIG_BIN || join(REPO, "target/debug/zeron-engine");
+export const BIN = process.env.ZEREN_RIG_BIN || join(REPO, "target/debug/zeren-engine");
 
 export const STAGING = {
   edge: "https://staging.zeron.sh",
@@ -24,8 +24,8 @@ export const STAGING = {
 };
 
 export const USERS = {
-  u1: { email: "zeron-plugin-rig-u1@example.net", first: "Rig", last: "One", org: "Plugin Rig U1" },
-  u2: { email: "zeron-plugin-rig-u2@example.net", first: "Rig", last: "Two", org: "Plugin Rig U2" },
+  u1: { email: "zeren-plugin-rig-u1@example.net", first: "Rig", last: "One", org: "Plugin Rig U1" },
+  u2: { email: "zeren-plugin-rig-u2@example.net", first: "Rig", last: "Two", org: "Plugin Rig U2" },
 };
 
 export const ENGINES = [
@@ -34,10 +34,10 @@ export const ENGINES = [
   { name: "B", port: 27893, user: "u2" },
 ].map((e) => {
   const root = join(STATE, e.name.toLowerCase());
-  // A port taken by someone else: ZERON_RIG_PORT_<NAME>=<n> moves the engine,
+  // A port taken by someone else: ZEREN_RIG_PORT_<NAME>=<n> moves the engine,
   // and the choice is remembered in <root>/port until changed again.
   let port = e.port;
-  const override = Number(process.env[`ZERON_RIG_PORT_${e.name}`]);
+  const override = Number(process.env[`ZEREN_RIG_PORT_${e.name}`]);
   if (override) port = override;
   else {
     try {
@@ -48,7 +48,7 @@ export const ENGINES = [
 });
 
 const PRODUCTION_PORT = 27654;
-const PRODUCTION_DATA = [join(homedir(), ".comet-native"), join(homedir(), ".zeron")];
+const PRODUCTION_DATA = [join(homedir(), ".comet-native"), join(homedir(), ".zeren")];
 
 /** Refuse anything that could be the production engine. */
 export function guard(port, data) {
@@ -110,7 +110,7 @@ export function commandOf(pid) {
 export function ourPid(engine) {
   const pid = readPid(engine);
   if (!pid || !alive(pid)) return null;
-  return commandOf(pid).includes("zeron-engine") ? pid : null;
+  return commandOf(pid).includes("zeren-engine") ? pid : null;
 }
 
 /** PIDs listening on a TCP port (127.0.0.1 or any). */

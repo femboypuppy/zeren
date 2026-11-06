@@ -1,4 +1,4 @@
--- A file, open: Zeron's preview (crates/ui/src/files/preview.rs), and a step
+-- A file, open: Zeren's preview (crates/ui/src/files/preview.rs), and a step
 -- past it. It lives in a sidebar, usually: a pane 360 to 520 points wide
 -- beside the chat. So its header is made for that, and more room only brings
 -- controls back out.
@@ -92,7 +92,7 @@ export type Props = {
 	doc: State<Doc?> | () -> Doc?,
 	-- The project's name, leading the trail.
 	root: string?,
-	-- How big a file opens here (Zeron's 8 MB), for "too big"'s words.
+	-- How big a file opens here (Zeren's 8 MB), for "too big"'s words.
 	limit: number?,
 	on_crumb: ((folder: string) -> ())?,
 	on_reveal: ((path: string) -> ())?,
@@ -159,7 +159,7 @@ export type Props = {
 -- foot's, and the pane widths where more comes out of the menu: an image's
 -- zoom and Markdown's words, then Wrap, then the rest.
 local function head_height(head: Head?): number
-	return (ui.theme.get(if head == "stack" then "zeron.files.stack" else "zeron.files.head") :: number?) or 40
+	return (ui.theme.get(if head == "stack" then "zeren.files.stack" else "zeren.files.head") :: number?) or 40
 end
 local FOOT = 26
 local ROOM_SWITCH, ROOM_TOOLS, ROOM_ALL = 440, 440, 640
@@ -285,10 +285,10 @@ local function notice(icon: Icon.Name, title: () -> string, body: () -> string, 
 			h = 28,
 			px = "$space.3",
 			rounded = "$radius.lg",
-			bg = if w.primary then "$zeron.primary.bg" else "$zeron.secondary.bg",
-			color = if w.primary then "$zeron.primary.text" else "$text.primary",
-			hover = { bg = if w.primary then "$zeron.primary.hover" else "$zeron.secondary.hover" },
-			active = { bg = if w.primary then "$zeron.primary.active" else "$zeron.secondary.active" },
+			bg = if w.primary then "$zeren.primary.bg" else "$zeren.secondary.bg",
+			color = if w.primary then "$zeren.primary.text" else "$text.primary",
+			hover = { bg = if w.primary then "$zeren.primary.hover" else "$zeren.secondary.hover" },
+			active = { bg = if w.primary then "$zeren.primary.active" else "$zeren.secondary.active" },
 			on_click = w.on_click,
 			ui.text { w.label, text_size = "$font.size.sm", weight = "$font.weight.medium" },
 		})
@@ -317,7 +317,7 @@ local function loading(): Node
 			w = if w > 0 then `{math.floor(w * 100)}%` else 0,
 			ml = if i % 3 == 0 then "$space.5" else 0,
 			rounded = "$radius.sm",
-			bg = "$zeron.secondary.bg",
+			bg = "$zeren.secondary.bg",
 		})
 	end
 	bars.on_mount = function(el)
@@ -600,7 +600,7 @@ local function image_view(doc: Doc, zoom_label: State<string>, commands: { [stri
 						local l, t = math.max(cx, x0), math.max(cy, y0)
 						local r, b = math.min(cx + CHECK, x1), math.min(cy + CHECK, y1)
 						if r > l and b > t then
-							c:rect(l, t, r - l, b - t, "$zeron.files.checker")
+							c:rect(l, t, r - l, b - t, "$zeren.files.checker")
 						end
 						i += 2
 					end
@@ -877,7 +877,7 @@ local function component(props: Props): Node
 				ui.button {
 					label = locale.t("ds.file_viewer.show_in_tree", { name = c.label }),
 					h = tall,
-					px = "$zeron.space.hair",
+					px = "$zeren.space.hair",
 					py = 0,
 					shrink = 0,
 					rounded = "$radius.sm",
@@ -1054,7 +1054,7 @@ local function component(props: Props): Node
 										if SAID[st] then locale.t(SAID[st]) else st,
 										shrink = 0,
 										text_size = "$font.size.xs",
-										color = if st == "ignored" then "$text.tertiary" else `$zeron.git.{st}`,
+										color = if st == "ignored" then "$text.tertiary" else `$zeren.git.{st}`,
 									}
 								end),
 							}
@@ -1093,7 +1093,7 @@ local function component(props: Props): Node
 						ref = words,
 						shrink = 0,
 						ml = function(): any
-							return if nested() then "$zeron.space.hair" else 0
+							return if nested() then "$zeren.space.hair" else 0
 						end,
 						text_size = "$font.size.md",
 						weight = "$font.weight.medium",
@@ -1185,7 +1185,7 @@ local function component(props: Props): Node
 	end
 	local function zoom_controls(): Node
 		return ui.row {
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			items = "center",
 			ui.show(function(): boolean
 				return room() >= ROOM_SWITCH
@@ -1382,7 +1382,7 @@ local function component(props: Props): Node
 		-- (Not keyed: each row's place, `i`, is built in (the keys' light),
 		-- so a row moved is a row built again. A few rows, at most.)
 		w_full = true,
-		gap = "$zeron.list.gap",
+		gap = "$zeren.list.gap",
 	})
 	local menu_rows_and_more: { Node } = {
 		own_group,
@@ -1428,7 +1428,7 @@ local function component(props: Props): Node
 		ui.row {
 			hook = if props.hooks then props.hooks.actions else nil,
 			shrink = 0,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			items = "center",
 			ui.show(function(): boolean
 				return dirty:get() and not readonly
@@ -1441,7 +1441,7 @@ local function component(props: Props): Node
 			-- from one to the other (these come and go with Source) never
 			-- moves the switch under the pointer.
 			ui.show(editing, ui.row {
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				mr = function(): any
 					return if shows({ "markdown" })() then "$space.1" else 0
 				end,
@@ -1455,7 +1455,7 @@ local function component(props: Props): Node
 			ui.show(function(): boolean
 				return has_file() and room() >= ROOM_ALL
 			end, ui.row {
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				items = "center",
 				ui.div { w = 1, h = 16, mx = "$space.1", bg = "$border" },
 				action(
@@ -1704,7 +1704,7 @@ local function component(props: Props): Node
 						ui.column {
 							w_full = true,
 							-- (A theme number: max_w takes points.)
-							max_w = ui.theme.get("zeron.prose.measure") :: number?,
+							max_w = ui.theme.get("zeren.prose.measure") :: number?,
 							px = "$space.6",
 							py = "$space.5",
 							Markdown {

@@ -281,7 +281,7 @@ return ui.component(function(props: Props): Node
 			label = title(entry.name),
 			bg = function(): string
 				local v = value:get()
-				return if v ~= nil and (v == shown or v == entry.e) then "$zeron.selected.flat.bg" else "#00000000"
+				return if v ~= nil and (v == shown or v == entry.e) then "$zeren.selected.flat.bg" else "#00000000"
 			end,
 			hover = { bg = "$hover" },
 			active = { bg = "$pressed" },
@@ -396,7 +396,7 @@ return ui.component(function(props: Props): Node
 				items = "center",
 				cursor = "pointer",
 				bg = function(): string
-					return if lit() then "$zeron.selected.flat.bg" else "#00000000"
+					return if lit() then "$zeren.selected.flat.bg" else "#00000000"
 				end,
 				color = function(): string
 					return if lit() then "$text.primary" else "$text.tertiary"
@@ -436,7 +436,7 @@ return ui.component(function(props: Props): Node
 				items = "center",
 				cursor = "pointer",
 				bg = function(): string
-					return if tone:get() == t then "$zeron.selected.flat.bg" else "#00000000"
+					return if tone:get() == t then "$zeren.selected.flat.bg" else "#00000000"
 				end,
 				hover = { bg = "$hover" },
 				active = { bg = "$pressed" },

@@ -1,5 +1,5 @@
 -- What the chat page's parts share: the one composer's draft, what it
--- carries and the passages quoted into it, each chat's own (as Zeron's
+-- carries and the passages quoted into it, each chat's own (as Zeren's
 -- composer keeps them, crates/ui composer.rs `drafts` and `attachments`:
 -- per chat, a new chat's under its own key, kept for the run, not saved
 -- across launches); how tall the docked composer is (the transcript
@@ -63,7 +63,7 @@ end
 
 -- Whether a file's name is a picture the window can draw. (zgx decodes
 -- no GIF or HEIC yet: those are file chips, so a thumbnail never fails.)
--- A project's file or folder as Zeron mentions it in a prompt, and back
+-- A project's file or folder as Zeren mentions it in a prompt, and back
 -- (screens/chat/file_links).
 local FileLinks = require("@app/screens/chat/file_links")
 M.file_link = FileLinks.link
@@ -438,7 +438,7 @@ function M.pointer_back()
 end
 
 -- Another chat mentioned (a sidebar session dropped on the chat): a chip,
--- sent as Zeron's chat mention (screens/chat/chat_links). Once each.
+-- sent as Zeren's chat mention (screens/chat/chat_links). Once each.
 function M.mention_chat(id: string, key: string?)
 	if not ChatLinks.valid(id) then
 		return
@@ -585,7 +585,7 @@ end
 -- cargo it's an item of kind "comment" with `file`, `line`, `body` (and,
 -- from the files pane, its `path` and the project's `root` too: given as
 -- `{ path, line, body, root }`, `file` is the path within the root).
--- On a diff (a plugin's, `zeron.compose_comment`): `side` ("L" or "R"), a
+-- On a diff (a plugin's, `zeren.compose_comment`): `side` ("L" or "R"), a
 -- range's last line `to`, the code it's on `snippet`; `plugin` and `key`
 -- say whose it is (published back to it: screens/plugins), and `session`
 -- the chat whose draft takes it (the one shown, else its draft kept).

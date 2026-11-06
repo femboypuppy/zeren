@@ -66,8 +66,8 @@ return function(props: Props): Node
 						col.label or "",
 						literal = true,
 						truncate = true,
-						text_size = "$zeron.visual.text.sm.size",
-						line_height = "$zeron.visual.text.sm.line",
+						text_size = "$zeren.visual.text.sm.size",
+						line_height = "$zeren.visual.text.sm.line",
 						weight = "$font.weight.medium",
 						color = "$text.secondary",
 					}

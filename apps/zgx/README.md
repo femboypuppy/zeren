@@ -1,23 +1,23 @@
-# Zeron in zgx
+# Zeren in zgx
 
-Zeron's interface rebuilt on [zgx](https://zgx.zeron.sh), starting with
+Zeren's interface rebuilt on [zgx](https://zgx.zeron.sh), starting with
 onboarding. The interface is Luau (`ui/`): it hot-reloads as it is saved,
 keeping its state, so most work never rebuilds Rust. The Rust host
 (`src/main.rs`) makes windows, registers fonts and answers the scripts'
-actions, and speaks to a Zeron engine (`src/engine/`), which owns the
+actions, and speaks to a Zeren engine (`src/engine/`), which owns the
 account, this Mac's agents and GitHub for Cloud.
 
 ## Running it
 
-**Dev builds talk to Zeron's staging servers, not production.** Signing in
+**Dev builds talk to Zeren's staging servers, not production.** Signing in
 uses staging's edge (`https://staging.zeron.sh`) and sign-in client, and
-the engine zgx starts keeps its data in `~/.zeron-staging`: your production
-account, chats and devices aren't there. `ZERON_ZGX_ENV=production` points a
+the engine zgx starts keeps its data in `~/.zeren-staging`: your production
+account, chats and devices aren't there. `ZEREN_ZGX_ENV=production` points a
 build at production instead (`src/auth.rs` lists the other overrides).
 
 You need Rust 1.85 or newer (edition 2024). We develop on macOS; Linux
 should work but is untested. The app is this folder: `apps/zgx` in
-zeronsh/zeron, or the root of zeronsh/zeron-zgx, which is a copy of it.
+zeronsh/zeren, or the root of zeronsh/zeren-zgx, which is a copy of it.
 
 On macOS you also need Zig 0.16 (`brew install zig@0.16`): Ghostty draws the
 panel's terminals there (zgx-desktop's `ghostty` feature), and zgx builds it
@@ -26,7 +26,7 @@ cached in `~/Library/Caches/zgx-ghostty` for every checkout. Without Zig 0.16
 the build stops and says so (`ZIG` points it at another Zig executable).
 
 ```sh
-git clone git@github.com:zeronsh/zeron-zgx.git && cd zeron-zgx
+git clone git@github.com:zeronsh/zeren-zgx.git && cd zeren-zgx
 cargo run --release -- gallery      # the workbench: every component and demo
 ```
 
@@ -55,12 +55,12 @@ cargo run --release -- intro        # the same
 cargo run --release -- onboarding   # setup alone, in its window, from sign-in
 cargo run --release -- main         # the main window: sessions, chats, files
 cargo run --release -- gallery      # the design system, dark and light side by side
-ZERON_ZGX_STEP=agents cargo run --release -- onboarding
+ZEREN_ZGX_STEP=agents cargo run --release -- onboarding
 cargo run --release -- gallery --inspect   # devtools for `zgx inspect` / its MCP
 ```
 
 A launch signed in goes straight to setup, and once setup has been finished
-on this Mac (its "Open Zeron"), to the main window; finishing setup opens it
+on this Mac (its "Open Zeren"), to the main window; finishing setup opens it
 too. Signed out, or new, it's the intro and setup again.
 
 ### The engine
@@ -68,30 +68,30 @@ too. Signed out, or new, it's the intro and setup again.
 Sign-in, Your agents and Connect GitHub are the engine's, over its local
 IPC: the engine keeps the session (zgx keeps none of its own), finds the
 agents and runs their sign-ins, and runs GitHub's device flow. zgx uses
-the staging engine, port 27871 with its data in `~/.zeron-staging`
+the staging engine, port 27871 with its data in `~/.zeren-staging`
 (`scripts/staging-app.sh`'s): one already running is used as it is,
-otherwise zgx starts `target/debug/zeron-engine` from this checkout's root
-(`cargo build -p zeron --bin zeron-engine` there first), detached, against
+otherwise zgx starts `target/debug/zeren-engine` from this checkout's root
+(`cargo build -p zeren --bin zeren-engine` there first), detached, against
 zgx's edge and sign-in client. Signing in restarts it once, to sync. Never
 the production engine: port 27654 and `~/.comet-native` are refused.
 
 ```sh
-ZERON_ZGX_ENGINE_PORT=27881 ZERON_ZGX_ENGINE_DATA=/tmp/zgx-engine \
-ZERON_ZGX_ENGINE_HOME=/tmp/zgx-home \
+ZEREN_ZGX_ENGINE_PORT=27881 ZEREN_ZGX_ENGINE_DATA=/tmp/zgx-engine \
+ZEREN_ZGX_ENGINE_HOME=/tmp/zgx-home \
   cargo run --release -- onboarding     # an engine of its own, throwaway
 ```
 
-`ZERON_ZGX_ENGINE_HOME` gives the engine zgx starts a home of its own
+`ZEREN_ZGX_ENGINE_HOME` gives the engine zgx starts a home of its own
 (`HOME`, `CLAUDE_CONFIG_DIR`, `CODEX_HOME`), so the agents' logins it reads
-and writes are that folder's, not this Mac's. `ZERON_ZGX_ENGINE_BIN` picks
-another engine; `ZERON_ZGX_ENGINE_SPAWN=0` only uses one that's running.
-`ZERON_ZGX_NO_BROWSER=1` opens no browser for a sign-in (a path instead
+and writes are that folder's, not this Mac's. `ZEREN_ZGX_ENGINE_BIN` picks
+another engine; `ZEREN_ZGX_ENGINE_SPAWN=0` only uses one that's running.
+`ZEREN_ZGX_NO_BROWSER=1` opens no browser for a sign-in (a path instead
 writes the page there, for a test rig). See `src/engine/manager.rs`.
-`ZERON_ZGX_MOCK=1` offers the engine's mock agent in the model picker
-(src/chat.rs), to run a chat without a paid one; `ZERON_MOCK_DELAY_MS`
-and `ZERON_MOCK_REPEAT` on the engine it starts pace and lengthen its replies.
+`ZEREN_ZGX_MOCK=1` offers the engine's mock agent in the model picker
+(src/chat.rs), to run a chat without a paid one; `ZEREN_MOCK_DELAY_MS`
+and `ZEREN_MOCK_REPEAT` on the engine it starts pace and lengthen its replies.
 
-This is a cargo workspace of its own (in zeronsh/zeron, not a member of the
+This is a cargo workspace of its own (in zeronsh/zeren, not a member of the
 root one). zgx
 builds against patched crates (winit, wgpu-hal, accesskit), and a git
 dependency does not carry a patch, so `Cargo.toml` repeats zgx's. Patching
@@ -110,8 +110,8 @@ ui/
                      its exit decodes setup's first screen into the real window
   ds/                the design system: the only place values live
     init.luau        what screens import: Text, Button, Surface, Mark, Steps, setup
-    tokens.luau      app tokens (zeron.*), declared in standard tokens; loads themes
-    themes/          zeron-dark.json, zeron-light.json (restyle in place as saved)
+    tokens.luau      app tokens (zeren.*), declared in standard tokens; loads themes
+    themes/          zeren-dark.json, zeren-light.json (restyle in place as saved)
     text.luau        type styles × tones (ui.variants)
     button.luau      primary / secondary / ghost / accent × sm / md / lg
     surface.luau     plain / raised / sunken / overlay; interactive; selected
@@ -146,7 +146,7 @@ files/           the session page's files (Pane { project, session }):
                      chimes.luau; host.luau's calls, src/settings.rs's
                      (ui/settings_stub.luau answers them headless)
   assets/            art, icons (paths resolve from ui/)
-fonts/               Instrument Serif (Geist comes from apps/ios/Zeron/Fonts)
+fonts/               Instrument Serif (Geist comes from apps/ios/Zeren/Fonts)
 ```
 
 ## The design system's rules
@@ -155,7 +155,7 @@ zgx's design guide has three layers, and this follows them:
 
 1. **Values live in the theme.** Colours, type, radii and spacing are
    tokens: the standard ones (`$text.secondary`, `$space.3`, `$radius.lg`) set
-   by `themes/*.json`, and Zeron's own under `zeron.*`, declared in
+   by `themes/*.json`, and Zeren's own under `zeren.*`, declared in
    `tokens.luau` in terms of standard ones so any theme styles them. To try a
    palette, edit the JSON; every window restyles without reloading scripts.
 2. **Components turn tokens into styles** with `ui.variants` (shadcn's
@@ -164,8 +164,8 @@ zgx's design guide has three layers, and this follows them:
    the script.
 3. **Spacing is a scale.** Every padding, margin and gap is a step of
    `space.1`–`space.8` (4, 8, 12, 16, 24, 32, 48, 64), written out in both
-   theme files, or one of two half-steps for controls: `zeron.space.hair` (2)
-   and `zeron.space.snug` (10). Fixed geometry, like a title bar's height or
+   theme files, or one of two half-steps for controls: `zeren.space.hair` (2)
+   and `zeren.space.snug` (10). Fixed geometry, like a title bar's height or
    where a control sits beside the traffic lights, is a named constant, not a
    spacing token.
 4. **The lint keeps screens honest.** Entries call `ui.theme.strict("warn")`
@@ -247,7 +247,7 @@ audit; each line names the mistake it keeps out):
 
 - **A component:** run the gallery, edit `ds/*.luau` or a theme file, and
   save. Both themes update side by side.
-- **A step:** `ZERON_ZGX_STEP=<step> … onboarding`. The step is kept across
+- **A step:** `ZEREN_ZGX_STEP=<step> … onboarding`. The step is kept across
   saves, so edit its module and watch it change in place.
 - **A variant of a component:** add an option to its recipe's axis, try it in
   the gallery, then keep it or delete it.
@@ -300,7 +300,7 @@ it opened on. From a fullscreen app it is covered and waits; zgx's
 
 ## Plugins and templates
 
-**A plugin is a folder in the engine's data dir:** `<data>/plugins/<id>/`, with its `zeron-plugin.json`, `init.luau` and files. Dropping one in installs it.
+**A plugin is a folder in the engine's data dir:** `<data>/plugins/<id>/`, with its `zeren-plugin.json`, `init.luau` and files. Dropping one in installs it.
 
 **The engine decides what loads** (`crates/engine/src/plugins`):
 - It checks each plugin's signature against the account that owns the key. Every device has its own ed25519 key, registered to the account on the edge.
@@ -310,53 +310,53 @@ it opened on. From a fullscreen app it is covered and waits; zgx's
 **The app loads only those snapshots** (`src/plugins`):
 - Each gets the zgx grants its permissions map to (`src/plugins/grants.rs`).
 - Plugins place nodes by selector (`#id`, `.class`, a role and name). The elements are mapped in `src/plugins/elements.rs`, which agents read through `describe_elements`.
-- What a plugin reads of Zeron comes as ids where it's placed, plus records the app keeps for it alone, holding only what its grants allow (`src/plugins/records.rs`): `sessions.read`, `messages.read`, `profile.read`, `account.email` and `files.read`.
+- What a plugin reads of Zeren comes as ids where it's placed, plus records the app keeps for it alone, holding only what its grants allow (`src/plugins/records.rs`): `sessions.read`, `messages.read`, `profile.read`, `account.email` and `files.read`.
 - An edit never runs before the engine has checked it again. Your own plugins are re-signed as they're saved, so they reload at once.
 - Allowing happens in a window of its own with no plugins (`ui/consent.luau`).
 
-**Templates are whole interfaces**, like WordPress themes. Each is a folder, `<data>/templates/<id>/`, holding `zeron-template.json` and any part of Zeron's UI (`app.luau`, `screens/`, `ds/`, `assets/`…). A file it leaves out is Zeron's own.
-- One template is in use at a time. The default, "Zeron v3" (id `zeron`), is always there. "Zeron v2" (id `zeron-v2`), the single-page layout from before v3, is Zeron's too: its files are `ui/templates/zeron-v2/`, installed into `<data>/templates/zeron-v2/` and kept current with each version, built in and trusted only while exactly as this build wrote it (`src/plugins/official.rs`). A test fails when a default file v2 replaces changes, until v2's copy is brought in step (`zeron_v2_is_in_step_with_the_default`).
-- Settings → Templates lists them as Plugins lists plugins: Installed (the default and Zeron v2, built in, first) and Yours, a row each with Use and a ⋯ menu (its folder, Duplicate, Delete), and New template (a copy of Zeron's own).
-- One is out of date when it was made for another version of Zeron: its manifest's `zeron_version` against this build's (the root workspace's version, which `build.rs` hands zgx as `ZERON_VERSION`). A save to Zeron's own while developing never makes one out of date; `template_status` still names the files whose Zeron original changed.
-- Agents make and change them through Zeron's MCP server: `list_templates`, `create_template`, `use_template`, `template_status`, `delete_template` and `describe_app`.
+**Templates are whole interfaces**, like WordPress themes. Each is a folder, `<data>/templates/<id>/`, holding `zeren-template.json` and any part of Zeren's UI (`app.luau`, `screens/`, `ds/`, `assets/`…). A file it leaves out is Zeren's own.
+- One template is in use at a time. The default, "Zeren v3" (id `zeren`), is always there. "Zeren v2" (id `zeren-v2`), the single-page layout from before v3, is Zeren's too: its files are `ui/templates/zeren-v2/`, installed into `<data>/templates/zeren-v2/` and kept current with each version, built in and trusted only while exactly as this build wrote it (`src/plugins/official.rs`). A test fails when a default file v2 replaces changes, until v2's copy is brought in step (`zeren_v2_is_in_step_with_the_default`).
+- Settings → Templates lists them as Plugins lists plugins: Installed (the default and Zeren v2, built in, first) and Yours, a row each with Use and a ⋯ menu (its folder, Duplicate, Delete), and New template (a copy of Zeren's own).
+- One is out of date when it was made for another version of Zeren: its manifest's `zeren_version` against this build's (the root workspace's version, which `build.rs` hands zgx as `ZEREN_VERSION`). A save to Zeren's own while developing never makes one out of date; `template_status` still names the files whose Zeren original changed.
+- Agents make and change them through Zeren's MCP server: `list_templates`, `create_template`, `use_template`, `template_status`, `delete_template` and `describe_app`.
 
 **Themes are colours, apart from templates** (`src/themes.rs`, `ui/screens/themes/`, `ui/ds/palettes.luau`).
-- Settings → Themes lists Zeron's built-in themes (crates/theme: each family's light and dark together, any other variant alone), each template's own `theme.luau` (read as data), and VS Code themes you import (a `.json` or an extension's folder, by Import theme or dropped on the page; rename and remove). Settings → Appearance has a quick pick for each scheme.
-- You choose one theme for light and one for dark, kept in `<data>/theme-choice.json`. `ds/palettes` wears them as the window's two themes (`theme-light`, `theme-dark`) over whichever template runs. A scheme with nothing chosen wears the running template's own theme, else Zeron's.
+- Settings → Themes lists Zeren's built-in themes (crates/theme: each family's light and dark together, any other variant alone), each template's own `theme.luau` (read as data), and VS Code themes you import (a `.json` or an extension's folder, by Import theme or dropped on the page; rename and remove). Settings → Appearance has a quick pick for each scheme.
+- You choose one theme for light and one for dark, kept in `<data>/theme-choice.json`. `ds/palettes` wears them as the window's two themes (`theme-light`, `theme-dark`) over whichever template runs. A scheme with nothing chosen wears the running template's own theme, else Zeren's.
 - A theme is data, so it needs no consent and can't run code.
-- The catalogue (what's listed, the library, the choice, palettes and what the window moves to keep them legible) is `zeron_theme::catalog`, shared with the engine. Agents read, make, change, delete and wear themes with Zeron's MCP tools (`list_themes`, `get_theme`, `create_theme`, `update_theme`, `delete_theme`, `use_theme`; guide: `docs/themes.md`). The engine tells the window after each change (`WatchThemes`), and the window reads the files again: a theme changed while it's worn restyles in place.
-- Built-in themes were templates once (`theme-<key>`). Each launch moves anyone on one to the default template with that theme chosen, and deletes only the folders shaped exactly as Zeron wrote them (`src/plugins/retired_themes.rs`).
+- The catalogue (what's listed, the library, the choice, palettes and what the window moves to keep them legible) is `zeren_theme::catalog`, shared with the engine. Agents read, make, change, delete and wear themes with Zeren's MCP tools (`list_themes`, `get_theme`, `create_theme`, `update_theme`, `delete_theme`, `use_theme`; guide: `docs/themes.md`). The engine tells the window after each change (`WatchThemes`), and the window reads the files again: a theme changed while it's worn restyles in place.
+- Built-in themes were templates once (`theme-<key>`). Each launch moves anyone on one to the default template with that theme chosen, and deletes only the folders shaped exactly as Zeren wrote them (`src/plugins/retired_themes.rs`).
 
 **How the window runs one** (`src/plugins/live.rs`):
-- The main window always runs from `<data>/templates/.live/`: Zeron's own (`.zeron/`, copied from `ui/`) with the template in use laid over it.
+- The main window always runs from `<data>/templates/.live/`: Zeren's own (`.zeren/`, copied from `ui/`) with the template in use laid over it.
 - Switching, or saving a template's file, rewrites only the files that differ, and the window reloads in place. A module's state is kept wherever both have the file.
 - These are never a template's: `screens/plugins/`, `screens/templates/`, `account/`, `.luaurc`, and the consent window, which always runs from `ui/`.
 - The main window's errors and devtools sources name `.live/…` files. Other windows, and `zgx test ui`, still run `ui/`.
 
 **When a template fails:**
-- A file that fails (at load, at build or later) falls back to Zeron's own for that module alone, with one notice.
-- If its `app.luau` fails, the whole window goes back to Zeron's own and the template shows as broken.
+- A file that fails (at load, at build or later) falls back to Zeren's own for that module alone, with one notice.
+- If its `app.luau` fails, the whole window goes back to Zeren's own and the template shows as broken.
 - Saving the file again retries it.
-- **The way back from any template:** View → **Use Zeron v3** (the host's own menu item, which no template can remove; on Windows and Linux, which have no menu bar, it's "Use Zeron v3" in the command palette, and Revert in a preview's toast), `zeron template use zeron`, or launching with `--zeron-template`.
+- **The way back from any template:** View → **Use Zeren v3** (the host's own menu item, which no template can remove; on Windows and Linux, which have no menu bar, it's "Use Zeren v3" in the command palette, and Revert in a preview's toast), `zeren template use zeren`, or launching with `--zeren-template`.
 
 **Plugins layer on whatever template is in use.** One that aims at an element the template dropped (its id or class) says "Not shown in this template" on the Plugins page. That check is static: only literal selectors are seen. A placed node that needs what its place doesn't give draws nothing, and its row says why.
 
-**When a plugin fails** (at load, at build, or later), Zeron goes on without it, with the window's state kept (`src/plugins/recovery.rs`).
+**When a plugin fails** (at load, at build, or later), Zeren goes on without it, with the window's state kept (`src/plugins/recovery.rs`).
 
 **Examples and how to write one:** `plugins-dev/README.md`. A staging rig of three engines is in `plugins-dev/rig/`.
 
 ```sh
-zeron plugin new my-plugin          # yours, signed; edit init.luau and it reloads
-zeron plugin sign <id-or-path>      # sign one you wrote as yours
-zeron plugin verify <path>          # who made it, and whether it changed
-ZERON_ZGX_REVIEW=<id> …  main       # (dev) that plugin's consent window at launch, with devtools
-ZERON_ZGX_PLUGIN_LOG=1 …            # (dev) tool calls and answers
-zeron template list|use <id>|create <id> [--from F]|status <id>|delete <id>
+zeren plugin new my-plugin          # yours, signed; edit init.luau and it reloads
+zeren plugin sign <id-or-path>      # sign one you wrote as yours
+zeren plugin verify <path>          # who made it, and whether it changed
+ZEREN_ZGX_REVIEW=<id> …  main       # (dev) that plugin's consent window at launch, with devtools
+ZEREN_ZGX_PLUGIN_LOG=1 …            # (dev) tool calls and answers
+zeren template list|use <id>|create <id> [--from F]|status <id>|delete <id>
 ```
 
 ## Not yet
 
-- Release bundles: Zeron's own copy that templates inherit from (`.zeron/`) is made from `ui/`'s source, so a bundled build must ship that source too.
+- Release bundles: Zeren's own copy that templates inherit from (`.zeren/`) is made from `ui/`'s source, so a bundled build must ship that source too.
 - Templates from others: only templates made on this device (by you or your agents) can be used. A template runs with all of the app's powers, so importing someone else's waits for signing and consent like plugins have.
 - The per-screen templates of Oct 31 (`<data>/templates/screens/…`) were development-only and aren't carried over.
 - The engine's manager in full (the shipping app's `managed.rs`: the
@@ -370,11 +370,11 @@ zeron template list|use <id>|create <id> [--from F]|status <id>|delete <id>
   production not until it's deployed there (until then the page says the
   change didn't go through).
 - Settings → About & updates updates the engine only where the engine
-  manages its own install (a service install on Linux or a Mac); the Zeron
+  manages its own install (a service install on Linux or a Mac); the Zeren
   app's own engine is updated from the app. No download progress: the
   engine's `ApplyUpdate` answers once it's done. "Check for updates" asks
   the public release feed itself (the engine has no call to check now).
   zgx isn't packaged, so nothing updates it.
 - Clicking a desktop banner opens the shipping app on its chat: the engine
-  posts the banners, and opens whichever app is registered as Zeron. zgx
+  posts the banners, and opens whichever app is registered as Zeren. zgx
   needs registering as the app first.

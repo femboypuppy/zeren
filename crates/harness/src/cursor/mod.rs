@@ -1,5 +1,5 @@
 //! Cursor harness: drives Cursor's agent runtime through the PINNED
-//! `@cursor/sdk` via a thin zeron-owned Node shim (`shim.mjs`, JSONL over
+//! `@cursor/sdk` via a thin zeren-owned Node shim (`shim.mjs`, JSONL over
 //! stdio) — NOT over ACP, and NOT over `cursor-agent`'s print surface.
 //!
 //! Why: Cursor's ACP surface is lossy (subagent transcripts are stripped at
@@ -16,7 +16,7 @@
 //! Revalidate the shim against the typings on every bump.
 //!
 //! - The shim is materialized into the SDK's managed npm install
-//!   (`~/.zeron/adapters/…`, [`crate::adapter_install::ensure_installed_shim`])
+//!   (`~/.zeren/adapters/…`, [`crate::adapter_install::ensure_installed_shim`])
 //!   and spawned as `node <shim>`.
 //! - Done = the SDK run's terminal result (`turn` frame off `run.wait()` /
 //!   `turn-ended`) — a crisp turn end by construction.
@@ -47,7 +47,7 @@ use serde_json::{Value, json};
 use tokio::io::AsyncWriteExt;
 use tokio::sync::mpsc;
 
-use zeron_proto::{
+use zeren_proto::{
     AgentEvent, DoneStatus, HarnessId, Model, ModelOption, ModelOptionChoice, ReasoningLevel,
     RunRequest, SteeringMode, TodoItem, TodoStatus, ToolCall,
 };
@@ -58,7 +58,7 @@ use crate::{Harness, HarnessError, RunControls, Signal, send_signal, shutdown_ch
 /// The pinned SDK (public beta 1.0.x line; inspected against 1.0.31's
 /// typings). Bump deliberately — see the module header.
 const CURSOR_SDK_PIN: &str = "@cursor/sdk@1.0.32";
-const SHIM_NAME: &str = "zeron-cursor-shim.mjs";
+const SHIM_NAME: &str = "zeren-cursor-shim.mjs";
 const SHIM_SOURCE: &str = include_str!("shim.mjs");
 /// A stopped turn normally settles `cancelled` at once. The SDK's cancel can
 /// wedge on a dead transport, leaving the run unsettled: past this the turn
@@ -303,10 +303,10 @@ impl Harness for CursorHarness {
     }
     /// "Installed" means the user evidently uses Cursor: their own
     /// cursor-agent CLI, or credentials the SDK itself runs on —
-    /// `CURSOR_API_KEY`, or its saved login (which Zeron's own Cursor sign-in
+    /// `CURSOR_API_KEY`, or its saved login (which Zeren's own Cursor sign-in
     /// writes). The SDK never uses the CLI, so requiring it hid Cursor from
     /// users who signed in without installing it (common on Windows). The SDK
-    /// itself is a managed install zeron performs on demand.
+    /// itself is a managed install zeren performs on demand.
     fn installed(&self) -> bool {
         self.executable.is_some()
             || crate::acp::find_on_paths("cursor-agent", cursor_cli_paths()).is_some()
@@ -397,7 +397,7 @@ impl Harness for CursorHarness {
         let mut cmd = Command::new(&exe);
         cmd.args(&args);
         if lease.is_some() {
-            cmd.env("ZERON_CURSOR_STATE_DIR", state::state_root());
+            cmd.env("ZEREN_CURSOR_STATE_DIR", state::state_root());
         }
         crate::compose_child_path(&mut cmd, &exe);
         crate::apply_run_env(&mut cmd, &request.env);
@@ -427,7 +427,7 @@ impl Harness for CursorHarness {
             tokio::spawn(async move {
                 let mut lines = crate::lossy_lines::lossy_lines(stderr);
                 while let Ok(Some(line)) = lines.next_line().await {
-                    tracing::debug!(target: "zeron_harness::cursor", "stderr: {line}");
+                    tracing::debug!(target: "zeren_harness::cursor", "stderr: {line}");
                     tail.push(&line);
                 }
             });
@@ -447,7 +447,7 @@ impl Harness for CursorHarness {
             "modelOptions": request.model_options,
             "resume": request.resume,
             "mcp": request.mcp,
-            // The plugins' native servers, beside Zeron's own.
+            // The plugins' native servers, beside Zeren's own.
             "extraMcp": request.extra_mcp,
             "storeDir": lease.as_ref().and_then(|lease| lease.store_dir.as_ref()),
             "images": images,
@@ -625,7 +625,7 @@ async fn stdin_writer(mut stdin: ChildStdin, mut rx: mpsc::UnboundedReceiver<Str
             stdin.flush().await
         };
         if let Err(e) = write.await {
-            tracing::debug!(target: "zeron_harness::cursor", "stdin write failed (tolerated): {e}");
+            tracing::debug!(target: "zeren_harness::cursor", "stdin write failed (tolerated): {e}");
             return;
         }
     }
@@ -743,7 +743,7 @@ async fn run_session(session: Session) {
             _ = tokio::time::sleep_until(stop_deadline.unwrap_or_else(tokio::time::Instant::now)),
                 if stop_deadline.is_some() && stopping && !interrupted =>
             {
-                tracing::warn!(target: "zeron_harness::cursor",
+                tracing::warn!(target: "zeren_harness::cursor",
                     session_id = ?session_id,
                     "a stopped turn did not settle within {}s; retiring the shim",
                     stop_timeout.as_secs());
@@ -764,7 +764,7 @@ async fn run_session(session: Session) {
                         continue;
                     }
                     let Ok(frame) = serde_json::from_str::<Value>(line) else {
-                        tracing::debug!(target: "zeron_harness::cursor", "unparseable shim frame (skipped)");
+                        tracing::debug!(target: "zeren_harness::cursor", "unparseable shim frame (skipped)");
                         continue;
                     };
                     match frame.get("ev").and_then(Value::as_str).unwrap_or("") {
@@ -807,7 +807,7 @@ async fn run_session(session: Session) {
                             if frame.get("ev").and_then(Value::as_str) == Some("fatal")
                                 || frame.get("status").and_then(Value::as_str) == Some("error")
                             {
-                                tracing::warn!(target: "zeron_harness::cursor",
+                                tracing::warn!(target: "zeren_harness::cursor",
                                     session_id = ?session_id,
                                     error = ?frame.get("error").or_else(|| frame.get("message")),
                                     "Cursor SDK run failed");
@@ -1172,7 +1172,7 @@ fn map_shim_frame(frame: &Value, interrupted: bool) -> Vec<AgentEvent> {
             session_id: None,
         }],
         other => {
-            tracing::debug!(target: "zeron_harness::cursor", "unknown shim frame (skipped): {other}");
+            tracing::debug!(target: "zeren_harness::cursor", "unknown shim frame (skipped): {other}");
             Vec::new()
         }
     }

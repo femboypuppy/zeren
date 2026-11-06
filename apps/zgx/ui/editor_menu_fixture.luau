@@ -41,8 +41,8 @@ return ui.column {
 	h_full = true,
 	p = "$space.4",
 	gap = "$space.4",
-	theme = "zeron-dark",
-	bg = "$zeron.menu.solid",
+	theme = "zeren-dark",
+	bg = "$zeren.menu.solid",
 	MenuAt.Host {},
 	ui.textarea(EditorMenu.on {
 		id = "plain",

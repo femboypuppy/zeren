@@ -1,28 +1,28 @@
 --!strict
--- Parallax scenes: Zeron's member-card scenes behind a new chat, each
+-- Parallax scenes: Zeren's member-card scenes behind a new chat, each
 -- layer shifting against the pointer by its depth (the sky still, what is
 -- nearest moving most), settling back as it leaves.
 --
 -- Built only from what any plugin can use. A new chat's background is a
--- place Zeron gives plugins (`#new-chat-background`): this replaces it
+-- place Zeren gives plugins (`#new-chat-background`): this replaces it
 -- (`ui.change`), which makes it a choice in Settings → Appearance →
--- Wallpaper. Zeron fades what's drawn there and lays the chosen effect
+-- Wallpaper. Zeren fades what's drawn there and lays the chosen effect
 -- (dither, ASCII, halftone, scanlines) over it; the place provides where
 -- the pointer is (`pointer`, { x, y }, 0 to 1). Which scene, and how far
 -- it moves, are this plugin's settings (its manifest's).
 
-local zeron = require("./zeron")("parallax-scenes")
+local zeren = require("./zeren")("parallax-scenes")
 local scenes = require("./scenes")
 local motion = require("@ds/motion")
 
-local chosen = zeron.setting("scene")
-local parallax = zeron.setting("parallax")
+local chosen = zeren.setting("scene")
+local parallax = zeren.setting("parallax")
 
 -- How far a layer moves at the pointer's edge, a step of depth: points
 -- across and down, at Normal; and each setting's share of that.
 local STEP_X, STEP_Y = 14, 9
 local REACH = { off = 0, subtle = 0.5, normal = 1, deep = 1.8 } :: { [string]: number }
--- The springs a layer follows the pointer by (Zeron's).
+-- The springs a layer follows the pointer by (Zeren's).
 local SPRING = { stiffness = 140, damping = 20 }
 
 -- The last scene shuffled to: the next shuffle picks another.
@@ -68,17 +68,17 @@ local function Scene(scene: scenes.Scene, reach: number, pointer: () -> any): No
 		relative = true,
 		overflow = "hidden",
 		role = "img",
-		label = zeron.s(`scene.{(string.gsub(scene.slug, "-", "_"))}`),
+		label = zeren.s(`scene.{(string.gsub(scene.slug, "-", "_"))}`),
 		table.unpack(layers),
 	}
 end
 
-zeron.place {
+zeren.place {
 	at = "#new-chat-background",
 	fill = true,
 	replace = function(): Node
 		-- (Read here, in the build: where the pointer is over the page.)
-		local pointer = zeron.live("pointer")
+		local pointer = zeren.live("pointer")
 		-- Built again as a setting changes (a shuffle picks again each time
 		-- a new chat's background is built: each new chat).
 		return ui.presence(function(): string

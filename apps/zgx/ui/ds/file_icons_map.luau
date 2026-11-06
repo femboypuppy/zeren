@@ -1,4 +1,4 @@
--- Written by tools/file_icons.py from Zeron's Symbols theme
+-- Written by tools/file_icons.py from Zeren's Symbols theme
 -- (crates/ui/src/file-icons.json). Don't edit; run the script again.
 -- Each name is an icon's path under assets/icons/files/<light|dark>/.
 

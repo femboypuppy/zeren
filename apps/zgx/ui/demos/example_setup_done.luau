@@ -1,9 +1,9 @@
 -- Setup's ending for this device (onboarding.rs render_done): what was set
 -- up, a line each (the look, sync, GitHub when you're signed in, the
--- agents), and the way into Zeron. Not a numbered step, so no dots. With
+-- agents), and the way into Zeren. Not a numbered step, so no dots. With
 -- no project yet, the way on is adding one (a project is a folder on one
 -- of your devices) and I'll do this later stands beside it; with projects
--- already (synced from another device), it's simply Start using Zeron.
+-- already (synced from another device), it's simply Start using Zeren.
 -- Anything skipped says where it waits ("Not yet · Settings → Cloud").
 --
 -- Each line keeps its place whatever it says; signed out, GitHub's line
@@ -30,13 +30,13 @@ end
 return {
 	id = "ex_setup_done",
 	title = "You're all set",
-	about = "The ending of this device's setup: the look, sync, GitHub (signed in only) and the agents, a line each, anything skipped saying where it waits; then Add a project (or I'll do this later), or Start using Zeron when projects came with the account.",
+	about = "The ending of this device's setup: the look, sync, GitHub (signed in only) and the agents, a line each, anything skipped saying where it waits; then Add a project (or I'll do this later), or Start using Zeren when projects came with the account.",
 	demo = function()
 		local function view(account: string): Node
 			local inside = account == "in"
 			local rows: { Node } = {
 				fact("Appearance", function()
-					return "Dark · Zeron"
+					return "Dark · Zeren"
 				end),
 				fact("Sync", function()
 					return if inside then "On" else "Only on this Mac"
@@ -57,7 +57,7 @@ return {
 				end, kit.quiet { label = "I'll do this later" }),
 				continue = {
 					label = function()
-						return if projects() then "Start using Zeron" else "Add a project"
+						return if projects() then "Start using Zeren" else "Add a project"
 					end,
 				},
 				kit.form {

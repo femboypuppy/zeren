@@ -1,4 +1,4 @@
-//! The Zeron engine this app works through: its account (src/auth.rs), the
+//! The Zeren engine this app works through: its account (src/auth.rs), the
 //! agents on this Mac (src/agents.rs) and GitHub for Cloud (src/github.rs)
 //! are all the engine's, reached over its local IPC ([`rpc`]). One
 //! connection for every window, kept open: dialled again when it drops,
@@ -85,8 +85,8 @@ impl Engine {
         let account = crate::auth::endpoint();
         let config = Config::from_env(&account.edge, &account.client, account.port);
         match &config {
-            Ok(config) => eprintln!("zeron-zgx: engine: {}", config.describe()),
-            Err(why) => eprintln!("zeron-zgx: engine: refused ({why}); nothing that needs it works"),
+            Ok(config) => eprintln!("zeren-zgx: engine: {}", config.describe()),
+            Err(why) => eprintln!("zeren-zgx: engine: refused ({why}); nothing that needs it works"),
         }
         Self {
             config,
@@ -193,14 +193,14 @@ impl Engine {
             return;
         };
         self.restarting.set(true);
-        eprintln!("zeron-zgx: engine: signed in on a local workspace; starting it again to sync");
+        eprintln!("zeren-zgx: engine: signed in on a local workspace; starting it again to sync");
         self.spawn(async move {
             // It answers, then stops; the connection ends and a new engine
             // is started in its place.
             if let Err(error) = rpc.call("StopEngine", json!({})).await
                 && error != "closed"
             {
-                eprintln!("zeron-zgx: engine: didn't stop: {error}");
+                eprintln!("zeren-zgx: engine: didn't stop: {error}");
             }
         });
     }
@@ -219,7 +219,7 @@ impl Engine {
                 Ok(rpc) => {
                     delay = Duration::from_millis(250);
                     said = None;
-                    eprintln!("zeron-zgx: engine: connected");
+                    eprintln!("zeren-zgx: engine: connected");
                     *self.rpc.borrow_mut() = Some(rpc.clone());
                     self.scope.borrow_mut().take();
                     self.restarting.set(false);
@@ -238,7 +238,7 @@ impl Engine {
                     }
                     let reason = rpc.pump().await;
                     self.rpc.borrow_mut().take();
-                    eprintln!("zeron-zgx: engine: connection ended ({reason})");
+                    eprintln!("zeren-zgx: engine: connection ended ({reason})");
                 }
                 Err(DialError::Refused) => {
                     if spawner.start_if_due(config) {
@@ -249,7 +249,7 @@ impl Engine {
                 Err(DialError::Unauthorized) => {}
                 Err(DialError::Other(error)) => {
                     if said.as_deref() != Some(&error) {
-                        eprintln!("zeron-zgx: engine: can't connect: {error}");
+                        eprintln!("zeren-zgx: engine: can't connect: {error}");
                         said = Some(error);
                     }
                 }

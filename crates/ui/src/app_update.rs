@@ -11,13 +11,13 @@
 //! release downloads in the background and is verified, the strip offers
 //! "restart to apply", and a staged update the user never restarts for is
 //! installed when the app quits — so nobody stays on a stale version just
-//! because they never clicked. `ZERON_AUTO_UPDATE=0` keeps it report-only.
+//! because they never clicked. `ZEREN_AUTO_UPDATE=0` keeps it report-only.
 
 use std::path::{Path, PathBuf};
 
 use gpui::{App, AppContext as _, Context, Entity, Global, SharedString, Task};
 use gpui_tokio::Tokio;
-use zeron_update::{Channel, InstallKind, UpdateBlocker, UpdateStatus, Updater};
+use zeren_update::{Channel, InstallKind, UpdateBlocker, UpdateStatus, Updater};
 
 /// Download/install lifecycle of the newest release in this process.
 #[derive(Debug, Clone, PartialEq)]
@@ -66,7 +66,7 @@ pub enum StripAction {
 pub struct AppUpdate {
     install: InstallKind,
     blocker: Option<UpdateBlocker>,
-    /// Background download + install on quit (`ZERON_AUTO_UPDATE` unset or on).
+    /// Background download + install on quit (`ZEREN_AUTO_UPDATE` unset or on).
     automatic: bool,
     edge_url: String,
     data_dir: PathBuf,
@@ -103,14 +103,14 @@ impl AppUpdate {
     }
 
     fn new(edge_url: String, data_dir: PathBuf, cx: &mut Context<Self>) -> Self {
-        let install = zeron_update::detect_install();
+        let install = zeren_update::detect_install();
         let blocker = install
             .supports_desktop_update()
             .then(|| install.desktop_update_blocker())
             .flatten();
         // The channel (update-channel.json) lives in the data dir, where the
         // next interface installed here reads it too.
-        zeron_update::channel::set_data_dir(&data_dir);
+        zeren_update::channel::set_data_dir(&data_dir);
         let checker = {
             let _runtime = Tokio::handle(cx).enter();
             Updater::spawn_desktop(edge_url.clone())
@@ -131,7 +131,7 @@ impl AppUpdate {
         Self {
             install,
             blocker,
-            automatic: zeron_update::desktop_auto_update_enabled(),
+            automatic: zeren_update::desktop_auto_update_enabled(),
             edge_url,
             data_dir,
             checker,
@@ -238,7 +238,7 @@ impl AppUpdate {
             version: version.clone(),
         };
         let stage = Tokio::spawn(cx, async move {
-            zeron_update::desktop::stage_offer(&edge_url, &data_dir, &install).await
+            zeren_update::desktop::stage_offer(&edge_url, &data_dir, &install).await
         });
         self.download = Some(cx.spawn(async move |this, cx| {
             let outcome = match stage.await {
@@ -367,7 +367,7 @@ impl AppUpdate {
 
     /// Whether this Mac follows the beta channel.
     pub fn beta(&self) -> bool {
-        zeron_update::channel::read(&self.data_dir).channel == Channel::Beta
+        zeren_update::channel::read(&self.data_dir).channel == Channel::Beta
     }
 
     /// Whether the channel choice applies here (a macOS app install).
@@ -383,10 +383,10 @@ impl AppUpdate {
     /// "Get beta updates": follow the beta channel (or stable again), then
     /// check at once. A beta needs macOS 13 (`BETA_MINIMUM_MACOS`); an older Mac is told so and
     /// stays on stable. Leaving beta offers stable's release even when it's
-    /// older ([`zeron_update::Offer::Switch`]).
+    /// older ([`zeren_update::Offer::Switch`]).
     pub fn set_beta(&mut self, on: bool, cx: &mut Context<Self>) {
         self.channel_note = None;
-        if let Err(why) = zeron_update::desktop::choose_channel(&self.data_dir, on) {
+        if let Err(why) = zeren_update::desktop::choose_channel(&self.data_dir, on) {
             tracing::warn!(%why, "update channel unchanged");
             self.channel_note = Some(why.into());
             cx.notify();
@@ -423,7 +423,7 @@ impl AppUpdate {
 
 /// Label + click action of the strip. Self-updating installs drive their flow
 /// from it; blocked installs explain themselves; managed installs without a
-/// desktop path get the `zeron update` hint; unmanaged installs (source builds,
+/// desktop path get the `zeren update` hint; unmanaged installs (source builds,
 /// hand-copied binaries) are pointed at the GitHub releases page.
 pub fn strip_for(
     install: &InstallKind,
@@ -459,7 +459,7 @@ pub fn strip_for(
     }
     if matches!(install, InstallKind::Managed { .. }) {
         (
-            format!("Update available — v{latest} · run `zeron update`").into(),
+            format!("Update available — v{latest} · run `zeren update`").into(),
             StripAction::Advise {
                 open_releases: false,
             },
@@ -496,7 +496,7 @@ mod tests {
     #[test]
     fn strip_follows_the_flow_on_self_updating_installs() {
         let mac_app = InstallKind::MacApp {
-            bundle: PathBuf::from("/Applications/Zeron.app"),
+            bundle: PathBuf::from("/Applications/Zeren.app"),
         };
         assert_eq!(
             strip_for(&mac_app, false, &Flow::Idle, "0.2.86"),
@@ -517,7 +517,7 @@ mod tests {
         );
         let ready = Flow::Ready {
             version: "0.2.86".into(),
-            staged: PathBuf::from("/tmp/Zeron.app"),
+            staged: PathBuf::from("/tmp/Zeren.app"),
         };
         assert_eq!(
             strip_for(&mac_app, false, &ready, "0.2.86").1,
@@ -554,7 +554,7 @@ mod tests {
             )
         );
         let managed = InstallKind::Managed {
-            app_root: PathBuf::from("/home/u/.zeron/app"),
+            app_root: PathBuf::from("/home/u/.zeren/app"),
         };
         let strip = strip_for(&managed, false, &Flow::Idle, "0.2.86");
         if cfg!(target_os = "linux") {
@@ -564,7 +564,7 @@ mod tests {
         } else {
             assert_eq!(
                 strip.0,
-                SharedString::from("Update available — v0.2.86 · run `zeron update`")
+                SharedString::from("Update available — v0.2.86 · run `zeren update`")
             );
         }
     }
@@ -573,7 +573,7 @@ mod tests {
     #[test]
     fn windows_installs_drive_the_desktop_flow() {
         let installed = InstallKind::WindowsPortable {
-            directory: PathBuf::from(r"C:\Users\u\AppData\Local\Programs\Zeron"),
+            directory: PathBuf::from(r"C:\Users\u\AppData\Local\Programs\Zeren"),
         };
         assert_eq!(
             strip_for(&installed, false, &Flow::Idle, "0.2.86"),

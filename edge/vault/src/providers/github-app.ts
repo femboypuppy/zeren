@@ -89,7 +89,7 @@ export const appJwt = async (clientId: string, pem: string, nowMs: number): Prom
 const headers = (bearer: string) => ({
   accept: "application/vnd.github+json",
   authorization: `Bearer ${bearer}`,
-  "user-agent": "zeron-vault",
+  "user-agent": "zeren-vault",
   "x-github-api-version": "2022-11-28"
 });
 

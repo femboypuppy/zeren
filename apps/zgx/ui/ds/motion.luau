@@ -1,6 +1,6 @@
 -- How the window's columns move: the sidebar folding away and back, a
 -- session's panel opening and closing, and what rides with them (the
--- page's title in the strip, the title bar's island). Zeron's own
+-- page's title in the strip, the title bar's island). Zeren's own
 -- (crates/ui `WidthTween::panel`, motion `PANEL_RESIZE`): the dialog
 -- entrance's curve, CSS `ease`, easing into the move and landing softly;
 -- 180 ms for the sidebar's width, longer moves taking longer by the square
@@ -18,7 +18,7 @@ local prefers = require("@self/prefers")
 local M = {}
 
 -- Reduce motion: the one place every animation asks. On with the system's
--- Reduce motion (macOS) or Zeron's own setting (`M.reduce`, Settings), and
+-- Reduce motion (macOS) or Zeren's own setting (`M.reduce`, Settings), and
 -- then nothing travels: a move lands at once, a fade is a short crossfade,
 -- and what a state change shows is right on the next frame. Tracked: read in
 -- a binding or computed, it follows a change of either.
@@ -138,7 +138,7 @@ M.sidebar = { duration = M.BASE, ease = M.EASE } :: TweenOptions
 -- tune it.
 M.SNAPPY = { open = 250, close = 200, zoom = 200, ease = "out(4)" }
 
--- A hover's fade (Zeron's `HOVER_FADE`: 150 ms on Tailwind's ease,
+-- A hover's fade (Zeren's `HOVER_FADE`: 150 ms on Tailwind's ease,
 -- cubic-bezier(0.4, 0, 0.2, 1)): what the pointer lights fades in at once
 -- and out as it leaves, from wherever it stood. `hover()` is it for
 -- `ui.tween`, at once with motion reduced.

@@ -84,7 +84,7 @@ fn setup(cx: &mut TestAppContext) -> (Entity<Shell>, &mut VisualTestContext) {
                     edge_token: None,
                     org_id: None,
                     workos_client_id: None,
-                    default_harness: zeron_proto::HarnessId::Mock,
+                    default_harness: zeren_proto::HarnessId::Mock,
                 },
                 cx,
             );
@@ -590,12 +590,12 @@ fn pull_requests_from_a_chat_open_as_tabs_beside_the_focused_session(cx: &mut Te
         });
     });
     // Pull requests sent to the default browser in Settings open there, even
-    // while other links open in Zeron.
+    // while other links open in Zeren.
     cx.update(|window, cx| {
         settings::update(SavePolicy::Immediate, cx, |settings| {
             settings.pull_request_destination = settings::PullRequestDestination::External;
         });
-        assert!(settings::current(cx).open_web_links_in_zeron);
+        assert!(settings::current(cx).open_web_links_in_zeren);
         shell.update(cx, |shell, cx| {
             let before = (shell.chat_pull_requests.len(), shell.browsers.len());
             assert_eq!(
@@ -608,12 +608,12 @@ fn pull_requests_from_a_chat_open_as_tabs_beside_the_focused_session(cx: &mut Te
             );
         });
     });
-    // With "Open links in Zeron" off, a pull request link leaves Zeron too,
+    // With "Open links in Zeren" off, a pull request link leaves Zeren too,
     // even with the pull request view selected.
     cx.update(|window, cx| {
         settings::update(SavePolicy::Immediate, cx, |settings| {
             settings.pull_request_destination = settings::PullRequestDestination::Native;
-            settings.open_web_links_in_zeron = false;
+            settings.open_web_links_in_zeren = false;
         });
         shell.update(cx, |shell, cx| {
             let before = (shell.chat_pull_requests.len(), shell.browsers.len());

@@ -91,12 +91,12 @@ pub trait KeyDirectory: Send + Sync + 'static {
 /// The real edge, with the signed-in user's bearer.
 pub struct EdgeDirectory {
     url: String,
-    token: Arc<dyn zeron_rpc::TokenSource>,
+    token: Arc<dyn zeren_rpc::TokenSource>,
     http: reqwest::Client,
 }
 
 impl EdgeDirectory {
-    pub fn new(url: &str, token: Arc<dyn zeron_rpc::TokenSource>) -> Self {
+    pub fn new(url: &str, token: Arc<dyn zeren_rpc::TokenSource>) -> Self {
         Self {
             url: url.trim_end_matches('/').to_owned(),
             token,

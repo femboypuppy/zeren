@@ -133,7 +133,7 @@ describe("claiming a username", () => {
     expect((await claim("user_rules", "no")).status).toBe(400);
     expect((await claim("user_rules", "has space")).status).toBe(400);
     expect((await claim("user_rules", 7)).status).toBe(400);
-    for (const reserved of ["admin", "API", "support", "zeron", "zeron-team"]) {
+    for (const reserved of ["admin", "API", "support", "zeren", "zeren-team"]) {
       const res = await claim("user_rules", reserved);
       expect(res.status).toBe(403);
       expect(await res.json()).toMatchObject({ error: "reserved_username" });
@@ -237,12 +237,12 @@ describe("admin usernames", () => {
 
   it("sets a name, reserved ones included, and shows it in the directory", async () => {
     await signUp("user_house");
-    const res = await admin("/admin/usernames/set", { userId: "user_house", username: "Zeron" });
-    expect(await res.json()).toMatchObject({ username: "zeron", ...deriveCard("user_house", CARD_SCENES) });
+    const res = await admin("/admin/usernames/set", { userId: "user_house", username: "Zeren" });
+    expect(await res.json()).toMatchObject({ username: "zeren", ...deriveCard("user_house", CARD_SCENES) });
     const listed = (await (await admin("/admin/users")).json()) as { users: { userId: string; username: string | null }[] };
-    expect(listed.users.find((u) => u.userId === "user_house")?.username).toBe("zeron");
+    expect(listed.users.find((u) => u.userId === "user_house")?.username).toBe("zeren");
     const csv = await (await admin("/admin/users?format=csv")).text();
-    expect(csv).toMatch(/\n\d+,user_house,.*,zeron,,\n/);
+    expect(csv).toMatch(/\n\d+,user_house,.*,zeren,,\n/);
   });
 
   it("won't take a name from someone holding it", async () => {

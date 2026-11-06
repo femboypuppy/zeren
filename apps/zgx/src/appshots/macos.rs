@@ -211,7 +211,7 @@ pub(super) fn start_global_shortcut(on_press: Box<dyn Fn()>, shortcut: Option<Sh
     };
     if status != 0 {
         SHORTCUT_READY.store(false, Ordering::Relaxed);
-        eprintln!("zeron-zgx: the Appshot shortcut's handler is unavailable ({status})");
+        eprintln!("zeren-zgx: the Appshot shortcut's handler is unavailable ({status})");
         return;
     }
     HOT_KEY.with(|registration| {
@@ -266,7 +266,7 @@ pub(super) fn refresh_global_shortcut(shortcut: Option<Shortcut>) {
         };
         SHORTCUT_READY.store(status == 0, Ordering::Relaxed);
         if status != 0 {
-            eprintln!("zeron-zgx: the Appshot shortcut isn't available ({status})");
+            eprintln!("zeren-zgx: the Appshot shortcut isn't available ({status})");
         }
     });
 }
@@ -390,7 +390,7 @@ pub(super) fn capture_frontmost_window() -> Result<Captured, CaptureError> {
             Err(error) => {
                 // ScreenCaptureKit is the reliable path for fullscreen Spaces,
                 // but keep macOS 12/13 and transient framework failures useful.
-                eprintln!("zeron-zgx: ScreenCaptureKit Appshot failed ({error}); using CoreGraphics");
+                eprintln!("zeren-zgx: ScreenCaptureKit Appshot failed ({error}); using CoreGraphics");
                 let png = capture_png(preserved_window.id)?;
                 (preserved_window, png)
             }
@@ -612,7 +612,7 @@ pub(super) fn foreground_after_capture() {
         let _: () = msg_send![configuration, setCreatesNewApplicationInstance: 0i8];
         let completion = ConcreteBlock::new(|_app: *mut Object, error: *mut Object| {
             if !error.is_null() {
-                eprintln!("zeron-zgx: couldn't bring Zeron forward after an Appshot");
+                eprintln!("zeren-zgx: couldn't bring Zeren forward after an Appshot");
             }
         })
         .copy();
@@ -763,7 +763,7 @@ fn capture_with_screen_capture_kit(
 fn load_screen_capture_kit() -> bool {
     static AVAILABLE: OnceLock<bool> = OnceLock::new();
     *AVAILABLE.get_or_init(|| unsafe {
-        // Load dynamically so Zeron's macOS 12.0 minimum remains valid. The
+        // Load dynamically so Zeren's macOS 12.0 minimum remains valid. The
         // screenshot manager arrived in macOS 14; older systems use fallback.
         let path = b"/System/Library/Frameworks/ScreenCaptureKit.framework/ScreenCaptureKit\0";
         !dlopen(path.as_ptr().cast(), 1).is_null() // RTLD_LAZY
@@ -914,7 +914,7 @@ fn encode_png(image: *mut c_void) -> Result<Vec<u8>, String> {
         }
         let len: usize = msg_send![data, length];
         if len as u64 > super::MAX_IMAGE_BYTES {
-            return Err("The captured window is larger than Zeron's 24 MB image limit.".into());
+            return Err("The captured window is larger than Zeren's 24 MB image limit.".into());
         }
         let bytes: *const u8 = msg_send![data, bytes];
         if bytes.is_null() || len == 0 {

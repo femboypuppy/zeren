@@ -1,4 +1,4 @@
--- A virtual list in a box whose height eases (a fold, as Zeron's sidebar
+-- A virtual list in a box whose height eases (a fold, as Zeren's sidebar
 -- groups and panel lists fold). The box clips; a column in it holds the
 -- list, which asks for its own height (12 rows of 200). Each row: a
 -- fixed-height row holding a full-height row. `open` eases the box shut

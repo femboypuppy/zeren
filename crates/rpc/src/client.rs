@@ -387,7 +387,7 @@ const CONNECT_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(5);
 
 /// Dial the engine's localhost IPC on `port`, presenting the bearer the
 /// engine published ([`crate::ipc_auth`]). Tokens are resolved at dial time
-/// — `$ZERON_IPC_TOKEN`, `$ZERON_IPC_TOKEN_FILE`, then
+/// — `$ZEREN_IPC_TOKEN`, `$ZEREN_IPC_TOKEN_FILE`, then
 /// `{data_dir}/ipc-token` — and tried in that order, so a stale explicit token
 /// falls back to the file the restarted engine just rewrote. With no token at
 /// all the dial goes out bare (an engine that predates IPC auth accepts it).
@@ -398,9 +398,9 @@ pub async fn connect_ipc(
     connect_ipc_with(port, data_dir, crate::ipc_auth::client_tokens(data_dir)).await
 }
 
-/// [`connect_ipc`] for an agent's `zeron mcp` server: with the agent-scoped
-/// token only — `$ZERON_IPC_TOKEN_FILE` (what the engine hands it), else
-/// `{data_dir}/ipc-token-agent` (a `zeron mcp` someone configured by hand).
+/// [`connect_ipc`] for an agent's `zeren mcp` server: with the agent-scoped
+/// token only — `$ZEREN_IPC_TOKEN_FILE` (what the engine hands it), else
+/// `{data_dir}/ipc-token-agent` (a `zeren mcp` someone configured by hand).
 /// Never the app's full token, so whatever runs the server reaches only
 /// what its tools need ([`crate::agent_allowed`]).
 pub async fn connect_ipc_as_agent(
@@ -471,7 +471,7 @@ async fn dial(url: &str, token: Option<&str>) -> Result<RpcClient, DialError> {
     }
     // An agent's MCP server says which chat it serves, for the engine's
     // record of who asked (claimed, never an authority).
-    if let Some(chat) = std::env::var("ZERON_CHAT_ID").ok().filter(|c| !c.is_empty())
+    if let Some(chat) = std::env::var("ZEREN_CHAT_ID").ok().filter(|c| !c.is_empty())
         && let Ok(value) = HeaderValue::from_str(&chat)
     {
         request.headers_mut().insert(crate::ipc_auth::CHAT_HEADER, value);

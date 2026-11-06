@@ -38,7 +38,7 @@ const CONFUSABLE: Record<string, string> = {
 };
 
 /** Words an org may not be named with, wherever they appear. */
-const ORG_BRANDS = ["zeron", "anthropic", "openai", "github", "microsoft", "workos", "google", "apple"];
+const ORG_BRANDS = ["zeren", "anthropic", "openai", "github", "microsoft", "workos", "google", "apple"];
 /** Words that only count as a whole word (`Apple`, not `Pineapple`). */
 const WHOLE_WORD = new Set(["google", "apple"]);
 

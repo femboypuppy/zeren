@@ -1,14 +1,14 @@
-//! A client for a Zeron engine's local IPC: one WebSocket at
+//! A client for a Zeren engine's local IPC: one WebSocket at
 //! `ws://127.0.0.1:{port}`, one JSON object per message. Requests are
 //! `{id, method, params}`; replies `{id, ok}` or `{id, err}`; watches stream
 //! `{id, item}` until `{id, done}` and stop with `{id, cancel: true}`
-//! (crates/rpc/src/lib.rs in zeronsh/zeron).
+//! (crates/rpc/src/lib.rs in zeronsh/zeren).
 //!
 //! The engine refuses a handshake without `Authorization: Bearer <token>`,
 //! the token it writes to `{data_dir}/ipc-token` on every start
 //! (crates/rpc/src/ipc_auth.rs), so a dial reads the file afresh.
 //!
-//! Adapted from zgx's `examples/support/zeron_rpc.rs` (which predates the
+//! Adapted from zgx's `examples/support/zeren_rpc.rs` (which predates the
 //! token): a background thread owns the socket; the UI thread routes frames
 //! by id. The thread sleeps until the socket has something or a request is
 //! sent (a byte down a pipe it waits on beside the socket), so an idle
@@ -321,7 +321,7 @@ pub fn connect(port: u16, token: Option<String>) -> impl Future<Output = Result<
     #[cfg(not(unix))]
     let ready = true;
     let spawned = ready.then(|| {
-        std::thread::Builder::new().name("zeron-ipc".into()).spawn(move || {
+        std::thread::Builder::new().name("zeren-ipc".into()).spawn(move || {
             let socket = match dial(port, token.as_deref()) {
                 Ok(socket) => socket,
                 Err(error) => {

@@ -231,7 +231,7 @@ function M.anchor(key: string, row: Node, fit: boolean?): Node
 			bottom = 0,
 			pointer_events = "none",
 			aria_hidden = true,
-			bg = "$zeron.selected.flat.bg",
+			bg = "$zeren.selected.flat.bg",
 			opacity = function()
 				return if M.lit:get() == key then 1 else 0
 			end,
@@ -278,7 +278,7 @@ local function titled(title: string): Node
 			end
 		end
 		table.insert(runs, ui.span { part("before") })
-		table.insert(runs, ui.span { part("match"), bg = "$zeron.match.wash", color = "$zeron.match.ink", radius = ui.raw(2, "a match's tint hugs its letters, inside the line") })
+		table.insert(runs, ui.span { part("match"), bg = "$zeren.match.wash", color = "$zeren.match.ink", radius = ui.raw(2, "a match's tint hugs its letters, inside the line") })
 		table.insert(runs, ui.span { part("after") })
 	end
 	local props: { [any]: any } = { text_size = "$font.size.md", line_height = "$font.line.md" }
@@ -367,14 +367,14 @@ function M.Field(): Node
 			selected = on,
 			cursor = "pointer",
 			w_full = true,
-			min_h = "$zeron.menu.row",
+			min_h = "$zeren.menu.row",
 			px = "$space.2",
 			py = "$space.1",
 			gap = "$space.2",
 			items = "center",
 			rounded = "$radius.md",
 			bg = function()
-				return if on() then "$zeron.selected.flat.bg" else "#00000000"
+				return if on() then "$zeren.selected.flat.bg" else "#00000000"
 			end,
 			color = function()
 				return if on() then "$text.primary" else "$text.secondary"
@@ -407,13 +407,13 @@ function M.Field(): Node
 		role = "listbox",
 		label = ui.t("settings.search.results"),
 		w_full = true,
-		gap = "$zeron.list.gap",
+		gap = "$zeren.list.gap",
 		ui.each(M.hits, function(_h: Hit, _i: number, hit: State<Hit>): Node
 			return row(hit)
 		end, {
 			key = id_of,
 			w_full = true,
-			gap = "$zeron.list.gap",
+			gap = "$zeren.list.gap",
 		}),
 		ui.show(function()
 			return count() == 0

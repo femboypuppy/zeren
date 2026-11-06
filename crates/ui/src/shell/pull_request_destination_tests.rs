@@ -4,10 +4,10 @@
 use super::*;
 use crate::settings::PullRequestDestination;
 use gpui::{AppContext, TestAppContext, VisualTestContext};
-use zeron_doc::{MessagePart, MessageRole, MessageStatus, SessionMessageEntry};
+use zeren_doc::{MessagePart, MessageRole, MessageStatus, SessionMessageEntry};
 
 fn pull_request(number: u64) -> String {
-    format!("https://github.com/acme/zeron/pull/{number}")
+    format!("https://github.com/acme/zeren/pull/{number}")
 }
 
 /// Sessions `a` (focused) and `b`, each on a branch whose open pull request
@@ -47,17 +47,17 @@ fn setup(cx: &mut TestAppContext) -> (tempfile::TempDir, Entity<Shell>, &mut Vis
                     }))
                     .unwrap(),
                 );
-                state.fixture_sidebar_change_request(zeron_proto::CheckoutChangeRequestStatus {
+                state.fixture_sidebar_change_request(zeren_proto::CheckoutChangeRequestStatus {
                     checkout_id: id.into(),
                     device_id: "local".into(),
                     cwd: "/repo".into(),
                     branch: branch.clone(),
-                    change_request: Some(zeron_proto::ChangeRequestSummary {
+                    change_request: Some(zeren_proto::ChangeRequestSummary {
                         provider: "github".into(),
                         number,
                         title: format!("Pull request {number}"),
                         url: pull_request(number),
-                        state: zeron_proto::ChangeRequestState::Open,
+                        state: zeren_proto::ChangeRequestState::Open,
                         base_ref: "main".into(),
                         head_ref: branch,
                         signals: None,
@@ -77,7 +77,7 @@ fn setup(cx: &mut TestAppContext) -> (tempfile::TempDir, Entity<Shell>, &mut Vis
                 edge_token: None,
                 org_id: None,
                 workos_client_id: None,
-                default_harness: zeron_proto::HarnessId::Mock,
+                default_harness: zeren_proto::HarnessId::Mock,
             },
             cx,
         );
@@ -115,18 +115,18 @@ fn click(cx: &mut VisualTestContext, selector: &'static str) {
 fn send_pull_requests(
     cx: &mut VisualTestContext,
     destination: PullRequestDestination,
-    open_web_links_in_zeron: bool,
+    open_web_links_in_zeren: bool,
 ) {
     cx.update(|_, cx| {
         settings::update(SavePolicy::Immediate, cx, |settings| {
             settings.pull_request_destination = destination;
-            settings.open_web_links_in_zeron = open_web_links_in_zeron;
+            settings.open_web_links_in_zeren = open_web_links_in_zeren;
         })
     });
     redraw(cx);
 }
 
-/// What a right-pane tab shows: Zeron's pull request view or a Browser tab,
+/// What a right-pane tab shows: Zeren's pull request view or a Browser tab,
 /// and the address it opened.
 fn shown(shell: &Shell, surface: &RightSurface, cx: &App) -> Option<(&'static str, String)> {
     match surface {
@@ -159,7 +159,7 @@ fn pane(
 }
 
 /// A badge opens its pull request where Settings says, beside the focused
-/// session, whatever "Open links in Zeron" says: a badge is not a link in a
+/// session, whatever "Open links in Zeren" says: a badge is not a link in a
 /// message. Off a session no pane can hold a Browser tab, so "In-app
 /// browser" opens the default browser there.
 #[gpui::test]
@@ -204,7 +204,7 @@ fn board_rows_open_pull_requests_where_settings_send_them(cx: &mut TestAppContex
             .read_with(cx, |shell, _| shell.pull_requests_page.clone())
             .expect("the board is open");
         let item = serde_json::from_value(serde_json::json!({
-            "provider": "github", "repository": "acme/zeron", "number": number,
+            "provider": "github", "repository": "acme/zeren", "number": number,
             "title": format!("Pull request {number}"), "url": pull_request(number),
             "state": "open", "isDraft": false, "additions": 1, "deletions": 1,
             "mergeability": "mergeable", "createdAt": Utc::now(), "updatedAt": Utc::now(),
@@ -242,9 +242,9 @@ fn board_rows_open_pull_requests_where_settings_send_them(cx: &mut TestAppContex
 }
 
 /// A pull request link in a message, clicked where the transcript painted
-/// it, opens where Settings says while "Open links in Zeron" is on and in the
-/// default browser while it is off (#956). "Open in Zeron" from the link's
-/// menu always stays in Zeron.
+/// it, opens where Settings says while "Open links in Zeren" is on and in the
+/// default browser while it is off (#956). "Open in Zeren" from the link's
+/// menu always stays in Zeren.
 #[gpui::test]
 fn transcript_pull_request_links_open_where_settings_send_them(cx: &mut TestAppContext) {
     let _selection = crate::markdown::selection::test_state_lock();
@@ -286,18 +286,18 @@ fn transcript_pull_request_links_open_where_settings_send_them(cx: &mut TestAppC
     assert_eq!(cx.opened_url(), Some(pull_request(3)));
     assert_eq!(pane(&shell, cx), (2, Some(("browser", pull_request(2)))));
 
-    // The link that left Zeron keeps focus and shows its destination; the
+    // The link that left Zeren keeps focus and shows its destination; the
     // next link in the same message still opens on the first press.
     send_pull_requests(cx, PullRequestDestination::Native, false);
     click_at(cx, painted("fix 4"));
     assert_eq!(cx.opened_url(), Some(pull_request(4)));
     assert_eq!(pane(&shell, cx), (2, Some(("browser", pull_request(2)))));
 
-    open_in_zeron(cx, "fix 5");
+    open_in_zeren(cx, "fix 5");
     assert_eq!(pane(&shell, cx), (3, Some(("view", pull_request(5)))));
 
     send_pull_requests(cx, PullRequestDestination::External, true);
-    open_in_zeron(cx, "fix 6");
+    open_in_zeren(cx, "fix 6");
     assert_eq!(pane(&shell, cx), (4, Some(("browser", pull_request(6)))));
     assert_eq!(cx.opened_url(), Some(pull_request(4)));
 }
@@ -307,11 +307,11 @@ fn painted(label: &str) -> Point<Pixels> {
     crate::markdown::render::selection_test_position(label) + gpui::point(px(2.), px(8.))
 }
 
-/// "Open in Zeron" from the menu of the link labelled `label`.
-fn open_in_zeron(cx: &mut VisualTestContext, label: &str) {
+/// "Open in Zeren" from the menu of the link labelled `label`.
+fn open_in_zeren(cx: &mut VisualTestContext, label: &str) {
     let position = painted(label);
     cx.simulate_mouse_down(position, MouseButton::Right, gpui::Modifiers::default());
     cx.simulate_mouse_up(position, MouseButton::Right, gpui::Modifiers::default());
     redraw(cx);
-    click(cx, "link-menu-open-zeron");
+    click(cx, "link-menu-open-zeren");
 }

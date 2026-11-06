@@ -8,7 +8,7 @@
 -- in the chat's folder. `fixture_width` narrows the page; the commands
 -- switch the theme and stream a reply that shows a picture.
 --
---   ./target/release/zeron-zgx fixture=reply_pictures_fixture.luau --inspect
+--   ./target/release/zeren-zgx fixture=reply_pictures_fixture.luau --inspect
 
 ui.theme.strict("warn")
 local ds = require("@ds")
@@ -136,11 +136,11 @@ local draft = ui.state("fixture_draft", { id = "", text = "" })
 
 ui.command { id = "theme_light", title = "Light theme", run = function()
 	ui.theme.follow_system(false)
-	ui.theme.current:set("zeron-light")
+	ui.theme.current:set("zeren-light")
 end }
 ui.command { id = "theme_dark", title = "Dark theme", run = function()
 	ui.theme.follow_system(false)
-	ui.theme.current:set("zeron-dark")
+	ui.theme.current:set("zeren-dark")
 end }
 -- A reply written word by word that shows a picture partway.
 ui.command { id = "stream", title = "Stream a reply with a picture", run = function()
@@ -164,7 +164,7 @@ local Page = ui.component(function(): Node
 	return ui.column {
 		w_full = true,
 		h_full = true,
-		bg = "$zeron.window",
+		bg = "$zeren.window",
 		items = "center",
 		ui.column {
 			h_full = true,

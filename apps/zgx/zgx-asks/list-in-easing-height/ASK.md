@@ -1,9 +1,9 @@
 # Ask: a virtual list in a box whose height eases, laid out without a panic
 
-**Priority: medium.** A panic takes the whole window down. Zeron's sidebar
+**Priority: medium.** A panic takes the whole window down. Zeren's sidebar
 groups and the panel home's Side chats and Subagents lists fold with an
 eased height; with about 200 rows in a fold, folding it panicked the app.
-Zeron works around it (below), and any zgx app that eases a box round a
+Zeren works around it (below), and any zgx app that eases a box round a
 `ui.list` meets it.
 
 **Today.** A `ui.list` (`data`, fixed `height`, its own `h`) inside a column
@@ -22,7 +22,7 @@ shrinking box, and the list's rows (built for the height it's given) never
 settle. Any one of these avoids it:
 - the list straight in the box, with no column between them
 - the row without its inner `h_full` row
-- the column given the list's height and `shrink = 0` (Zeron's workaround,
+- the column given the list's height and `shrink = 0` (Zeren's workaround,
   ds/session_row `Fold`: its content laid out at full height, the clip
   alone easing)
 
@@ -37,4 +37,4 @@ shut.
 2. Otherwise, at the limit, an error the app can see (`app:error()`, the
    inspector), not a panic, naming the node that didn't settle.
 
-**Seen on:** zgx `f6506b6e6` (Zeron's pin), macOS, Nov 2.
+**Seen on:** zgx `f6506b6e6` (Zeren's pin), macOS, Nov 2.

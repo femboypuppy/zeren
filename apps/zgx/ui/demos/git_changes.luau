@@ -1,5 +1,5 @@
 -- The changed files of a commit or a pull request as one list, drawn for
--- the worst case: a thousand files. Zeron's own Changes panel is a single
+-- the worst case: a thousand files. Zeren's own Changes panel is a single
 -- virtualized list at line granularity (changes.rs: every file header,
 -- hunk header and line a row of its own; a folded file keeps no body
 -- rows), and this does the same with `ui.list`, so a thousand files cost
@@ -52,7 +52,7 @@ local DIRS = {
 	"apps/zgx/ui/screens",
 	"edge/src",
 	"edge/src/rooms",
-	"apps/ios/Zeron/Views",
+	"apps/ios/Zeren/Views",
 	"apps/android/app/src/main",
 	"docs",
 }
@@ -67,7 +67,7 @@ local EXT: { [string]: string } = {
 	["apps/zgx/ui/screens"] = "luau",
 	["edge/src"] = "ts",
 	["edge/src/rooms"] = "ts",
-	["apps/ios/Zeron/Views"] = "swift",
+	["apps/ios/Zeren/Views"] = "swift",
 	["apps/android/app/src/main"] = "kt",
 	["docs"] = "md",
 }

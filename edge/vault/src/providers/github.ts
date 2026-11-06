@@ -240,7 +240,7 @@ export const fetchGithubLogin = async (accessToken: string, fetchFn: FetchFn): P
     headers: {
       accept: "application/vnd.github+json",
       authorization: `Bearer ${accessToken}`,
-      "user-agent": "zeron-vault",
+      "user-agent": "zeren-vault",
       "x-github-api-version": "2022-11-28"
     }
   });

@@ -2,8 +2,8 @@
 //! Measuring retained allocations avoids platform-dependent RSS/GC thresholds.
 use std::alloc::{GlobalAlloc, Layout, System};
 use std::sync::atomic::{AtomicUsize, Ordering::Relaxed};
-use zeron_doc::{MessagePart, SegmentWriter, SessionDoc, fold_event_into_parts};
-use zeron_proto::AgentEvent;
+use zeren_doc::{MessagePart, SegmentWriter, SessionDoc, fold_event_into_parts};
+use zeren_proto::AgentEvent;
 
 struct CountingAllocator;
 static LIVE_BYTES: AtomicUsize = AtomicUsize::new(0);

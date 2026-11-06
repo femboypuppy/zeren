@@ -24,7 +24,7 @@ In every run the left session was left 0.60 to 0.62 s after Enter. Its message l
 Regenerate, with the driver copied to `crates/ui/examples/`:
 
 ```sh
-cargo build -p zeron-ui --features appshots-fixture --example undelivered-send-repro
+cargo build -p zeren-ui --features appshots-fixture --example undelivered-send-repro
 ./run.sh target/debug/examples/undelivered-send-repro after
 ```
 

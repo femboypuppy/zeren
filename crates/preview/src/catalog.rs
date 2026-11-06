@@ -1,6 +1,6 @@
 //! Persisted names are independent of ephemeral process/listener observations.
 use crate::discovery::{Listener, command_identity, framework};
-use zeron_preview_label::process_label;
+use zeren_preview_label::process_label;
 use anyhow::Context;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -10,7 +10,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 use tokio::sync::watch;
-use zeron_proto::{PREVIEW_PROXY_PORT, PreviewService, PreviewSnapshot};
+use zeren_proto::{PREVIEW_PROXY_PORT, PreviewService, PreviewSnapshot};
 
 #[derive(Clone)]
 pub struct Catalog(Arc<Inner>);
@@ -305,7 +305,7 @@ impl Catalog {
             (
                 root.clone(),
                 std::cmp::Reverse(framework(&l.args).1),
-                std::cmp::Reverse(l.zeron_owned),
+                std::cmp::Reverse(l.zeren_owned),
                 l.started_at,
                 l.pid,
                 l.address,
@@ -427,7 +427,7 @@ impl Catalog {
                 pid: listener.pid,
                 cwd: listener.cwd.to_string_lossy().into_owned(),
                 started_at: listener.started_at,
-                zeron_owned: listener.zeron_owned,
+                zeren_owned: listener.zeren_owned,
                 chat_id: listener.chat_id.clone(),
                 process: process_label(&listener.args),
             };
@@ -480,7 +480,7 @@ mod tests {
             ],
             started_at: pid as u64,
             address: ([127, 0, 0, 1], port).into(),
-            zeron_owned: true,
+            zeren_owned: true,
             origin: Some("chat:chat".into()),
             chat_id: Some("chat".into()),
             signing_in: false,

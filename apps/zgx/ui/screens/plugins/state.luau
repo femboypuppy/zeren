@@ -19,7 +19,7 @@
 --   state.open_folder(id?)    its folder (or the plugins folder) in Finder
 --   state.install({ path? , url?, device? })  a promise of `{ plugin, update,
 --                             added, removed, waiting }`: someone else's plugin
---                             from a .zeron-plugin file (this device only) or a
+--                             from a .zeren-plugin file (this device only) or a
 --                             link; it waits for the consent window unless it's
 --                             signed as yours
 --   state.update(id, device?)  a promise of the same: the update found for it

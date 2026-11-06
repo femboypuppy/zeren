@@ -47,11 +47,11 @@ describe("card pages", () => {
   });
 
   it("shows the first name only, and the handle when there is none", () => {
-    const html = renderShare(card, urls, { site: "@zeron" });
-    expect(html).toContain('<meta name="twitter:title" content="Ada — Zeron member #182" />');
-    expect(html).toContain('<meta name="twitter:site" content="@zeron" />');
+    const html = renderShare(card, urls, { site: "@zeren" });
+    expect(html).toContain('<meta name="twitter:title" content="Ada — Zeren member #182" />');
+    expect(html).toContain('<meta name="twitter:site" content="@zeren" />');
     expect(nameOf({ ...card, firstName: null })).toBe("@ada");
-    expect(renderPlayer({ ...card, firstName: null }, urls)).toContain("<title>@ada — Zeron</title>");
+    expect(renderPlayer({ ...card, firstName: null }, urls)).toContain("<title>@ada — Zeren</title>");
   });
 
   it("carries the Player Card and Open Graph tags with absolute URLs, and no noindex", () => {

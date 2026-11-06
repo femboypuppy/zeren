@@ -187,8 +187,8 @@ pub(crate) fn shell(bar: &Rc<MenuBar>, plugins: Vec<zgx_script::Plugin>) -> Wind
     w
 }
 
-/// Zeron's own shortcuts in `w` now: each command's id and key.
-pub(crate) fn zerons(w: &Window) -> Vec<(String, String)> {
+/// Zeren's own shortcuts in `w` now: each command's id and key.
+pub(crate) fn zerens(w: &Window) -> Vec<(String, String)> {
     w.app.host.commands().get().into_iter().filter(|c| !c.id.contains('/')).filter_map(|c| c.key.map(|k| (c.id, k))).collect()
 }
 
@@ -222,7 +222,7 @@ pub(crate) fn scratch(what: &str) -> PathBuf {
 
 /// The reported bug (Nov 3): a plugin added or updated asks for consent in
 /// a sheet of its own (src/plugins/consent.rs), and from then on no
-/// shortcut works until Zeron is relaunched. The sheet's window is served
+/// shortcut works until Zeren is relaunched. The sheet's window is served
 /// as any window was: its scripts' commands (consent.luau has none) made
 /// the app's menu bar, for every window, so the main window's ⌘K, ⌘N, ⌘W…
 /// left with it; closed, nothing gave the main window's back.
@@ -231,7 +231,7 @@ fn a_consent_sheet_never_takes_the_app_s_shortcuts() {
     let desktop = Desktop::new();
     let bar = desktop.bar();
     let mut main = shell(&bar, Vec::new());
-    let expected = zerons(&main);
+    let expected = zerens(&main);
     assert!(expected.len() > 20, "the shell's shortcuts: {expected:?}");
     let opened = unreached(&mut main, &desktop, &expected);
     assert!(opened.is_empty(), "the shell alone:\n{}", opened.join("\n"));
@@ -274,13 +274,13 @@ fn alias(key: &str) -> String {
     key.replace("cmd", if cfg!(target_os = "macos") { "meta" } else { "ctrl" })
 }
 
-/// A plugin's shortcut Zeron has (spelled as Zeron spells it, or another
-/// way), one no menu can show, and one in a menu with no name: Zeron keeps
+/// A plugin's shortcut Zeren has (spelled as Zeren spells it, or another
+/// way), one no menu can show, and one in a menu with no name: Zeren keeps
 /// all of its own, the plugin's free key works, its other commands stay in
 /// the menu bar without theirs, and its row says why.
 #[test]
-fn a_plugin_s_key_zeron_has_stays_zeron_s_and_its_row_says_so() {
-    let dir = scratch("zerons");
+fn a_plugin_s_key_zeren_has_stays_zeren_s_and_its_row_says_so() {
+    let dir = scratch("zerens");
     let body = r#"
 ui.command { id = "mine", title = "Mine", menu = "Keys", key = "cmd+k", run = function() end }
 ui.command { id = "alias", title = "Also new", menu = "Keys", key = "ALIAS", run = function() end }
@@ -293,10 +293,10 @@ ui.command { id = "nameless", title = "Nameless", menu = "", key = "cmd+shift+u"
     let desktop = Desktop::new();
     let bar = desktop.bar();
     let mut w = shell(&bar, vec![plugin(&dir, "keys", &body)]);
-    let expected = zerons(&w);
+    let expected = zerens(&w);
     assert!(desktop.refusals.borrow().is_empty(), "refused: {:?}", desktop.refusals.borrow());
     let wrong = unreached(&mut w, &desktop, &expected);
-    assert!(wrong.is_empty(), "Zeron's:\n{}", wrong.join("\n"));
+    assert!(wrong.is_empty(), "Zeren's:\n{}", wrong.join("\n"));
     for (keys, id) in [("cmd+shift+y", "keys/free"), ("cmd+shift+u", "keys/nameless")] {
         assert_eq!(w.reach(&desktop, keys).as_deref(), Some(id), "the plugin's {keys}");
         assert!(w.app.host.run_command(id), "{id} runs");
@@ -310,14 +310,14 @@ ui.command { id = "nameless", title = "Nameless", menu = "", key = "cmd+shift+u"
     use crate::menu_bar::Why;
     let lost = dropped(&w);
     let why = |title: &str| lost.iter().find(|d| d.title == title).map(|d| d.why.clone());
-    assert_eq!(why("Mine"), Some(Why::Zerons("Search".into())), "{lost:?}");
-    assert_eq!(why("Also new"), Some(Why::Zerons("New chat".into())), "{lost:?}");
+    assert_eq!(why("Mine"), Some(Why::Zerens("Search".into())), "{lost:?}");
+    assert_eq!(why("Also new"), Some(Why::Zerens("New chat".into())), "{lost:?}");
     assert_eq!(why("Odd"), Some(Why::NoKey), "{lost:?}");
     assert_eq!(why("Accent"), Some(Why::NoKey), "{lost:?}");
     assert_eq!(lost.len(), 4, "{lost:?}");
     // Its row on the Plugins page.
     let notice = crate::plugins::shortcut_notice(&lost, |id| id.to_string());
-    assert_eq!(notice, "Its ⌘K for “Mine” is already Zeron's (Search), so it's in the menu bar without one. So are 3 more of its commands.");
+    assert_eq!(notice, "Its ⌘K for “Mine” is already Zeren's (Search), so it's in the menu bar without one. So are 3 more of its commands.");
 }
 
 /// Two plugins with one key: the one loaded first keeps it, the other's
@@ -331,7 +331,7 @@ fn two_plugins_with_one_key_the_first_keeps_it() {
     let first = plugin(&dir, "first", r#"ui.command { id = "go", title = "Go", menu = "First", key = "cmd+shift+y", run = function() end }"#);
     let second = plugin(&dir, "second", r#"ui.command { id = "go", title = "Go too", menu = "Second", key = "meta+shift+y", run = function() end }"#);
     let mut w = shell(&bar, vec![first, second]);
-    let expected = zerons(&w);
+    let expected = zerens(&w);
     assert!(desktop.refusals.borrow().is_empty(), "refused: {:?}", desktop.refusals.borrow());
     assert!(unreached(&mut w, &desktop, &expected).is_empty());
     assert_eq!(w.reach(&desktop, "cmd+shift+y").as_deref(), Some("first/go"));
@@ -374,7 +374,7 @@ ui.command { id = "free", title = "Free", menu = "Keys", key = "cmd+shift+y", ru
     let desktop = Desktop::new();
     let bar = desktop.bar();
     let mut w = shell(&bar, vec![entry]);
-    let expected = zerons(&w);
+    let expected = zerens(&w);
     let check = |w: &mut Window, when: &str, free: bool| {
         assert!(desktop.refusals.borrow().is_empty(), "{when}: refused: {:?}", desktop.refusals.borrow());
         let wrong = unreached(w, &desktop, &expected);
@@ -393,19 +393,19 @@ ui.command { id = "free", title = "Free", menu = "Keys", key = "cmd+shift+y", ru
 }
 
 /// The platform refusing a bar anyway (it shouldn't: `Bar::of` makes one
-/// it takes): Zeron's own goes in, never nothing.
+/// it takes): Zeren's own goes in, never nothing.
 #[test]
-fn a_bar_refused_anyway_leaves_zeron_s_own() {
+fn a_bar_refused_anyway_leaves_zeren_s_own() {
     let dir = scratch("refused");
     let desktop = Desktop::new();
     desktop.refuse_plugins.set(true);
     let bar = desktop.bar();
     let mut w = shell(&bar, vec![plugin(&dir, "keys", r#"ui.command { id = "free", title = "Free", menu = "Keys", key = "cmd+shift+y", run = function() end }"#)]);
-    let expected = zerons(&w);
+    let expected = zerens(&w);
     assert!(!desktop.refusals.borrow().is_empty(), "the test's platform refused it");
     let wrong = unreached(&mut w, &desktop, &expected);
-    assert!(wrong.is_empty(), "Zeron's own after a refusal:\n{}", wrong.join("\n"));
-    assert!(items(&desktop.menus.borrow()).iter().any(|(_, a, _)| a == crate::plugins::USE_ZERON_TEMPLATE));
+    assert!(wrong.is_empty(), "Zeren's own after a refusal:\n{}", wrong.join("\n"));
+    assert!(items(&desktop.menus.borrow()).iter().any(|(_, a, _)| a == crate::plugins::USE_ZEREN_TEMPLATE));
 }
 
 /// A window with a bar of its own opened over the main window (setup over
@@ -415,7 +415,7 @@ fn the_last_window_opened_has_the_bar_and_the_one_under_it_gets_it_back() {
     let desktop = Desktop::new();
     let bar = desktop.bar();
     let mut main = shell(&bar, Vec::new());
-    let expected = zerons(&main);
+    let expected = zerens(&main);
     let dir = scratch("over");
     std::fs::write(dir.join("over.luau"), r#"
 ui.command { id = "over.only", title = "Only here", menu = "File", key = "cmd+k", run = function() end }
@@ -428,9 +428,9 @@ return ui.column {}
     assert!(wrong.is_empty(), "after it closed:\n{}", wrong.join("\n"));
 }
 
-/// The host's own View items: "Use Zeron v3" always, "Keep <template>…"
+/// The host's own View items: "Use Zeren v3" always, "Keep <template>…"
 /// while one is in preview, after the scripts' View items; a script's
-/// command with a host id (`zeron.`) is left out, never a second item.
+/// command with a host id (`zeren.`) is left out, never a second item.
 #[test]
 fn the_host_s_own_items_follow_a_preview_and_no_script_takes_their_ids() {
     let command = |id: &str, title: &str| zgx_script::Command { id: id.into(), title: title.into(), menu: "View".into(), key: None, separator: false };
@@ -444,7 +444,7 @@ fn the_host_s_own_items_follow_a_preview_and_no_script_takes_their_ids() {
         vec![
             ("Toggle sidebar".into(), "shell.toggle_sidebar".into()),
             ("Keep Dusk…".into(), crate::plugins::KEEP_TEMPLATE.into()),
-            ("Use Zeron v3".into(), crate::plugins::USE_ZERON_TEMPLATE.into()),
+            ("Use Zeren v3".into(), crate::plugins::USE_ZEREN_TEMPLATE.into()),
         ]
     );
     let none = crate::menu_bar::Bar::of(&commands, &[], &[], None);

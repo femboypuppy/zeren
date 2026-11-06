@@ -80,7 +80,7 @@ describe("member card pages", () => {
     expect(html).toContain('<meta name="twitter:image" content="https://edge.test/c/ada-pages/card.png" />');
     expect(html).toContain('<meta property="og:image" content="https://edge.test/c/ada-pages/card.png" />');
     expect(html).toContain('<script type="module" src="https://edge.test/card/card-page.js"></script>');
-    expect(html).toContain("<title>Ada — Zeron member #");
+    expect(html).toContain("<title>Ada — Zeren member #");
     expect(html).not.toContain("noindex");
     expect(dataBlock(html)).toEqual(card);
     scan(html);

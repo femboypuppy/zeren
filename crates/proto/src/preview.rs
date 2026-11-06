@@ -7,9 +7,9 @@ pub const PREVIEW_PROXY_PORT: u16 = 7331;
 /// [`chat_origin`] for agent runs, [`terminal_origin`] for its terminals
 /// (project actions run in one). Children inherit it, through `nohup`,
 /// daemonizing and an engine restart alike, so preview discovery lists
-/// exactly the servers Zeron started and knows which chat started them. One
-/// variable, so the nearest Zeron launch always overwrites an outer one.
-pub const ORIGIN_ENV: &str = "ZERON_ORIGIN";
+/// exactly the servers Zeren started and knows which chat started them. One
+/// variable, so the nearest Zeren launch always overwrites an outer one.
+pub const ORIGIN_ENV: &str = "ZEREN_ORIGIN";
 
 pub fn chat_origin(chat_id: &str) -> String {
     format!("chat:{chat_id}")
@@ -36,7 +36,7 @@ pub struct PreviewService {
     pub cwd: String,
     /// Process creation time, milliseconds since the Unix epoch.
     pub started_at: u64,
-    pub zeron_owned: bool,
+    pub zeren_owned: bool,
     /// The chat whose agent or terminal started it (see [`ORIGIN_ENV`]).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub chat_id: Option<String>,

@@ -1,4 +1,4 @@
--- A change, as Zeron's git pages draw one: a pull request's header and its
+-- A change, as Zeren's git pages draw one: a pull request's header and its
 -- tabs, a list of changed files, a diff of one file (with a + on any line
 -- to comment there, and what stands under a line: a thread, a comment
 -- being written), its checks folded to a line, and what happened to it in
@@ -12,9 +12,9 @@
 --   git.checks_block { list = checks, open = state }
 --   git.activity(events, { branch = "x", base = "main" })
 --
--- The vocabulary is Zeron's (pull_requests.rs row_status: Draft, Open,
+-- The vocabulary is Zeren's (pull_requests.rs row_status: Draft, Open,
 -- Approved, Changes requested, Merge conflicts; Checks · n). Every piece has
--- two widths, the window's and a side pane's (`narrow`): Zeron's right pane
+-- two widths, the window's and a side pane's (`narrow`): Zeren's right pane
 -- is 360 at its narrowest (settings.rs RIGHT_PANE_MIN), and the narrow
 -- layout holds there: the header stacks, the tabs' badges drop under them,
 -- the diff keeps one column of line numbers.
@@ -68,8 +68,8 @@ function M.glyph(inside: any, tone: string?, size: number?): Node
 		items = "center",
 		justify = "center",
 		rounded = "$radius.full",
-		bg = if tone then `$zeron.tone.{tone}.wash` else "$zeron.secondary.bg",
-		color = if tone then `$zeron.tone.{tone}.ink` else "$text.secondary",
+		bg = if tone then `$zeren.tone.{tone}.wash` else "$zeren.secondary.bg",
+		color = if tone then `$zeren.tone.{tone}.ink` else "$text.secondary",
 		if type(inside) == "string" then Icon { name = inside :: any, size = if d >= 32 then 16 else 14 } else inside,
 	}
 end
@@ -184,7 +184,7 @@ function M.tabs(o: TabsProps): Node
 	return Tabs { value = o.value, label = locale.t("ds.git.pull_request") :: any, options = o.options, trail = trail, inset = o.inset }
 end
 
--- A changed file: its path, its status (Zeron's: added, modified, deleted,
+-- A changed file: its path, its status (Zeren's: added, modified, deleted,
 -- renamed, conflict) and the lines it adds and takes.
 export type File = { path: string, status: string, add: number, del: number }
 
@@ -229,7 +229,7 @@ function M.card(head: Node?, rows: { Node }, faded: ((i: number) -> boolean)?): 
 				h = 1,
 				w_full = true,
 				shrink = 0,
-				bg = "$zeron.settings.rule",
+				bg = "$zeren.settings.rule",
 				aria_hidden = true,
 				opacity = if faded
 					then function(): number
@@ -243,9 +243,9 @@ function M.card(head: Node?, rows: { Node }, faded: ((i: number) -> boolean)?): 
 	return ui.column {
 		w_full = true,
 		rounded = M.RADIUS,
-		bg = "$zeron.settings.card",
+		bg = "$zeren.settings.card",
 		border = M.EDGE,
-		border_color = "$zeron.settings.edge",
+		border_color = "$zeren.settings.edge",
 		overflow = "hidden",
 		table.unpack(items),
 	}
@@ -253,7 +253,7 @@ end
 
 -- The hairline across a card, edge to edge, between its parts.
 function M.rule(): Node
-	return ui.div { h = 1, w_full = true, shrink = 0, bg = "$zeron.settings.rule", aria_hidden = true }
+	return ui.div { h = 1, w_full = true, shrink = 0, bg = "$zeren.settings.rule", aria_hidden = true }
 end
 
 -- A card of the pages' corner, fill and edge round what it is given: `fill`
@@ -274,9 +274,9 @@ function M.frame(props: FrameProps): Node
 		px = if props.padded then "$space.4" else nil,
 		py = if props.padded then "$space.3" else nil,
 		rounded = M.RADIUS,
-		bg = "$zeron.settings.card",
+		bg = "$zeren.settings.card",
 		border = M.EDGE,
-		border_color = "$zeron.settings.edge",
+		border_color = "$zeren.settings.edge",
 		overflow = "hidden",
 		table.unpack(kids),
 	}
@@ -325,7 +325,7 @@ end
 
 -- The files of the change as a list to choose from, each row a button; the
 -- chosen one (the diff beside it is its) on the design system's flat
--- selection wash, the sidebar's and the settings nav's (`zeron.selected
+-- selection wash, the sidebar's and the settings nav's (`zeren.selected
 -- .flat.bg`), and a row under the pointer on the hover wash. Each washes
 -- the whole row, edge to edge, as the folders' bands do: no inset, no
 -- corner of its own, no hairlines.
@@ -466,7 +466,7 @@ M.prefs = {
 -- own highlighters), worked out once per list of lines, the first time
 -- one of them is drawn: each line's runs by its index (none for a hunk's
 -- header). A hunk starts the lexer afresh (a comment open across one
--- isn't known); a language Zeron doesn't colour, none at all.
+-- isn't known); a language Zeren doesn't colour, none at all.
 export type Run = { text: string, color: string }
 local painted: { [any]: any } = setmetatable({}, { __mode = "k" }) :: any
 local TEXT = lex.C.text
@@ -610,7 +610,7 @@ local function mark_of(mark: (() -> string?)?): Node?
 			return if mark() then 1 else 0
 		end,
 		bg = function(): string
-			return if mark() == "lit" then "$zeron.diff.comment_wash" else "#00000000"
+			return if mark() == "lit" then "$zeren.diff.comment_wash" else "#00000000"
 		end,
 		ui.div {
 			class = "diff-mark-bar",
@@ -661,8 +661,8 @@ local DiffLine = ui.component(function(props: { line: Line, narrow: boolean?, on
 	local over = ui.use_state(false)
 	local dragging = ui.use_state(false)
 	local l = props.line
-	local wash = if l.kind == "+" then "$zeron.tone.success.wash" elseif l.kind == "-" then "$zeron.tone.danger.wash" else nil
-	local ink = if l.kind == "+" then "$zeron.diff.added" elseif l.kind == "-" then "$zeron.diff.removed" else "$text.tertiary"
+	local wash = if l.kind == "+" then "$zeren.tone.success.wash" elseif l.kind == "-" then "$zeren.tone.danger.wash" else nil
+	local ink = if l.kind == "+" then "$zeren.diff.added" elseif l.kind == "-" then "$zeren.diff.removed" else "$text.tertiary"
 	local slot: { [any]: any } = {
 		w = Inline.SLOT,
 		h = M.LINE_H,
@@ -738,7 +738,7 @@ function M.hunk_row(l: Line): Node
 		px = "$space.3",
 		gap = "$space.3",
 		items = "center",
-		bg = "$zeron.secondary.bg",
+		bg = "$zeren.secondary.bg",
 		ui.text { ranges or l.text, literal = true, shrink = 0, font = "$font.mono", text_size = "$font.size.xs", color = "$text.tertiary" },
 		if context and context ~= ""
 			then ui.text { context, literal = true, shrink = 0, font = "$font.mono", text_size = "$font.size.xs", color = "$text.secondary" }
@@ -759,13 +759,13 @@ local function half(l: Line?, side: string, runs_of: { Run }?, wrap: boolean?, s
 			min_w = 0,
 			min_h = M.LINE_H,
 			h_full = true,
-			bg = "$zeron.secondary.bg",
+			bg = "$zeren.secondary.bg",
 			aria_hidden = true,
 		}
 	end
 	local kind = l.kind
-	local wash = if kind == "+" then "$zeron.tone.success.wash" elseif kind == "-" then "$zeron.tone.danger.wash" else nil
-	local ink = if kind == "+" then "$zeron.diff.added" elseif kind == "-" then "$zeron.diff.removed" else "$text.tertiary"
+	local wash = if kind == "+" then "$zeren.tone.success.wash" elseif kind == "-" then "$zeren.tone.danger.wash" else nil
+	local ink = if kind == "+" then "$zeren.diff.added" elseif kind == "-" then "$zeren.diff.removed" else "$text.tertiary"
 	local n = if side == "left" then l.old else l.new
 	return ui.row {
 		w = 0,
@@ -822,7 +822,7 @@ local SplitLine = ui.component(function(props: { pair: Pair, left_runs: { Run }?
 			end
 			else nil,
 		half(p.left, "left", props.left_runs, props.wrap, ui.div { w = Inline.SLOT, shrink = 0 }),
-		ui.div { w = 1, shrink = 0, bg = "$zeron.settings.rule", aria_hidden = true },
+		ui.div { w = 1, shrink = 0, bg = "$zeren.settings.rule", aria_hidden = true },
 		half(r, "right", props.right_runs, props.wrap, slot),
 		mark_of(props.mark),
 	}
@@ -1059,11 +1059,11 @@ function M.checks_block(o: ChecksBlock): Node
 	end
 	local rows: { Node } = {}
 	for _, c in o.list do
-		table.insert(rows, ui.div { h = 1, w_full = true, shrink = 0, bg = "$zeron.settings.rule", aria_hidden = true })
+		table.insert(rows, ui.div { h = 1, w_full = true, shrink = 0, bg = "$zeren.settings.rule", aria_hidden = true })
 		table.insert(rows, check_row(c))
 	end
 	if #o.list == 0 and o.empty then
-		table.insert(rows, ui.div { h = 1, w_full = true, shrink = 0, bg = "$zeron.settings.rule", aria_hidden = true })
+		table.insert(rows, ui.div { h = 1, w_full = true, shrink = 0, bg = "$zeren.settings.rule", aria_hidden = true })
 		table.insert(rows, ui.div { w_full = true, px = "$space.4", py = "$space.3", ui.text { o.empty, wrap = true, text_size = "$font.size.sm", color = "$text.secondary" } })
 	end
 	if o.log then
@@ -1093,7 +1093,7 @@ function M.checks_block(o: ChecksBlock): Node
 			grow = 1,
 			min_w = 0,
 			items = "start",
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			ui.text { locale.t("ds.git.checks"), text_size = "$font.size.md", line_height = "$font.line.md", weight = "$font.weight.medium", color = "$text.primary" },
 			-- One line, how they stand and what to know, fading at its end
 			-- where it runs long (never wrapping); the outcome is the glyph's
@@ -1128,9 +1128,9 @@ function M.checks_block(o: ChecksBlock): Node
 	return ui.column {
 		w_full = true,
 		rounded = M.RADIUS,
-		bg = "$zeron.settings.card",
+		bg = "$zeren.settings.card",
 		border = M.EDGE,
-		border_color = "$zeron.settings.edge",
+		border_color = "$zeren.settings.edge",
 		overflow = "hidden",
 		header,
 		body,
@@ -1141,14 +1141,14 @@ end
 function M.log(lines: { string }): Node
 	local rows: { Node } = {}
 	for _, s in lines do
-		table.insert(rows, ui.text { s, literal = true, font = "$font.mono", text_size = "$font.size.xs", line_height = "$font.line.sm", color = if string.match(s, "^FAIL") then "$zeron.tone.danger.ink" else "$text.secondary", wrap = true })
+		table.insert(rows, ui.text { s, literal = true, font = "$font.mono", text_size = "$font.size.xs", line_height = "$font.line.sm", color = if string.match(s, "^FAIL") then "$zeren.tone.danger.ink" else "$text.secondary", wrap = true })
 	end
 	return ui.column {
 		w_full = true,
 		px = "$space.3",
 		py = "$space.2",
 		rounded = "$radius.md",
-		bg = "$zeron.secondary.bg",
+		bg = "$zeren.secondary.bg",
 		table.unpack(rows),
 	}
 end
@@ -1203,9 +1203,9 @@ local function note(...: Node): Node
 		py = "$space.2",
 		gap = "$space.1",
 		rounded = "$radius.lg",
-		bg = "$zeron.settings.card",
+		bg = "$zeren.settings.card",
 		border = 1,
-		border_color = "$zeron.settings.edge",
+		border_color = "$zeren.settings.edge",
 		...,
 	}
 end
@@ -1313,7 +1313,7 @@ local function event(e: Event, last: boolean, o: ActivityOpts): Node
 		items = "start",
 		pb = if last then 0 else "$space.4",
 		-- The lead on the window's own fill, so the trunk passes behind it.
-		ui.div { w = LEAD, h = LEAD, shrink = 0, rounded = "$radius.full", bg = "$zeron.window", items = "center", justify = "center", lead },
+		ui.div { w = LEAD, h = LEAD, shrink = 0, rounded = "$radius.full", bg = "$zeren.window", items = "center", justify = "center", lead },
 		ui.column { grow = 1, min_w = 0, body },
 	}
 end
@@ -1334,7 +1334,7 @@ function M.activity(events: { Event }, opts: ActivityOpts?): Node
 			top = LEAD / 2,
 			bottom = LEAD / 2,
 			w = 1,
-			bg = "$zeron.settings.rule",
+			bg = "$zeren.settings.rule",
 			pointer_events = "none",
 			aria_hidden = true,
 		},

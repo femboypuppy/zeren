@@ -6,7 +6,7 @@
 --
 -- `github_fixture.width` narrows the tab to a side pane's width (0: the
 -- window's); `github_fixture.light` draws it light; `github_fixture.template`
--- ("pink") lays a template's few tokens over Zeron's (a hot pink, as
+-- ("pink") lays a template's few tokens over Zeren's (a hot pink, as
 -- people's own do: only some tokens set).
 
 local ds = require("@ds")
@@ -18,26 +18,26 @@ local light = ui.state("github_fixture.light", false)
 -- The pull request it shows (a real one, with real gh: any address).
 local address = ui.state("github_fixture.url", "https://github.com/zeronsh/zgx/pull/1264")
 
--- A template that sets only some tokens, over each of Zeron's themes: its
--- accent, its window and its cards (a hot pink), the rest Zeron's own.
+-- A template that sets only some tokens, over each of Zeren's themes: its
+-- accent, its window and its cards (a hot pink), the rest Zeren's own.
 ui.theme.register {
 	name = "pink-light",
 	type = "light",
-	extends = "zeron-light",
+	extends = "zeren-light",
 	tokens = {
 		accent = "#ff2d95",
 		background = "#ffe3f1",
-		zeron = { window = "#ffe3f1", settings = { card = "#fff3f9", edge = "#ffb3d6", rule = "#ffd0e6" } },
+		zeren = { window = "#ffe3f1", settings = { card = "#fff3f9", edge = "#ffb3d6", rule = "#ffd0e6" } },
 	},
 }
 ui.theme.register {
 	name = "pink-dark",
 	type = "dark",
-	extends = "zeron-dark",
+	extends = "zeren-dark",
 	tokens = {
 		accent = "#ff4fa8",
 		background = "#24101c",
-		zeron = { window = "#24101c", settings = { card = "#341628", edge = "#ff4fa83d", rule = "#ff4fa826" } },
+		zeren = { window = "#24101c", settings = { card = "#341628", edge = "#ff4fa83d", rule = "#ff4fa826" } },
 	},
 }
 
@@ -53,8 +53,8 @@ end, function(): Node
 		w_full = true,
 		h_full = true,
 		items = "center",
-		theme = if template:peek() == "pink" then `pink-{scheme}` else `zeron-{scheme}`,
-		bg = "$zeron.window",
+		theme = if template:peek() == "pink" then `pink-{scheme}` else `zeren-{scheme}`,
+		bg = "$zeren.window",
 		ui.column {
 			w = if w > 0 then ui.raw(w, "a side pane's width") else nil,
 			w_full = w == 0,

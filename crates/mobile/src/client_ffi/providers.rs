@@ -1,5 +1,5 @@
 //! A computer's agents over FFI: which ones it offers and the CLI logins
-//! each runs on (`zeron_client::providers`) — the phone's Settings →
+//! each runs on (`zeren_client::providers`) — the phone's Settings →
 //! Providers for a device picked in its switcher.
 
 use super::{CoreClient, CoreResult, HarnessInfo, on_runtime};
@@ -22,7 +22,7 @@ pub struct DeviceAccountInfo {
     pub display_name: Option<String>,
     pub plan_label: Option<String>,
     pub active: bool,
-    /// Can be switched to / removed (false for logins Zeron can't read).
+    /// Can be switched to / removed (false for logins Zeren can't read).
     pub switchable: bool,
     /// An API key rather than an account.
     pub api_key: bool,
@@ -35,8 +35,8 @@ pub struct DeviceAccountInfo {
     pub usage_error: Option<String>,
 }
 
-impl From<zeron_proto::AgentAccount> for DeviceAccountInfo {
-    fn from(a: zeron_proto::AgentAccount) -> Self {
+impl From<zeren_proto::AgentAccount> for DeviceAccountInfo {
+    fn from(a: zeren_proto::AgentAccount) -> Self {
         Self {
             id: a.id,
             harness: serde_json::to_value(a.harness)
@@ -48,7 +48,7 @@ impl From<zeron_proto::AgentAccount> for DeviceAccountInfo {
             plan_label: a.plan_label,
             active: a.active,
             switchable: a.switchable,
-            api_key: a.auth_kind == Some(zeron_proto::AgentAuthKind::ApiKey),
+            api_key: a.auth_kind == Some(zeren_proto::AgentAuthKind::ApiKey),
             organization: a.organization,
             provider: a.provider,
             usage: a
@@ -88,12 +88,12 @@ pub struct DeviceLoginPollInfo {
 /// How an agent signs in, from the rules every platform's Providers follows.
 #[derive(Debug, Clone, PartialEq, uniffi::Record)]
 pub struct AgentLoginRules {
-    /// The agent's display name ("Claude Code"); empty for one Zeron doesn't
+    /// The agent's display name ("Claude Code"); empty for one Zeren doesn't
     /// sign in to.
     pub name: String,
-    /// The agent has accounts Zeron can sign in to at all.
+    /// The agent has accounts Zeren can sign in to at all.
     pub signs_in: bool,
-    /// Zeron switches between its accounts (not Hermes, not Antigravity).
+    /// Zeren switches between its accounts (not Hermes, not Antigravity).
     pub switches: bool,
     /// It holds one login: once connected there is nothing to add.
     pub keeps_one_login: bool,
@@ -116,8 +116,8 @@ pub struct LoginOptionInfo {
 /// [`AgentLoginRules`] for `harness` (`claude-code`, `codex`, …).
 #[uniffi::export]
 pub fn agent_login_rules(harness: String) -> AgentLoginRules {
-    use zeron_proto::providers as rules;
-    let Ok(id) = serde_json::from_value::<zeron_proto::HarnessId>(serde_json::json!(harness))
+    use zeren_proto::providers as rules;
+    let Ok(id) = serde_json::from_value::<zeren_proto::HarnessId>(serde_json::json!(harness))
     else {
         return AgentLoginRules {
             name: String::new(),
@@ -157,7 +157,7 @@ pub fn agent_login_rules(harness: String) -> AgentLoginRules {
     }
 }
 
-fn accounts(snapshot: zeron_proto::AgentAccountsSnapshot) -> Vec<DeviceAccountInfo> {
+fn accounts(snapshot: zeren_proto::AgentAccountsSnapshot) -> Vec<DeviceAccountInfo> {
     snapshot.accounts.into_iter().map(Into::into).collect()
 }
 
@@ -227,7 +227,7 @@ impl CoreClient {
         .map(|start| DeviceLoginInfo {
             login_id: start.login_id,
             url: start.url,
-            paste_code: start.mode == zeron_proto::AgentLoginMode::PasteCode,
+            paste_code: start.mode == zeren_proto::AgentLoginMode::PasteCode,
         })
     }
 
@@ -246,9 +246,9 @@ impl CoreClient {
         .await
         .map(|poll| DeviceLoginPollInfo {
             status: match poll.status {
-                zeron_proto::AgentLoginStatus::Pending => "pending",
-                zeron_proto::AgentLoginStatus::Done => "done",
-                zeron_proto::AgentLoginStatus::Error => "error",
+                zeren_proto::AgentLoginStatus::Pending => "pending",
+                zeren_proto::AgentLoginStatus::Done => "done",
+                zeren_proto::AgentLoginStatus::Error => "error",
             }
             .into(),
             message: poll.message,

@@ -20,7 +20,7 @@
 -- submenu and ← back out, Enter or Space to choose, Escape to close one
 -- level, Tab to close them all. The pointer: a submenu opens as its row is
 -- reached and stays open while the pointer heads for it, across the rows
--- in its way (Zeron's hover intent: crates/ui/src/popover/hover_intent.rs).
+-- in its way (Zeren's hover intent: crates/ui/src/popover/hover_intent.rs).
 
 local Icon = require("@self/icon")
 local FadeText = require("@self/fade_text")
@@ -74,11 +74,11 @@ export type Props = {
 	[any]: any,
 }
 
--- The panel's width: the menus' (`zeron.menu.width`, 232). A row's look
+-- The panel's width: the menus' (`zeren.menu.width`, 232). A row's look
 -- (its height, padding and corner) is the menus' (`Menu.look`).
-local WIDTH = "$zeron.menu.width"
+local WIDTH = "$zeren.menu.width"
 -- How long the pointer may take crossing other rows to an open submenu
--- before the row it rests on takes over (Zeron's grace, renewed while it
+-- before the row it rests on takes over (Zeren's grace, renewed while it
 -- keeps moving toward it), how far past the submenu's edges its corridor
 -- reaches, and how far the pointer must move to count as heading somewhere.
 local GRACE, SLACK, NUDGE = 300, 8, 2
@@ -94,7 +94,7 @@ local BLINK = 50
 -- Whether the pointer at `p`, having last rested on the trigger at `o`, is
 -- still heading for the submenu `b` (on the left of it, `left`): inside the
 -- triangle from `o` to the submenu's near edge, its ends `SLACK` past the
--- submenu's top and foot (Zeron's `corridor`).
+-- submenu's top and foot (Zeren's `corridor`).
 local function toward(o: { x: number, y: number }, p: { x: number, y: number }, b: Element, left: boolean): boolean
 	local bx, by, bw, bh = b.x, b.y, b.width, b.height
 	if not (bx and by and bw and bh) then
@@ -496,7 +496,7 @@ local function build_panel(props: PanelProps): Node
 			table.insert(groups, ui.column {
 				w_full = true,
 				p = "$space.1",
-				gap = "$zeron.list.gap",
+				gap = "$zeren.list.gap",
 				role = if title then "group" else nil,
 				label = title,
 				table.unpack(rows),
@@ -545,7 +545,7 @@ local function build_panel(props: PanelProps): Node
 			name = ui.column {
 				grow = 1,
 				min_w = 0,
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				ui.text { e.label or "", text_size = "$font.size.md", line_height = "$font.line.md", color = ink },
 				ui.text { reason, text_size = "$font.size.sm", line_height = "$font.line.sm", color = "$text.tertiary", wrap = true },
 			}
@@ -580,10 +580,10 @@ local function build_panel(props: PanelProps): Node
 			description = reason,
 			bg = function()
 				if armed:get() == i then
-					return "$zeron.menu.danger"
+					return "$zeren.menu.danger"
 				end
 				if lit() then
-					return if e.danger then "$zeron.menu.danger" else "$hover"
+					return if e.danger then "$zeren.menu.danger" else "$hover"
 				end
 				-- Its submenu open: lit while the pointer is over it.
 				return "#00000000"

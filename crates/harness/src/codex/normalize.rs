@@ -6,7 +6,7 @@
 //! types) are accepted, and unknown item types map to nothing.
 
 use serde_json::Value;
-use zeron_proto::{AgentEvent, DoneStatus, TodoItem, TodoStatus, ToolCall};
+use zeren_proto::{AgentEvent, DoneStatus, TodoItem, TodoStatus, ToolCall};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Phase {
@@ -123,7 +123,7 @@ pub(crate) fn turn_error_message(params: &Value, limits: Option<&Value>) -> Opti
 /// What the person reads when the provider refuses Codex's credentials (a
 /// 401): a missing or expired ChatGPT login, or an API key — OpenAI's or a
 /// custom provider's — that is wrong or revoked. The UI offers its sign-in
-/// action on this text (`zeron_proto::run_errors` matches "run codex login").
+/// action on this text (`zeren_proto::run_errors` matches "run codex login").
 pub(crate) const SIGNED_OUT_MESSAGE: &str = "Codex's credentials were rejected. Run codex login \
      (or check the API key for your model provider), then send again.";
 
@@ -358,7 +358,7 @@ fn file_change_call(changes: &[(String, String)]) -> ToolCall {
 
 /// `turn/plan/updated` → the live checklist chip. Steps carry
 /// `pending | inProgress | completed`; like ACP plans the update has no item
-/// id, so it refreshes the singleton [`zeron_proto::LIVE_PLAN_TOOL_ID`] in place.
+/// id, so it refreshes the singleton [`zeren_proto::LIVE_PLAN_TOOL_ID`] in place.
 pub(crate) fn plan_update_events(params: &Value) -> Vec<AgentEvent> {
     let Some(plan) = params.get("plan").and_then(Value::as_array) else {
         return Vec::new();
@@ -374,7 +374,7 @@ pub(crate) fn plan_update_events(params: &Value) -> Vec<AgentEvent> {
         .collect();
     tool_lifecycle(
         Phase::Completed,
-        zeron_proto::LIVE_PLAN_TOOL_ID.into(),
+        zeren_proto::LIVE_PLAN_TOOL_ID.into(),
         ToolCall::Todo { items },
         false,
     )
@@ -490,14 +490,14 @@ pub(crate) fn map_item(phase: Phase, item: &Value) -> Vec<AgentEvent> {
             }],
             Phase::Completed => {
                 // Absent when the command never ran (declined) or Codex lost
-                // it; the doc keeps the output's tail (see zeron-doc's
+                // it; the doc keeps the output's tail (see zeren-doc's
                 // `command_output_tail`), this its end only.
                 let exit_code = field(item, &["exitCode", "exit_code"])
                     .and_then(Value::as_i64)
                     .and_then(|code| i32::try_from(code).ok());
                 let output = field(item, &["aggregatedOutput", "aggregated_output"])
                     .and_then(Value::as_str)
-                    .and_then(zeron_proto::command_output_cap);
+                    .and_then(zeren_proto::command_output_cap);
                 vec![AgentEvent::ToolResult {
                     id,
                     is_error: status == "failed" || exit_code.is_some_and(|code| code != 0),
@@ -827,7 +827,7 @@ impl ChildStream {
                 let notice = error_notice(params, None);
                 if notice.will_retry {
                     tracing::debug!(
-                        target: "zeron_harness::codex",
+                        target: "zeren_harness::codex",
                         child, "subagent retrying: {}", notice.message
                     );
                 } else {
@@ -999,9 +999,9 @@ mod tests {
             &json!({"type": "commandExecution", "id": "c1", "status": "failed",
                     "exitCode": 101, "aggregatedOutput": output}),
         )) {
-            zeron_doc::fold_event_into_parts(&mut parts, &event);
+            zeren_doc::fold_event_into_parts(&mut parts, &event);
         }
-        let zeron_doc::MessagePart::Tool {
+        let zeren_doc::MessagePart::Tool {
             is_error,
             output: Some(tail),
             output_bytes,
@@ -1045,11 +1045,11 @@ mod tests {
                 exit_code: Some(0),
             },
         ] {
-            zeron_doc::fold_event_into_parts(&mut parts, &event);
+            zeren_doc::fold_event_into_parts(&mut parts, &event);
         }
         assert!(matches!(
             &parts[0],
-            zeron_doc::MessagePart::Tool {
+            zeren_doc::MessagePart::Tool {
                 output: None,
                 output_bytes: None,
                 exit_code: None,
@@ -1194,7 +1194,7 @@ mod tests {
             events,
             vec![
                 AgentEvent::ToolCall {
-                    id: zeron_proto::LIVE_PLAN_TOOL_ID.into(),
+                    id: zeren_proto::LIVE_PLAN_TOOL_ID.into(),
                     call: ToolCall::Todo {
                         items: vec![
                             TodoItem::new("read", TodoStatus::Completed),
@@ -1204,7 +1204,7 @@ mod tests {
                     },
                 },
                 AgentEvent::ToolResult {
-                    id: zeron_proto::LIVE_PLAN_TOOL_ID.into(),
+                    id: zeren_proto::LIVE_PLAN_TOOL_ID.into(),
                     is_error: false,
                     output: None,
                     diff: None,
@@ -1409,7 +1409,7 @@ mod tests {
 
     #[test]
     fn structured_error_info_decides_sign_in_and_limit_text() {
-        use zeron_proto::run_errors::{ProviderProblem, provider_problem};
+        use zeren_proto::run_errors::{ProviderProblem, provider_problem};
         let signed_out = codex_error_text(
             &json!({"message": "401 Unauthorized: token_expired", "codexErrorInfo": "unauthorized"}),
             None,

@@ -4,7 +4,7 @@
 //! threads freely while the orchestrator keeps listening.
 
 use super::*;
-use zeron_proto::voice::{VoicePhase, VoiceWork};
+use zeren_proto::voice::{VoicePhase, VoiceWork};
 
 /// The stage paints the hero preset magnified to fill the canvas.
 pub(super) const VOICE_STAGE_ORB_SCALE: f32 = 2.25;
@@ -52,7 +52,7 @@ impl Shell {
                 model: None,
                 reasoning: None,
                 model_options: Default::default(),
-                sandbox: zeron_proto::SandboxLevel::WorkspaceWrite,
+                sandbox: zeren_proto::SandboxLevel::WorkspaceWrite,
                 access: Default::default(),
                 plan: false,
             });
@@ -391,7 +391,7 @@ impl Shell {
         }
 
         // Streamed words veil in like transcript text; a new speaker turn
-        // fades the previous caption out (zeron-veil, shared with mobile).
+        // fades the previous caption out (zeren-veil, shared with mobile).
         let caption = self.voice_caption.advance(
             caption_item.as_deref(),
             &partial,
@@ -742,7 +742,7 @@ impl Shell {
 /// The caption with its fading words recolored, paint-only (`apply_veil`).
 fn veiled_caption(
     text: String,
-    spans: &[zeron_veil::VeilSpan],
+    spans: &[zeren_veil::VeilSpan],
     theme: &Theme,
     window: &Window,
 ) -> gpui::StyledText {
@@ -1068,7 +1068,7 @@ mod tests {
             crate::app_menus::init(cx);
             settings::init(settings::UiSettings::default(), dir.path(), cx);
         });
-        let orchestrator = format!("{}1", zeron_proto::voice::ORCHESTRATOR_CHAT_PREFIX);
+        let orchestrator = format!("{}1", zeren_proto::voice::ORCHESTRATOR_CHAT_PREFIX);
         let (host, cx) = cx.add_window_view(|_, cx| {
             OrbHost(cx.new(|cx| {
                 let state = cx.new(|_| AppState::new());

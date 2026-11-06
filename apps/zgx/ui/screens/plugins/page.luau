@@ -21,7 +21,7 @@
 -- must not be able to allow anything themselves.
 --
 -- Someone else's plugins come in by Install… (a link: a package, a GitHub
--- release, a git repository; or, on this device, a .zeron-plugin file):
+-- release, a git repository; or, on this device, a .zeren-plugin file):
 -- the engine checks the signature, then it waits for the consent window
 -- like any other. Each one's source is checked for a newer version as the
 -- page opens on a device (the engine checks every few hours too); a row
@@ -109,7 +109,7 @@ end
 
 -- (Its name read as the dialog opens, in the locale then.)
 local function package_filter(): { any }
-	return { { ui.t("plugins.page.package_filter"):get(), { "zeron-plugin" } } }
+	return { { ui.t("plugins.page.package_filter"):get(), { "zeren-plugin" } } }
 end
 
 -- What went wrong asking the host, said once: a device that couldn't be
@@ -164,7 +164,7 @@ local function install(from: { path: string?, url: string?, device: string? })
 	end)
 end
 
--- Install's file: a .zeron-plugin (this device's alone), installed with
+-- Install's file: a .zeren-plugin (this device's alone), installed with
 -- the dialog open as a link is.
 local function choose_file()
 	if install_busy:peek() then
@@ -293,7 +293,7 @@ local Control = ui.component(function(props: { now: State<any>, on: string? }): 
 		-- up. Another device's plugins' settings are that device's.)
 		ui.div {
 			w = function(): number
-				return (ui.theme.get("zeron.icon_button.sm") :: number?) or 22
+				return (ui.theme.get("zeren.icon_button.sm") :: number?) or 22
 			end,
 			shrink = 0,
 			ui.show(function(): boolean
@@ -360,7 +360,7 @@ local Control = ui.component(function(props: { now: State<any>, on: string? }): 
 				}
 				else ui.div {},
 		}),
-		-- (Zeron's own are turned off, never removed: their button is there,
+		-- (Zeren's own are turned off, never removed: their button is there,
 		-- off, so every row's controls line up.)
 		ds.IconButton {
 			icon = "trash-bin-minimalistic",
@@ -446,7 +446,7 @@ local function row(p: state.Item, _i: number, now: State<any>): Node
 		end,
 		-- (Its icon from its device: the listing carries it.)
 		lead = words.tile(p, 32),
-		-- (Zeron's own: what it's allowed, wrapped on a line of its own.)
+		-- (Zeren's own: what it's allowed, wrapped on a line of its own.)
 		-- (Someone else's: a newer version found where it came from.)
 		detail = function(): string?
 			local it = now:get()
@@ -455,7 +455,7 @@ local function row(p: state.Item, _i: number, now: State<any>): Node
 		detail_action = UpdateLink { now = now },
 		truncate = true,
 		-- Its version, centred on the row beside its controls; before it,
-		-- Unverified for one whose maker Zeron can't vouch for.
+		-- Unverified for one whose maker Zeren can't vouch for.
 		control = ui.row {
 			gap = "$space.3",
 			items = "center",

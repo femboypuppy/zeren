@@ -2,9 +2,9 @@
 
 Click an HTTP(S) link in an agent message to open and select a **new Browser tab** in that conversation. The right panel opens if necessary. Links in a subagent transcript belong to its containing conversation. A pending activation is discarded if the selected conversation has changed.
 
-Right-click a link for **Open in Zeron**, **Open in external browser**, or **Copy link address**. The same menu includes **Open links in Zeron**, which controls normal click and Enter/Space activation and is enabled by default. The three explicit actions remain available regardless of that preference. Tab and Shift+Tab move through links and other controls when an input or completion menu does not consume the key. Enter or Space activates a focused link. Shift+F10 opens its action menu; arrows or Tab move through the actions, and Escape dismisses the menu.
+Right-click a link for **Open in Zeren**, **Open in external browser**, or **Copy link address**. The same menu includes **Open links in Zeren**, which controls normal click and Enter/Space activation and is enabled by default. The three explicit actions remain available regardless of that preference. Tab and Shift+Tab move through links and other controls when an input or completion menu does not consume the key. Enter or Space activates a focused link. Shift+F10 opens its action menu; arrows or Tab move through the actions, and Escape dismisses the menu.
 
-A github.com pull request link follows **Open pull requests in** (Settings → General → Links) while Open links in Zeron is on: **Pull request view** opens Zeron's own view as a tab in the conversation's pane, **In-app browser** opens a new Browser tab, and **Default browser** opens the system browser. With Open links in Zeron off, it opens in the system browser like any other link. **Open in Zeron** opens the pull request view when that is the chosen destination, and a Browser tab otherwise.
+A github.com pull request link follows **Open pull requests in** (Settings → General → Links) while Open links in Zeren is on: **Pull request view** opens Zeren's own view as a tab in the conversation's pane, **In-app browser** opens a new Browser tab, and **Default browser** opens the system browser. With Open links in Zeren off, it opens in the system browser like any other link. **Open in Zeren** opens the pull request view when that is the chosen destination, and a Browser tab otherwise.
 
 Hover or keyboard focus shows the full destination, including when the Markdown label says something different. The compact tooltip fits the destination text up to 360 px, wraps long destinations, and scrolls within the window. Copy link address is available in the context menu. Opening that menu hides the tooltip and cancels pending hover disclosure until the menu closes. Inspecting a link makes no network requests. Scrolling the transcript, changing conversations, or removing a link dismisses its disclosure. So does a press anywhere else, which still reaches what was pressed, another link in the same message included.
 
@@ -22,12 +22,12 @@ The fixture uses synthetic chat data, temporary app storage, and a local HTTP se
 - [Native scenario](../crates/ui/examples/browser-fixture/transcript_links.rs)
 
 ```sh
-cargo test -p zeron-ui
-cargo build -p zeron
-cargo build -p zeron-ui --example browser-fixture --features browser-fixture
-ZERON_TRANSCRIPT_LINK_FIXTURE_ONLY=1 \
+cargo test -p zeren-ui
+cargo build -p zeren
+cargo build -p zeren-ui --example browser-fixture --features browser-fixture
+ZEREN_TRANSCRIPT_LINK_FIXTURE_ONLY=1 \
   BROWSER_FIXTURE_BINARY=target/debug/examples/browser-fixture \
-  scripts/test-linux-browser.sh /tmp/zeron-transcript-links
+  scripts/test-linux-browser.sh /tmp/zeren-transcript-links
 ```
 
 If FFmpeg lacks `libx264`, add `BROWSER_FIXTURE_VIDEO_CODEC=mpeg4` to the runner environment.
@@ -37,18 +37,18 @@ The Linux runner exercises X11 and nested Wayland with native pointer input. It 
 On macOS, build the same example and run it with the release application's Info.plist:
 
 ```sh
-ZERON_TRANSCRIPT_LINK_FIXTURE_ONLY=1 \
+ZEREN_TRANSCRIPT_LINK_FIXTURE_ONLY=1 \
   scripts/run-macos-browser-fixture.sh target/debug/examples/browser-fixture \
-  /tmp/zeron-transcript-links-macos
+  /tmp/zeren-transcript-links-macos
 ```
 
-Native runtime-failure validation can be run on Linux by placing an empty `libwebkit2gtk-4.1.so.0` in a temporary directory, setting `LD_LIBRARY_PATH` to that directory, and setting `ZERON_LINK_FIXTURE_MISSING_RUNTIME=1` for the fixture. This simulates the dynamic loader's failure without changing installed packages. The main application must remain usable and expose the error and external-browser control.
+Native runtime-failure validation can be run on Linux by placing an empty `libwebkit2gtk-4.1.so.0` in a temporary directory, setting `LD_LIBRARY_PATH` to that directory, and setting `ZEREN_LINK_FIXTURE_MISSING_RUNTIME=1` for the fixture. This simulates the dynamic loader's failure without changing installed packages. The main application must remain usable and expose the error and external-browser control.
 
 ## Validation recorded for this change
 
-- `cargo test -p zeron-ui`: 916 tests passed, plus doc tests.
-- `cargo build -p zeron`: passed.
-- `cargo check -p zeron`: passed.
+- `cargo test -p zeren-ui`: 916 tests passed, plus doc tests.
+- `cargo build -p zeren`: passed.
+- `cargo check -p zeren`: passed.
 - Rustfmt checks passed for the modified library modules and the new native scenario; shell syntax and whitespace checks passed. The existing browser fixture's formatting was preserved.
 - Linux X11: native input, clipboard, navigation, tab ownership/close, and visual disclosure over WebKitGTK verified.
 - Linux Wayland: native pointer, clipboard, keyboard actions, navigation, and tab close assertions passed in nested Weston. Captures did not reliably reflect updated frames, including with software Vulkan and an explicit frame request; visual verification of Wayland overlays remains outstanding.

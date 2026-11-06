@@ -43,7 +43,7 @@ M.TITLE_TOP = M.TITLEBAR + HEADER + HEADER_GAP + LEAD
 
 -- The window's content. Frosted, the window's glass shows through the
 -- theme's `background`; opaque, it is the window's own colour
--- (`zeron.window`). `opaque` holds it opaque whatever the setting (a stand-in
+-- (`zeren.window`). `opaque` holds it opaque whatever the setting (a stand-in
 -- for the window drawn somewhere with no glass under it: the intro's), and
 -- it eases to frosted once that lets go. Everything in it wears the app's
 -- accent (ds.look). The title bar's strip lies over
@@ -99,7 +99,7 @@ function M.Frame(props: FrameProps): Node
 		theme = function()
 			return look.theme()
 		end,
-		bg = ui.tween(frosted, { from = "$zeron.window", to = "$background", duration = 320, ease = "outQuad" }),
+		bg = ui.tween(frosted, { from = "$zeren.window", to = "$background", duration = 320, ease = "outQuad" }),
 		table.unpack(kids),
 		ui.div {
 			absolute = true,
@@ -426,7 +426,7 @@ local ScrollStep = ui.component(function(props: ScrollStepProps): Node
 		table.insert(form, k)
 	end
 	local measure = props.form.measure
-		or ui.theme.get(if props.form.wide then "zeron.form.list" else "zeron.form.measure") :: number?
+		or ui.theme.get(if props.form.wide then "zeren.form.list" else "zeren.form.measure") :: number?
 	-- The top: the dots, and the room under them, where the small title
 	-- comes.
 	local top = ui.column {
@@ -662,12 +662,12 @@ local WayInPill = ui.component(function(props: WayIn): Node
 		size = size,
 		shape = "pill",
 		px = if size == "lg" then "$space.5" else "$space.4",
-		bg = "$zeron.scene.pill.tint",
-		color = "$zeron.scene.pill.ink",
-		hover = { bg = "$zeron.scene.pill.hover" },
-		active = { bg = "$zeron.scene.pill.active" },
+		bg = "$zeren.scene.pill.tint",
+		color = "$zeren.scene.pill.ink",
+		hover = { bg = "$zeren.scene.pill.hover" },
+		active = { bg = "$zeren.scene.pill.active" },
 		border = 1,
-		border_color = "$zeron.scene.pill.edge",
+		border_color = "$zeren.scene.pill.edge",
 		focus = FOCUS,
 		scale = ui.spring(pressed, { from = 1, to = 0.98, stiffness = 520, damping = 30 }),
 		disabled = props.disabled,
@@ -723,7 +723,7 @@ M.LIST_MEASURE = 560
 function M.Fact(props: { label: string | Message, value: string | Message | () -> string }): Node
 	return ui.row {
 		w_full = true,
-		min_h = "$zeron.settings.row",
+		min_h = "$zeren.settings.row",
 		px = "$space.4",
 		py = "$space.3",
 		gap = "$space.4",
@@ -762,7 +762,7 @@ function M.Form(props: FormProps): Node
 	return ui.column {
 		w_full = true,
 		-- (A theme number, read as it is built: max_w takes points.)
-		max_w = props.measure or ui.theme.get(if props.wide then "zeron.form.list" else "zeron.form.measure") :: number?,
+		max_w = props.measure or ui.theme.get(if props.wide then "zeren.form.list" else "zeren.form.measure") :: number?,
 		gap = "$space.6",
 		ui.column {
 			w_full = true,

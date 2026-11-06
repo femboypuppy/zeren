@@ -11,7 +11,7 @@ use tokio::{
     sync::{Mutex, mpsc},
 };
 use tokio_tungstenite::tungstenite::Message;
-use zeron_preview::{PreviewService, Scope, signaling};
+use zeren_preview::{PreviewService, Scope, signaling};
 
 struct Token;
 #[async_trait::async_trait]

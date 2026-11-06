@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BINARY="$1"
 shift
-BUNDLE="$(mktemp -d "${TMPDIR:-/tmp}/zeron-browser-fixture.XXXXXX")/Fixture.app"
+BUNDLE="$(mktemp -d "${TMPDIR:-/tmp}/zeren-browser-fixture.XXXXXX")/Fixture.app"
 trap 'rm -r "$(dirname "$BUNDLE")"' EXIT
 mkdir -p "$BUNDLE/Contents/MacOS"
 cp "$BINARY" "$BUNDLE/Contents/MacOS/fixture"

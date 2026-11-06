@@ -3,7 +3,7 @@
 -- still to install, every agent that speaks the Agent Client Protocol (the
 -- registry) and the pages that add one, each agent's own settings dialog,
 -- and the resets Codex banks for an account. The agents, their order and
--- what each can do are Zeron's (crates/proto/src/providers.rs,
+-- what each can do are Zeren's (crates/proto/src/providers.rs,
 -- settings/accounts.rs, settings/harnesses.rs); the registry is the real
 -- one (cdn.agentclientprotocol.com, 43 agents on Oct 30 2026).
 
@@ -57,9 +57,9 @@ M.codex_reset = ui.state("ex_pv_codex_reset", "banked")
 M.reset_open = ui.state("ex_pv_reset_open", false)
 M.reset_choice = ui.state("ex_pv_reset_choice", "c1")
 
--- The agents on this Mac, in Zeron's order, with the version each reports.
+-- The agents on this Mac, in Zeren's order, with the version each reports.
 -- An agent: its name and mark, the version on this Mac (and a newer one
--- out), or that Zeron can't install it (`manual`).
+-- out), or that Zeren can't install it (`manual`).
 export type Agent = { id: string, name: string, mark: string, version: string?, latest: string?, manual: boolean? }
 
 local INSTALLED: { Agent } = {
@@ -69,8 +69,8 @@ local INSTALLED: { Agent } = {
 	{ id = "grok", name = "Grok", mark = "grok", version = "1.4.0" },
 }
 M.INSTALLED = INSTALLED
--- The rest of Zeron's own providers, not on this Mac. Antigravity has no
--- installer Zeron can run.
+-- The rest of Zeren's own providers, not on this Mac. Antigravity has no
+-- installer Zeren can run.
 local MORE: { Agent } = {
 	{ id = "antigravity", name = "Antigravity", mark = "antigravity", manual = true },
 	{ id = "devin", name = "Devin", mark = "devin" },
@@ -107,7 +107,7 @@ M.ACCOUNTS = {
 
 -- Every agent in the registry (its id, name, who makes it, its version,
 -- how it installs, its license, what it says of itself), as published. The
--- ones Zeron drives itself are built in.
+-- ones Zeren drives itself are built in.
 export type Entry = { id: string, name: string, by: string, version: string, kind: string, license: string, about: string, builtin: boolean?, icon: boolean?, source: string? }
 local REGISTRY: { Entry } = {
 	{ id = "agoragentic-acp", name = "Agoragentic", by = "ACRE", version = "1.3.0", kind = "npx", license = "MIT", about = "An agent marketplace: browse, invoke and pay for agent services." },
@@ -178,7 +178,7 @@ function M.needs(e: Entry): string
 end
 
 -- An agent's icon on the marks' white tile (the registry draws its icons
--- in one ink), Zeron's own mark for the agents it drives itself, or its
+-- in one ink), Zeren's own mark for the agents it drives itself, or its
 -- initial on a tile of its own when it has none.
 local MARKS: { [string]: string } = {
 	["claude-acp"] = "claude",
@@ -219,7 +219,7 @@ export type CardOptions = {
 }
 
 -- Each agent's own settings, in a dialog from its card. The rows are the
--- ones Zeron keeps per agent (settings/completion.rs, delegation.rs,
+-- ones Zeren keeps per agent (settings/completion.rs, delegation.rs,
 -- harnesses.rs): how skills complete in the composer, whether the agent
 -- delegates to subagents of its own, and how its updates are taken. They
 -- apply as they are changed, so the dialog only needs a way out.
@@ -374,7 +374,7 @@ function M.cards(): Node
 	return ui.column { w_full = true, gap = "$space.4", table.unpack(cards) }
 end
 
--- The agents still to install: Zeron's own, a click each; then every other
+-- The agents still to install: Zeren's own, a click each; then every other
 -- agent there is, a page away.
 M.install_row = Card.InstallRow
 M.loading = Card.Loading
@@ -423,7 +423,7 @@ local function back(label: string, to: string): Node
 end
 
 -- The registry: every agent, searched, each a row that opens it; the ones
--- Zeron drives itself say so and stay put. Last, one of your own.
+-- Zeren drives itself say so and stay put. Last, one of your own.
 function M.registry_page(): Node
 	local function rows(): Node
 		local q = string.lower(M.query:get())
@@ -493,7 +493,7 @@ function M.sub_page(where: Node, page: Node): Node
 	return ui.column {
 		w_full = true,
 		-- (A theme number, read as it is built: max_w takes points.)
-		max_w = ui.theme.get("zeron.settings.measure") :: number?,
+		max_w = ui.theme.get("zeren.settings.measure") :: number?,
 		gap = "$space.4",
 		where,
 		page,

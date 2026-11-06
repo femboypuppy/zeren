@@ -40,9 +40,9 @@ use gpui::{
     size,
 };
 
-use zeron_doc::{MessagePart, MessageRole, MessageStatus, SessionMessageEntry, SubagentStatus};
-use zeron_proto::view::{AnswerLine, InputOutcome};
-use zeron_proto::{HarnessId, ToolCall};
+use zeren_doc::{MessagePart, MessageRole, MessageStatus, SessionMessageEntry, SubagentStatus};
+use zeren_proto::view::{AnswerLine, InputOutcome};
+use zeren_proto::{HarnessId, ToolCall};
 
 use crate::markdown::mermaid_cache::{self, MermaidCache};
 use crate::markdown::parser::{
@@ -55,7 +55,7 @@ use crate::notice::{NoticeChipIcon::Tile, notice_chip_with_action};
 use crate::state::AppState;
 use crate::syntax_cache::{DocumentHighlightKey, SyntaxHighlightCache};
 use crate::theme::Theme;
-use zeron_syntax::LanguageId as Lang;
+use zeren_syntax::LanguageId as Lang;
 
 // ---------------------------------------------------------------------------
 // Constants (mugen ports)
@@ -812,7 +812,7 @@ pub enum ToolDetail {
     /// (chat2-sync A1). The full diff upgrades this to [`ToolDetail::Diff`]
     /// via the sidecar fetch.
     Stats {
-        stats: Arc<Vec<zeron_doc::ToolDiffStat>>,
+        stats: Arc<Vec<zeren_doc::ToolDiffStat>>,
     },
 }
 
@@ -839,8 +839,8 @@ const DETAIL_SEPARATOR: f32 = 1.0;
 /// STATS instead of inline diff text, which win the same way.
 pub fn tool_detail(
     output: Option<&str>,
-    diff: Option<&zeron_proto::ToolDiff>,
-    diff_stats: Option<&[zeron_doc::ToolDiffStat]>,
+    diff: Option<&zeren_proto::ToolDiff>,
+    diff_stats: Option<&[zeren_doc::ToolDiffStat]>,
 ) -> Option<ToolDetail> {
     if let Some(diff) = diff {
         let mut file = diff_to_file(diff);
@@ -938,9 +938,9 @@ pub fn call_block(call: &ToolCall) -> Option<ToolDetail> {
             .iter()
             .map(|i| {
                 let mark = match i.status() {
-                    zeron_proto::TodoStatus::Completed => "[x]",
-                    zeron_proto::TodoStatus::InProgress => "[~]",
-                    zeron_proto::TodoStatus::Pending => "[ ]",
+                    zeren_proto::TodoStatus::Completed => "[x]",
+                    zeren_proto::TodoStatus::InProgress => "[~]",
+                    zeren_proto::TodoStatus::Pending => "[ ]",
                 };
                 format!("{mark} {}", i.text)
             })
@@ -983,10 +983,10 @@ pub fn call_block(call: &ToolCall) -> Option<ToolDetail> {
     })
 }
 
-/// Reduce an inline [`zeron_proto::ToolDiff`] to the changes pane's
+/// Reduce an inline [`zeren_proto::ToolDiff`] to the changes pane's
 /// [`crate::changes::FileDiff`]: hunks grouped with 3 context lines, dual
 /// 1-based line numbers, unified-diff hunk headers, and add/del counts.
-pub fn diff_to_file(diff: &zeron_proto::ToolDiff) -> crate::changes::FileDiff {
+pub fn diff_to_file(diff: &zeren_proto::ToolDiff) -> crate::changes::FileDiff {
     use crate::changes::{DiffLine, FileDiff, FileStatus, Hunk, LineKind};
     let old = diff.old_text.as_deref().unwrap_or("");
     let text_diff = similar::TextDiff::from_lines(old, &diff.new_text);
@@ -1082,13 +1082,13 @@ pub enum RowKind {
         attachments: Arc<Vec<crate::attachments::UserImageAttachment>>,
         /// Context the prompt folded in as text, lifted back out by `badges`.
         badges: Arc<Vec<crate::badges::MessageBadge>>,
-        /// The chat that sent this message through Zeron's `send_message`,
+        /// The chat that sent this message through Zeren's `send_message`,
         /// lifted out of the routing header the receiving agent still reads.
         sender: Option<AgentSender>,
         /// Optimistic echo not yet confirmed by a doc frame.
         pending: bool,
     },
-    /// A message this chat's agent sent another chat through Zeron's
+    /// A message this chat's agent sent another chat through Zeren's
     /// `send_message`: one `Message to [logo] Chat` line, not the tool call.
     SentMessage {
         /// The recipient as the call named it (id, id prefix, or title),
@@ -1169,7 +1169,7 @@ pub struct Row {
     pub turn_start: bool,
     pub kind: RowKind,
     /// The owning message entry — hover anywhere on the entry's rows reveals
-    /// its timestamp strip (zeron chat-view.tsx `group`/`group-hover`).
+    /// its timestamp strip (zeren chat-view.tsx `group`/`group-hover`).
     pub entry_id: SharedString,
     /// Epoch-ms for the 16px hover-timestamp strip UNDER this row: set on the
     /// LAST row of a completed entry (user rows always; assistant rows only
@@ -1410,7 +1410,7 @@ pub fn rows_for_entry(
         // Chips stand in for their attachments: those leave the strip, and a
         // chip carries its upload's path for its progress and, for an image,
         // a click opening it.
-        let chips = zeron_proto::attachment_mentions::attachment_mentions(&body);
+        let chips = zeren_proto::attachment_mentions::attachment_mentions(&body);
         let mut attachments = parsed.attachments;
         let (text, mut mentions) = match crate::composer::sent_mention_display(&body) {
             Some((display, spans)) => (display, spans),
@@ -1547,7 +1547,7 @@ pub fn rows_for_entry(
                 // A message to another chat reads as one line naming the
                 // recipient, one per recipient, out of the tool fold (compact
                 // mode folds it with the rest of the work).
-                if !compact && let Some(sent) = zeron_proto::agent_messages::outgoing_messages(call)
+                if !compact && let Some(sent) = zeren_proto::agent_messages::outgoing_messages(call)
                 {
                     flush_group(
                         &mut rows,
@@ -1771,8 +1771,8 @@ pub fn rows_for_entry(
                     } => {
                         // Model-generated header onto the one-line chip.
                         let header: SharedString =
-                            zeron_proto::view::input_header(questions).into();
-                        let outcome = zeron_proto::view::input_outcome(
+                            zeren_proto::view::input_header(questions).into();
+                        let outcome = zeren_proto::view::input_outcome(
                             questions,
                             *resolved,
                             answers.as_deref(),
@@ -1960,13 +1960,13 @@ fn is_compact_work_part(ix: usize, part: &MessagePart, reply_start: Option<usize
     }
 }
 
-/// `ZERON_FRAME_STATS=1` logs live-row render-cost percentiles (p50/p95 µs
+/// `ZEREN_FRAME_STATS=1` logs live-row render-cost percentiles (p50/p95 µs
 /// over rolling windows of [`FRAME_STATS_WINDOW`] samples) at `warn` level —
 /// the smoothness measurement knob. Off by default; zero cost when off.
 fn frame_stats_enabled() -> bool {
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ENABLED
-        .get_or_init(|| std::env::var("ZERON_FRAME_STATS").is_ok_and(|v| !v.is_empty() && v != "0"))
+        .get_or_init(|| std::env::var("ZEREN_FRAME_STATS").is_ok_and(|v| !v.is_empty() && v != "0"))
 }
 
 const FRAME_STATS_WINDOW: usize = 240;
@@ -1999,12 +1999,12 @@ pub(crate) fn record_view_frame(view: &'static str) -> bool {
     })
 }
 
-/// `ZERON_NO_RENDER_CACHE=1` bypasses the cross-frame flatten cache — the
+/// `ZEREN_NO_RENDER_CACHE=1` bypasses the cross-frame flatten cache — the
 /// A/B knob for the frame-cost measurement above.
 fn render_cache_disabled() -> bool {
     static DISABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *DISABLED.get_or_init(|| {
-        std::env::var("ZERON_NO_RENDER_CACHE").is_ok_and(|v| !v.is_empty() && v != "0")
+        std::env::var("ZEREN_NO_RENDER_CACHE").is_ok_and(|v| !v.is_empty() && v != "0")
     })
 }
 
@@ -2161,7 +2161,7 @@ pub fn diff_rows(old: &[Row], new: &[Row]) -> Option<(Range<usize>, usize)> {
 
 /// The ToolGroup summary line — "Ran 3 commands · edited 2 files".
 ///
-/// The rule lives in `zeron_proto::view` so the terminal viewport reports the
+/// The rule lives in `zeren_proto::view` so the terminal viewport reports the
 /// same summary; this only adapts the row model's [`ToolItem`] to it.
 pub fn tool_group_summary(tools: &[ToolItem]) -> String {
     #[cfg(test)]
@@ -2185,7 +2185,7 @@ pub fn tool_group_summary(tools: &[ToolItem]) -> String {
     let base = if pairs.is_empty() {
         String::new()
     } else {
-        zeron_proto::view::tool_group_summary(&pairs)
+        zeren_proto::view::tool_group_summary(&pairs)
     };
     // Thought and note chips ride the group (they are UI-synthesized, so the
     // shared view summary never sees them): name them on the collapsed line.
@@ -2306,11 +2306,11 @@ fn tool_group_title(text: SharedString, shimmer_phase: Option<f32>, theme: &Them
 }
 
 // `single_line` and the per-kind chip label/detail are shared with the terminal
-// viewport (`zeron_proto::view`): a tool must be named identically on every
+// viewport (`zeren_proto::view`): a tool must be named identically on every
 // surface, and the one-line collapse is needed for the same reason in both (a
 // literal newline breaks gpui's ellipsis logic and would be a cursor move in a
 // cell grid).
-pub use zeron_proto::view::{single_line, tool_chip_content};
+pub use zeren_proto::view::{single_line, tool_chip_content};
 
 /// Analytic expanded-chips height — no measurement needed for the fold tween.
 pub fn chips_height(count: usize) -> f32 {
@@ -2391,7 +2391,7 @@ const FULL_OUTPUT_MAX_LINES: usize = 400;
 /// blobs render (near-)uncapped — fetching past the summary was the point.
 fn blob_detail(text: &str, is_diff: bool) -> Option<ToolDetail> {
     if is_diff {
-        let diff: zeron_proto::ToolDiff = serde_json::from_str(text).ok()?;
+        let diff: zeren_proto::ToolDiff = serde_json::from_str(text).ok()?;
         return tool_detail(None, Some(&diff), None);
     }
     let mut lines: Vec<SharedString> = text.lines().map(output_line).collect();
@@ -2424,7 +2424,7 @@ fn format_kb(bytes: u64) -> String {
 
 /// Rotating flavour vocabulary (21 words / 7s, seeded per chat).
 pub const FLAVOUR_WORDS: [&str; 21] = [
-    "Zeroning",
+    "Zerening",
     "Thinking",
     "Pondering",
     "Scheming",
@@ -2545,7 +2545,7 @@ fn compact_work_title(
 
 struct HighlightEntry {
     key: DocumentHighlightKey,
-    document: Option<Weak<zeron_syntax::HighlightedDocument>>,
+    document: Option<Weak<zeren_syntax::HighlightedDocument>>,
     _task: Option<Task<()>>,
 }
 
@@ -2567,7 +2567,7 @@ impl HighlightStore {
         lang: Lang,
         code: &str,
         cx: &mut Context<Transcript>,
-    ) -> Option<Arc<zeron_syntax::HighlightedDocument>> {
+    ) -> Option<Arc<zeren_syntax::HighlightedDocument>> {
         let slot_key = (row_id.clone(), block_ix);
         let document_key = DocumentHighlightKey::new(lang, code);
         if let Some(entry) = self.entries.get(&slot_key)
@@ -2596,7 +2596,7 @@ impl HighlightStore {
             let document = cx
                 .background_executor()
                 .spawn(async move {
-                    zeron_syntax::highlight(zeron_syntax::HighlightRequest {
+                    zeren_syntax::highlight(zeren_syntax::HighlightRequest {
                         source: &code,
                         path: None,
                         fence_tag: Some(match lang {
@@ -2682,29 +2682,29 @@ pub(crate) struct TranscriptPreparation {
     cache: HashMap<String, Arc<Vec<Row>>>,
     live_parsers: HashMap<String, IncrementalParser>,
     tree_cache: HashMap<String, (usize, Arc<BlockTree>)>,
-    baseline: Option<zeron_doc::TranscriptBaseline>,
+    baseline: Option<zeren_doc::TranscriptBaseline>,
 }
 
 pub(crate) struct PreparedTranscript {
     pub(crate) rows: HashMap<String, Arc<Vec<Row>>>,
     pub(crate) historical: HashMap<String, Vec<Row>>,
     fully_historical: HashSet<String>,
-    pub(crate) navigation_baseline: Arc<zeron_doc::TranscriptBaseline>,
+    pub(crate) navigation_baseline: Arc<zeren_doc::TranscriptBaseline>,
     pub(crate) bytes: usize,
 }
 
 impl TranscriptPreparation {
     pub(crate) fn prepare(
         &mut self,
-        update: &zeron_doc::TranscriptUpdate,
-    ) -> Result<Arc<PreparedTranscript>, zeron_doc::TranscriptDesync> {
+        update: &zeren_doc::TranscriptUpdate,
+    ) -> Result<Arc<PreparedTranscript>, zeren_doc::TranscriptDesync> {
         match &update.frame {
-            zeron_doc::TranscriptFrame::Reset { .. } => {
+            zeren_doc::TranscriptFrame::Reset { .. } => {
                 self.cache.clear();
                 self.tree_cache.clear();
                 self.live_parsers.clear();
             }
-            zeron_doc::TranscriptFrame::Delta {
+            zeren_doc::TranscriptFrame::Delta {
                 upsert,
                 append,
                 remove,
@@ -2723,7 +2723,7 @@ impl TranscriptPreparation {
                 }
             }
         }
-        zeron_doc::apply_transcript_frame(&mut self.entries, update.frame.clone())?;
+        zeren_doc::apply_transcript_frame(&mut self.entries, update.frame.clone())?;
         if let Some(baseline) = &update.replay_baseline {
             self.baseline = Some(baseline.clone());
         }
@@ -2778,7 +2778,7 @@ impl TranscriptPreparation {
             historical,
             fully_historical,
             bytes,
-            navigation_baseline: Arc::new(zeron_doc::TranscriptBaseline::capture(&self.entries)),
+            navigation_baseline: Arc::new(zeren_doc::TranscriptBaseline::capture(&self.entries)),
         }))
     }
 }
@@ -3343,7 +3343,7 @@ pub struct Transcript {
     /// Entrance state follows stable groups through completion so fast calls
     /// finish revealing. Replay rows have no entrance timestamps.
     tool_group_reveals: HashMap<SharedString, ToolGroupReveal>,
-    last_replay_baseline: Option<Arc<zeron_doc::TranscriptBaseline>>,
+    last_replay_baseline: Option<Arc<zeren_doc::TranscriptBaseline>>,
     /// Parsed historical prefixes, used to seed text before a coalesced live
     /// suffix is painted. The wire watermark contains lengths, not text.
     historical_markdown: HashMap<SharedString, Row>,
@@ -3509,7 +3509,7 @@ pub struct Transcript {
     /// Bumped whenever `rows` is replaced.
     rows_revision: u64,
     /// `(row id, entry id)` under the pointer — reveals the entry's timestamp
-    /// strip (zeron chat-view.tsx `group-hover`; the rows report hover
+    /// strip (zeren chat-view.tsx `group-hover`; the rows report hover
     /// themselves). Keyed by ROW so a row→row move within one entry can't
     /// clear the reveal when the old row's leave event arrives after the new
     /// row's enter (enter/leave order across rows is not guaranteed).
@@ -3924,7 +3924,7 @@ impl Transcript {
         }
     }
 
-    /// Centered over the blank list: the zeron loader and what it waits on.
+    /// Centered over the blank list: the zeren loader and what it waits on.
     fn render_loader(
         &self,
         loading: crate::state::TranscriptLoading,
@@ -5691,7 +5691,7 @@ impl Transcript {
             let reply = crate::attachments::call_with_timeout(
                 &engine,
                 cx.background_executor(),
-                zeron_rpc::methods::FETCH_TOOL_BLOB,
+                zeren_rpc::methods::FETCH_TOOL_BLOB,
                 serde_json::json!({ "blobRef": ref_key.as_ref() }),
                 Duration::from_secs(20),
             )
@@ -5993,7 +5993,7 @@ impl Transcript {
     }
 
     /// Devices that may own a user message's attachment files: the chat's host
-    /// device (uploads targeted it) plus this device (zeron's
+    /// device (uploads targeted it) plus this device (zeren's
     /// `uniqueIds([attachmentDeviceId, m.device_id])`).
     fn attachment_device_ids(&self, cx: &Context<Self>) -> Vec<String> {
         // `selected_chat_row` belongs to the PRIMARY transcript's chat — an
@@ -7687,7 +7687,7 @@ impl Transcript {
                             // so the overlay stays live even once the trailer's
                             // 30s pending-send bridge has lapsed.
                             let pulse = motion::pulse_wave(motion::pulse_delta(
-                                &motion::ZERON_PULSE,
+                                &motion::ZEREN_PULSE,
                                 cx.entity_id(),
                                 cx,
                             ));
@@ -7731,7 +7731,7 @@ impl Transcript {
                     .opacity(
                         0.35 + 0.4
                             * motion::pulse_wave(motion::pulse_delta(
-                                &motion::ZERON_PULSE,
+                                &motion::ZEREN_PULSE,
                                 cx.entity_id(),
                                 cx,
                             )),
@@ -7768,7 +7768,7 @@ impl Transcript {
                 let params = serde_json::json!({ "chatId": chat_id });
                 if let Err(err) = engine
                     .client()
-                    .call(zeron_rpc::methods::RETRY_DELIVERY, params)
+                    .call(zeren_rpc::methods::RETRY_DELIVERY, params)
                     .await
                 {
                     tracing::warn!(error = %err, "delivery retry RPC failed");
@@ -7918,7 +7918,7 @@ impl Transcript {
             "Queued — will send automatically"
         } else if let Some(state) = booting {
             // The send waits for the chat's own Cloud machine.
-            if state == zeron_proto::CloudState::Provisioning {
+            if state == zeren_proto::CloudState::Provisioning {
                 "Starting a Cloud machine"
             } else {
                 "Waking the Cloud machine"
@@ -8110,7 +8110,7 @@ impl Transcript {
                         .iter()
                         .map(|chat| (chat.id.as_str(), chat.title.as_deref()))
                         .collect();
-                    zeron_proto::agent_messages::resolve_chat_key(to, &chats).map(str::to_owned)
+                    zeren_proto::agent_messages::resolve_chat_key(to, &chats).map(str::to_owned)
                 };
                 let lead = if *failed {
                     "Couldn't message"
@@ -8300,7 +8300,7 @@ impl Transcript {
                 self.render_visual(&row.id, owner, path, title, cx)
             }
             RowKind::ErrorChip { message } => {
-                let problem = zeron_proto::run_errors::provider_problem(message);
+                let problem = zeren_proto::run_errors::provider_problem(message);
                 let sign_in = self
                     .chat_id
                     .clone()
@@ -8623,7 +8623,7 @@ impl Transcript {
         tree: &Arc<BlockTree>,
         only: Option<usize>,
         cx: &mut Context<Self>,
-    ) -> HashMap<usize, Option<Arc<zeron_syntax::HighlightedDocument>>> {
+    ) -> HashMap<usize, Option<Arc<zeren_syntax::HighlightedDocument>>> {
         let mut out = HashMap::new();
         for (ix, top) in tree.blocks.iter().enumerate() {
             if only.is_some_and(|o| o != ix) {
@@ -8632,7 +8632,7 @@ impl Transcript {
             if let Block::CodeBlock { language, code } = &top.block
                 && let Some(lang) = language
                     .as_deref()
-                    .and_then(zeron_syntax::language_for_alias)
+                    .and_then(zeren_syntax::language_for_alias)
             {
                 out.insert(
                     ix,
@@ -8662,7 +8662,7 @@ impl Transcript {
         let old = match old_text {
             Some(source) => {
                 let path = file.old_path.as_deref().unwrap_or(&file.path);
-                let lang = zeron_syntax::language_for_path(path)?;
+                let lang = zeren_syntax::language_for_path(path)?;
                 Some(
                     self.highlights
                         .request(cache_row.clone(), 0, lang, source, cx)?,
@@ -8672,7 +8672,7 @@ impl Transcript {
         };
         let new = match new_text {
             Some(source) => {
-                let lang = zeron_syntax::language_for_path(&file.path)?;
+                let lang = zeren_syntax::language_for_path(&file.path)?;
                 Some(self.highlights.request(cache_row, 1, lang, source, cx)?)
             }
             None => None,
@@ -9049,7 +9049,7 @@ impl Transcript {
             // Quiet even when children failed: agents routinely have failed
             // probes mid-work, and a red HEADER read as "this whole step
             // broke" (user report). Failures still show on the individual
-            // chips (destructive tint, zeron tool-chip.tsx) and in the
+            // chips (destructive tint, zeren tool-chip.tsx) and in the
             // summary's "· N failed" count.
             .text_color(theme.text_muted)
             .hover(|s| s.text_color(theme.text))
@@ -9478,11 +9478,11 @@ pub(crate) fn chat_identity(
     }
 }
 
-/// Split the routing header (`[Message from Zeron chat …]`) off a message an
+/// Split the routing header (`[Message from Zeren chat …]`) off a message an
 /// agent sent: the agent keeps reading it in the stored prompt, while the
 /// transcript shows the sender above the bubble and only the body inside it.
 pub(crate) fn agent_message_sender(text: &str) -> Option<(AgentSender, &str)> {
-    let (sender, body) = zeron_proto::agent_messages::agent_message_sender(text)?;
+    let (sender, body) = zeren_proto::agent_messages::agent_message_sender(text)?;
     Some((
         AgentSender {
             chat_id: sender.chat_id.into(),
@@ -9938,7 +9938,7 @@ fn user_file_pill(name: &str, theme: &Theme) -> AnyElement {
 }
 
 /// The transcript ErrorChip — the shared [`notice_chip_with_action`] in its tile
-/// treatment (a port of zeron chat-view.tsx `ErrorChip`, restacked for long
+/// treatment (a port of zeren chat-view.tsx `ErrorChip`, restacked for long
 /// payloads: header row with the red-washed tile and the medium "Error"
 /// label, then the human message below). Unlike the web port, the message
 /// WRAPS instead of truncating: startup-crash errors carry the agent's exit
@@ -9949,11 +9949,11 @@ fn user_file_pill(name: &str, theme: &Theme) -> AnyElement {
 /// label and carries a "Log in" button for that chat's provider.
 fn error_chip(
     message: SharedString,
-    problem: Option<zeron_proto::run_errors::ProviderProblem>,
+    problem: Option<zeren_proto::run_errors::ProviderProblem>,
     sign_in: Option<impl Fn(&gpui::ClickEvent, &mut Window, &mut gpui::App) + 'static>,
     theme: &Theme,
 ) -> AnyElement {
-    use zeron_proto::run_errors::ProviderProblem;
+    use zeren_proto::run_errors::ProviderProblem;
     let label = match problem {
         Some(ProviderProblem::SignedOut) => "Signed out",
         Some(ProviderProblem::LimitReached) => "Limit reached",
@@ -10269,12 +10269,12 @@ fn input_chip(header: SharedString, outcome: &InputOutcome, theme: &Theme) -> An
         .into_any_element()
 }
 
-/// A small glyph standing in for the tool's icon (zeron uses an icon set; a
+/// A small glyph standing in for the tool's icon (zeren uses an icon set; a
 /// quiet monochrome character keeps the tile without shipping SVGs).
-/// The glyph for a tool call (zeron tool-chip.tsx `toolIcon`, Solar set).
+/// The glyph for a tool call (zeren tool-chip.tsx `toolIcon`, Solar set).
 fn tool_icon_path(call: &ToolCall) -> &'static str {
     // A Cloud machine's own setup: the machine, then its git steps.
-    match zeron_proto::cloud_setup_step(call) {
+    match zeren_proto::cloud_setup_step(call) {
         Some("clone" | "branch") => return crate::icons::GIT_BRANCH,
         Some(_) => return crate::icons::CLOUD,
         None => {}
@@ -10945,7 +10945,7 @@ fn reveal_tool_row(row: AnyElement, height: f32, progress: f32) -> AnyElement {
         .into_any_element()
 }
 
-/// BoardUI-style task tree with Zeron's tool glyph restored at each branch tip.
+/// BoardUI-style task tree with Zeren's tool glyph restored at each branch tip.
 /// The previous row draws the first leg of a new arrival to its lower boundary;
 /// this row then continues down, rounds the elbow, and finally reveals the icon.
 /// One paint owns every segment in a row, avoiding alpha-darkened joints.
@@ -11680,7 +11680,7 @@ mod tests {
             });
         });
     }
-    use zeron_doc::MessagePart;
+    use zeren_doc::MessagePart;
 
     fn with_tool_group_navigation(
         cx: &mut gpui::TestAppContext,
@@ -11808,14 +11808,14 @@ mod tests {
     fn tool_group_revisit_skips_batched_history_but_animates_live_arrivals(
         cx: &mut gpui::TestAppContext,
     ) {
-        use zeron_doc::transcript_delta::{TranscriptFrame, diff_transcript};
+        use zeren_doc::transcript_delta::{TranscriptFrame, diff_transcript};
 
         with_tool_group_navigation(cx, |state, transcript, cx| {
             let apply_frame = |frame, replay_baseline, cx: &mut gpui::App| {
                 state.update(cx, |state, cx| {
                     state
                         .receive_transcript_update(
-                            zeron_doc::TranscriptUpdate {
+                            zeren_doc::TranscriptUpdate {
                                 frame,
                                 replay_baseline,
                                 context_usage: None,
@@ -11833,7 +11833,7 @@ mod tests {
             )];
             apply_frame(
                 TranscriptFrame::reset(&cached),
-                Some(zeron_doc::TranscriptBaseline::capture(&cached)),
+                Some(zeren_doc::TranscriptBaseline::capture(&cached)),
                 cx,
             );
             state.update(cx, |state, cx| state.select_chat(Some("chat-b".into()), cx));
@@ -11862,7 +11862,7 @@ mod tests {
             );
             apply_frame(
                 TranscriptFrame::reset(&cached),
-                Some(zeron_doc::TranscriptBaseline::capture(&cached)),
+                Some(zeren_doc::TranscriptBaseline::capture(&cached)),
                 cx,
             );
             let row_id: SharedString = "tools#g0".into();
@@ -11883,7 +11883,7 @@ mod tests {
                 assert!(matches!(&frame, TranscriptFrame::Delta { .. }));
                 apply_frame(
                     frame,
-                    Some(zeron_doc::TranscriptBaseline::capture(next)),
+                    Some(zeren_doc::TranscriptBaseline::capture(next)),
                     cx,
                 );
                 let reveal = &transcript.read(cx).tool_group_reveals[&row_id];
@@ -11928,10 +11928,10 @@ mod tests {
             assistant("b", MessageStatus::Complete, vec![tool_part("t", "pwd")]),
         ];
         let first = worker
-            .prepare(&zeron_doc::TranscriptUpdate {
-                frame: zeron_doc::TranscriptFrame::reset(&original),
+            .prepare(&zeren_doc::TranscriptUpdate {
+                frame: zeren_doc::TranscriptFrame::reset(&original),
                 context_usage: None,
-                replay_baseline: Some(zeron_doc::TranscriptBaseline::capture(&original)),
+                replay_baseline: Some(zeren_doc::TranscriptBaseline::capture(&original)),
             })
             .unwrap();
         let mut changed = original.clone();
@@ -11940,8 +11940,8 @@ mod tests {
             text: "omega".into(),
         }];
         let next = worker
-            .prepare(&zeron_doc::TranscriptUpdate {
-                frame: zeron_doc::diff_transcript(&original, &changed),
+            .prepare(&zeren_doc::TranscriptUpdate {
+                frame: zeren_doc::diff_transcript(&original, &changed),
                 context_usage: None,
                 replay_baseline: None,
             })
@@ -11954,18 +11954,18 @@ mod tests {
     #[gpui::test]
     fn prepared_whale_open_and_revisit_do_not_build_rows_on_ui(cx: &mut gpui::TestAppContext) {
         let (update, prepared, preparation_ms) = std::thread::spawn(|| {
-            let entries = if let Ok(path) = std::env::var("ZERON_WHALE_SNAPSHOT") {
-                let doc = zeron_doc::SessionDoc::init("fixture").unwrap();
+            let entries = if let Ok(path) = std::env::var("ZEREN_WHALE_SNAPSHOT") {
+                let doc = zeren_doc::SessionDoc::init("fixture").unwrap();
                 doc.doc().import(&std::fs::read(path).unwrap()).unwrap();
-                zeron_doc::join_continuation_entries(doc.read_entries().unwrap())
+                zeren_doc::join_continuation_entries(doc.read_entries().unwrap())
             } else {
                 vec![assistant("whale-turn", MessageStatus::Complete, (0..5000).map(|i| {
                     MessagePart::Text { id: format!("part-{i}"), text: format!("## Result {i}\n\n**Markdown** with `code` and [links](https://example.com).\n") }
                 }).collect())]
             };
-            let update = zeron_doc::TranscriptUpdate {
-                replay_baseline: Some(zeron_doc::TranscriptBaseline::capture(&entries)),
-                frame: zeron_doc::TranscriptFrame::Reset { reset: entries },
+            let update = zeren_doc::TranscriptUpdate {
+                replay_baseline: Some(zeren_doc::TranscriptBaseline::capture(&entries)),
+                frame: zeren_doc::TranscriptFrame::Reset { reset: entries },
                 context_usage: None,
             };
             let start = Instant::now();
@@ -12047,9 +12047,9 @@ mod tests {
                 state.update(cx, |state, cx| {
                     state
                         .receive_opening_transcript_update(
-                            zeron_doc::TranscriptUpdate {
-                                frame: zeron_doc::TranscriptFrame::reset(entries),
-                                replay_baseline: Some(zeron_doc::TranscriptBaseline::capture(
+                            zeren_doc::TranscriptUpdate {
+                                frame: zeren_doc::TranscriptFrame::reset(entries),
+                                replay_baseline: Some(zeren_doc::TranscriptBaseline::capture(
                                     entries,
                                 )),
                                 context_usage: None,
@@ -12103,8 +12103,8 @@ mod tests {
             state.update(cx, |state, cx| {
                 state
                     .receive_transcript_update(
-                        zeron_doc::TranscriptUpdate {
-                            frame: zeron_doc::diff_transcript(&full, &live),
+                        zeren_doc::TranscriptUpdate {
+                            frame: zeren_doc::diff_transcript(&full, &live),
                             replay_baseline: None,
                             context_usage: None,
                         },
@@ -12140,13 +12140,13 @@ mod tests {
                 vec![tool_part("new", "git status")],
             ));
             state.update(cx, |state, cx| {
-                let frame = zeron_doc::diff_transcript(&state.transcript, &history);
+                let frame = zeren_doc::diff_transcript(&state.transcript, &history);
                 state
                     .receive_transcript_update(
-                        zeron_doc::TranscriptUpdate {
+                        zeren_doc::TranscriptUpdate {
                             frame,
                             context_usage: None,
-                            replay_baseline: Some(zeron_doc::TranscriptBaseline::capture(&history)),
+                            replay_baseline: Some(zeren_doc::TranscriptBaseline::capture(&history)),
                         },
                         cx,
                     )
@@ -12154,8 +12154,8 @@ mod tests {
                 // Both updates land before the transcript observes/render them.
                 state
                     .receive_transcript_update(
-                        zeron_doc::TranscriptUpdate {
-                            frame: zeron_doc::diff_transcript(&history, &live),
+                        zeren_doc::TranscriptUpdate {
+                            frame: zeren_doc::diff_transcript(&history, &live),
                             context_usage: None,
                             replay_baseline: None,
                         },
@@ -12186,10 +12186,10 @@ mod tests {
         with_tool_group_navigation(cx, |state, transcript, cx| {
             let apply = |entries: &[SessionMessageEntry], baseline, cx: &mut gpui::App| {
                 state.update(cx, |state, cx| {
-                    let frame = zeron_doc::diff_transcript(&state.transcript, entries);
+                    let frame = zeren_doc::diff_transcript(&state.transcript, entries);
                     state
                         .receive_transcript_update(
-                            zeron_doc::TranscriptUpdate {
+                            zeren_doc::TranscriptUpdate {
                                 frame,
                                 replay_baseline: baseline,
                                 context_usage: None,
@@ -12218,7 +12218,7 @@ mod tests {
             historical[0].parts.retain(|p| p.id().starts_with("old"));
             apply(
                 &entries,
-                Some(zeron_doc::TranscriptBaseline::capture(&historical)),
+                Some(zeren_doc::TranscriptBaseline::capture(&historical)),
                 cx,
             );
             let reveal = &transcript.read(cx).tool_group_reveals[&row];
@@ -12230,7 +12230,7 @@ mod tests {
             entries[0].parts.push(tool_part("live-c", "pwd"));
             apply(
                 &entries,
-                Some(zeron_doc::TranscriptBaseline::capture(&historical)),
+                Some(zeren_doc::TranscriptBaseline::capture(&historical)),
                 cx,
             );
             let reveal = &transcript.read(cx).tool_group_reveals[&row];
@@ -12246,8 +12246,8 @@ mod tests {
                 state.select_chat(Some("new-chat".into()), cx);
                 state
                     .receive_transcript_update(
-                        zeron_doc::TranscriptUpdate {
-                            frame: zeron_doc::TranscriptFrame::reset(&[]),
+                        zeren_doc::TranscriptUpdate {
+                            frame: zeren_doc::TranscriptFrame::reset(&[]),
                             context_usage: None,
                             replay_baseline: Some(Default::default()),
                         },
@@ -12264,8 +12264,8 @@ mod tests {
             state.update(cx, |state, cx| {
                 state
                     .receive_transcript_update(
-                        zeron_doc::TranscriptUpdate {
-                            frame: zeron_doc::diff_transcript(&[], &live),
+                        zeren_doc::TranscriptUpdate {
+                            frame: zeren_doc::diff_transcript(&[], &live),
                             context_usage: None,
                             replay_baseline: None,
                         },
@@ -12294,11 +12294,11 @@ mod tests {
                 ));
             }
             state.update(cx, |state, cx| {
-                let frame = zeron_doc::diff_transcript(&state.transcript, &live);
-                assert!(matches!(&frame, zeron_doc::TranscriptFrame::Reset { .. }));
+                let frame = zeren_doc::diff_transcript(&state.transcript, &live);
+                assert!(matches!(&frame, zeren_doc::TranscriptFrame::Reset { .. }));
                 state
                     .receive_transcript_update(
-                        zeron_doc::TranscriptUpdate {
+                        zeren_doc::TranscriptUpdate {
                             frame,
                             context_usage: None,
                             replay_baseline: None,
@@ -12454,7 +12454,7 @@ mod tests {
             (Theme::dark(), crate::theme::grey(48)),
             (Theme::light(), crate::theme::grey(230)),
         ] {
-            theme.surface_treatment = zeron_theme::SurfaceTreatment::Opaque;
+            theme.surface_treatment = zeren_theme::SurfaceTreatment::Opaque;
             let badge = crate::theme::flatten(theme.ink(0.06), base);
             let icon_well = crate::theme::flatten(crate::file_icons::well_bg(&theme), badge);
             let contrast = crate::theme::contrast_ratio(icon_well, badge);
@@ -12475,9 +12475,9 @@ mod tests {
     #[test]
     fn file_badge_icon_well_uses_more_coverage_on_frost() {
         for mut theme in [Theme::dark(), Theme::light()] {
-            theme.surface_treatment = zeron_theme::SurfaceTreatment::Opaque;
+            theme.surface_treatment = zeren_theme::SurfaceTreatment::Opaque;
             let opaque_alpha = crate::file_icons::well_bg(&theme).a;
-            theme.surface_treatment = zeron_theme::SurfaceTreatment::Frosted;
+            theme.surface_treatment = zeren_theme::SurfaceTreatment::Frosted;
             let frosted = crate::file_icons::well_bg(&theme);
             let badge = crate::theme::flatten(theme.ink(0.06), theme.bg);
             let icon_well = crate::theme::flatten(frosted, badge);
@@ -13147,7 +13147,7 @@ mod tests {
 
     fn question_entry(
         resolved: bool,
-        answers: Option<Vec<zeron_proto::UserInputAnswer>>,
+        answers: Option<Vec<zeren_proto::UserInputAnswer>>,
     ) -> SessionMessageEntry {
         SessionMessageEntry {
             id: "m-ask".into(),
@@ -13155,7 +13155,7 @@ mod tests {
             parts: vec![MessagePart::Input {
                 id: "r1".into(),
                 request_id: "r1".into(),
-                questions: vec![zeron_proto::UserInputQuestion {
+                questions: vec![zeren_proto::UserInputQuestion {
                     id: "q".into(),
                     header: "Recherche".into(),
                     question: "How deep should the research go?".into(),
@@ -13178,7 +13178,7 @@ mod tests {
     #[test]
     fn question_chip_carries_what_was_answered_and_rekeys_when_it_lands() {
         let picked = |label: &str| {
-            Some(vec![zeron_proto::UserInputAnswer {
+            Some(vec![zeren_proto::UserInputAnswer {
                 question_id: "q".into(),
                 labels: vec![label.into()],
             }])
@@ -13241,7 +13241,7 @@ mod tests {
         let send = |id: &str, tool: &str, input: serde_json::Value| MessagePart::Tool {
             id: id.into(),
             call: ToolCall::Mcp {
-                server: "zeron".into(),
+                server: "zeren".into(),
                 tool: tool.into(),
                 input: Some(input),
             },
@@ -13309,7 +13309,7 @@ mod tests {
     fn agent_messages_show_their_sender_over_the_body() {
         let id = "cd27c5c2-0000-4000-8000-000000000000";
         let text = format!(
-            "[Message from Zeron chat zgui prod: Windows (WING-PC) (cd27c5c2). Reply to it with the Zeron `send_message` tool, chat {id}.]\n\nWindows lane: done."
+            "[Message from Zeren chat zgui prod: Windows (WING-PC) (cd27c5c2). Reply to it with the Zeren `send_message` tool, chat {id}.]\n\nWindows lane: done."
         );
         let rows = rows_for_entry(&user_entry("u1", &text), false, false, &mut parse);
         let RowKind::User {
@@ -13331,12 +13331,12 @@ mod tests {
         );
         // An untitled sender is labelled by its short id alone.
         let untitled = format!(
-            "[Message from Zeron chat cd27c5c2. Reply to it with the Zeron `send_message` tool, chat {id}.]\n\nhi"
+            "[Message from Zeren chat cd27c5c2. Reply to it with the Zeren `send_message` tool, chat {id}.]\n\nhi"
         );
         let (sender, body) = agent_message_sender(&untitled).unwrap();
         assert_eq!((sender.title.as_ref(), body), ("cd27c5c2", "hi"));
         // A typed message that merely starts alike is left alone.
-        assert!(agent_message_sender("[Message from Zeron chat x]\n\nhi").is_none());
+        assert!(agent_message_sender("[Message from Zeren chat x]\n\nhi").is_none());
     }
 
     #[test]
@@ -13361,10 +13361,10 @@ mod tests {
         assert!(markdown("just a question\n\nand another").is_none());
         // Chips paint over the plain text's layout, so a prompt with one
         // stays plain.
-        let link = zeron_proto::attachment_mentions::attachment_mention_link(1, Some("notes.md"));
+        let link = zeren_proto::attachment_mentions::attachment_mention_link(1, Some("notes.md"));
         assert!(markdown(&format!("**read** {link}")).is_none());
         // An agent's message renders its body, under the sender caption.
-        let routed = "[Message from Zeron chat cd27c5c2. Reply to it with the Zeron `send_message` tool, chat cd27c5c2-0000-4000-8000-000000000000.]\n\nRun `cargo test`.";
+        let routed = "[Message from Zeren chat cd27c5c2. Reply to it with the Zeren `send_message` tool, chat cd27c5c2-0000-4000-8000-000000000000.]\n\nRun `cargo test`.";
         assert!(markdown(routed).is_some());
     }
 
@@ -13656,7 +13656,7 @@ mod tests {
             cx.set_global(Theme::dark());
             crate::settings::init(crate::settings::UiSettings::default(), dir.path(), cx);
         });
-        let chat = |id: &str| zeron_proto::Chat {
+        let chat = |id: &str| zeren_proto::Chat {
             id: id.into(),
             device_id: "reply-host".into(),
             title: None,
@@ -15053,10 +15053,10 @@ mod tests {
                         state.select_chat(Some("chat".into()), cx);
                         state
                             .receive_transcript_update(
-                                zeron_doc::TranscriptUpdate {
-                                    frame: zeron_doc::TranscriptFrame::reset(&history),
+                                zeren_doc::TranscriptUpdate {
+                                    frame: zeren_doc::TranscriptFrame::reset(&history),
                                     context_usage: None,
-                                    replay_baseline: Some(zeron_doc::TranscriptBaseline::capture(
+                                    replay_baseline: Some(zeren_doc::TranscriptBaseline::capture(
                                         &history,
                                     )),
                                 },
@@ -15081,12 +15081,12 @@ mod tests {
                     this.state.update(cx, |state, cx| {
                         state
                             .receive_transcript_update(
-                                zeron_doc::TranscriptUpdate {
-                                    frame: zeron_doc::diff_transcript(&history, &next),
+                                zeren_doc::TranscriptUpdate {
+                                    frame: zeren_doc::diff_transcript(&history, &next),
                                     context_usage: None,
                                     // The RPC must retain its opening cutoff when
                                     // publishing subsequent changed-part history.
-                                    replay_baseline: Some(zeron_doc::TranscriptBaseline::capture(
+                                    replay_baseline: Some(zeren_doc::TranscriptBaseline::capture(
                                         &cutoff,
                                     )),
                                 },
@@ -15136,10 +15136,10 @@ mod tests {
                         state.select_chat(Some("chat".into()), cx);
                         state
                             .receive_transcript_update(
-                                zeron_doc::TranscriptUpdate {
-                                    frame: zeron_doc::TranscriptFrame::reset(&history),
+                                zeren_doc::TranscriptUpdate {
+                                    frame: zeren_doc::TranscriptFrame::reset(&history),
                                     context_usage: None,
-                                    replay_baseline: Some(zeron_doc::TranscriptBaseline::capture(
+                                    replay_baseline: Some(zeren_doc::TranscriptBaseline::capture(
                                         &history,
                                     )),
                                 },
@@ -15148,8 +15148,8 @@ mod tests {
                             .unwrap();
                         state
                             .receive_transcript_update(
-                                zeron_doc::TranscriptUpdate {
-                                    frame: zeron_doc::diff_transcript(&history, &live),
+                                zeren_doc::TranscriptUpdate {
+                                    frame: zeren_doc::diff_transcript(&history, &live),
                                     context_usage: None,
                                     replay_baseline: None,
                                 },
@@ -15198,10 +15198,10 @@ mod tests {
                     this.state.update(cx, |state, cx| {
                         state
                             .receive_transcript_update(
-                                zeron_doc::TranscriptUpdate {
-                                    frame: zeron_doc::diff_transcript(&live, &next),
+                                zeren_doc::TranscriptUpdate {
+                                    frame: zeren_doc::diff_transcript(&live, &next),
                                     context_usage: None,
-                                    replay_baseline: Some(zeron_doc::TranscriptBaseline::capture(
+                                    replay_baseline: Some(zeren_doc::TranscriptBaseline::capture(
                                         &next_history,
                                     )),
                                 },
@@ -15302,14 +15302,14 @@ mod tests {
                         this.spring_kick = true;
                         updated.push(prompt(&format!("history-{}", updated.len())));
                         this.state.update(cx, |state, cx| {
-                            let frame = zeron_doc::diff_transcript(&state.transcript, &updated);
+                            let frame = zeren_doc::diff_transcript(&state.transcript, &updated);
                             state
                                 .receive_transcript_update(
-                                    zeron_doc::TranscriptUpdate {
+                                    zeren_doc::TranscriptUpdate {
                                         frame,
                                         context_usage: None,
                                         replay_baseline: Some(
-                                            zeron_doc::TranscriptBaseline::capture(&updated),
+                                            zeren_doc::TranscriptBaseline::capture(&updated),
                                         ),
                                     },
                                     cx,
@@ -15546,7 +15546,7 @@ mod tests {
                     feed(this, vec![prompt("prompt")], cx);
                     this.rail_enabled = false;
                     this.state.update(cx, |state, _| {
-                        state.sessions.push(zeron_proto::Session {
+                        state.sessions.push(zeren_proto::Session {
                             last_completed_turn: None,
                             last_turn_outcome: None,
                             terminal_activity: None,
@@ -15554,7 +15554,7 @@ mod tests {
                             background_tasks: Vec::new(),
                             chat_id: "chat".into(),
                             device_id: "test".into(),
-                            status: zeron_proto::SessionStatus::Working,
+                            status: zeren_proto::SessionStatus::Working,
                             started_at: Some(chrono::Utc::now()),
                             updated_at: chrono::Utc::now(),
                         })
@@ -16969,8 +16969,8 @@ mod tests {
     fn bubble_chip_padding_is_shaped_in_geist() {
         let raw = format!(
             "open {} and {}",
-            zeron_proto::attachment_mentions::attachment_mention_link(1, None),
-            zeron_proto::attachment_mentions::attachment_mention_link(2, Some("notes.md")),
+            zeren_proto::attachment_mentions::attachment_mention_link(1, None),
+            zeren_proto::attachment_mentions::attachment_mention_link(2, Some("notes.md")),
         );
         let (text, spans) = crate::composer::sent_mention_display(&raw).expect("chips project");
         let mut theme = Theme::dark();
@@ -17004,7 +17004,7 @@ mod tests {
     /// land (the ref is rewritten to a local path) the icon comes back.
     #[gpui::test]
     fn sent_chips_show_upload_progress_until_their_bytes_land(cx: &mut gpui::TestAppContext) {
-        use zeron_proto::attachment_mentions::attachment_mention_link;
+        use zeren_proto::attachment_mentions::attachment_mention_link;
         let dir = tempfile::tempdir().unwrap();
         cx.update(|cx| {
             gpui_base::init(cx);
@@ -17013,7 +17013,7 @@ mod tests {
         });
         let state = cx.new(|_| AppState::new());
         state.update(cx, |state, _| {
-            state.apply_transfers(vec![zeron_proto::TransferProgress {
+            state.apply_transfers(vec![zeren_proto::TransferProgress {
                 upload_id: "att-1".into(),
                 file_name: "Image 1.png".into(),
                 done: 430,
@@ -17081,12 +17081,12 @@ mod tests {
     #[test]
     fn user_bubbles_project_attachment_chips_in_place_of_the_strip() {
         use crate::composer::ChipKind;
-        use zeron_proto::attachment_mentions::attachment_mention_link;
+        use zeren_proto::attachment_mentions::attachment_mention_link;
         let body = format!(
             "compare {} with {} and {}",
             attachment_mention_link(1, None),
             attachment_mention_link(2, Some("notes.md")),
-            "[composer.rs](zeron-file:crates/ui/src/composer.rs)",
+            "[composer.rs](zeren-file:crates/ui/src/composer.rs)",
         );
         let raw = crate::attachments::with_attachments(
             &body,
@@ -17110,7 +17110,7 @@ mod tests {
         else {
             panic!("expected a user row");
         };
-        assert!(!text.contains("zeron-") && !text.contains("Attached images"));
+        assert!(!text.contains("zeren-") && !text.contains("Attached images"));
         assert_eq!(
             mentions.iter().map(|m| m.kind).collect::<Vec<_>>(),
             [ChipKind::Image, ChipKind::File, ChipKind::File]
@@ -17161,7 +17161,7 @@ mod tests {
 
     #[test]
     fn user_rows_project_file_mentions_into_chips() {
-        let raw = "look at [composer.rs](zeron-file:crates/ui/src/composer.rs) please";
+        let raw = "look at [composer.rs](zeren-file:crates/ui/src/composer.rs) please";
         let mut entry = assistant("u3", MessageStatus::Complete, vec![]);
         entry.role = MessageRole::User;
         entry.status = None;
@@ -17171,7 +17171,7 @@ mod tests {
             panic!("expected a user row");
         };
         assert!(
-            !text.contains("zeron-file:"),
+            !text.contains("zeren-file:"),
             "raw link left visible: {text}"
         );
         assert!(text.contains("composer.rs"));
@@ -17237,7 +17237,7 @@ mod tests {
         let old = (1..=20).map(|i| format!("line {i}")).collect::<Vec<_>>();
         let mut new = old.clone();
         new[9] = "LINE 10".into();
-        let diff = zeron_proto::ToolDiff {
+        let diff = zeren_proto::ToolDiff {
             path: "/w/a.rs".into(),
             old_text: Some(old.join("\n") + "\n"),
             new_text: new.join("\n") + "\n",
@@ -17274,7 +17274,7 @@ mod tests {
         assert_eq!(old_text.as_deref(), diff.old_text.as_deref());
         assert_eq!(new_text.as_deref(), Some(diff.new_text.as_str()));
         // New files carry Added status (and no old numbers).
-        let created = zeron_proto::ToolDiff {
+        let created = zeren_proto::ToolDiff {
             path: "/w/new.txt".into(),
             old_text: None,
             new_text: "only\n".into(),
@@ -17518,8 +17518,8 @@ mod tests {
         );
         let todo = ToolCall::Todo {
             items: vec![
-                zeron_proto::TodoItem::new("a", zeron_proto::TodoStatus::Completed),
-                zeron_proto::TodoItem::new("b", zeron_proto::TodoStatus::Pending),
+                zeren_proto::TodoItem::new("a", zeren_proto::TodoStatus::Completed),
+                zeren_proto::TodoItem::new("b", zeren_proto::TodoStatus::Pending),
             ],
         };
         assert_eq!(tool_chip_content(&todo), ("Todo", "1/2 done".to_string()));
@@ -17714,19 +17714,19 @@ mod tests {
         let Some(ToolDetail::Output { lines, .. }) = call_block(&ToolCall::Mcp {
             server: "gh".into(),
             tool: "issues".into(),
-            input: Some(serde_json::json!({"repo": "zeron"})),
+            input: Some(serde_json::json!({"repo": "zeren"})),
         }) else {
             panic!("expected an output block")
         };
         assert_eq!(lines[0].as_ref(), "gh · issues");
-        assert!(lines.iter().any(|l| l.contains("\"repo\": \"zeron\"")));
+        assert!(lines.iter().any(|l| l.contains("\"repo\": \"zeren\"")));
 
         // Todos list one item per line with checkbox state.
         let Some(ToolDetail::Output { lines, .. }) = call_block(&ToolCall::Todo {
             items: vec![
-                zeron_proto::TodoItem::new("a", zeron_proto::TodoStatus::Completed),
-                zeron_proto::TodoItem::new("b", zeron_proto::TodoStatus::InProgress),
-                zeron_proto::TodoItem::new("c", zeron_proto::TodoStatus::Pending),
+                zeren_proto::TodoItem::new("a", zeren_proto::TodoStatus::Completed),
+                zeren_proto::TodoItem::new("b", zeren_proto::TodoStatus::InProgress),
+                zeren_proto::TodoItem::new("c", zeren_proto::TodoStatus::Pending),
             ],
         }) else {
             panic!("expected an output block")
@@ -18023,7 +18023,7 @@ mod tests {
         let (out, requests) = tokio::sync::mpsc::channel::<String>(256);
         let (replies, inbound) = tokio::sync::mpsc::channel::<String>(256);
         let engine =
-            crate::state::EngineHandle::from_test_client(zeron_rpc::RpcClient::new(out, inbound));
+            crate::state::EngineHandle::from_test_client(zeren_rpc::RpcClient::new(out, inbound));
         let state = cx.new(|_| {
             let mut state = AppState::new();
             state.local_device_id = Some("local".into());
@@ -18196,7 +18196,7 @@ mod tests {
         let _guard = runtime.enter();
         let dir = tempfile::tempdir().unwrap();
         let (parent, _engine) = remote_chats_state(cx, dir.path());
-        let side_chat = |id: &str| -> zeron_proto::Chat {
+        let side_chat = |id: &str| -> zeren_proto::Chat {
             serde_json::from_value(serde_json::json!({
                 "id": id, "parentChatId": "a", "deviceId": "omarchy",
                 "archived": false, "createdAt": chrono::Utc::now(),

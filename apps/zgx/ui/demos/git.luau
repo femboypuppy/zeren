@@ -114,12 +114,12 @@ local function changes(): Node
 				end,
 			},
 		},
-		ui.column { gap = "$zeron.list.gap", table.unpack(rows) },
+		ui.column { gap = "$zeren.list.gap", table.unpack(rows) },
 		TextArea { value = message, placeholder = "Message", name = "Commit message", subject = { soft = 50, max = 72 }, rows = 2, max_rows = 8, w_full = true },
 		ui.row {
 			gap = "$space.2",
 			items = "center",
-			people.Person { id = "mara", name = "Mara", size = 18, detail = "on zeron/primitives" },
+			people.Person { id = "mara", name = "Mara", size = 18, detail = "on zeren/primitives" },
 			ui.div { grow = 1 },
 			SplitButton {
 				"Commit",
@@ -156,7 +156,7 @@ local function pr_row(number: number, state: badge.PrState, title: string, who: 
 		ui.column {
 			grow = 1,
 			min_w = 0,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			FadeText { title, text_size = "$font.size.md", weight = "$font.weight.medium", color = "$text.primary" },
 			ui.row {
 				gap = "$space.2",
@@ -225,7 +225,7 @@ return {
 						SearchField { value = query, size = "sm", placeholder = "Filter", w = 200, shortcut = "cmd+f" },
 					},
 					ui.column {
-						gap = "$zeron.list.gap",
+						gap = "$zeren.list.gap",
 						pr_row(1142, "open", "Add the design system's primitives", ME, { ADA, GRACE }, "passing", "approved", 1800, 2480, 61),
 						pr_row(1151, "draft", "Settings pages on the new primitives", ME, {}, "running", "pending", 600, 412, 90),
 						pr_row(1139, "open", "Teach the sidebar to use Badge for its pull requests", ADA, { ME, GRACE, ALAN, { id = "k", name = "Katherine" } }, "failing", "changes", 86400, 18, 44),

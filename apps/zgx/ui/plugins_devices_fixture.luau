@@ -46,7 +46,7 @@ local DEVBOX = {
 		update = { version = "1.1.0", added = {}, removed = {} },
 	}),
 	plugin("ping", "Ping", "pending", { author = { kind = "unknown" } }),
-	plugin("teleport", "Teleport", "broken", { error = "Its manifest asks for a permission Zeron doesn't know: teleport" }),
+	plugin("teleport", "Teleport", "broken", { error = "Its manifest asks for a permission Zeren doesn't know: teleport" }),
 }
 
 sessions.now:set({
@@ -179,7 +179,7 @@ ui.command {
 }
 
 -- Light, for pictures of it.
-ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeron-light") end }
+ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeren-light") end }
 
 return ui.scroll {
 	w_full = true,

@@ -13,7 +13,7 @@ use std::{
     path::PathBuf,
     time::Duration,
 };
-use zeron_ui::*;
+use zeren_ui::*;
 
 async fn pause(cx: &mut AsyncApp, ms: u64) {
     cx.background_executor()
@@ -39,10 +39,10 @@ fn capture(directory: &std::path::Path, name: &str) -> anyhow::Result<()> {
     };
     // A nested Wayland compositor whose only output is this window: `grim`.
     #[cfg(not(target_os = "macos"))]
-    let status = if let Ok(command) = std::env::var("ZERON_BROWSER_CAPTURE_COMMAND") {
+    let status = if let Ok(command) = std::env::var("ZEREN_BROWSER_CAPTURE_COMMAND") {
         std::process::Command::new(command).arg(&path).status()?
     } else {
-        let capture_window = std::env::var("ZERON_BROWSER_CAPTURE_WINDOW").ok();
+        let capture_window = std::env::var("ZEREN_BROWSER_CAPTURE_WINDOW").ok();
         let windows = std::process::Command::new("xdotool")
             .args([
                 "search",
@@ -156,15 +156,15 @@ fn main() -> anyhow::Result<()> {
     let output = PathBuf::from(
         std::env::args()
             .nth(1)
-            .unwrap_or_else(|| "/tmp/zeron-browser-captures".into()),
+            .unwrap_or_else(|| "/tmp/zeren-browser-captures".into()),
     );
     std::fs::create_dir_all(&output)?;
     let temp = tempfile::tempdir()?;
-    let data = std::env::var_os("ZERON_BROWSER_STORAGE_ROOT")
+    let data = std::env::var_os("ZEREN_BROWSER_STORAGE_ROOT")
         .map(PathBuf::from).unwrap_or_else(|| temp.path().to_path_buf());
     let storage_root = data.clone();
-    let storage_profile = std::env::var("ZERON_BROWSER_STORAGE_PROFILE").unwrap_or_else(|_| "local".into());
-    let storage_url = std::env::var("ZERON_BROWSER_STORAGE_URL").ok();
+    let storage_profile = std::env::var("ZEREN_BROWSER_STORAGE_PROFILE").unwrap_or_else(|_| "local".into());
+    let storage_url = std::env::var("ZEREN_BROWSER_STORAGE_URL").ok();
     let listener = std::net::TcpListener::bind("127.0.0.1:0")?;
     let _origin = format!("http://{}", listener.local_addr()?);
     std::thread::spawn(move || {
@@ -173,9 +173,9 @@ fn main() -> anyhow::Result<()> {
             let mut request = [0; 4096];
             let n = stream.read(&mut request).unwrap_or(0);
             let request = String::from_utf8_lossy(&request[..n]);
-            // The bench's video, from `ZERON_BROWSER_BENCH_VIDEO`.
+            // The bench's video, from `ZEREN_BROWSER_BENCH_VIDEO`.
             if request.starts_with("GET /bench.mp4 ")
-                && let Some(video) = std::env::var_os("ZERON_BROWSER_BENCH_VIDEO").and_then(|path| std::fs::read(path).ok())
+                && let Some(video) = std::env::var_os("ZEREN_BROWSER_BENCH_VIDEO").and_then(|path| std::fs::read(path).ok())
             {
                 let _ = write!(
                     stream,
@@ -222,8 +222,8 @@ fn main() -> anyhow::Result<()> {
         composer::init(cx, settings.composer_send_behavior); terminal::panel::init(cx); app_menus::init(cx);
         let state = cx.new(|_| {
             let mut s = state::AppState::new();
-            s.connection = zeron_proto::view::ConnectionStatus::Ready;
-            s.workspace_scope = Some(zeron_proto::WorkspaceScope::Local);
+            s.connection = zeren_proto::view::ConnectionStatus::Ready;
+            s.workspace_scope = Some(zeren_proto::WorkspaceScope::Local);
             s.local_device_id = Some(storage_profile.clone());
             s.devices = vec![serde_json::from_value(serde_json::json!({"id":"local","name":"This device","platform":std::env::consts::OS,"lastSeenAt":null})).unwrap()];
             s.selected_chat = Some("browser-fixture".into()); s.selected_space = Some("project".into());
@@ -237,7 +237,7 @@ fn main() -> anyhow::Result<()> {
             window_bounds: Some(WindowBounds::Windowed(Bounds::new(gpui::point(px(12.),px(30.)), size(px(1000.),px(680.))))),
             titlebar: Some(gpui::TitlebarOptions { title: None, appears_transparent: true, traffic_light_position: Some(gpui::point(px(14.),px(14.))) }),
             app_owns_titlebar_drag: true,
-            app_id: Some("zeron-browser-fixture".into()),
+            app_id: Some("zeren-browser-fixture".into()),
             ..Default::default()
         }, |_, cx| cx.new(|cx| shell::Shell::new(state.clone(), boot, cx))).unwrap();
         state.update(cx, |_, cx| cx.notify());
@@ -252,7 +252,7 @@ fn main() -> anyhow::Result<()> {
                     }))?)?;
                     return Ok(());
                 }
-                if std::env::var_os("ZERON_TRANSCRIPT_LINK_FIXTURE_ONLY").is_some() {
+                if std::env::var_os("ZEREN_TRANSCRIPT_LINK_FIXTURE_ONLY").is_some() {
                     return transcript_links::exercise(window, state.clone(), &_origin, &output, cx).await;
                 }
                 state.update(cx, |s, cx| {
@@ -260,7 +260,7 @@ fn main() -> anyhow::Result<()> {
                         {"id":"fixture-user","role":"user","parts":[{"id":"text","kind":"text","text":"Build a calm, thoughtful workspace for Fieldnotes. Let’s preview the landing page beside this conversation."}],"createdAt":1788900000000_i64,"deviceId":"local"},
                         {"id":"fixture-assistant","role":"assistant","parts":[{"id":"text","kind":"text","text":"The first layout is ready to review.\n\nIt uses warm neutrals, generous spacing, and a simple hierarchy. The workspace cards stay readable as the preview gets narrower.\n\nOpen **Browser** from the sidebar’s **+** menu to keep the page beside your work."}],"createdAt":1788900001000_i64,"deviceId":"local","status":"complete"}
                     ])).unwrap();
-                    s.receive_transcript_frame(zeron_doc::TranscriptFrame::Reset { reset: entries }, cx).unwrap();
+                    s.receive_transcript_frame(zeren_doc::TranscriptFrame::Reset { reset: entries }, cx).unwrap();
                 });
                 let (first_id, first) = window.update(cx, |shell, w, cx| shell.fixture_open_browser(None, w, cx))?;
                 pause(cx, 500).await;
@@ -275,7 +275,7 @@ fn main() -> anyhow::Result<()> {
                     }
                     pause(cx, 500).await;
                     #[cfg(target_os = "linux")]
-                    if let Some(seconds) = std::env::var("ZERON_BROWSER_BENCH").ok().and_then(|s| s.parse().ok()) {
+                    if let Some(seconds) = std::env::var("ZEREN_BROWSER_BENCH").ok().and_then(|s| s.parse().ok()) {
                         return linux::bench(window, first.clone(), &_origin, &output, seconds, cx).await;
                     }
                     capture_frame(window, &output, "browser-preview-dark", cx).await?;
@@ -416,7 +416,7 @@ fn main() -> anyhow::Result<()> {
                 }
                 #[cfg(target_os = "macos")]
                 {
-                    cx.update(|cx|appearance::set_surface(zeron_theme::SurfacePreference::Frosted,cx));
+                    cx.update(|cx|appearance::set_surface(zeren_theme::SurfacePreference::Frosted,cx));
                     first.read_with(cx, |b,_| b.fixture_eval("(() => {let grid=document.createElement('div'); grid.id='browser-blur-grid'; grid.style='height:140px;background:repeating-conic-gradient(#172f25 0% 25%,#f5f0df 0% 50%) 0 0/16px 16px'; document.body.style.paddingTop='0'; document.body.prepend(grid);})()"));
                     pause(cx,300).await;
                     let mut layout_video = std::process::Command::new("/usr/sbin/screencapture").args(["-v","-V","30","-C","-k","-D","1"]).arg(output.join("browser-layout.mov")).spawn()?;
@@ -509,11 +509,11 @@ fn main() -> anyhow::Result<()> {
                     pause(cx,500).await;
                     capture_frame(window, &output, "browser-blur-solid-light", cx).await?;
                     let window_width=gpui::AnyWindowHandle::from(window).update(cx,|_,w,_|f32::from(w.viewport_size().width))?;
-                    cx.update(|cx|appearance::set_surface(zeron_theme::SurfacePreference::Opaque,cx));
+                    cx.update(|cx|appearance::set_surface(zeren_theme::SurfacePreference::Opaque,cx));
                     pause(cx,500).await;
                     anyhow::ensure!(first.read_with(cx,|b,_|b.fixture_backdrops().is_empty()),"opaque appearance retained native blur");
                     capture_frame(window, &output, "browser-menu-opaque", cx).await?;
-                    cx.update(|cx| {appearance::set_mode(appearance::AppearanceMode::Dark,cx);appearance::set_surface(zeron_theme::SurfacePreference::Frosted,cx);});
+                    cx.update(|cx| {appearance::set_mode(appearance::AppearanceMode::Dark,cx);appearance::set_surface(zeren_theme::SurfacePreference::Frosted,cx);});
                     window.update(cx,|s,_,cx|s.fixture_browser_menu(false,cx))?;
                     pause(cx,500).await;
                     anyhow::ensure!(first.read_with(cx,|b,_|b.fixture_backdrops().is_empty()),"dismissed menu retained native blur");

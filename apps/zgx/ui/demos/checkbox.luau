@@ -78,7 +78,7 @@ return {
 				ui.column {
 					w = 360,
 					gap = "$space.3",
-					Checkbox { value = a, label = "Sign commits", description = "With the SSH key Zeron made for this device." },
+					Checkbox { value = a, label = "Sign commits", description = "With the SSH key Zeren made for this device." },
 					Checkbox { value = b, label = "Push after committing", description = "To the branch's upstream, setting one if it has none." },
 				}
 			),

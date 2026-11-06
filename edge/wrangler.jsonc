@@ -1,5 +1,5 @@
 {
-  // Zeron edge: per-session + per-workspace Loro sync DOs, per-device
+  // Zeren edge: per-session + per-workspace Loro sync DOs, per-device
   // relay DOs, R2 blobs, the absorbed WorkOS auth routes, and the Cloud
   // control plane (CloudAccount/CloudIndex DOs, per-session lifecycle Workflows,
   // usage metering; docs/design/cloud-device.md) in front of the vault.
@@ -23,7 +23,7 @@
   // Public hostname on the zeron.sh zone, plus the install surface and member
   // card pages carved out of the landing host: path routes beat the landing
   // worker's custom domain, so `curl -fsSL https://zeron.sh/install.sh | sh`
-  // installs Zeron and zeron.sh/@wing is a card, while the rest of zeron.sh
+  // installs Zeren and zeron.sh/@wing is a card, while the rest of zeron.sh
   // serves the landing page.
   "routes": [
     { "pattern": "edge.zeron.sh", "custom_domain": true },
@@ -94,16 +94,16 @@
   // Cloud device lifecycle (src/cloud/workflows.ts). Workflow names are
   // account-wide: the dev/test wrangler configs must never reuse them.
   "workflows": [
-    { "name": "zeron-cloud-provision", "binding": "CLOUD_PROVISION", "class_name": "ProvisionWorkflow" },
-    { "name": "zeron-cloud-wake", "binding": "CLOUD_WAKE", "class_name": "WakeWorkflow" },
-    { "name": "zeron-cloud-sleep", "binding": "CLOUD_SLEEP", "class_name": "SleepWorkflow" },
+    { "name": "zeren-cloud-provision", "binding": "CLOUD_PROVISION", "class_name": "ProvisionWorkflow" },
+    { "name": "zeren-cloud-wake", "binding": "CLOUD_WAKE", "class_name": "WakeWorkflow" },
+    { "name": "zeren-cloud-sleep", "binding": "CLOUD_SLEEP", "class_name": "SleepWorkflow" },
     // Explicit delete: stop → final usage read → DELETE (billing-exact).
-    { "name": "zeron-cloud-delete", "binding": "CLOUD_DELETE", "class_name": "DeleteWorkflow" }
+    { "name": "zeren-cloud-delete", "binding": "CLOUD_DELETE", "class_name": "DeleteWorkflow" }
   ],
   // The credential vault (edge/vault, deployed by its own job BEFORE this
   // worker: a service binding to a missing worker fails the deploy). It has
   // no routes; this binding is the only way in.
-  "services": [{ "binding": "VAULT", "service": "zeron-vault", "entrypoint": "VaultApi" }],
+  "services": [{ "binding": "VAULT", "service": "zeren-vault", "entrypoint": "VaultApi" }],
   // Hourly: Cloud usage reconcile backstop + daily orphan scan (00:17 UTC) +
   // closed-month exports to R2 usage/{YYYY-MM}.json (src/cloud/billing.ts).
   "triggers": { "crons": ["17 * * * *"] },
@@ -215,7 +215,7 @@
   // Secrets: as production's Cloud list above, set with `--env staging`.
   "env": {
     "staging": {
-      "name": "zeron-edge-staging",
+      "name": "zeren-edge-staging",
       // Both ways in: the worker's own URL (scripts/staging-app.sh and
       // CLOUD_EDGE_URL still use it) and staging.zeron.sh, a custom domain
       // on the zeron.sh zone (its record wins over the zone's *.zeron.sh
@@ -235,18 +235,18 @@
         ]
       },
       "workflows": [
-        { "name": "zeron-staging-cloud-provision", "binding": "CLOUD_PROVISION", "class_name": "ProvisionWorkflow" },
-        { "name": "zeron-staging-cloud-wake", "binding": "CLOUD_WAKE", "class_name": "WakeWorkflow" },
-        { "name": "zeron-staging-cloud-sleep", "binding": "CLOUD_SLEEP", "class_name": "SleepWorkflow" },
-        { "name": "zeron-staging-cloud-delete", "binding": "CLOUD_DELETE", "class_name": "DeleteWorkflow" }
+        { "name": "zeren-staging-cloud-provision", "binding": "CLOUD_PROVISION", "class_name": "ProvisionWorkflow" },
+        { "name": "zeren-staging-cloud-wake", "binding": "CLOUD_WAKE", "class_name": "WakeWorkflow" },
+        { "name": "zeren-staging-cloud-sleep", "binding": "CLOUD_SLEEP", "class_name": "SleepWorkflow" },
+        { "name": "zeren-staging-cloud-delete", "binding": "CLOUD_DELETE", "class_name": "DeleteWorkflow" }
       ],
-      "services": [{ "binding": "VAULT", "service": "zeron-vault-staging", "entrypoint": "VaultApi" }],
+      "services": [{ "binding": "VAULT", "service": "zeren-vault-staging", "entrypoint": "VaultApi" }],
       "triggers": { "crons": ["17 * * * *"] },
       "ratelimits": [{ "name": "CARD_READS", "namespace_id": "1002", "simple": { "limit": 60, "period": 60 } }],
       "r2_buckets": [
-        { "binding": "BLOBS", "bucket_name": "zeron-staging-blobs" },
-        { "binding": "RELEASES", "bucket_name": "zeron-staging-releases" },
-        { "binding": "CARD_IMAGES", "bucket_name": "zeron-staging-card-images" }
+        { "binding": "BLOBS", "bucket_name": "zeren-staging-blobs" },
+        { "binding": "RELEASES", "bucket_name": "zeren-staging-releases" },
+        { "binding": "CARD_IMAGES", "bucket_name": "zeren-staging-card-images" }
       ],
       "browser": { "binding": "BROWSER" },
       "vars": {
@@ -257,12 +257,12 @@
         "CLOUD_IDLE_MINUTES": "10",
         "CLOUD_MAX_AWAKE": "5",
         "CLOUD_MACHINE": "default",
-        "CLOUD_TEMPLATE": "zeron-cloud-dev",
+        "CLOUD_TEMPLATE": "zeren-cloud-dev",
         "CLOUD_STARTING_CREDITS": "600",
         // Staging's Cloud shares production's Boat account: only Wing's
         // staging account (production's list is a secret).
         "CLOUD_ACCESS": "user_01KWD6G6ZPW9HT4SW6D89HB5FB",
-        "CLOUD_EDGE_URL": "https://zeron-edge-staging.sylasincorporated.workers.dev",
+        "CLOUD_EDGE_URL": "https://zeren-edge-staging.sylasincorporated.workers.dev",
         "BOAT_API_BASE": "https://boat.dev/api/v1",
         "STRIPE_PRICE_BASE": "price_1URyT5Ld6XnizwPIilL1dIYa",
         "STRIPE_PRICE_PRO": "price_1URyT5Ld6XnizwPIBzZSBN6b",

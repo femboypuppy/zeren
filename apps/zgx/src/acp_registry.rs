@@ -225,7 +225,7 @@ impl Registry {
             }
             Ok(_) => {}
             Err(error) => {
-                eprintln!("zeron-zgx: acp registry: the list didn't come: {error}");
+                eprintln!("zeren-zgx: acp registry: the list didn't come: {error}");
                 if self.loading.get() == run && self.look.get() != Look::Ready {
                     self.look.set(Look::Unavailable);
                     self.publish();
@@ -264,7 +264,7 @@ impl Registry {
             }
             Err(error) => {
                 self.publish();
-                eprintln!("zeron-zgx: acp registry: {id} wasn't added: {error}");
+                eprintln!("zeren-zgx: acp registry: {id} wasn't added: {error}");
                 Err(reason(&error))
             }
         }
@@ -279,7 +279,7 @@ impl Registry {
                 Ok(Value::from(reply["agent"]["harness"].as_str().unwrap_or_default()))
             }
             Err(error) => {
-                eprintln!("zeron-zgx: acp registry: your agent wasn't added: {error}");
+                eprintln!("zeren-zgx: acp registry: your agent wasn't added: {error}");
                 Err(reason(&error))
             }
         }
@@ -309,7 +309,7 @@ impl Registry {
                 Ok(Value::Nil)
             }
             Err(error) => {
-                eprintln!("zeron-zgx: acp registry: {id} wasn't removed: {error}");
+                eprintln!("zeren-zgx: acp registry: {id} wasn't removed: {error}");
                 Err(reason(&error))
             }
         }

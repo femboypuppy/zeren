@@ -195,7 +195,7 @@ describe("claude setup token", () => {
       })
     );
     // The canary also checks the GitHub App: answer that here, not from the network.
-    mockUpstream({ "https://api.github.com/app": () => json({ slug: "zeron-test" }) });
+    mockUpstream({ "https://api.github.com/app": () => json({ slug: "zeren-test" }) });
     const [, claudeResult] = await runCanary({ ...env, CANARY_USER_ID: userId });
     expect(claudeResult).toMatchObject({ provider: "claude", ok: false, status: "expiring" });
   });

@@ -22,7 +22,7 @@ local PIXEL = 2
 local HORIZON = 0.62
 -- The reveal (`shader_params` of every layer): front, band, ragged; centre.
 local BAND, RAGGED = 0.36, 0.14
--- The agents Zeron runs (their marks from zeron.sh), floating: scattered
+-- The agents Zeren runs (their marks from zeron.sh), floating: scattered
 -- loosely about the words, no two alike in place, size or tilt, flying in
 -- from outside (`fx`, `fy`) and drifting each on its own period. `x` is a fraction of the width from the middle, `y`
 -- of the height from the top.
@@ -661,7 +661,7 @@ local sheet = ui.column {
 	-- Setup's own background, solid as its window's: what the picture holds
 	-- under it (the words) never shows through, and the last fade, onto the
 	-- window, changes no pixel.
-	bg = "$zeron.window",
+	bg = "$zeren.window",
 	rounded = function()
 		local r = onboarding_radius:get() :: number
 		return if r > 0 then r else 16
@@ -812,7 +812,7 @@ return ui.overlay {
 			layer_params = decode.collapse_params,
 			ui.div { w = 2, h = 2, bg = "#00000001" },
 		},
-		ui.div { absolute = true, w = 2, h = 2, bg = "#00000001", backdrop_blur = "$zeron.scene.pill.blur" },
+		ui.div { absolute = true, w = 2, h = 2, bg = "#00000001", backdrop_blur = "$zeren.scene.pill.blur" },
 		ui.div { absolute = true, w = 2, h = 2, blur = 2, opacity = 0.01, ui.div { w = 2, h = 2, bg = "#000000" } },
 		ui.div { absolute = true, w = 2, h = 2, bg = "#00000001", shadow = { y = 2, blur = 4, color = "#00000002" } },
 	}),

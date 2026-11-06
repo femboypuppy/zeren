@@ -290,17 +290,17 @@ return ui.component(function(props: Props): Node
 		id = "session-lanes",
 		w = props.w or 280,
 		p = INSET,
-		gap = "$zeron.list.gap",
+		gap = "$zeren.list.gap",
 		rounded = CARD_RADIUS,
 		border = 1,
-		border_color = "$zeron.settings.edge",
-		bg = "$zeron.settings.card",
+		border_color = "$zeren.settings.edge",
+		bg = "$zeren.settings.card",
 		heading(
 			locale.t("ds.session_lanes.side_chats"),
 			ui.show(function(): boolean
 				return #props.side() > 0
 			end, ui.row {
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				IconButton { icon = "plus", label = locale.t("ds.session_lanes.new_side"), tooltip = locale.s("ds.session_lanes.new_side"), size = "sm", tone = "quiet", on_click = props.on_new },
 				IconButton { icon = "git-branch", label = locale.t("ds.session_lanes.fork"), tooltip = locale.s("ds.session_lanes.fork"), size = "sm", tone = "quiet", on_click = props.on_fork },
 			})
@@ -309,11 +309,11 @@ return ui.component(function(props: Props): Node
 			return #props.side() == 0
 		end, ui.column {
 			w_full = true,
-			gap = "$zeron.list.gap",
+			gap = "$zeren.list.gap",
 			action("plus", locale.t("ds.session_lanes.new_side"), props.on_new),
 			action("git-branch", locale.t("ds.session_lanes.fork"), props.on_fork),
 		}),
-		ui.column { w_full = true, gap = "$zeron.list.gap", ui.each(side, side_row, { key = by_id, w_full = true }) },
+		ui.column { w_full = true, gap = "$zeren.list.gap", ui.each(side, side_row, { key = by_id, w_full = true }) },
 		show_more(side_shown, function(): number
 			return #props.side()
 		end),
@@ -322,10 +322,10 @@ return ui.component(function(props: Props): Node
 			return #s.active + #s.finished > 0
 		end, ui.column {
 			w_full = true,
-			gap = "$zeron.list.gap",
-			ui.div { w_full = true, h = 1, my = "$space.1", bg = "$zeron.settings.rule" },
+			gap = "$zeren.list.gap",
+			ui.div { w_full = true, h = 1, my = "$space.1", bg = "$zeren.settings.rule" },
 			heading(locale.t("ds.session_lanes.subagents")),
-			ui.column { w_full = true, gap = "$zeron.list.gap", ui.each(active, sub_row, { key = by_ref, w_full = true }) },
+			ui.column { w_full = true, gap = "$zeren.list.gap", ui.each(active, sub_row, { key = by_ref, w_full = true }) },
 			show_more(subs_shown, function(): number
 				return #split:get().active
 			end),
@@ -363,7 +363,7 @@ return ui.component(function(props: Props): Node
 					color = "$text.secondary",
 				},
 			}),
-			ui.column { w_full = true, gap = "$zeron.list.gap", ui.each(finished, sub_row, { key = by_ref, w_full = true }) },
+			ui.column { w_full = true, gap = "$zeren.list.gap", ui.each(finished, sub_row, { key = by_ref, w_full = true }) },
 		}),
 	}
 end)

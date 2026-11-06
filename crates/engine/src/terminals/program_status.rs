@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use base64::Engine as _;
 use base64::engine::general_purpose::STANDARD;
 use chrono::{DateTime, Utc};
-use zeron_proto::{ProgramInputKind, ProgramState, ProgramStatus};
+use zeren_proto::{ProgramInputKind, ProgramState, ProgramStatus};
 
 pub(super) const SUPPORT_REPLY: &[u8] =
     b"\x1b]7501;?:states=idle,working,done,blocked,error:kinds=permission,question,auth\x1b\\";

@@ -1636,7 +1636,7 @@ export const handleUserDirectoryRoute = async (
       const organizations = await directory.listOrganizations();
       if (!csv) return json({ count: organizations.length, organizations });
       return csvResponse(
-        "zeron-organizations.csv",
+        "zeren-organizations.csv",
         "org_id,name,external_id,domains,member_count,members,created_at,updated_at,deleted_at,created_by",
         organizations.map((o) => [
           o.orgId,
@@ -1658,7 +1658,7 @@ export const handleUserDirectoryRoute = async (
     const users = await directory.list();
     if (!csv) return json({ count: users.length, users });
     return csvResponse(
-      "zeron-users.csv",
+      "zeren-users.csv",
       "user_number,user_id,email,name,first_name,last_name,profile_picture_url,joined_at,updated_at,deleted_at,badges,username,created_org_id,onboarding_done",
       users.map((u) => [
         String(u.userNumber),

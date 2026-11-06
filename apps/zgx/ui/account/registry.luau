@@ -23,7 +23,7 @@
 -- source_url?, website?, kind? ("binary" | "npx" | "uvx"; nil: no build
 -- for the device), readiness ("ready" | "needs-node" | "needs-uv" |
 -- "no-build"), host?, checksum? (a binary checked against the registry's
--- sha256, or not; nil for a package), built_in? (the harness Zeron drives
+-- sha256, or not; nil for a package), built_in? (the harness Zeren drives
 -- it with), added? (the version there), adding, delisted, own (one of
 -- your own, `own.<slug>`), icon? (SVG) }.
 

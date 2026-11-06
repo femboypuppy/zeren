@@ -1,7 +1,7 @@
 --!strict
 -- Plugins' settings: a page each in Settings, under "Plugins" after
--- Zeron's own pages, for every plugin that's on and declares settings in
--- its manifest (`settings`, src/plugins/settings.rs). Zeron draws each
+-- Zeren's own pages, for every plugin that's on and declares settings in
+-- its manifest (`settings`, src/plugins/settings.rs). Zeren draws each
 -- page with the same Page, Section, Group and Row every built-in page
 -- uses: a plugin declares, it never draws here, and no plugin reaches
 -- these pages (`private`). The host publishes the list (`plugins.settings`,
@@ -13,13 +13,13 @@
 -- by kind: a choice's `options` ({ value, label }) and `style` ("select" or
 -- "segmented"); text's `placeholder`; a number's `min`, `max`, `step`,
 -- `unit`. Kinds: switch, choice, text, number, shortcut, folder, and
--- `permission` (Zeron's own plugins alone, `{ id, kind, permission }`: a
--- macOS permission's row, every word and button Zeron's, screens/plugins/
+-- `permission` (Zeren's own plugins alone, `{ id, kind, permission }`: a
+-- macOS permission's row, every word and button Zeren's, screens/plugins/
 -- permissions). An option may carry a `description`, said in the
 -- setting's place while it's chosen.
 --
 -- `status` holds what the plugin reports of its settings, by id (`{ badge?,
--- tone, text? }`, plain text in a fixed tone): Zeron draws the badge beside
+-- tone, text? }`, plain text in a fixed tone): Zeren draws the badge beside
 -- the control and the text in the description's place.
 --
 -- What's set goes to the host (`M.set`, `M.choose_folder`: a fixture
@@ -43,7 +43,7 @@ export type Status = { badge: string?, tone: string?, text: string? }
 export type Setting = {
 	id: string,
 	kind: string,
-	-- (None on a permission row: Zeron's words.)
+	-- (None on a permission row: Zeren's words.)
 	label: string?,
 	permission: string?,
 	description: string?,
@@ -64,7 +64,7 @@ export type Entry = {
 	values: { [string]: any },
 	status: { [string]: Status }?,
 	-- What its page says under its title (the manifest's
-	-- `settings_description`, plain); none, Zeron's own line.
+	-- `settings_description`, plain); none, Zeren's own line.
 	description: string?,
 }
 
@@ -117,7 +117,7 @@ local function status_of(plugin: string, id: string): Status?
 	return if type(st) == "table" then st else nil
 end
 
--- A setting's label: its own, or Zeron's for a permission or the wallpaper.
+-- A setting's label: its own, or Zeren's for a permission or the wallpaper.
 local function label_of(s: Setting): string
 	if s.kind == "wallpaper" then
 		return ui.t("plugins.settings.wallpaper.label"):get()
@@ -168,7 +168,7 @@ local function status_badge(plugin: string, id: string): Node
 	} :: any)
 end
 
--- A permission's row control, every part Zeron's: granted or not, the way
+-- A permission's row control, every part Zeren's: granted or not, the way
 -- to grant it (macOS's prompt, then System Settings), and Check again.
 local PermissionControl = ui.component(function(props: { permission: string }): Node
 	local p = permissions.KNOWN[props.permission]
@@ -439,9 +439,9 @@ local function shape(e: Entry?): string
 	return table.concat(parts, "\0")
 end
 
--- A plugin's wallpaper (a `wallpaper` row, Zeron's words): used as a new
+-- A plugin's wallpaper (a `wallpaper` row, Zeren's words): used as a new
 -- chat's, in place of Appearance's (one plugin's at a time: turning it on
--- here takes over from another's), and Zeron's effect over it while it is.
+-- here takes over from another's), and Zeren's effect over it while it is.
 local WallpaperRows = ui.component(function(props: { plugin: string, setting: Setting, name: string }): Node
 	local plugin, s, name = props.plugin, props.setting, props.name
 	local on = ui.use_state(appearance.plugin:peek() == plugin)
@@ -512,7 +512,7 @@ local function view(plugin: string): Node
 	end
 	return ds.Settings.Page {
 		title = name,
-		-- Unverified, at the top right, for one whose maker Zeron can't
+		-- Unverified, at the top right, for one whose maker Zeren can't
 		-- vouch for (as its row says).
 		trail = ui.show(function(): boolean
 			return words.unverified(item())
@@ -546,7 +546,7 @@ local function view(plugin: string): Node
 						search.anchor(
 							s.id,
 							ds.Settings.Row {
-								-- (A permission's words Zeron's, read as they're drawn.)
+								-- (A permission's words Zeren's, read as they're drawn.)
 								label = if permission
 									then function(): string
 										return label_of(s)
@@ -567,7 +567,7 @@ local function view(plugin: string): Node
 						)
 					)
 				end
-				-- (Zeron's note under permission rows: whose permissions they are.)
+				-- (Zeren's note under permission rows: whose permissions they are.)
 				local asks = false
 				for _, s in run.settings do
 					asks = asks or s.kind == "permission"
@@ -583,7 +583,7 @@ local function view(plugin: string): Node
 	}
 end
 
--- The pages, after Zeron's own, under "Plugins". (A template whose
+-- The pages, after Zeren's own, under "Plugins". (A template whose
 -- Settings shell predates pages that come and go lists none.)
 -- A plugin's own icon (the SVG the host read from it), if it ships one.
 local function icon_of(plugin: string): string?

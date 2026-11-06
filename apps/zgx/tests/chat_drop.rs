@@ -1,4 +1,4 @@
-//! Files carried over a chat drop anywhere on it, as Zeron's conversation
+//! Files carried over a chat drop anywhere on it, as Zeren's conversation
 //! takes them (crates/ui shell/chat_dropzone.rs): the whole chat dims under
 //! "Drop to attach" while files are over it, a drop on the transcript
 //! attaches them to the composer, and a drag that isn't files shows
@@ -13,7 +13,7 @@ use zgx::input::{InputEvent, PointerButton};
 use zgx_script::{ScriptHost, testing::TestApp};
 
 fn ui_dir() -> PathBuf {
-    std::env::var_os("ZERON_ZGX_TEST_UI")
+    std::env::var_os("ZEREN_ZGX_TEST_UI")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui"))
 }
@@ -62,7 +62,7 @@ fn files_over_the_transcript_dim_the_chat_and_a_drop_attaches_them() {
     let mut app = session();
     assert!(!dimmed(&mut app), "nothing carried: no overlay");
     let (x, y) = over_transcript(&mut app);
-    let path = PathBuf::from("/tmp/zeron-drop/notes.md");
+    let path = PathBuf::from("/tmp/zeren-drop/notes.md");
     app.ui.dispatch(InputEvent::FileHover { x, y, path: path.clone() });
     app.frames(2);
     assert!(dimmed(&mut app), "files over the transcript dim the whole chat");
@@ -80,7 +80,7 @@ fn files_over_the_transcript_dim_the_chat_and_a_drop_attaches_them() {
 fn files_leaving_the_window_take_the_overlay_with_them() {
     let mut app = session();
     let (x, y) = over_transcript(&mut app);
-    app.ui.dispatch(InputEvent::FileHover { x, y, path: PathBuf::from("/tmp/zeron-drop/a.png") });
+    app.ui.dispatch(InputEvent::FileHover { x, y, path: PathBuf::from("/tmp/zeren-drop/a.png") });
     app.frames(2);
     assert!(dimmed(&mut app));
     app.ui.dispatch(InputEvent::FileHoverCancelled);
@@ -143,7 +143,7 @@ fn files_dropped_on_a_new_chats_page_attach_to_its_composer() {
     app.frames(30);
     let r = app.bounds("#chat-home");
     let (x, y) = (r.x + r.width / 2., r.y + r.height * 0.15);
-    let path = PathBuf::from("/tmp/zeron-drop/plan.pdf");
+    let path = PathBuf::from("/tmp/zeren-drop/plan.pdf");
     app.ui.dispatch(InputEvent::FileHover { x, y, path: path.clone() });
     app.frames(2);
     assert!(dimmed(&mut app), "a new chat's page dims too");

@@ -1,8 +1,8 @@
--- The template consent sheet says plainly that a template is Zeron's own
+-- The template consent sheet says plainly that a template is Zeren's own
 -- code with all its powers, who signed it, that its signature checks out,
 -- and which files it may not replace; Install and Not now answer with
 -- exactly what was shown (its hash); an unknown signer says so, and the
--- sheet follows once Zeron has looked them up. On the sheet in
+-- sheet follows once Zeren has looked them up. On the sheet in
 -- ui/template_consent_fixture.luau.
 
 local function open(): any
@@ -18,7 +18,7 @@ test("it says what a template can do, who signed it, and what's left out", funct
 	expect(tree).to_contain("Install Ledger?")
 	expect(tree).to_contain("Made by @ada")
 	expect(tree).to_contain("Install it only if you trust @ada")
-	expect(tree).to_contain("A template runs as part of Zeron")
+	expect(tree).to_contain("A template runs as part of Zeren")
 	expect(tree).to_contain("Its signature checks out")
 	expect(tree).to_contain("by key AbCdEfGh")
 	expect(tree).to_contain("42 files")
@@ -75,7 +75,7 @@ test("keeping a template in preview says what keeping gives it, and answers with
 	expect(tree).to_contain("Keep it only if you trust what made it")
 	expect(tree).to_contain("An agent made, changed or switched to this template")
 	expect(tree).to_contain("7 files of its own")
-	expect(tree).to_contain("Zeron asks again")
+	expect(tree).to_contain("Zeren asks again")
 	expect(tree).never.to_contain("Install")
 	expect(tree).never.to_contain("signature checks out")
 	app:click("#template-consent-allow")

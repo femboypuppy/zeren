@@ -1,4 +1,4 @@
--- Zeron's transcript (ds/transcript) cut down until a focused row still
+-- Zeren's transcript (ds/transcript) cut down until a focused row still
 -- comes to rest out of view (zgx-asks/focus-scroll, follow-up 1). Seen on
 -- zgx 2e22d99d3: ⇧Tab from the composer up through the replies' tool rows
 -- lands each at y 70 (the list's top 38 + `scroll_padding.top` 32), until

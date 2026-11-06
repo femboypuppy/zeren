@@ -3,18 +3,18 @@
 //! titlebar's card toggle floats it over the conversation. Offline (no
 //! engine): the card shows the chat's device, project and branch.
 //!
-//!     cargo build -p zeron-ui --example session-card-fixture --features appshots-fixture
+//!     cargo build -p zeren-ui --example session-card-fixture --features appshots-fixture
 //!     target/debug/examples/session-card-fixture <out-dir> <name>
 //!
-//! Writes `<name>.png` and `<name>.txt` (theme facts). ZERON_PALETTE_LIGHT=1
-//! renders the light theme; ZERON_CARD_OPAQUE=1 forces the opaque surface
-//! (the default is the shipping "theme default" surface). ZERON_CARD_TOGGLE=x,y
+//! Writes `<name>.png` and `<name>.txt` (theme facts). ZEREN_PALETTE_LIGHT=1
+//! renders the light theme; ZEREN_CARD_OPAQUE=1 forces the opaque surface
+//! (the default is the shipping "theme default" surface). ZEREN_CARD_TOGGLE=x,y
 //! overrides the toggle's computed position (logical px).
 use anyhow::Context as _;
 use gpui::{AppContext, Bounds, WindowBounds, WindowOptions, px, size};
 use serde_json::json;
 use std::path::PathBuf;
-use zeron_ui::*;
+use zeren_ui::*;
 
 /// Main column 1100 − 256 = 844 < 1092, the least that docks the card
 /// beside the default 736px reading column.
@@ -68,9 +68,9 @@ fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt().with_env_filter("warn").init();
     let temp = tempfile::tempdir()?;
     let data = temp.path().to_path_buf();
-    let light = std::env::var_os("ZERON_PALETTE_LIGHT").is_some();
-    let opaque = std::env::var_os("ZERON_CARD_OPAQUE").is_some();
-    let toggle = std::env::var("ZERON_CARD_TOGGLE")
+    let light = std::env::var_os("ZEREN_PALETTE_LIGHT").is_some();
+    let opaque = std::env::var_os("ZEREN_CARD_OPAQUE").is_some();
+    let toggle = std::env::var("ZEREN_CARD_TOGGLE")
         .ok()
         .and_then(|v| {
             let (x, y) = v.split_once(',')?;
@@ -79,7 +79,7 @@ fn main() -> anyhow::Result<()> {
         // Pane toggle 28 at the 6px right pad, files toggle 4 left of it,
         // then the 8px row gap and the 28px card toggle; 4px top pad.
         .unwrap_or((WINDOW.0 - 6.0 - 28.0 - 4.0 - 28.0 - 8.0 - 14.0, 4.0 + 17.0));
-    let path = "/Users/ana/code/zeron";
+    let path = "/Users/ana/code/zeren";
     let mut entries = Vec::new();
     for (ix, prompt) in [
         "Sort the explorer so folders come first",
@@ -101,7 +101,7 @@ fn main() -> anyhow::Result<()> {
         settings.sidebar_width = SIDEBAR;
         settings.github_star_banner_dismissed = true;
         if opaque {
-            settings.surface = zeron_theme::SurfacePreference::Opaque;
+            settings.surface = zeren_theme::SurfacePreference::Opaque;
         }
         settings.save(&data).unwrap();
         settings::init(settings.clone(), data.clone(), cx);
@@ -116,11 +116,11 @@ fn main() -> anyhow::Result<()> {
         app_menus::init(cx);
         let state = cx.new(|_| {
             let mut s = state::AppState::new();
-            s.connection = zeron_proto::view::ConnectionStatus::Ready;
-            s.workspace_scope = Some(zeron_proto::WorkspaceScope::Local);
+            s.connection = zeren_proto::view::ConnectionStatus::Ready;
+            s.workspace_scope = Some(zeren_proto::WorkspaceScope::Local);
             s.local_device_id = Some("local".into());
             s.devices = vec![serde_json::from_value(json!({"id":"local","name":"Studio Mac","platform":"macos","lastSeenAt":null})).unwrap()];
-            s.spaces = vec![serde_json::from_value(json!({"id":"space","deviceId":"local","path":path,"name":"zeron","gitDetected":true,"createdAt":"2026-10-25T00:00:00Z"})).unwrap()];
+            s.spaces = vec![serde_json::from_value(json!({"id":"space","deviceId":"local","path":path,"name":"zeren","gitDetected":true,"createdAt":"2026-10-25T00:00:00Z"})).unwrap()];
             s.chats = vec![serde_json::from_value(json!({"id":"card","deviceId":"local","title":"Explorer ordering","archived":false,"cwd":path,"branch":"main","spaceId":"space","createdAt":"2026-10-25T00:00:00Z","config":{"harness":"claude-code","model":"claude-sonnet-4-6","reasoning":null,"sandbox":"workspace-write"}})).unwrap()];
             s.selected_space = Some("space".into());
             s.selected_chat = Some("card".into());
@@ -151,7 +151,7 @@ fn main() -> anyhow::Result<()> {
         cx.spawn(async move |cx| {
             pause(cx, 600).await;
             state.update(cx, |s, cx| {
-                s.receive_transcript_frame(zeron_doc::TranscriptFrame::Reset { reset: serde_json::from_value(serde_json::Value::Array(entries)).unwrap() }, cx).ok();
+                s.receive_transcript_frame(zeren_doc::TranscriptFrame::Reset { reset: serde_json::from_value(serde_json::Value::Array(entries)).unwrap() }, cx).ok();
                 cx.notify();
             });
             pause(cx, 1500).await;

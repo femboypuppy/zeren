@@ -25,7 +25,7 @@ return {
 		end
 		local function panel(): Node
 			return Menu.Panel {
-				w = "$zeron.menu.width",
+				w = "$zeren.menu.width",
 				shrink = 0,
 				Menu.Group {
 					heading = "Organize",
@@ -79,7 +79,7 @@ return {
 						open = open,
 						anchor = trigger,
 						placement = { side = "bottom", align = "start", offset = 4 },
-						w = "$zeron.menu.width",
+						w = "$zeren.menu.width",
 						build = function()
 							return Menu.Group {
 								Menu.Row { icon = "pen", label = "Rename", on_click = function() open:set(false) end },

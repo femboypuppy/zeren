@@ -19,7 +19,7 @@ use zgx_script::{ScriptHost, Value, testing::TestApp};
 const W: f32 = 1200.;
 const H: f32 = 800.;
 
-/// Zeron's title line beside the traffic lights: 21 down (38 tall, 4 of pad).
+/// Zeren's title line beside the traffic lights: 21 down (38 tall, 4 of pad).
 
 /// The room between the page's controls and the window's buttons at the right,
 /// one rhythm by ink: the panel toggle's glyph (12 of ink in its 24) to
@@ -102,7 +102,7 @@ fn on_line(app: &mut TestApp, line: f32, when: &str) {
 }
 
 #[test]
-fn beside_windows_caption_buttons_zerons_controls_start_at_the_left_on_their_line() {
+fn beside_windows_caption_buttons_zerens_controls_start_at_the_left_on_their_line() {
     let mut app = mount(windows(W));
     let caption = W - 138.;
     // No gap kept for traffic lights: the toggle 10 in, as the shipping
@@ -321,24 +321,24 @@ fn every_menu_item_is_in_the_command_palette() {
     let own = ["shell.new_chat", "shell.new_project", "shell.archive", "shell.toggle_sidebar", "shell.settings", "shell.reload", "shell.reload_interface"];
     for item in &items {
         let (id, title) = (text(item, "id"), text(item, "title"));
-        // (The app's own: Zeron's shell and panel, the host's, plugins'. The
+        // (The app's own: Zeren's shell and panel, the host's, plugins'. The
         // fixture's scaffolding commands, standing in for the engine, aren't
         // the app's menu items. Search is the palette itself.)
-        let app_s = id.starts_with("shell.") || id.starts_with("panel.") || id.starts_with("zeron.") || id.contains('/');
+        let app_s = id.starts_with("shell.") || id.starts_with("panel.") || id.starts_with("zeren.") || id.contains('/');
         if !app_s || id == "shell.palette" {
             continue;
         }
         assert!(app.host.run_command("shell.palette"), "the palette didn't open");
         app.wait_until(|app| app.find(field).is_some());
         app.frames(20);
-        let label = if id == crate::plugins::USE_ZERON_TEMPLATE { "Use Zeron v3".to_owned() } else { title.clone() };
+        let label = if id == crate::plugins::USE_ZEREN_TEMPLATE { "Use Zeren v3".to_owned() } else { title.clone() };
         app.type_text(field, &label);
         app.frames(20);
         let row = format!("role:option \"{label}\"");
         assert!(app.find(&row).is_some(), "{id} (\"{title}\") isn't in the palette: {}", app.texts().join("|"));
         // (Run through the menu item's id: checked on rows no other of the
-        // palette's shares a label with, Zeron's Pin and the host's way back.)
-        if !own.contains(&id.as_str()) && (id == "shell.pin" || id == crate::plugins::USE_ZERON_TEMPLATE) {
+        // palette's shares a label with, Zeren's Pin and the host's way back.)
+        if !own.contains(&id.as_str()) && (id == "shell.pin" || id == crate::plugins::USE_ZEREN_TEMPLATE) {
             // (The fixture's host calls are its stub's, kept in a log:
             // ui/settings_stub.luau.)
             ran.borrow_mut().clear();
@@ -357,7 +357,7 @@ fn every_menu_item_is_in_the_command_palette() {
         }
     }
     let ids: Vec<String> = items.iter().map(|i| text(i, "id")).collect();
-    assert!(ids.iter().any(|i| i == crate::plugins::USE_ZERON_TEMPLATE), "the way back to the default interface: {ids:?}");
+    assert!(ids.iter().any(|i| i == crate::plugins::USE_ZEREN_TEMPLATE), "the way back to the default interface: {ids:?}");
     assert!(!ids.iter().any(|i| i == crate::plugins::KEEP_TEMPLATE), "Keep is the preview toast's alone");
 }
 

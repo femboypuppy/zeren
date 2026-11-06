@@ -5,13 +5,13 @@
  * Provider-neutral by contract (sandbox-provider.ts): POSIX sh on Linux
  * x86_64/aarch64 with curl, tar, sudo and systemd; it runs as whatever
  * unprivileged user `exec` uses and installs into that user's home. Its
- * inputs (`ZERON_RUNNER_ENROLL`, `ZERON_EDGE_URL`) come from the sandbox's
+ * inputs (`ZEREN_RUNNER_ENROLL`, `ZEREN_EDGE_URL`) come from the sandbox's
  * create-time env, overridable inline by the command (installCommand).
  *
  * Not the public install.sh: that one installs a local-only *user* service.
  * The Cloud device needs a *system* unit — enabled system units are what a
  * provider restarts after stop/resume — whose environment comes from an
- * EnvironmentFile (~/.zeron/env, 0600), because the sandbox env reaches
+ * EnvironmentFile (~/.zeren/env, 0600), because the sandbox env reaches
  * `exec` commands but not systemd services.
  *
  * Idempotent by construction: providers don't retry commands and a lost
@@ -20,24 +20,24 @@
  * be mid-flight. Hence the flock, the "already downloaded" skip, atomic
  * env-file replace, and restart-only-on-change.
  *
- * `ZERON_CLOUD_HOME` / `ZERON_CLOUD_UNIT_DIR` exist so the unit tier can run
+ * `ZEREN_CLOUD_HOME` / `ZEREN_CLOUD_UNIT_DIR` exist so the unit tier can run
  * the real script in a temp dir; production never sets them.
  */
 
-export const CLOUD_UNIT_NAME = "zeron-cloud.service";
+export const CLOUD_UNIT_NAME = "zeren-cloud.service";
 
 export const CLOUD_INSTALL_SCRIPT = `#!/bin/sh
-# Zeron Cloud engine installer (edge/src/cloud/install-script.ts).
+# Zeren Cloud engine installer (edge/src/cloud/install-script.ts).
 # POSIX sh, idempotent, provider-neutral.
 set -eu
 
-: "\${ZERON_RUNNER_ENROLL:?ZERON_RUNNER_ENROLL is required}"
-: "\${ZERON_EDGE_URL:?ZERON_EDGE_URL is required}"
+: "\${ZEREN_RUNNER_ENROLL:?ZEREN_RUNNER_ENROLL is required}"
+: "\${ZEREN_EDGE_URL:?ZEREN_EDGE_URL is required}"
 
 run_user="$(id -un)"
-home="\${ZERON_CLOUD_HOME:-$HOME}"
-unit_dir="\${ZERON_CLOUD_UNIT_DIR:-/etc/systemd/system}"
-data="$home/.zeron"
+home="\${ZEREN_CLOUD_HOME:-$HOME}"
+unit_dir="\${ZEREN_CLOUD_UNIT_DIR:-/etc/systemd/system}"
+data="$home/.zeren"
 app="$data/app"
 unit="$unit_dir/${CLOUD_UNIT_NAME}"
 
@@ -52,19 +52,19 @@ flock 9
 case "$(uname -m)" in
   x86_64 | amd64) arch=x86_64 ;;
   aarch64 | arm64) arch=aarch64 ;;
-  *) echo "zeron cloud install: unsupported architecture $(uname -m)" >&2; exit 1 ;;
+  *) echo "zeren cloud install: unsupported architecture $(uname -m)" >&2; exit 1 ;;
 esac
 
 # (No pipefail in POSIX sh: a failed fetch yields an empty version, refused below.)
-ver="$(curl -fsSL --retry 3 --max-time 30 "$ZERON_EDGE_URL/releases/latest.txt" | tr -d '[:space:]')"
+ver="$(curl -fsSL --retry 3 --max-time 30 "$ZEREN_EDGE_URL/releases/latest.txt" | tr -d '[:space:]')"
 case "$ver" in
-  "" | *[!A-Za-z0-9._+-]*) echo "zeron cloud install: bad release version '$ver'" >&2; exit 1 ;;
+  "" | *[!A-Za-z0-9._+-]*) echo "zeren cloud install: bad release version '$ver'" >&2; exit 1 ;;
 esac
 
 restart=0
 dest="$app/$ver"
-if [ -x "$dest/zeron" ]; then
-  echo "zeron $ver already installed"
+if [ -x "$dest/zeren" ]; then
+  echo "zeren $ver already installed"
 else
   tmp="$(mktemp -d "$data/.download.XXXXXX")"
   trap 'rm -rf "$tmp"' EXIT
@@ -72,11 +72,11 @@ else
   # without a floor one bad connection trickled for good, holding the lock
   # every retried install then queued behind.
   curl -fsSL --retry 3 --connect-timeout 15 --speed-limit 1048576 --speed-time 15 \\
-    -o "$tmp/zeron.tar.gz" "$ZERON_EDGE_URL/releases/zeron-$ver-linux-$arch.tar.gz"
+    -o "$tmp/zeren.tar.gz" "$ZEREN_EDGE_URL/releases/zeren-$ver-linux-$arch.tar.gz"
   mkdir "$tmp/unpacked"
-  tar -xzf "$tmp/zeron.tar.gz" -C "$tmp/unpacked" --strip-components=1
+  tar -xzf "$tmp/zeren.tar.gz" -C "$tmp/unpacked" --strip-components=1
   # Probe before switching: a binary that cannot start must not replace one that can.
-  "$tmp/unpacked/zeron" --version >/dev/null
+  "$tmp/unpacked/zeren" --version >/dev/null
   rm -rf "$dest"
   mv "$tmp/unpacked" "$dest"
 fi
@@ -90,16 +90,16 @@ fi
 put() { if [ -n "$2" ]; then printf '%s=%s\\n' "$1" "$2"; fi; }
 env_new="$(mktemp "$data/.env.XXXXXX")"
 {
-  put ZERON_RUNNER_ENROLL "$ZERON_RUNNER_ENROLL"
-  put ZERON_EDGE_URL "$ZERON_EDGE_URL"
-  printf 'ZERON_DEVICE_NAME="%s"\\n' "\${ZERON_DEVICE_NAME:-Cloud session}"
-  put ZERON_DEVICE_PLATFORM "\${ZERON_DEVICE_PLATFORM:-cloud}"
-  put ZERON_CLOUD_ACCOUNT "\${ZERON_CLOUD_ACCOUNT:-}"
-  put ZERON_CLOUD_CHAT "\${ZERON_CLOUD_CHAT:-}"
-  put ZERON_CLOUD_REPO "\${ZERON_CLOUD_REPO:-}"
-  put ZERON_CLOUD_PATH "\${ZERON_CLOUD_PATH:-}"
-  put ZERON_CLOUD_BRANCH "\${ZERON_CLOUD_BRANCH:-}"
-  put ZERON_AUTO_UPDATE 1
+  put ZEREN_RUNNER_ENROLL "$ZEREN_RUNNER_ENROLL"
+  put ZEREN_EDGE_URL "$ZEREN_EDGE_URL"
+  printf 'ZEREN_DEVICE_NAME="%s"\\n' "\${ZEREN_DEVICE_NAME:-Cloud session}"
+  put ZEREN_DEVICE_PLATFORM "\${ZEREN_DEVICE_PLATFORM:-cloud}"
+  put ZEREN_CLOUD_ACCOUNT "\${ZEREN_CLOUD_ACCOUNT:-}"
+  put ZEREN_CLOUD_CHAT "\${ZEREN_CLOUD_CHAT:-}"
+  put ZEREN_CLOUD_REPO "\${ZEREN_CLOUD_REPO:-}"
+  put ZEREN_CLOUD_PATH "\${ZEREN_CLOUD_PATH:-}"
+  put ZEREN_CLOUD_BRANCH "\${ZEREN_CLOUD_BRANCH:-}"
+  put ZEREN_AUTO_UPDATE 1
   put HOME "$home"
 } >"$env_new"
 chmod 600 "$env_new"
@@ -113,7 +113,7 @@ fi
 unit_new="$(mktemp "$data/.unit.XXXXXX")"
 cat >"$unit_new" <<UNIT
 [Unit]
-Description=Zeron Cloud engine
+Description=Zeren Cloud engine
 After=network-online.target
 Wants=network-online.target
 
@@ -122,7 +122,7 @@ User=$run_user
 WorkingDirectory=$home
 Environment=HOME=$home
 EnvironmentFile=$data/env
-ExecStart=$app/current/zeron headless
+ExecStart=$app/current/zeren headless
 Restart=always
 RestartSec=5
 
@@ -144,7 +144,7 @@ if [ "$restart" = 1 ]; then
 else
   sudo systemctl start ${CLOUD_UNIT_NAME}
 fi
-echo "zeron cloud: $ver ready"
+echo "zeren cloud: $ver ready"
 `;
 
 /** `orgId.userId.deviceId.code` (ids + base64url only). */
@@ -163,27 +163,27 @@ export const isBranch = (value: string): boolean => BRANCH_RE.test(value) && !va
 
 /** Everything a session sandbox is provisioned with (also its create env). */
 export interface SessionEnv {
-  readonly ZERON_RUNNER_ENROLL: string;
-  readonly ZERON_EDGE_URL: string;
-  readonly ZERON_DEVICE_NAME: string;
-  readonly ZERON_DEVICE_PLATFORM: string;
-  readonly ZERON_CLOUD_ACCOUNT: string;
-  readonly ZERON_CLOUD_CHAT: string;
-  readonly ZERON_CLOUD_REPO: string;
-  readonly ZERON_CLOUD_PATH: string;
-  readonly ZERON_CLOUD_BRANCH: string;
+  readonly ZEREN_RUNNER_ENROLL: string;
+  readonly ZEREN_EDGE_URL: string;
+  readonly ZEREN_DEVICE_NAME: string;
+  readonly ZEREN_DEVICE_PLATFORM: string;
+  readonly ZEREN_CLOUD_ACCOUNT: string;
+  readonly ZEREN_CLOUD_CHAT: string;
+  readonly ZEREN_CLOUD_REPO: string;
+  readonly ZEREN_CLOUD_PATH: string;
+  readonly ZEREN_CLOUD_BRANCH: string;
 }
 
 const CHECKS: Record<keyof SessionEnv, (v: string) => boolean> = {
-  ZERON_RUNNER_ENROLL: (v) => ENROLL_RE.test(v),
-  ZERON_EDGE_URL: isEdgeOrigin,
-  ZERON_DEVICE_NAME: (v) => /^[A-Za-z0-9 ._-]{1,64}$/.test(v),
-  ZERON_DEVICE_PLATFORM: (v) => ID_RE.test(v),
-  ZERON_CLOUD_ACCOUNT: (v) => ID_RE.test(v),
-  ZERON_CLOUD_CHAT: (v) => ID_RE.test(v),
-  ZERON_CLOUD_REPO: isRepoUrl,
-  ZERON_CLOUD_PATH: isCheckoutPath,
-  ZERON_CLOUD_BRANCH: isBranch
+  ZEREN_RUNNER_ENROLL: (v) => ENROLL_RE.test(v),
+  ZEREN_EDGE_URL: isEdgeOrigin,
+  ZEREN_DEVICE_NAME: (v) => /^[A-Za-z0-9 ._-]{1,64}$/.test(v),
+  ZEREN_DEVICE_PLATFORM: (v) => ID_RE.test(v),
+  ZEREN_CLOUD_ACCOUNT: (v) => ID_RE.test(v),
+  ZEREN_CLOUD_CHAT: (v) => ID_RE.test(v),
+  ZEREN_CLOUD_REPO: isRepoUrl,
+  ZEREN_CLOUD_PATH: isCheckoutPath,
+  ZEREN_CLOUD_BRANCH: isBranch
 };
 
 /**
@@ -219,8 +219,8 @@ export const START_ENGINE_COMMAND = `sudo systemctl start ${CLOUD_UNIT_NAME}`;
 /** A sleep's first step: the engine starts no new work, so nothing begins that
  * the stop would cut off; what arrives meanwhile waits for the woken machine.
  * Exits {@link QUIESCE_BUSY_EXIT} when a turn is in flight or a message is
- * waiting (mirrors `zeron quiesce`, apps/zeron/src/main.rs). */
-export const QUIESCE_ENGINE_COMMAND = `"$HOME/.zeron/app/current/zeron" quiesce`;
+ * waiting (mirrors `zeren quiesce`, apps/zeren/src/main.rs). */
+export const QUIESCE_ENGINE_COMMAND = `"$HOME/.zeren/app/current/zeren" quiesce`;
 export const QUIESCE_BUSY_EXIT = 75;
 
 /** Before a sleep's stop: systemd delivers SIGTERM and the engine drains. The

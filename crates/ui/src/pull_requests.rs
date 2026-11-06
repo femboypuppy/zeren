@@ -9,13 +9,13 @@ use gpui::{
     AnyElement, Context, Entity, Focusable, IntoElement, ListOffset, ListState, Render,
     ScrollHandle, SharedString, Subscription, Task, Window, div, list, prelude::*, px,
 };
-use zeron_proto::{
+use zeren_proto::{
     ChangeRequestFilter, ChangeRequestListItem, ChangeRequestMergeability, ChangeRequestPage,
     ChangeRequestReviewDecision, Device,
 };
-use zeron_rpc::{RpcError, capability_errors, methods};
+use zeren_rpc::{RpcError, capability_errors, methods};
 
-use zeron_proto::change_request_assessment::{Blocker, CiState, Facts};
+use zeren_proto::change_request_assessment::{Blocker, CiState, Facts};
 
 use crate::composer::{ComposerInput, ComposerInputEvent};
 use crate::icons::{self, icon};
@@ -1152,7 +1152,7 @@ impl PullRequestsPage {
             })
             .collect();
             let profile = match &state.auth {
-                Some(zeron_proto::AuthState::SignedIn { user, org_id }) => {
+                Some(zeren_proto::AuthState::SignedIn { user, org_id }) => {
                     Some(format!("{}:{org_id:?}", user.id))
                 }
                 _ => None,
@@ -3071,7 +3071,7 @@ fn status_description(item: &ChangeRequestListItem) -> String {
             .attention
             .iter()
             .filter(|reason| {
-                **reason != zeron_proto::change_request_assessment::AttentionReason::FailingCi
+                **reason != zeren_proto::change_request_assessment::AttentionReason::FailingCi
             })
             .map(|reason| reason.label()),
     );
@@ -3098,7 +3098,7 @@ fn row_status(item: &ChangeRequestListItem, tight: bool) -> String {
             .attention
             .iter()
             .filter(|reason| {
-                **reason != zeron_proto::change_request_assessment::AttentionReason::FailingCi
+                **reason != zeren_proto::change_request_assessment::AttentionReason::FailingCi
             })
             .map(|reason| reason.label()),
     );
@@ -3416,7 +3416,7 @@ fn recent_git_projects(state: &AppState, local: &str) -> Vec<ProjectRef> {
     let mut seen = HashSet::new();
     let (primary, alternatives): (Vec<_>, Vec<_>) = projects
         .into_iter()
-        .partition(|(.., space)| seen.insert(zeron_proto::view::project_key(space)));
+        .partition(|(.., space)| seen.insert(zeren_proto::view::project_key(space)));
     primary
         .into_iter()
         .chain(alternatives)
@@ -3518,7 +3518,7 @@ fn error_copy(error: &PullRequestsPageError) -> (String, String) {
             "Reconnect the device and try again.".into(),
         ),
         PullRequestsPageError::UpdateRequired(name) => (
-            format!("Update Zeron on {name}"),
+            format!("Update Zeren on {name}"),
             "This device doesn’t support pull requests yet.".into(),
         ),
     }
@@ -3653,7 +3653,7 @@ mod tests {
             number,
             title: format!("Pull request {number}"),
             url: format!("https://github.com/{repository}/pull/{number}"),
-            state: zeron_proto::ChangeRequestState::Open,
+            state: zeren_proto::ChangeRequestState::Open,
             is_draft: false,
             review_decision: ChangeRequestReviewDecision::Unknown,
             additions: changes,
@@ -3687,8 +3687,8 @@ mod tests {
         }
     }
 
-    fn space(id: &str, device: &str, git: bool, created_minutes_ago: i64) -> zeron_proto::Space {
-        zeron_proto::Space {
+    fn space(id: &str, device: &str, git: bool, created_minutes_ago: i64) -> zeren_proto::Space {
+        zeren_proto::Space {
             github_repo: None,
             id: id.into(),
             device_id: device.into(),
@@ -3703,8 +3703,8 @@ mod tests {
         }
     }
 
-    fn session(space: &str, last_message_at: Option<DateTime<Utc>>) -> zeron_proto::Chat {
-        zeron_proto::Chat {
+    fn session(space: &str, last_message_at: Option<DateTime<Utc>>) -> zeren_proto::Chat {
+        zeren_proto::Chat {
             id: "chat".into(),
             device_id: "local".into(),
             title: None,
@@ -3834,7 +3834,7 @@ mod tests {
                 if repository == "slow/repo" {
                     delayed.notified().await;
                 }
-                zeron_rpc::RpcReply::value(&ChangeRequestPage {
+                zeren_rpc::RpcReply::value(&ChangeRequestPage {
                     items: if repository == "authored/repo"
                         || (filter == "all" && repository != "empty/repo")
                     {
@@ -4025,8 +4025,8 @@ mod tests {
         page.update(cx, |page, _| {
             // A cached board, so opening it needs no engine.
             page.snapshots.push((
-                (None, "acme/zeron".into(), ChangeRequestFilter::Authored),
-                vec![pull_request("acme/zeron", 10, 1, 1, 1)],
+                (None, "acme/zeren".into(), ChangeRequestFilter::Authored),
+                vec![pull_request("acme/zeren", 10, 1, 1, 1)],
                 Instant::now(),
                 Paging::default(),
             ));
@@ -4039,12 +4039,12 @@ mod tests {
         page.update(cx, |page, cx| {
             assert!(page.repository_menu.is_open());
             page.repository_input
-                .update(cx, |input, cx| input.set_text("acme/zeron", cx));
+                .update(cx, |input, cx| input.set_text("acme/zeren", cx));
         });
         cx.simulate_keystrokes("enter");
         cx.run_until_parked();
         page.read_with(cx, |page, _| {
-            assert_eq!(page.repository.as_deref(), Some("acme/zeron"));
+            assert_eq!(page.repository.as_deref(), Some("acme/zeren"));
             assert!(!page.repository_menu.is_open());
             assert_eq!(page.items[0].number, 10);
         });
@@ -4066,13 +4066,13 @@ mod tests {
             assert_eq!(page.load_state, PullRequestsLoadState::Idle);
             // No engine exists. Any accidental request would produce Network.
             page.snapshots.push((
-                (None, "acme/zeron".into(), ChangeRequestFilter::Authored),
-                vec![pull_request("acme/zeron", 10, 1, 1, 1)],
+                (None, "acme/zeren".into(), ChangeRequestFilter::Authored),
+                vec![pull_request("acme/zeren", 10, 1, 1, 1)],
                 Instant::now(),
                 Paging::default(),
             ));
             page.repository_input
-                .update(cx, |input, cx| input.set_text("ACME/ZERON", cx));
+                .update(cx, |input, cx| input.set_text("ACME/ZEREN", cx));
             page.select_repository(cx);
             assert_eq!(page.items[0].number, 10);
             assert_eq!(page.load_state, PullRequestsLoadState::Ready);
@@ -4084,7 +4084,7 @@ mod tests {
             page.reset_for_target(None, cx);
             assert_eq!(page.items[0].number, 10);
             page.repository_input.update(cx, |input, cx| {
-                input.set_text("acme/zeron repo:other/repo", cx)
+                input.set_text("acme/zeren repo:other/repo", cx)
             });
             page.select_repository(cx);
             assert!(
@@ -4092,7 +4092,7 @@ mod tests {
                     .iter()
                     .any(|message| message.contains("owner/name"))
             );
-            assert_eq!(page.repository.as_deref(), Some("acme/zeron"));
+            assert_eq!(page.repository.as_deref(), Some("acme/zeren"));
         });
     }
 
@@ -4114,12 +4114,12 @@ mod tests {
                         if stalled {
                             return futures::future::pending().await;
                         }
-                        zeron_rpc::RpcReply::value(&Some("owner/repo"))
+                        zeren_rpc::RpcReply::value(&Some("owner/repo"))
                     }
                     methods::LIST_CHANGE_REQUEST_PAGE => {
                         assert_eq!(params["repository"], "owner/repo");
                         assert_eq!(params["filter"], "authored");
-                        zeron_rpc::RpcReply::value(&ChangeRequestPage {
+                        zeren_rpc::RpcReply::value(&ChangeRequestPage {
                             items: vec![pull_request("owner/canonical", 7, 1, 1, 1)],
                             next_cursor: None,
                             total_count: Some(1),
@@ -4155,12 +4155,12 @@ mod tests {
                             if path == "/slow" {
                                 release.notified().await;
                             }
-                            zeron_rpc::RpcReply::value(
+                            zeren_rpc::RpcReply::value(
                                 &(path != "/scratch").then(|| format!("owner{}", path)),
                             )
                         }
                         methods::LIST_CHANGE_REQUEST_PAGE => {
-                            zeron_rpc::RpcReply::value(&ChangeRequestPage {
+                            zeren_rpc::RpcReply::value(&ChangeRequestPage {
                                 items: vec![pull_request(
                                     params["repository"].as_str().unwrap(),
                                     7,
@@ -4353,7 +4353,7 @@ mod tests {
         let page = cx.new(|cx| PullRequestsPage::new(state.clone(), cx));
         state.update(cx, |state, cx| {
             state.set_test_engine(crate::state::EngineHandle::from_test_client(rpc.client()));
-            state.spaces = vec![zeron_proto::Space {
+            state.spaces = vec![zeren_proto::Space {
                 github_repo: None,
                 id: "project".into(),
                 device_id: "local".into(),
@@ -4432,13 +4432,13 @@ mod tests {
                         let cwd = params["cwd"].as_str().unwrap().to_owned();
                         calls.lock().unwrap().push(cwd.clone());
                         let name = cwd.trim_start_matches('/');
-                        zeron_rpc::RpcReply::value(
+                        zeren_rpc::RpcReply::value(
                             &(name != "scratch").then(|| format!("owner/{name}")),
                         )
                     }
                     methods::LIST_CHANGE_REQUEST_PAGE => {
                         let repository = params["repository"].as_str().unwrap();
-                        zeron_rpc::RpcReply::value(&ChangeRequestPage {
+                        zeren_rpc::RpcReply::value(&ChangeRequestPage {
                             items: vec![pull_request(repository, 7, 1, 1, 1)],
                             next_cursor: None,
                             total_count: Some(1),
@@ -4538,7 +4538,7 @@ mod tests {
         let page = cx.new(|cx| PullRequestsPage::new(state.clone(), cx));
         state.update(cx, |state, cx| {
             state.set_test_engine(crate::state::EngineHandle::from_test_client(rpc.client()));
-            state.spaces = vec![zeron_proto::Space {
+            state.spaces = vec![zeren_proto::Space {
                 github_repo: None,
                 id: "project".into(),
                 device_id: "local".into(),
@@ -4602,7 +4602,7 @@ mod tests {
         let page = cx.new(|cx| PullRequestsPage::new(state.clone(), cx));
         state.update(cx, |state, cx| {
             state.set_test_engine(crate::state::EngineHandle::from_test_client(rpc.client()));
-            state.spaces = vec![zeron_proto::Space {
+            state.spaces = vec![zeren_proto::Space {
                 github_repo: None,
                 id: "project".into(),
                 device_id: "local".into(),
@@ -4757,7 +4757,7 @@ mod tests {
             let mut page = PullRequestsPage::new(state, cx);
             let mut mine = pull_request("owner/repo", 1, 1, 1, 1);
             mine.head_ref_oid = "a".repeat(40);
-            mine.ci = zeron_proto::change_request_assessment::ChangeRequestCi {
+            mine.ci = zeren_proto::change_request_assessment::ChangeRequestCi {
                 state: CiState::Failed,
                 total_count: 3,
             };
@@ -4955,10 +4955,10 @@ mod tests {
 
     #[test]
     fn search_matches_all_words_across_title_repo_number_and_status() {
-        let mut item = pull_request("ZeronSH/Zeron", 181, 1, 1, 1);
+        let mut item = pull_request("ZeronSH/Zeren", 181, 1, 1, 1);
         item.title = "Add a pull request dashboard".into();
         item.is_draft = true;
-        assert!(matches_query(&item, "ZERON dashboard #181 draft"));
+        assert!(matches_query(&item, "ZEREN dashboard #181 draft"));
         assert!(matches_query(&item, "  "));
         assert!(!matches_query(&item, "dashboard approved"));
     }
@@ -5227,7 +5227,7 @@ mod tests {
                     .push((after.clone(), params["refresh"] == true));
                 if params["filter"] == "reviewing" {
                     release.notified().await;
-                    return zeron_rpc::RpcReply::value(&ChangeRequestPage {
+                    return zeren_rpc::RpcReply::value(&ChangeRequestPage {
                         items: vec![pull_request("owner/repo", 99, 1, 1, 1)],
                         next_cursor: None,
                         total_count: Some(1),
@@ -5235,7 +5235,7 @@ mod tests {
                     });
                 }
                 match after.as_deref() {
-                    None => zeron_rpc::RpcReply::value(&ChangeRequestPage {
+                    None => zeren_rpc::RpcReply::value(&ChangeRequestPage {
                         items: (1..=50)
                             .map(|n| pull_request("Owner/Repo", n, 1, 1, 1))
                             .collect(),
@@ -5243,7 +5243,7 @@ mod tests {
                         total_count: Some(52),
                         fetched_at: None,
                     }),
-                    Some("Y3Vyc29yOjUw") => zeron_rpc::RpcReply::value(&ChangeRequestPage {
+                    Some("Y3Vyc29yOjUw") => zeren_rpc::RpcReply::value(&ChangeRequestPage {
                         // #50 moved onto the second page; it must not repeat.
                         items: [50, 51, 52]
                             .map(|n| pull_request("Owner/Repo", n, 1, 1, 1))
@@ -5405,7 +5405,7 @@ mod tests {
                     assert_eq!(method.as_str(), methods::LIST_CHANGE_REQUEST_PAGE);
                     let cached = params["cached"] == true;
                     calls.lock().unwrap().push(cached);
-                    zeron_rpc::RpcReply::value(&ChangeRequestPage {
+                    zeren_rpc::RpcReply::value(&ChangeRequestPage {
                         items: vec![pull_request(
                             "owner/repo",
                             if cached { 1 } else { 2 },

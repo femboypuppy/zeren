@@ -1,4 +1,4 @@
--- Markdown as it is typed, as Zeron's composer edits it
+-- Markdown as it is typed, as Zeren's composer edits it
 -- (crates/ui/src/composer_markdown.rs). The draft stays plain markdown;
 -- this only says how to show it and how a line break continues it.
 --
@@ -17,7 +17,7 @@
 local M = {}
 
 local MARKER = "$text.tertiary"
-local CODE_WASH = "$zeron.code.wash"
+local CODE_WASH = "$zeren.code.wash"
 
 type Props = { [string]: any }
 type Mark = { a: number, b: number, p: Props }

@@ -94,9 +94,9 @@ return function(props: Props): Node
 		rounded = ui.raw(size * 0.25, "a mark tile's radius scales with it"),
 		items = "center",
 		justify = "center",
-		bg = "$zeron.mark.bg",
+		bg = "$zeren.mark.bg",
 		border = 1,
-		border_color = "$zeron.mark.border",
+		border_color = "$zeren.mark.border",
 		shadow = "$shadow.sm",
 		picture(name :: Name, size * 0.56, nil),
 	}

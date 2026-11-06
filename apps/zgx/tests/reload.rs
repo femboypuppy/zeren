@@ -205,10 +205,10 @@ fn made_answer(name: &str) -> Option<String> {
 
 type Log = Rc<RefCell<Vec<String>>>;
 
-/// The scripts: this checkout's `ui/`, or `ZERON_ZGX_TEST_UI`'s (another
+/// The scripts: this checkout's `ui/`, or `ZEREN_ZGX_TEST_UI`'s (another
 /// copy, to see the test fail on code from before a fix).
 fn ui_dir() -> PathBuf {
-    std::env::var_os("ZERON_ZGX_TEST_UI")
+    std::env::var_os("ZEREN_ZGX_TEST_UI")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui"))
 }
@@ -342,10 +342,10 @@ fn reload_changes_nothing(window: &'static str, step: &'static str) {
 
 /// A reload of `app` as it stands moves nothing and asks for nothing again
 /// (but what `known` names: asked again for a reason told where it's given).
-/// The tree for `ZERON_ZGX_TEST_DUMP`: the window's (200 lines), or, with
-/// `ZERON_ZGX_TEST_DUMP=full`, every line of it.
+/// The tree for `ZEREN_ZGX_TEST_DUMP`: the window's (200 lines), or, with
+/// `ZEREN_ZGX_TEST_DUMP=full`, every line of it.
 fn dump(app: &mut TestApp) -> String {
-    if std::env::var("ZERON_ZGX_TEST_DUMP").as_deref() != Ok("full") {
+    if std::env::var("ZEREN_ZGX_TEST_DUMP").as_deref() != Ok("full") {
         return app.tree();
     }
     let options = zgx_script::driver::TreeOptions { budget: 100_000, ..Default::default() };
@@ -367,11 +367,11 @@ fn reload_holds_still(app: &mut TestApp, log: &Log, window: &str, step: &str, kn
     let before = boxes(app);
     log.borrow_mut().clear();
 
-    if std::env::var_os("ZERON_ZGX_TEST_DUMP").is_some() {
+    if std::env::var_os("ZEREN_ZGX_TEST_DUMP").is_some() {
         eprintln!("{window} at {step}, before the reload:\n{}", dump(app));
     }
     app.host.reload().expect("the reload failed");
-    if std::env::var_os("ZERON_ZGX_TEST_DUMP").is_some() {
+    if std::env::var_os("ZEREN_ZGX_TEST_DUMP").is_some() {
         app.frames(1);
         eprintln!("{window} at {step}, a frame after:\n{}", dump(app));
     }
@@ -1022,13 +1022,13 @@ fn a_resize_keeps_the_reading_place() {
     for w in &widths {
         resize(&mut app, *w, 820.);
         trace.push((format!("{w}"), place_of(&mut app, &needle).map_or(i32::MIN, |p| p.0)));
-        if std::env::var_os("ZERON_ZGX_PROBE").is_some() && (*w == 860. || *w == 840.) {
+        if std::env::var_os("ZEREN_ZGX_PROBE").is_some() && (*w == 860. || *w == 840.) {
             for l in app.tree().lines().filter(|l| l.contains("#transcript ") || l.contains("#shell-sidebar ") || l.contains("Reply 30, paragraph 1:") || l.contains("#chat-session ")) {
                 eprintln!("PROBE {w} {l}");
             }
         }
     }
-    if std::env::var_os("ZERON_ZGX_TRACE").is_some() {
+    if std::env::var_os("ZEREN_ZGX_TRACE").is_some() {
         eprintln!("mid-history {needle}: {}", trace.iter().map(|(f, y)| format!("{f}:{y}")).collect::<Vec<_>>().join(" "));
     }
     let moved = drift(&trace, from);
@@ -1045,7 +1045,7 @@ fn a_resize_keeps_the_reading_place() {
         resize(&mut app, *w, 820.);
         trace.push((format!("{w}"), foot(&mut app)));
     }
-    if std::env::var_os("ZERON_ZGX_TRACE").is_some() {
+    if std::env::var_os("ZEREN_ZGX_TRACE").is_some() {
         eprintln!("at the end, last line's foot: {}", trace.iter().map(|(f, y)| format!("{f}:{y}")).collect::<Vec<_>>().join(" "));
     }
     let moved = drift(&trace, start);
@@ -1068,7 +1068,7 @@ fn a_panel_opening_and_closing_keeps_the_reading_place() {
             std::thread::sleep(std::time::Duration::from_millis(16));
             app.frame();
             trace.push((format!("{label} {f}"), place_of(&mut app, &needle).map_or(i32::MIN, |p| p.0)));
-            if std::env::var_os("ZERON_ZGX_TRACE2").is_some() && f <= 10 {
+            if std::env::var_os("ZEREN_ZGX_TRACE2").is_some() && f <= 10 {
                 let off = app.host.shared("chat.transcript.offset", Value::Nil).get();
                 let line = app.tree().lines().find(|l| l.contains(" #transcript ")).unwrap_or_default().trim().to_owned();
                 let para = app.tree().lines().find(|l| l.contains(&needle)).unwrap_or_default().trim().to_owned();
@@ -1076,7 +1076,7 @@ fn a_panel_opening_and_closing_keeps_the_reading_place() {
             }
         }
     }
-    if std::env::var_os("ZERON_ZGX_TRACE").is_some() {
+    if std::env::var_os("ZEREN_ZGX_TRACE").is_some() {
         eprintln!("panel {needle}: {}", trace.iter().map(|(f, y)| format!("{f}:{y}")).collect::<Vec<_>>().join(" "));
     }
     let moved = drift(&trace, from);

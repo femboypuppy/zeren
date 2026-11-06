@@ -4,8 +4,8 @@
 //! groups, questions, errors, attachments), the synthetic big transcripts
 //! for benchmarks, and the scripted streaming reply.
 
-use zeron_doc::{MessagePart, MessageRole, MessageStatus, SessionMessageEntry, ToolDiffStat};
-use zeron_proto::{TodoItem, TodoStatus, ToolCall, UserInputQuestion};
+use zeren_doc::{MessagePart, MessageRole, MessageStatus, SessionMessageEntry, ToolDiffStat};
+use zeren_proto::{TodoItem, TodoStatus, ToolCall, UserInputQuestion};
 
 pub(crate) const PHONE: &str = "ios-demo";
 
@@ -51,7 +51,7 @@ fn agent(
     id: &str,
     description: &str,
     input: serde_json::Value,
-    status: zeron_doc::parts::SubagentStatus,
+    status: zeren_doc::parts::SubagentStatus,
     tail: Option<&str>,
 ) -> MessagePart {
     let mut part = tool(
@@ -60,7 +60,7 @@ fn agent(
             name: format!("Agent: {description}"),
             input: Some(input),
         },
-        status == zeron_doc::parts::SubagentStatus::Failed,
+        status == zeren_doc::parts::SubagentStatus::Failed,
         None,
     );
     if let MessagePart::Tool {
@@ -121,7 +121,7 @@ pub(crate) fn subagent_transcript(
                 ),
                 tool(
                     "k4",
-                    exec("cargo test -p zeron-ui veil::graphemes"),
+                    exec("cargo test -p zeren-ui veil::graphemes"),
                     false,
                     Some(
                         "running 6 tests\ntest veil::graphemes::zwj_family ... ok\ntest veil::graphemes::flags ... ok\ntest veil::graphemes::combining_acute ... ok\n\ntest result: ok. 6 passed; 0 failed",
@@ -139,7 +139,7 @@ pub(crate) fn subagent_transcript(
                 tool("k1", read("crates/mobile/src/layout/rows.rs"), false, None),
                 tool(
                     "k2",
-                    exec("cargo bench -p zeron-mobile --bench layout -- veil"),
+                    exec("cargo bench -p zeren-mobile --bench layout -- veil"),
                     false,
                     Some(
                         "veil/on   time: [212.4 µs 214.9 µs 217.6 µs]\nveil/off  time: [208.1 µs 209.7 µs 211.5 µs]\nchange: +2.48% (p = 0.00 < 0.05)",
@@ -151,14 +151,14 @@ pub(crate) fn subagent_transcript(
                 ),
                 tool(
                     "k3",
-                    read("apps/ios/Zeron/Transcript/RowView.swift"),
+                    read("apps/ios/Zeren/Transcript/RowView.swift"),
                     false,
                     None,
                 ),
                 tool(
                     "k4",
                     exec(
-                        "xcodebuild test -scheme Zeron -only-testing:ZeronUITests/ScrollPerformanceTests",
+                        "xcodebuild test -scheme Zeren -only-testing:ZerenUITests/ScrollPerformanceTests",
                     ),
                     false,
                     Some(
@@ -172,7 +172,7 @@ pub(crate) fn subagent_transcript(
                 tool(
                     "k5",
                     exec(
-                        "xcrun xctrace record --template 'Time Profiler' --launch Zeron.app -- -demo -huge -stream",
+                        "xcrun xctrace record --template 'Time Profiler' --launch Zeren.app -- -demo -huge -stream",
                     ),
                     false,
                     None,
@@ -185,7 +185,7 @@ pub(crate) fn subagent_transcript(
                 tool("k1", read("crates/ui/src/markdown/veil.rs"), false, None),
                 tool(
                     "k2",
-                    exec("cargo test -p zeron-ui veil -- --list"),
+                    exec("cargo test -p zeren-ui veil -- --list"),
                     false,
                     Some(
                         "veil::alpha_bounds: test\nveil::cadence_clamp: test\nveil::lifecycle_drop: test\n…14 tests",
@@ -290,13 +290,13 @@ fn assistant(id: &str, host: &str, at: i64, parts: Vec<MessagePart>) -> SessionM
 /// Paths the demo serves generated images for.
 pub(crate) const DEMO_IMAGES: &[(&str, u32, u32, u32)] = &[
     (
-        "/Users/dev/.zeron/uploads/4f1c9a2e-Image_1.png",
+        "/Users/dev/.zeren/uploads/4f1c9a2e-Image_1.png",
         960,
         540,
         1,
     ),
-    ("/Users/dev/.zeron/uploads/scroll-tall.png", 400, 800, 2),
-    ("/Users/dev/.zeron/uploads/square.png", 600, 600, 3),
+    ("/Users/dev/.zeren/uploads/scroll-tall.png", 400, 800, 2),
+    ("/Users/dev/.zeren/uploads/square.png", 600, 600, 3),
 ];
 
 const VEIL_PLAN: &str = r#"## Veil port plan
@@ -338,7 +338,7 @@ pub fn veil_alpha(elapsed_ms: f32, duration_ms: f32) -> f32 {
 }
 ```
 
-The row keeps one `RowVeil` while streaming and drops it on the live→complete flip, exactly like the desktop lifecycle. Details in [the veil design note](https://github.com/zeron-sh/zeron/blob/main/docs/design/transcript-veil.md#lifecycle)."#;
+The row keeps one `RowVeil` while streaming and drops it on the live→complete flip, exactly like the desktop lifecycle. Details in [the veil design note](https://github.com/zeren-sh/zeren/blob/main/docs/design/transcript-veil.md#lifecycle)."#;
 
 const CJK_REPLY: &str = r#"### Grapheme-safe fading
 
@@ -356,7 +356,7 @@ Chunk boundaries now snap to **extended grapheme clusters**, so these all fade a
 | Emoji ZWJ | 👨‍👩‍👧‍👦 | 1 |
 | Flags | 🇨🇦🇯🇵 | 2 |
 
-The splitter lives in `/Users/dev/zeron/crates/ui/src/markdown/veil/grapheme_boundaries_for_streamed_chunks.rs` and is covered by a table test:
+The splitter lives in `/Users/dev/zeren/crates/ui/src/markdown/veil/grapheme_boundaries_for_streamed_chunks.rs` and is covered by a table test:
 
 ```python
 CASES = [
@@ -382,8 +382,8 @@ const VEIL_LIVE_PREFIX: &str = "All 14 veil tests pass. Pushing `veil-fade` and"
 /// The remainder `chat-veil`'s live entry streams when the session opens.
 pub(crate) const VEIL_LIVE_REST: &str = r#" opening the pull request against `main`:
 
-- [x] `cargo test -p zeron-ui veil` — 14 passed
-- [x] `xcodebuild -scheme Zeron build`
+- [x] `cargo test -p zeren-ui veil` — 14 passed
+- [x] `xcodebuild -scheme Zeren build`
 - [ ] Screenshots for the PR description
 
 ```bash
@@ -391,24 +391,24 @@ git push -u origin veil-fade
 gh pr create --base main --title "Stream pull request status on every client"
 ```
 
-PR **#90** is open: https://github.com/zeron-sh/zeron/pull/90"#;
+PR **#90** is open: https://github.com/zeren-sh/zeren/pull/90"#;
 
 fn veil(host: &str, now: i64) -> Vec<SessionMessageEntry> {
     // Sent from the desktop composer: file, folder and skill chips, plus the
     // image and recording it attached, each mentioned by its chip.
-    let review = zeron_proto::invocation::Invocation::Skill {
+    let review = zeren_proto::invocation::Invocation::Skill {
         name: "review".into(),
         path: "/Users/dev/.claude/skills/review/SKILL.md".into(),
         command: None,
     };
     let attach = crate::attachments::with_attachments(
         &format!(
-            "Port the streaming fade-in veil from [transcript.rs](zeron-file:crates/ui/src/transcript.rs) into [Transcript](zeron-file:apps/ios/Zeron/Transcript/). It must never affect layout — opacity only, split at chunk boundaries. Here's how it looks today: [Image 1](zeron-image:1), and the fade is in [veil-recording.zip](zeron-attachment:2). Run {} when done.",
+            "Port the streaming fade-in veil from [transcript.rs](zeren-file:crates/ui/src/transcript.rs) into [Transcript](zeren-file:apps/ios/Zeren/Transcript/). It must never affect layout — opacity only, split at chunk boundaries. Here's how it looks today: [Image 1](zeren-image:1), and the fade is in [veil-recording.zip](zeren-attachment:2). Run {} when done.",
             review.link()
         ),
         &[
             DEMO_IMAGES[0].0.to_owned(),
-            "/Users/dev/.zeron/uploads/7d03b6e1-veil-recording.zip".to_owned(),
+            "/Users/dev/.zeren/uploads/7d03b6e1-veil-recording.zip".to_owned(),
         ],
     );
     let mut live = assistant(
@@ -419,7 +419,7 @@ fn veil(host: &str, now: i64) -> Vec<SessionMessageEntry> {
             text("t0", "Opening the PR now. Running the checks first:"),
             tool(
                 "k1",
-                exec("cargo test -p zeron-ui veil -- --nocapture"),
+                exec("cargo test -p zeren-ui veil -- --nocapture"),
                 false,
                 Some("test result: ok. 14 passed; 0 failed; 0 ignored"),
             ),
@@ -428,7 +428,7 @@ fn veil(host: &str, now: i64) -> Vec<SessionMessageEntry> {
                 VEIL_AGENTS[1].0,
                 "Benchmark the veil on 600 turns",
                 serde_json::json!({ "subagent_type": "general-purpose" }),
-                zeron_doc::parts::SubagentStatus::Running,
+                zeren_doc::parts::SubagentStatus::Running,
                 Some("Profiling the 600-turn case on an iPhone 17 Pro next."),
             ),
             text("t1", VEIL_LIVE_PREFIX),
@@ -458,11 +458,11 @@ fn veil(host: &str, now: i64) -> Vec<SessionMessageEntry> {
                     false,
                     Some("crates/ui/src/markdown/veil.rs:12: pub const VEIL_MIN_FADE_MS"),
                 ),
-                edit("k3", "apps/ios/Zeron/Transcript/Veil.swift", 84, 12),
+                edit("k3", "apps/ios/Zeren/Transcript/Veil.swift", 84, 12),
                 tool(
                     "k4",
                     exec(
-                        "xcodebuild -scheme Zeron -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build",
+                        "xcodebuild -scheme Zeren -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build",
                     ),
                     false,
                     Some("** BUILD SUCCEEDED **"),
@@ -522,7 +522,7 @@ fn veil(host: &str, now: i64) -> Vec<SessionMessageEntry> {
                     VEIL_AGENTS[0].0,
                     "Audit grapheme splits in veil.rs",
                     serde_json::json!({ "subagent_type": "Explore", "model": "claude-haiku-5" }),
-                    zeron_doc::parts::SubagentStatus::Done,
+                    zeren_doc::parts::SubagentStatus::Done,
                     None,
                 ),
                 agent(
@@ -530,7 +530,7 @@ fn veil(host: &str, now: i64) -> Vec<SessionMessageEntry> {
                     VEIL_AGENTS[2].0,
                     "Review the fade-curve tests",
                     serde_json::json!({ "subagent_type": "reviewer", "model": "claude-opus-5" }),
-                    zeron_doc::parts::SubagentStatus::Done,
+                    zeren_doc::parts::SubagentStatus::Done,
                     None,
                 ),
                 text("t0", CJK_REPLY),
@@ -640,14 +640,14 @@ fn tabs(host: &str, now: i64) -> Vec<SessionMessageEntry> {
                 ),
                 tool(
                     "k2",
-                    exec("cargo test -p zeron-ui tool_group"),
+                    exec("cargo test -p zeren-ui tool_group"),
                     true,
                     Some("error[E0425]: cannot find value `danger_muted` in this scope"),
                 ),
                 edit("k3", "crates/ui/src/shell/transcript.rs", 6, 9),
                 tool(
                     "k4",
-                    exec("cargo test -p zeron-ui tool_group"),
+                    exec("cargo test -p zeren-ui tool_group"),
                     false,
                     Some("test result: ok. 9 passed"),
                 ),
@@ -759,7 +759,7 @@ override func layoutSubviews() {
                 ),
                 tool(
                     "k1",
-                    exec("xcodebuild test -only-testing:ZeronTests/TranscriptScrollMatrixTests"),
+                    exec("xcodebuild test -only-testing:ZerenTests/TranscriptScrollMatrixTests"),
                     false,
                     Some("Executed 36 tests, with 0 failures"),
                 ),
@@ -903,7 +903,7 @@ fn short(host: &str, now: i64, prompt: &str, reply: &str) -> Vec<SessionMessageE
 /// `send_message` call reads as the message it sent.
 fn easing(host: &str, now: i64) -> Vec<SessionMessageEntry> {
     let send = ToolCall::Mcp {
-        server: "zeron".into(),
+        server: "zeren".into(),
         tool: "send_message".into(),
         input: Some(serde_json::json!({
             "chat": "chat-side",
@@ -927,10 +927,10 @@ fn easing(host: &str, now: i64) -> Vec<SessionMessageEntry> {
     ]
 }
 
-/// A side chat another chat messaged through Zeron's `send_message`: its
+/// A side chat another chat messaged through Zeren's `send_message`: its
 /// header names the Codex side chat that sent it.
 fn side(host: &str, now: i64) -> Vec<SessionMessageEntry> {
-    let sent = zeron_proto::agent_messages::agent_message(
+    let sent = zeren_proto::agent_messages::agent_message(
         "Spring vs. power curve for the veil (chat-sid)",
         "chat-side-easing",
         "Keeping the power curve for the veil. Which EMA window should the fade track so the cadence stays steady?",
@@ -1114,7 +1114,7 @@ pub(crate) fn reply(prompt: &str, long: bool) -> Vec<Step> {
             run_ms: 350,
         },
         Step::Tool {
-            call: exec("cargo test -p zeron-client transcript"),
+            call: exec("cargo test -p zeren-client transcript"),
             output: Some("test result: ok. 12 passed; 0 failed".into()),
             is_error: false,
             run_ms: 900,

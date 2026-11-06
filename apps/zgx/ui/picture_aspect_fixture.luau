@@ -42,7 +42,7 @@ return ui.column {
 	h_full = true,
 	p = 24,
 	gap = 16,
-	bg = "$zeron.window",
+	bg = "$zeren.window",
 	ui.row {
 		gap = 16,
 		bare("aspect-cover", false),

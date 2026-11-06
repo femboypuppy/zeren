@@ -6,10 +6,10 @@ use std::time::Duration;
 
 use base64::Engine as _;
 use chrono::Utc;
-use zeron_engine::{EngineCore, HarnessRegistry};
-use zeron_mcp::{Origin, Tools, Zeron};
-use zeron_proto::{ChatIndicator, HarnessId, Session, SessionStatus, TerminalEvent};
-use zeron_rpc::memory_client;
+use zeren_engine::{EngineCore, HarnessRegistry};
+use zeren_mcp::{Origin, Tools, Zeren};
+use zeren_proto::{ChatIndicator, HarnessId, Session, SessionStatus, TerminalEvent};
+use zeren_rpc::memory_client;
 
 fn assemble(path: &std::path::Path) -> EngineCore {
     EngineCore::assemble(
@@ -31,7 +31,7 @@ async fn state(
             let snapshot = rows.borrow_and_update().clone();
             let chat = core.workspace.chat("chat").unwrap().unwrap();
             if let Some(row) = snapshot.into_iter().find(|row| row.chat_id == "chat")
-                && zeron_proto::view::display_status(&chat, Some(&row), Utc::now()) == expected
+                && zeren_proto::view::display_status(&chat, Some(&row), Utc::now()) == expected
             {
                 return row;
             }
@@ -69,11 +69,11 @@ async fn pty_states_match_sidebar_mcp_and_synced_registry_without_a_viewport() {
         .unwrap();
     core.terminals.associate_chat(&terminal.id, "chat").unwrap();
     let mut rows = core.sessions.watch_sessions();
-    let zeron = Arc::new(Zeron::with_client(
+    let zeren = Arc::new(Zeren::with_client(
         memory_client(core.rpc_service()),
         Origin::default(),
     ));
-    let tools = Tools::new(zeron.clone());
+    let tools = Tools::new(zeren.clone());
 
     emit(&core, &terminal.id, "state=working:app=demo");
     let working = state(&mut rows, ChatIndicator::Working, &core).await;
@@ -152,7 +152,7 @@ async fn pty_states_match_sidebar_mcp_and_synced_registry_without_a_viewport() {
     // been accepted but has not started. It needs native completion evidence.
     let chat = core.workspace.chat("chat").unwrap().unwrap();
     let (waited, ()) = tokio::join!(
-        zeron.wait_for_turn(&chat, Some(&done), true, Duration::from_millis(200)),
+        zeren.wait_for_turn(&chat, Some(&done), true, Duration::from_millis(200)),
         async {
             tokio::time::sleep(Duration::from_millis(25)).await;
             emit(&core, &terminal.id, "state=working:app=demo");

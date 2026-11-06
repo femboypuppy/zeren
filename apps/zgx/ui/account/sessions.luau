@@ -23,7 +23,7 @@
 --                          default tile again)
 --   sessions.rename_device(id, name)  a promise (Settings → Devices)
 --   sessions.delete(id)    gone for good: a promise
---   sessions.link(id)      its Zeron conversation link: a promise
+--   sessions.link(id)      its Zeren conversation link: a promise
 --   sessions.collapse(id, folded)  a section of yours folded, everywhere
 --   sessions.seen(id)      its finished state seen, on every device
 --   sessions.place(places) where sessions are put by hand, as the sidebar
@@ -155,7 +155,7 @@ function M.rename_device(id: string, name: string): any
 	return ui.call("sessions.rename_device", { id = id, name = name })
 end
 
--- Its Zeron conversation link (`zeron://open/chat/…`, the shipping app's,
+-- Its Zeren conversation link (`zeren://open/chat/…`, the shipping app's,
 -- so either opens it): a promise; refused while it can't be known yet.
 function M.link(id: string): any
 	return ui.call("sessions.link", id)

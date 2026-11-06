@@ -10,7 +10,7 @@ ds.setup()
 -- them, and private_text's turn hiding on themselves.
 ds.PrivateText.hidden:set(false)
 
-local EMAILS = { "mara@halcyon.dev", "theo.lindqvist@halcyon.dev", "ines_duarte+zeron@north-wind.io" }
+local EMAILS = { "mara@halcyon.dev", "theo.lindqvist@halcyon.dev", "ines_duarte+zeren@north-wind.io" }
 
 local stand_ins = ui.state("private_stand_ins", {} :: { string })
 local list = {}

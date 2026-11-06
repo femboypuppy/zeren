@@ -505,7 +505,7 @@ end
 -- isn't (the web's, an absolute path, past the top). The shipping app's
 -- `relative_target` (files/markdown_preview.rs).
 function M.relative(document: string, target: string): (string?, string?)
-	if string.sub(target, 1, 11) == "zeron-file:" then
+	if string.sub(target, 1, 11) == "zeren-file:" then
 		return M.relative("", string.sub(target, 12))
 	end
 	if string.sub(target, 1, 1) == "/" or string.find(target, "[:\\]") then

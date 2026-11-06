@@ -65,7 +65,7 @@ const BASE_DEADLINE: Duration = Duration::from_secs(10 * 60);
 const DEADLINE_PER_GIB: Duration = Duration::from_secs(60);
 const MAX_DEADLINE: Duration = Duration::from_secs(60 * 60);
 /// Overrides the deadline (seconds), for testing a stuck trial.
-const DEADLINE_ENV: &str = "ZERON_UPDATE_TRIAL_SECS";
+const DEADLINE_ENV: &str = "ZEREN_UPDATE_TRIAL_SECS";
 
 /// How much space to leave free on top of what an update needs.
 const SPARE_BYTES: u64 = 256 * 1024 * 1024;
@@ -79,13 +79,13 @@ const GIB: u64 = 1024 * 1024 * 1024;
 // Only Unix runs the watchdog as its own process; on Windows the old version
 // stays on as it.
 #[cfg(unix)]
-const WATCH_ID_ENV: &str = "ZERON_UPDATE_WATCH_ID";
+const WATCH_ID_ENV: &str = "ZEREN_UPDATE_WATCH_ID";
 #[cfg(unix)]
-const WATCH_PID_ENV: &str = "ZERON_UPDATE_WATCH_PID";
+const WATCH_PID_ENV: &str = "ZEREN_UPDATE_WATCH_PID";
 #[cfg(unix)]
-const WATCH_DATA_ENV: &str = "ZERON_UPDATE_WATCH_DATA";
+const WATCH_DATA_ENV: &str = "ZEREN_UPDATE_WATCH_DATA";
 #[cfg(unix)]
-const WATCH_ARGS_ENV: &str = "ZERON_UPDATE_WATCH_ARGS";
+const WATCH_ARGS_ENV: &str = "ZEREN_UPDATE_WATCH_ARGS";
 
 /// The hidden subcommand that runs [`run_watchdog`].
 pub const WATCHDOG_SUBCOMMAND: &str = "update-watchdog";
@@ -133,7 +133,7 @@ pub enum Layout {
     Versioned { app_root: PathBuf },
     /// `bundle` is the installed app; `incoming` is the new one beside it.
     MacBundle { bundle: PathBuf, incoming: PathBuf },
-    /// `directory/zeron.exe` is installed; `incoming` is the new exe, in a folder
+    /// `directory/zeren.exe` is installed; `incoming` is the new exe, in a folder
     /// of its own inside `directory`.
     WindowsFolder { directory: PathBuf, incoming: PathBuf },
 }
@@ -164,7 +164,7 @@ impl Layout {
         match self {
             Self::Versioned { app_root } => app_root.join("current").join(name),
             Self::MacBundle { bundle, .. } => bundle.join("Contents/MacOS").join(name),
-            Self::WindowsFolder { directory, .. } => directory.join("zeron.exe"),
+            Self::WindowsFolder { directory, .. } => directory.join("zeren.exe"),
         }
     }
 
@@ -213,7 +213,7 @@ impl Layout {
                 let current = recorded.unwrap_or_else(|| transaction.from.clone());
                 let me = if inside(incoming) {
                     transaction.target.clone()
-                } else if inside(&directory.join("zeron.exe")) {
+                } else if inside(&directory.join("zeren.exe")) {
                     current.clone()
                 } else {
                     return None;
@@ -339,9 +339,9 @@ impl Transaction {
 /// builds don't have the knob.
 fn crash_point(step: &str) {
     if cfg!(debug_assertions)
-        && std::env::var("ZERON_UPDATE_CRASH_AT").is_ok_and(|at| at == step)
+        && std::env::var("ZEREN_UPDATE_CRASH_AT").is_ok_and(|at| at == step)
     {
-        eprintln!("zeron-update: crashing at {step}, as asked");
+        eprintln!("zeren-update: crashing at {step}, as asked");
         std::process::abort();
     }
 }
@@ -508,7 +508,7 @@ fn room_verdict(free: u64, needed: u64) -> Result<(), String> {
     }
     Err(format!(
         "There isn't enough disk space to update safely: {} needed, {} free. Free up some space \
-         and try again. Zeron is still running.",
+         and try again. Zeren is still running.",
         gib(needed),
         gib(free)
     ))
@@ -519,7 +519,7 @@ fn room_verdict(free: u64, needed: u64) -> Result<(), String> {
 /// once it's staged. A check that can't run refuses too: not knowing isn't room.
 pub fn ensure_room(data_dir: &Path, app_root: &Path, download: u64) -> Result<(), String> {
     let cannot = |err: std::io::Error| {
-        format!("Zeron couldn't check the free disk space ({err}), so it didn't update.")
+        format!("Zeren couldn't check the free disk space ({err}), so it didn't update.")
     };
     let snapshot = store_bytes(data_dir);
     let snapshot_copy = snapshot + snapshot / 20;
@@ -994,7 +994,7 @@ pub fn boot<G>(
                 "another version was installed during the update; leaving its data alone"
             );
             let reason = format!(
-                "Zeron {} was installed while this update was running, so the update stopped there.",
+                "Zeren {} was installed while this update was running, so the update stopped there.",
                 who.me
             );
             let layout = transaction.layout.clone();
@@ -1048,14 +1048,14 @@ fn start_trial<G>(
     let new_binary = transaction.layout.new_binary(&transaction.target, &exe_name);
     if !new_binary.is_file() {
         let why = format!(
-            "Zeron {}'s files are missing, so it stayed on {}.",
+            "Zeren {}'s files are missing, so it stayed on {}.",
             transaction.target, transaction.from
         );
         return give_up(transaction, why, new_binary.display().to_string());
     }
     if let Err(err) = take_snapshot(data_dir, &transaction.id) {
         let why = format!(
-            "Zeron couldn't back up its data before updating, so it stayed on {}.",
+            "Zeren couldn't back up its data before updating, so it stayed on {}.",
             transaction.from
         );
         return give_up(transaction, why, format!("{err:#}"));
@@ -1070,7 +1070,7 @@ fn start_trial<G>(
         // Without a watchdog a stuck new version would never be stopped. Nothing
         // has touched the data yet, so there's nothing to restore.
         let why = format!(
-            "Zeron couldn't watch over the update, so it stayed on {}.",
+            "Zeren couldn't watch over the update, so it stayed on {}.",
             transaction.from
         );
         return give_up(transaction, why, format!("{err:#}"));
@@ -1081,7 +1081,7 @@ fn start_trial<G>(
     let err = hand_over(data_dir, options, &mut transaction, &new_binary);
     // Only reached if the new binary couldn't be started at all.
     let why = format!(
-        "Zeron {} couldn't start here, so it stayed on {}.",
+        "Zeren {} couldn't start here, so it stayed on {}.",
         transaction.target, transaction.from
     );
     give_up(transaction, why, err.to_string())
@@ -1176,7 +1176,7 @@ fn roll_back(data_dir: &Path, mut transaction: Transaction) -> anyhow::Result<()
         data_dir,
         transaction,
         Phase::RolledBack,
-        Some(format!("{why} Zeron went back to {from} instead of {target}.")),
+        Some(format!("{why} Zeren went back to {from} instead of {target}.")),
     )?;
     crash_point("rollback-recorded");
     discard_snapshots(data_dir);
@@ -1224,7 +1224,7 @@ fn prepare_watchdog(
     let status = command
         .arg("-c")
         .arg(r#""$@" </dev/null & exit 0"#)
-        .arg("zeron-update-watch")
+        .arg("zeren-update-watch")
         .arg(&exe)
         .args(&options.watchdog_args)
         .env(WATCH_ID_ENV, &transaction.id)
@@ -1319,7 +1319,7 @@ fn watch(data_dir: &Path, id: &str, pid: u32, engine_args: &[String], exe_name: 
                     &format!("The new version didn't finish starting within {minutes} min."),
                 );
                 tracing::error!(pid, "update trial missed its deadline; stopping it");
-                eprintln!("zeron-update: the update trial missed its deadline; stopping it");
+                eprintln!("zeren-update: the update trial missed its deadline; stopping it");
                 kill_process(pid);
             }
         } else {
@@ -1454,7 +1454,7 @@ fn start_unit(unit: &str) {
         .args(["--user", "--no-block", "start", unit])
         .status();
     if !started.is_ok_and(|status| status.success()) {
-        eprintln!("zeron-update: couldn't ask the service manager to start {unit}");
+        eprintln!("zeren-update: couldn't ask the service manager to start {unit}");
     }
 }
 
@@ -1464,7 +1464,7 @@ fn relaunch_installed(layout: &Layout, exe_name: &std::ffi::OsStr, engine_args: 
     let mut command = std::process::Command::new(layout.installed_binary(exe_name));
     command.args(engine_args).stdin(std::process::Stdio::null());
     if let Err(err) = spawn_detached(&mut command) {
-        eprintln!("zeron-update: couldn't start the previous version: {err}");
+        eprintln!("zeren-update: couldn't start the previous version: {err}");
     }
 }
 

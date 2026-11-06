@@ -63,7 +63,7 @@ end
 -- here goes back to ready. Clicking again while waiting starts afresh (the
 -- first is given up).
 -- Whether this load is the one waiting on the browser (and then on
--- Zeron's answers): a reload's new scripts hear nothing of an earlier
+-- Zeren's answers): a reload's new scripts hear nothing of an earlier
 -- load's calls, so Sign in, still "waiting", is theirs to finish (init.luau
 -- goes on once the account says signed in).
 local asking = false
@@ -96,7 +96,7 @@ function M.cancel_sign_in()
 	state.signin:set("ready")
 end
 
--- How long sign-in waits on Zeron's answers before going on without them
+-- How long sign-in waits on Zeren's answers before going on without them
 -- (each step that needs one asks again).
 local ASK = 4000
 
@@ -151,7 +151,7 @@ function M.signed_in()
 end
 
 -- A run starts: it opens on the first page not finished before it (the
--- account's, as Zeron answered, and this Mac's); with none left, on done.
+-- account's, as Zeren answered, and this Mac's); with none left, on done.
 function M.start_run(account_done: { string })
 	local passed: { [string]: boolean } = {}
 	if not state.replay then

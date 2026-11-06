@@ -1,7 +1,7 @@
 --!strict
 -- The scenes, each its folder under art/ and its layers back to front:
 -- the first the sky (depth 0, still), the rest cut-outs at increasing
--- depth, moving more as they come nearer. (Zeron's member-card scenes,
+-- depth, moving more as they come nearer. (Zeren's member-card scenes,
 -- the ones laid wide enough for a window.)
 
 export type Scene = { slug: string, layers: { string } }

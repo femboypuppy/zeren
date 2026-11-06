@@ -1,8 +1,8 @@
-//! Muse Code accounts, kept by zeron — any number of them, each its own Muse
+//! Muse Code accounts, kept by zeren — any number of them, each its own Muse
 //! login, nothing ever swapped.
 //!
 //! Muse keeps ONE login per config root (`$XDG_CONFIG_HOME/muse`), on macOS
-//! in the Keychain by default. So each account zeron adds gets a config root
+//! in the Keychain by default. So each account zeren adds gets a config root
 //! of its own under `{data_dir}/agent-accounts/muse-homes/<slot>/config`,
 //! file-backed (`TBH_CREDENTIAL_BACKEND=file`, so no Keychain prompt can
 //! stall a background engine), and a Muse run of that account is pointed at
@@ -17,25 +17,25 @@
 //!
 //! Sign-in, identity, usage and sign-out all go through Muse's own account
 //! surface (verified live against Muse 1.4.12; usage stays empty from a
-//! fresh host, see [`AgentAccounts::muse_usage`]) ([`zeron_harness::muse::account`]): Muse mints, refreshes and
-//! locks its tokens itself; zeron never reads one. With no zeron account
+//! fresh host, see [`AgentAccounts::muse_usage`]) ([`zeren_harness::muse::account`]): Muse mints, refreshes and
+//! locks its tokens itself; zeren never reads one. With no zeren account
 //! selected, Muse runs on its own login (`muse login`), untouched.
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
-use zeron_harness::muse::account as msp;
-use zeron_proto::{AgentLoginMode, AgentLoginStart, AgentUsageWindow, HarnessId};
+use zeren_harness::muse::account as msp;
+use zeren_proto::{AgentLoginMode, AgentLoginStart, AgentUsageWindow, HarnessId};
 
 use super::{
     AgentAccounts, EngineError, LoginFlow, Slot, SlotProfile, TaskLoginState, UsageSnapshot, lock,
     new_id, now_ms, private_dir, slot_id_for,
 };
 
-/// The selected zeron-kept account's slot id (absent: Muse's own login).
+/// The selected zeren-kept account's slot id (absent: Muse's own login).
 const ACTIVE_FILE: &str = "muse-active";
 const HOMES_DIR: &str = "muse-homes";
-/// The run-credential fingerprint of Muse's own login (no zeron account).
+/// The run-credential fingerprint of Muse's own login (no zeren account).
 pub(crate) const OWN_LOGIN: &str = "muse-own-login";
 
 /// Make `root` mirror `real` (see module docs): links to every entry of
@@ -98,7 +98,7 @@ fn mirror_config(real: &Path, root: &Path) -> std::io::Result<()> {
 fn mirror_config(_real: &Path, _root: &Path) -> std::io::Result<()> {
     Err(std::io::Error::new(
         std::io::ErrorKind::Unsupported,
-        "Muse accounts kept by Zeron need macOS or Linux",
+        "Muse accounts kept by Zeren need macOS or Linux",
     ))
 }
 
@@ -111,7 +111,7 @@ impl AgentAccounts {
         if let Some(path) = lock(&self.inner.cli_overrides).get(&HarnessId::Muse) {
             return Ok(path.clone());
         }
-        zeron_harness::MuseHarness::new()
+        zeren_harness::MuseHarness::new()
             .resolve_executable()
             .map_err(muse_error)
     }
@@ -142,7 +142,7 @@ impl AgentAccounts {
         Ok(self.inner.config.private_root()?.join(ACTIVE_FILE))
     }
 
-    /// The selected zeron-kept account, when there is one (and it still
+    /// The selected zeren-kept account, when there is one (and it still
     /// exists).
     pub(super) fn muse_active(&self) -> Option<Slot> {
         let id = std::fs::read_to_string(self.active_file().ok()?).ok()?;
@@ -322,7 +322,7 @@ impl AgentAccounts {
                 display_name: None,
                 organization: None,
                 plan: None,
-                auth_kind: zeron_proto::AgentAuthKind::Oauth,
+                auth_kind: zeren_proto::AgentAuthKind::Oauth,
             },
             credentials: serde_json::json!({}),
             claude_config: None,
@@ -392,7 +392,7 @@ impl crate::registry::RunEnvironment for MuseRunEnvironment {
     async fn prepare(
         &self,
         harness: HarnessId,
-        request: &mut zeron_proto::RunRequest,
+        request: &mut zeren_proto::RunRequest,
     ) -> Result<(), String> {
         if harness != HarnessId::Muse {
             return Ok(());
@@ -520,7 +520,7 @@ for line in sys.stdin:
     else: send({"jsonrpc": "2.0", "id": rid, "error": {"code": -32601, "message": "nope"}})
 "#;
 
-    fn run_request() -> zeron_proto::RunRequest {
+    fn run_request() -> zeren_proto::RunRequest {
         serde_json::from_str(
             r#"{"prompt":"p","model":null,"reasoning":null,"cwd":".","sandbox":"workspace-write","resume":null}"#,
         )
@@ -531,9 +531,9 @@ for line in sys.stdin:
         for _ in 0..200 {
             let poll = accounts.poll_login(login_id).await.unwrap();
             match poll.status {
-                zeron_proto::AgentLoginStatus::Pending => {}
-                zeron_proto::AgentLoginStatus::Done => return,
-                zeron_proto::AgentLoginStatus::Error => panic!("{:?}", poll.message),
+                zeren_proto::AgentLoginStatus::Pending => {}
+                zeren_proto::AgentLoginStatus::Done => return,
+                zeren_proto::AgentLoginStatus::Error => panic!("{:?}", poll.message),
             }
             tokio::time::sleep(std::time::Duration::from_millis(25)).await;
         }
@@ -619,7 +619,7 @@ for line in sys.stdin:
         let start = accounts.start_login(HarnessId::Muse).await.unwrap();
         poll_done(&accounts, &start.login_id).await;
 
-        let rows = |snapshot: zeron_proto::AgentAccountsSnapshot| {
+        let rows = |snapshot: zeren_proto::AgentAccountsSnapshot| {
             snapshot
                 .accounts
                 .into_iter()
@@ -704,7 +704,7 @@ for line in sys.stdin:
     }
 
     /// Against a real `muse` (opt-in, never approves anything):
-    /// `MUSE_LIVE_BIN=~/.local/bin/muse cargo test -p zeron-engine --lib
+    /// `MUSE_LIVE_BIN=~/.local/bin/muse cargo test -p zeren-engine --lib
     /// live_muse_sign_in_stays_pending -- --ignored --nocapture`.
     #[tokio::test]
     #[ignore]
@@ -723,14 +723,14 @@ for line in sys.stdin:
         for second in 0..20 {
             let poll = accounts.poll_login(&start.login_id).await.unwrap();
             println!("{second}s: {:?} {:?}", poll.status, poll.message);
-            assert_eq!(poll.status, zeron_proto::AgentLoginStatus::Pending);
+            assert_eq!(poll.status, zeren_proto::AgentLoginStatus::Pending);
             tokio::time::sleep(std::time::Duration::from_secs(1)).await;
         }
         accounts.cancel_login(&start.login_id);
     }
 
     /// Signs in for real through the engine (approve the printed code):
-    /// `MUSE_LIVE_BIN=~/.local/bin/muse cargo test -p zeron-engine --lib
+    /// `MUSE_LIVE_BIN=~/.local/bin/muse cargo test -p zeren-engine --lib
     /// live_muse_sign_in_is_adopted -- --ignored --nocapture`.
     #[tokio::test]
     #[ignore]
@@ -747,7 +747,7 @@ for line in sys.stdin:
         println!("\n>>> Open {}\n", start.url);
         for _ in 0..900 {
             let poll = accounts.poll_login(&start.login_id).await.unwrap();
-            if poll.status != zeron_proto::AgentLoginStatus::Pending {
+            if poll.status != zeren_proto::AgentLoginStatus::Pending {
                 println!("finished: {:?} {:?}", poll.status, poll.message);
                 break;
             }

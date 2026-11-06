@@ -1,8 +1,8 @@
 # User-message captions runtime evidence
 
-Captured on 2026-10-26 on Linux (Xvfb, Mesa lavapipe software Vulkan) from `message-captions-fixture`: an offline shell with one chat that switched from Claude Code to Codex and then received a message from another chat through Zeron's `send_message`. The `before-*` captures run the same fixture against `main` `255c540d` with this change's sources stashed.
+Captured on 2026-10-26 on Linux (Xvfb, Mesa lavapipe software Vulkan) from `message-captions-fixture`: an offline shell with one chat that switched from Claude Code to Codex and then received a message from another chat through Zeren's `send_message`. The `before-*` captures run the same fixture against `main` `255c540d` with this change's sources stashed.
 
-Build and run: `cargo run -p zeron-ui --features appshots-fixture --example message-captions-fixture` (add `--capture <dir>` on platforms where `render_to_image` is implemented; on Linux the window was captured from the X display with `import -window root`, and hover/click driven with `xdotool`).
+Build and run: `cargo run -p zeren-ui --features appshots-fixture --example message-captions-fixture` (add `--capture <dir>` on platforms where `render_to_image` is implemented; on Linux the window was captured from the X display with `import -window root`, and hover/click driven with `xdotool`).
 
 - The provider-switch seam has no divider and rides right-aligned over the message that switched, `USER_CAPTION_GAP` above its bubble.
 - An agent-sent message shows `Message from [provider mark] Chat title` over its bubble; the routing header and the trailing short id leave the bubble. Hovering brightens the caption (`sender-hover-dark.png`); clicking opens the sending chat (`sender-click-dark.png`: the fixture's sender chat has no transcript of its own).

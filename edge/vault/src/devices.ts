@@ -4,7 +4,7 @@
  * switch, and an append-only audit log.
  *
  * A grant request is a statement signed by a device key:
- *   Ed25519("zeron-vault-grant\n{userId}\n{deviceId}\n{provider}\n{ts}")
+ *   Ed25519("zeren-vault-grant\n{userId}\n{deviceId}\n{provider}\n{ts}")
  * accepted only while `ts` is within ±120 s of now AND strictly greater than
  * that device's last accepted `ts`. The window bounds how long a captured
  * request is useful; the fence makes it single-use even inside the window.
@@ -31,7 +31,7 @@ export const GRANT_WINDOW_MS = 120_000;
 const AUDIT_RETAIN_MS = 400 * 24 * 60 * 60_000;
 
 export const grantMessage = (userId: string, deviceId: string, provider: VaultProviderId, ts: number): string =>
-  `zeron-vault-grant\n${userId}\n${deviceId}\n${provider}\n${ts}`;
+  `zeren-vault-grant\n${userId}\n${deviceId}\n${provider}\n${ts}`;
 
 export type AuditEvent =
   | "enroll"

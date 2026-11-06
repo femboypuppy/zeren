@@ -1,6 +1,6 @@
 /**
  * Claude (subscription) — the credential the unmodified Claude Code CLI uses,
- * for running Claude Code on the user's own Cloud device (permitted for Zeron
+ * for running Claude Code on the user's own Cloud device (permitted for Zeren
  * under its arrangement with Anthropic; grants go only to the user's own
  * devices). Two upload shapes:
  *

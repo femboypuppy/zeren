@@ -84,7 +84,7 @@ CI_SELF = [
 ]
 
 # The apps link the Rust mobile core and everything it depends on (iOS and Android).
-# main() replaces this with zeron-mobile's dependency closure from the Cargo.toml
+# main() replaces this with zeren-mobile's dependency closure from the Cargo.toml
 # files; this list is the fallback when they cannot be read.
 MOBILE_CORE = [
     "crates/mobile/**", "crates/client/**", "crates/text/**", "crates/markdown/**",
@@ -93,7 +93,7 @@ MOBILE_CORE = [
     "crates/term/**", "crates/term-link/**", "crates/veil/**", "crates/zatex/**", "crates/preview/**",
 ]
 
-# Voice: the WebRTC audio stack (zeron-audio, which nothing else builds yet) and
+# Voice: the WebRTC audio stack (zeren-audio, which nothing else builds yet) and
 # the packaged Windows media runtime. The rest of voice is tested where it is
 # built: protocol and transport in core-tests, mobile voice in ios-core,
 # voice-media in core-tests and the Windows tests.
@@ -101,7 +101,7 @@ VOICE_PATHS = ["crates/audio/**", "crates/voice-media/**", "dist/voice/**", "scr
                "scripts/codex-voice-remote-smoke.py", "scripts/tests/*voice*", ".github/workflows/voice-tests.yml"]
 
 BROAD: dict[str, list[str]] = {
-    "core": CARGO + ["crates/**", "apps/zeron/**", "scripts/ci/**", ".github/actions/linux-ci/**",
+    "core": CARGO + ["crates/**", "apps/zeren/**", "scripts/ci/**", ".github/actions/linux-ci/**",
                      ".github/workflows/ui-tests.yml"],
     "ui": CARGO + ["crates/**", "scripts/ci/**", ".github/actions/linux-ci/**",
                    "scripts/test-linux-browser.sh", "scripts/test-browser-storage.py",
@@ -110,30 +110,30 @@ BROAD: dict[str, list[str]] = {
                        "scripts/*cursor-sdk*", ".github/workflows/cursor-*.yml"],
     "edge": ["edge/**", ".github/workflows/preview-tests.yml"],
     "installer": ["edge/src/install.sh", "scripts/package-linux.sh", "scripts/test-linux-desktop-entry.sh",
-                  "scripts/ci/apt-install.sh", "dist/zeron.desktop", "dist/zeron.png",
+                  "scripts/ci/apt-install.sh", "dist/zeren.desktop", "dist/zeren.png",
                   ".github/workflows/linux-installer.yml"],
     "voice": CARGO + VOICE_PATHS,
-    "windows": CARGO + ["crates/**", "apps/zeron/**", "dist/windows/**", "scripts/test-windows-*.ps1",
+    "windows": CARGO + ["crates/**", "apps/zeren/**", "dist/windows/**", "scripts/test-windows-*.ps1",
                         "scripts/package-windows.ps1", ".github/actions/windows-ci-setup/**",
                         ".github/workflows/windows.yml"],
-    "macos": CARGO + ["crates/**", "apps/zeron/**", "edge/**", "scripts/run-macos-browser-fixture.sh",
+    "macos": CARGO + ["crates/**", "apps/zeren/**", "edge/**", "scripts/run-macos-browser-fixture.sh",
                       "scripts/test-browser-storage.py", "scripts/ci/run-macos-fixture.sh",
                       "dist/macos/Info.plist", ".github/workflows/macos.yml"],
     # Tests the pinned GPUI checkout: only when the pin moves (see gpui_moved()).
     "frame_source": [".github/workflows/macos.yml"],
     "ios": CARGO + MOBILE_CORE + ["apps/ios/**", "scripts/ios/**", ".github/workflows/macos.yml"],
-    "android": CARGO + ["apps/android/**", "crates/**", "scripts/android/**", "apps/ios/Zeron/Fonts/**",
-                        "apps/ios/Zeron/Assets.xcassets/**", ".github/workflows/android.yml"],
+    "android": CARGO + ["apps/android/**", "crates/**", "scripts/android/**", "apps/ios/Zeren/Fonts/**",
+                        "apps/ios/Zeren/Assets.xcassets/**", ".github/workflows/android.yml"],
 }
 
 # Fast tier: the files that always select the platform suite...
 FAST_PATHS: dict[str, list[str]] = {
     "voice": VOICE_PATHS,
-    "windows": CARGO + ["apps/zeron/**", "dist/windows/**", "scripts/test-windows-*.ps1",
+    "windows": CARGO + ["apps/zeren/**", "dist/windows/**", "scripts/test-windows-*.ps1",
                         "scripts/package-windows.ps1", ".github/actions/windows-ci-setup/**",
                         ".github/workflows/windows.yml", "crates/update/**", "crates/cli/**",
                         "crates/launch/**"],
-    "macos": CARGO + ["apps/zeron/**", "crates/update/**", "crates/cli/**", "crates/launch/**",
+    "macos": CARGO + ["apps/zeren/**", "crates/update/**", "crates/cli/**", "crates/launch/**",
                       "crates/preview/**", "crates/text/**",
                       "edge/package.json", "edge/package-lock.json", "scripts/run-macos-browser-fixture.sh",
                       "scripts/test-browser-storage.py", "scripts/ci/run-macos-fixture.sh",
@@ -141,7 +141,7 @@ FAST_PATHS: dict[str, list[str]] = {
     # The Rust is the same code the Linux suites test (no Android cfg), so a pull
     # request builds the APK for the app, the FFI crate and dependency changes.
     "android": CARGO + ["apps/android/**", "scripts/android/**", "crates/mobile/**", "crates/mobile-bindgen/**",
-                        "apps/ios/Zeron/Fonts/**", "apps/ios/Zeron/Assets.xcassets/**",
+                        "apps/ios/Zeren/Fonts/**", "apps/ios/Zeren/Assets.xcassets/**",
                         ".github/workflows/android.yml"],
 }
 
@@ -150,7 +150,7 @@ FAST_PATHS: dict[str, list[str]] = {
 JOB_PATHS: dict[tuple[str, str], list[str]] = {
     # Release build, packaging, installer and startup probes (`tests` already
     # compiles the app).
-    ("windows", "app"): CARGO + ["apps/zeron/**", "dist/windows/**", "scripts/test-windows-*.ps1",
+    ("windows", "app"): CARGO + ["apps/zeren/**", "dist/windows/**", "scripts/test-windows-*.ps1",
                                  "scripts/package-windows.ps1", ".github/actions/windows-ci-setup/**",
                                  ".github/workflows/windows.yml", "crates/update/**"],
     # The simulator unit tests (and the bindings they link): the app, the FFI
@@ -430,7 +430,7 @@ def main() -> int:
 
     mobile = None
     try:
-        mobile = [d + "/**" for d in sorted(reuse.Workspace(".").closure(["zeron-mobile"]))] + ["crates/mobile-bindgen/**"]
+        mobile = [d + "/**" for d in sorted(reuse.Workspace(".").closure(["zeren-mobile"]))] + ["crates/mobile-bindgen/**"]
     except (OSError, ValueError, KeyError) as error:
         print(f"::warning::could not read the workspace ({error}); using the static mobile core list")
     selected = plan(files, tier, mobile, nightly)

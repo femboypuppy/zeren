@@ -1,9 +1,9 @@
--- What a person sent, as Zeron's transcript shows it (transcript.rs,
+-- What a person sent, as Zeren's transcript shows it (transcript.rs,
 -- `render_user_body`): a bubble of the soft wash at the right, no wider than
 -- four fifths of the column, its text the reply's size.
 --
 -- A long message folds to five lines. Its foot fades out over the last line
--- and a half rather than cutting a line in two (Zeron's #1089), and "Show
+-- and a half rather than cutting a line in two (Zeren's #1089), and "Show
 -- more" under it opens it: the bubble's height eases to the whole text,
 -- which is laid out all along behind the clip, so nothing rewraps as it
 -- opens. Whether it folds is measured, not guessed from its length: a
@@ -56,7 +56,7 @@ export type Props = {
 -- The messages opened, by id: every bubble's, outside any of them.
 local OPENED = ui.state("user_message_opened", {} :: { [string]: boolean })
 
--- An image, as a thumbnail cropped to Zeron's size, in a hairline frame
+-- An image, as a thumbnail cropped to Zeren's size, in a hairline frame
 -- (a light image on a light window would otherwise lose its edge). The box
 -- clips it to its corners, not the image: zgx's image drops its own rounded
 -- clip when `cover` crops it top and bottom (a portrait image). A click (or
@@ -90,17 +90,17 @@ local function thumb(a: Attachment, source: () -> (string, boolean), group: stri
 		group = group,
 		index = index,
 		items = images,
-		radius = ui.theme.get("zeron.prose.thumb.radius") :: number,
+		radius = ui.theme.get("zeren.prose.thumb.radius") :: number,
 		label = locale.t("ds.user_message.open_named", { name = a.name }),
 		tooltip = a.name,
-		w = "$zeron.prose.thumb.w",
-		h = "$zeron.prose.thumb.h",
+		w = "$zeren.prose.thumb.w",
+		h = "$zeren.prose.thumb.h",
 		shrink = 0,
-		rounded = "$zeron.prose.thumb.radius",
+		rounded = "$zeren.prose.thumb.radius",
 		ui.overlay {
 			w_full = true,
 			h_full = true,
-			rounded = "$zeron.prose.thumb.radius",
+			rounded = "$zeren.prose.thumb.radius",
 			overflow = "hidden",
 			border = 1,
 			border_color = "$border",
@@ -150,8 +150,8 @@ local function chip(a: Attachment): Node
 		pr = "$space.4",
 		gap = "$space.3",
 		items = "center",
-		rounded = "$zeron.prose.thumb.radius",
-		bg = "$zeron.prose.bubble.bg",
+		rounded = "$zeren.prose.thumb.radius",
+		bg = "$zeren.prose.bubble.bg",
 		label = a.name,
 		ui.row {
 			w = 36,
@@ -167,7 +167,7 @@ local function chip(a: Attachment): Node
 		ui.column {
 			min_w = 0,
 			grow = 1,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			FadeText { a.name, literal = true, text_size = "$font.size.md", color = "$text.primary", weight = "$font.weight.medium" },
 			if a.meta
 				then ui.text { a.meta, literal = true, text_size = "$font.size.xs", color = "$text.tertiary" }
@@ -197,7 +197,7 @@ return ui.component(function(props: Props): Node
 		end
 	end
 	local body = ui.ref()
-	local line = ui.theme.get("zeron.prose.line") :: number
+	local line = ui.theme.get("zeren.prose.line") :: number
 	local folded_h = LINES * line
 	-- Folds when the whole text is taller than five lines (half a point
 	-- over for rounding); `long` once measured so.
@@ -267,8 +267,8 @@ return ui.component(function(props: Props): Node
 				-- An Appshot: its picture over "{App} · Appshot" and the
 				-- window's title (the shipping app's card).
 				table.insert(attachments, ui.column {
-					w = "$zeron.prose.thumb.w",
-					gap = "$zeron.space.hair",
+					w = "$zeren.prose.thumb.w",
+					gap = "$zeren.space.hair",
 					shrink = 0,
 					label = locale.t("ds.user_message.appshot_label", { app = shot.app, title = shot.title or shot.app }),
 					thumb(a, from, group, images, shown, pictures),
@@ -288,7 +288,7 @@ return ui.component(function(props: Props): Node
 		gap = "$space.2",
 		role = "article",
 		label = locale.t("ds.user_message.you"),
-		-- What came with it rides above the words, at the right, as Zeron's do
+		-- What came with it rides above the words, at the right, as Zeren's do
 		-- (not part of a selection of the words: it isn't what was said).
 		if #attachments > 0
 			then ui.row { selectable = false, max_w = "80%", flex_wrap = true, justify = "end", gap = "$space.2", attachments }
@@ -297,9 +297,9 @@ return ui.component(function(props: Props): Node
 			min_w = 0,
 			max_w = "80%",
 			px = "$space.4",
-			py = "$zeron.space.snug",
-			rounded = "$zeron.prose.bubble.radius",
-			bg = "$zeron.prose.bubble.bg",
+			py = "$zeren.space.snug",
+			rounded = "$zeren.prose.bubble.radius",
+			bg = "$zeren.prose.bubble.bg",
 			-- The clip over the whole text: five lines while folded, fading at
 			-- its foot; open, as tall as the text, the space easing between.
 			ui.column {

@@ -8,7 +8,7 @@ local EmptyState = require("@ds/empty_state")
 local route = require("@app/screens/shell/route")
 local boundary = require("@app/screens/shell/boundary")
 
--- No project yet (Zeron's first launch): one thing to do, in the
+-- No project yet (Zeren's first launch): one thing to do, in the
 -- composer's place (the shell holds the composer back meanwhile).
 local function first_project(): Node
 	return EmptyState {

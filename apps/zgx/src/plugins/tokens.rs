@@ -12,8 +12,8 @@
 //!   formula's TeX) with "messages.read", or for a plugin allowed to change
 //!   how those blocks show (`blocks_read`), else nothing.
 //!
-//! The app's scripts make tokens with `zeron.file_token(path)` and
-//! `zeron.block_token(value)` (`ui.call_sync`), which no plugin reaches
+//! The app's scripts make tokens with `zeren.file_token(path)` and
+//! `zeren.block_token(value)` (`ui.call_sync`), which no plugin reaches
 //! (never exposed). A token is a keyed hash, its key this run's own: the
 //! same file the same token, all run long; nothing in it says the path.
 
@@ -104,14 +104,14 @@ pub fn block_of(token: &str) -> Option<Value> {
     TOKENS.with(|t| t.blocks.borrow().get(token).cloned())
 }
 
-/// The app's: making tokens (`zeron.file_token`, `zeron.block_token`).
+/// The app's: making tokens (`zeren.file_token`, `zeren.block_token`).
 /// Never exposed, so no plugin calls them.
 pub fn install(host: &ScriptHost) {
-    host.function("zeron.file_token", |path: Value| match path {
+    host.function("zeren.file_token", |path: Value| match path {
         Value::Str(path) => Value::from(file(&path).as_str()),
         _ => Value::Nil,
     });
-    host.function("zeron.block_token", |value: Value| match value {
+    host.function("zeren.block_token", |value: Value| match value {
         Value::Nil => Value::Nil,
         value => Value::from(block(&value).as_str()),
     });

@@ -1,4 +1,4 @@
--- Icons: Zeron's own (crates/ui/assets/icons, Solar Linear), drawn in the
+-- Icons: Zeren's own (crates/ui/assets/icons, Solar Linear), drawn in the
 -- colour of the text around them (a button's, hover included).
 -- `Icon { name = "plus", size = 16 }`.
 
@@ -121,7 +121,7 @@ export type Name =
 	| "tag"
 	| "inbox"
 	| "chat-add"
-	-- Settings' pages, as Zeron's settings sidebar names them: a person, a
+	-- Settings' pages, as Zeren's settings sidebar names them: a person, a
 	-- group of people, tuning dials, a plug, a wallet.
 	| "user-rounded"
 	| "users-group-rounded"
@@ -165,7 +165,7 @@ end
 -- `src`, its stroke the theme's, those points at any `size`. (The source is
 -- 24 units across, drawn `size` points across.)
 local function in_glyph_stroke(src: string, size: number): string
-	local points = (ui.theme.get("zeron.glyph.stroke") :: number?) or 1.1667
+	local points = (ui.theme.get("zeren.glyph.stroke") :: number?) or 1.1667
 	return (string.gsub(src, 'stroke%-width="[%d%.]+"', `stroke-width="{points * 24 / size}"`))
 end
 

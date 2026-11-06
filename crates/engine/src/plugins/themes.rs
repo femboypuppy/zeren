@@ -1,19 +1,19 @@
 //! Themes for agents: the theme tools' methods (`ListThemes`, `GetTheme`,
 //! `CreateTheme`, `UpdateTheme`, `DeleteTheme`, `UseTheme`) over this
 //! device's library and choice in the data dir, through the catalogue the
-//! window shares (`zeron_theme::catalog`). A theme is data, so nothing here
+//! window shares (`zeren_theme::catalog`). A theme is data, so nothing here
 //! asks the person: it holds colours and a name, never code, and only yours
 //! can be changed or deleted. Each change is told to the window
 //! (`WatchThemes`), which reads the files again and restyles.
 //!
-//! These are local-only (`zeron_rpc::local_only`): a peer device never reads
+//! These are local-only (`zeren_rpc::local_only`): a peer device never reads
 //! or writes another's themes, as a device's templates are its own.
 
 use std::path::Path;
 
 use serde_json::{Value as Json, json};
-use zeron_rpc::methods;
-use zeron_theme::catalog;
+use zeren_rpc::methods;
+use zeren_theme::catalog;
 
 use super::guides;
 
@@ -87,7 +87,7 @@ mod tests {
     use super::*;
 
     fn palette(seed: &str) -> Json {
-        let v = zeron_theme::builtin_registry().families.iter().flat_map(|f| &f.variants).find(|v| v.id == seed).unwrap();
+        let v = zeren_theme::builtin_registry().families.iter().flat_map(|f| &f.variants).find(|v| v.id == seed).unwrap();
         catalog::Palette::of(v).to_json(None)
     }
 

@@ -1,14 +1,14 @@
 #!/bin/sh
-# fake antigravity acp server for zeron-harness tests.
+# fake antigravity acp server for zeren-harness tests.
 #
 # mirrors the wire shapes of agy_acp_server 1.1.1: effort baked into model
 # ids, a default/auto_edit/yolo mode select, auth_required (-32000) on
 # session/new for a cwd containing "needs-login", and an `authenticate` that
 # prints its sign-in url to stderr like the real browser flow. the prompt
-# reply echoes every config option zeron set. a cwd containing "yolo-current"
+# reply echoes every config option zeren set. a cwd containing "yolo-current"
 # opens the session in yolo, one containing "reject-mode" refuses mode sets,
 # and a "permissions" prompt asks to read, edit and run before replying with
-# the option zeron picked for each.
+# the option zeren picked for each.
 
 emit() { printf '%s\n' "$1"; }
 rid() { printf '%s' "$1" | sed 's/.*"id":\([0-9]*\).*/\1/'; }
@@ -24,7 +24,7 @@ EMPTY=0
 REJECT_MODE=0
 CURRENT=$OPTIONS
 # ask $1 = kind, $2 = toolCall extras: one permission request, then the
-# picked option id (or "cancelled") from zeron's answer. runs in a command
+# picked option id (or "cancelled") from zeren's answer. runs in a command
 # substitution, so the request goes out on fd 3 (the real stdout).
 exec 3>&1
 ask() {

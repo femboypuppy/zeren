@@ -72,7 +72,7 @@ pub enum BrowserEvent {
     Close,
     /// An element the user picked; `last` ends the pick (focus the composer).
     Annotation {
-        annotation: zeron_proto::annotation::BrowserAnnotation,
+        annotation: zeren_proto::annotation::BrowserAnnotation,
         /// The page's marker for the element, labelled once numbered.
         marker: u32,
         last: bool,
@@ -105,7 +105,7 @@ const MAX_ANNOTATION_PICKS: usize = 24;
 #[cfg(any(target_os = "macos", target_os = "linux", windows))]
 const MAX_ANNOTATION_MISSES: u32 = 20;
 
-/// The overlay's palette and type, so the page chrome reads as Zeron's.
+/// The overlay's palette and type, so the page chrome reads as Zeren's.
 #[cfg(any(target_os = "macos", target_os = "linux", windows))]
 fn annotation_theme(cx: &App) -> serde_json::Value {
     let theme = crate::theme::Theme::of(cx);
@@ -176,7 +176,7 @@ pub struct BrowserSurface {
     address_edited: bool,
     validation: Option<String>,
     remote: bool,
-    previews: zeron_proto::PreviewSnapshot,
+    previews: zeren_proto::PreviewSnapshot,
     previews_loading: bool,
     previews_task: Option<gpui::Task<()>>,
     #[cfg(feature = "browser-fixture")]
@@ -261,7 +261,7 @@ impl BrowserSurface {
             address_edited: false,
             validation: None,
             remote,
-            previews: zeron_proto::PreviewSnapshot::default(),
+            previews: zeren_proto::PreviewSnapshot::default(),
             previews_loading: true,
             previews_task: None,
             #[cfg(feature = "browser-fixture")]
@@ -355,7 +355,7 @@ impl BrowserSurface {
     }
 
     #[cfg(feature = "browser-fixture")]
-    pub fn fixture_previews(&self) -> zeron_proto::PreviewSnapshot {
+    pub fn fixture_previews(&self) -> zeren_proto::PreviewSnapshot {
         self.previews.clone()
     }
     #[cfg(feature = "browser-fixture")]
@@ -376,14 +376,14 @@ impl BrowserSurface {
                 let subscription = handle
                     .client()
                     .subscribe(
-                        zeron_rpc::methods::WATCH_PREVIEWS,
+                        zeren_rpc::methods::WATCH_PREVIEWS,
                         serde_json::json!({"chatId": chat_id}),
                     )
                     .await;
                 if let Ok(mut updates) = subscription {
                     while let Some(value) = updates.recv().await {
                         if let Ok(snapshot) =
-                            serde_json::from_value::<zeron_proto::PreviewSnapshot>(value)
+                            serde_json::from_value::<zeren_proto::PreviewSnapshot>(value)
                         {
                             if this
                                 .update(cx, |this, cx| {
@@ -559,7 +559,7 @@ impl BrowserSurface {
         // Below 2^32, so the page's JavaScript numbers hold it exactly.
         let nonce = (uuid::Uuid::new_v4().as_u128() as u32).max(1);
         self.evaluate(&format!(
-            "{ANNOTATE_SCRIPT}\n;window.__zeronAnnotator.start({nonce}, {}); 'started'",
+            "{ANNOTATE_SCRIPT}\n;window.__zerenAnnotator.start({nonce}, {}); 'started'",
             annotation_theme(cx)
         ));
         #[cfg(windows)]
@@ -576,7 +576,7 @@ impl BrowserSurface {
                         .is_some_and(|session| session.nonce == nonce);
                     if live {
                         this.evaluate(&format!(
-                            "(() => {{ const a = window.__zeronAnnotator; return a ? a.take({nonce}) : '{{\"state\":\"gone\"}}'; }})()"
+                            "(() => {{ const a = window.__zerenAnnotator; return a ? a.take({nonce}) : '{{\"state\":\"gone\"}}'; }})()"
                         ));
                     }
                     live
@@ -602,7 +602,7 @@ impl BrowserSurface {
     pub fn stop_annotation(&mut self, cx: &mut Context<Self>) {
         #[cfg(any(target_os = "macos", target_os = "linux", windows))]
         if self.annotation.take().is_some() {
-            self.evaluate("(() => { window.__zeronAnnotator?.stop(); return 'stopped'; })()");
+            self.evaluate("(() => { window.__zerenAnnotator?.stop(); return 'stopped'; })()");
             cx.emit(BrowserEvent::Changed);
             cx.notify();
         }
@@ -617,7 +617,7 @@ impl BrowserSurface {
         #[derive(serde::Deserialize)]
         struct Pick {
             #[serde(flatten)]
-            annotation: zeron_proto::annotation::BrowserAnnotation,
+            annotation: zeren_proto::annotation::BrowserAnnotation,
             #[serde(default)]
             marker: u32,
         }
@@ -663,7 +663,7 @@ impl BrowserSurface {
     pub fn label_marker(&self, marker: u32, number: u32) {
         #[cfg(any(target_os = "macos", target_os = "linux", windows))]
         self.evaluate(&format!(
-            "(() => {{ window.__zeronAnnotator?.label({marker}, {number}); return 'ok'; }})()"
+            "(() => {{ window.__zerenAnnotator?.label({marker}, {number}); return 'ok'; }})()"
         ));
         #[cfg(not(any(target_os = "macos", target_os = "linux", windows)))]
         let _ = (marker, number);
@@ -673,7 +673,7 @@ impl BrowserSurface {
     pub fn keep_markers(&self, numbers: &[u32]) {
         #[cfg(any(target_os = "macos", target_os = "linux", windows))]
         self.evaluate(&format!(
-            "(() => {{ window.__zeronAnnotator?.keep({numbers:?}); return 'ok'; }})()"
+            "(() => {{ window.__zerenAnnotator?.keep({numbers:?}); return 'ok'; }})()"
         ));
         #[cfg(not(any(target_os = "macos", target_os = "linux", windows)))]
         let _ = numbers;
@@ -683,7 +683,7 @@ impl BrowserSurface {
     pub fn focus_marker(&self, number: Option<u32>) {
         #[cfg(any(target_os = "macos", target_os = "linux", windows))]
         self.evaluate(&format!(
-            "(() => {{ window.__zeronAnnotator?.focus({}); return 'ok'; }})()",
+            "(() => {{ window.__zerenAnnotator?.focus({}); return 'ok'; }})()",
             number.unwrap_or(0)
         ));
         #[cfg(not(any(target_os = "macos", target_os = "linux", windows)))]
@@ -903,7 +903,7 @@ impl BrowserContext {
             if native::persistent_profiles_supported() {
                 let profile = profile::BrowserProfile::for_workspace(
                     data_dir,
-                    Some(zeron_proto::WorkspaceScope::Local),
+                    Some(zeren_proto::WorkspaceScope::Local),
                     None,
                     Some(device),
                 )

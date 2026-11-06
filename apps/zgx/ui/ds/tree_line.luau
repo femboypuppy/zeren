@@ -2,10 +2,10 @@
 -- mark, drawn in one even tone. The lines are the text's ink, faint, so two
 -- strokes laid over each other go darker where they cross: a trunk and an
 -- arm stroked apart double along the curve, where it leaves the trunk. So
--- the two are one outline, filled once (as Zeron's `activity_rail` unions
+-- the two are one outline, filled once (as Zeren's `activity_rail` unions
 -- them), and the tone holds through the joint.
 --
--- `c:fill(tree_line.branch { x = 12, mid = 13, tip = 24, h = 28, bend = 6, on = true }, "$zeron.tree")`
+-- `c:fill(tree_line.branch { x = 12, mid = 13, tip = 24, h = 28, bend = 6, on = true }, "$zeren.tree")`
 -- `on`: the trunk goes on below the arm; `h` is where it stops.
 
 local M = {}

@@ -275,7 +275,7 @@ local function cropper(): Node
 			relative = true,
 			rounded = "$radius.full",
 			overflow = "hidden",
-			bg = "$zeron.secondary.bg",
+			bg = "$zeren.secondary.bg",
 			cursor = "grab",
 			role = "img",
 			label = ui.t("settings.profile.photo.preview"),
@@ -554,11 +554,11 @@ local function missing(): Node
 			h = H * ZOOM,
 			shrink = 0,
 			p = "$space.3",
-			rounded = "$zeron.card.radius",
+			rounded = "$zeren.card.radius",
 			border = 1,
 			border_dash = { 4, 4 },
 			border_color = "$border.strong",
-			ui.text { "zeron", font = "$font.sans", weight = "$font.weight.bold", text_size = "$font.size.xs", color = "$text.disabled" },
+			ui.text { "zeren", font = "$font.sans", weight = "$font.weight.bold", text_size = "$font.size.xs", color = "$text.disabled" },
 		},
 		ui.text { ui.t("settings.profile.card.none"), text_size = "$font.size.sm", line_height = "$font.line.sm", color = "$text.tertiary" },
 		ds.Button {
@@ -592,7 +592,7 @@ local function aside(): Node
 			elseif k == "none" then
 				return missing()
 			end
-			return ui.div { w = CARD_W, h = H * ZOOM, rounded = "$zeron.card.radius", bg = "$zeron.secondary.bg" }
+			return ui.div { w = CARD_W, h = H * ZOOM, rounded = "$zeren.card.radius", bg = "$zeren.secondary.bg" }
 		end, { enter = { opacity = { 0, 1 }, duration = 160 }, exit = { opacity = 0, duration = 80 }, mode = "wait" }) },
 		true
 	)
@@ -606,7 +606,7 @@ end
 -- yours will be, made out to you, where your card stands once you're in;
 -- what an account gives, as the rows the page will hold; and the one way
 -- in, where Save changes stands (setup, as signing out leaves you).
-local PREVIEW_SEED = "zeron-account-preview"
+local PREVIEW_SEED = "zeren-account-preview"
 local function today(): string
 	local d = os.date("*t") :: any
 	return api.since(string.format("%04d-%02d-%02d", d.year, d.month, d.day))

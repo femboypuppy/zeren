@@ -1,9 +1,9 @@
--- Settings → About & updates: which Zeron this is, and its updates, as the
+-- Settings → About & updates: which Zeren this is, and its updates, as the
 -- shipping app has them (its About panel and "Check for Updates…", crates/ui
 -- app_menus.rs, app_update.rs; the engine's updater, crates/update).
 --
--- As the Zeron app (the beta: `self_updating`), it updates itself as
--- Zeron.app does (src/about.rs): a new version downloads in the background,
+-- As the Zeren app (the beta: `self_updating`), it updates itself as
+-- Zeren.app does (src/about.rs): a new version downloads in the background,
 -- "Restart to update" installs it, and one nobody restarted for installs on
 -- quit. "Get beta updates" chooses the release channel; leaving beta goes
 -- back to Stable even when that's an older version.
@@ -172,7 +172,7 @@ function M.describe(a: About, doing: string): Update
 	end
 	local retry = ui.t("common.retry"):get()
 	if a.self_updating then
-		-- The Zeron app's own updates (Zeron.app's lifecycle).
+		-- The Zeren app's own updates (Zeren.app's lifecycle).
 		local mine = a.app_version
 		if doing == "checking" then
 			return { title = s("checking"), line = s("checking_line") }
@@ -244,7 +244,7 @@ end
 -- reads them).
 function M.summary(a: About): string
 	local lines = {
-		`Zeron engine: {a.engine_version or "not connected"}`,
+		`Zeren engine: {a.engine_version or "not connected"}`,
 	}
 	if a.engine_build then
 		table.insert(lines, `Engine build: {a.engine_build}`)
@@ -281,7 +281,7 @@ function M.view(): Node
 		ds.Settings.Section {
 			ds.Settings.Group {
 				row("version", {
-					label = "Zeron",
+					label = "Zeren",
 					description = function(): string
 						return M.build(M.now:get().engine_build) or ui.t("settings.about.version.description"):get()
 					end,

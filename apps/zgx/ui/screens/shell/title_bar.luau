@@ -1,5 +1,5 @@
 -- The main window's title bar: the design system's (ds.TitleBar: the
--- window's buttons, the sidebar's toggle, back and forward, at Zeron's
+-- window's buttons, the sidebar's toggle, back and forward, at Zeren's
 -- places), over the window's top, its island showing while the sidebar is
 -- collapsed over a new chat's wallpaper. At its other end, the page's own
 -- controls: on a session, its panel's toggle. Plugins place theirs by
@@ -45,7 +45,7 @@ local function corner_card(size: number): Node
 			w = (18 + stroke) * s,
 			h = (16 + stroke) * s,
 			rounded = raw((4 + stroke / 2) * s),
-			border = "$zeron.glyph.stroke",
+			border = "$zeren.glyph.stroke",
 			border_color = "$text.secondary",
 		},
 		ui.div {
@@ -74,9 +74,9 @@ return function(props: Props): Node
 	local actions = ui.row {
 		id = "titlebar-actions",
 		items = "center",
-		gap = "$zeron.island.gap",
+		gap = "$zeren.island.gap",
 		-- The session's details (its lanes: side chats and subagents), as
-		-- Zeron's titlebar toggle: its count while any run, open or not.
+		-- Zeren's titlebar toggle: its count while any run, open or not.
 		ui.show(
 			function(): boolean
 				local l = lanes()
@@ -121,7 +121,7 @@ return function(props: Props): Node
 						items = "center",
 						justify = "center",
 						rounded = "$radius.full",
-						bg = "$zeron.status.working",
+						bg = "$zeren.status.working",
 						pointer_events = "none",
 						ui.text {
 							function(): string

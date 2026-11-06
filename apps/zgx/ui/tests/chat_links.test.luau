@@ -1,4 +1,4 @@
--- A transcript's file links, read as Zeron reads them (crates/ui
+-- A transcript's file links, read as Zeren reads them (crates/ui
 -- workspace_links.rs, its tests' cases): screens/chat/file_links `resolve`.
 
 local links = require("../screens/chat/file_links")
@@ -16,7 +16,7 @@ test("relative, absolute and file:// links resolve inside the project, with thei
 	expect(at("crates/ui/src/lib.rs")).to_be("crates/ui/src/lib.rs|-|-|in")
 	expect(at("/work/comet/crates/ui/src/lib.rs:42:7")).to_be("crates/ui/src/lib.rs|42|7|in")
 	expect(at("file:///work/comet/README.md#L12")).to_be("README.md|12|-|in")
-	expect(at("zeron-file:src/a%20file%23%5Bx%5D.rs")).to_be("src/a file#[x].rs|-|-|in")
+	expect(at("zeren-file:src/a%20file%23%5Bx%5D.rs")).to_be("src/a file#[x].rs|-|-|in")
 end)
 
 test("paths decode once; unsafe decodes never resolve", function()

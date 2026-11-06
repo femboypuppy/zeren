@@ -1,19 +1,19 @@
 -- What the composer's `/` and `$` offer: the agent's slash commands and
 -- skills for where it works (a chat's folder, or a new chat's project, on
--- its device), as Zeron's composer finds them (crates/ui/src/composer.rs):
+-- its device), as Zeren's composer finds them (crates/ui/src/composer.rs):
 -- read from the engine by the host (`chat.invocations`, src/completion.rs),
 -- commands first in the agent's order, then its enabled skills, each with
 -- what it does.
 --
 -- Each list is kept by agent and place (kept state: a reload reads none
 -- again) and read again each time a `/` or `$` opens afresh, the last list
--- showing meanwhile, as Zeron's does.
+-- showing meanwhile, as Zeren's does.
 --
 -- A command or skill picked lands in the draft as its token (`/review`,
 -- `$code-review`); what it stands for is remembered, and the send writes
--- each such token as its canonical reference (`[/review](zeron-invoke:…)`),
+-- each such token as its canonical reference (`[/review](zeren-invoke:…)`),
 -- which the engine gives each agent in its own form. A token typed by hand,
--- not picked, stays the words it is (Zeron's: only references made by
+-- not picked, stays the words it is (Zeren's: only references made by
 -- completion are read).
 
 local M = {}

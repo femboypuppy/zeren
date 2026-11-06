@@ -27,9 +27,9 @@ over an image, on Windows.
    `ui.window.popups_blur`, or `backdrop_blur` falling back to the fill made
    opaque), so an app draws its glass solid there.
 
-**Zeron meanwhile:** the host says `system.popups_blur = false` on Windows
+**Zeren meanwhile:** the host says `system.popups_blur = false` on Windows
 (`src/transparency.rs`), and `ds/material.menus_see_through()` makes the
-menus' glass solid there (`$zeron.menu.solid`, as Windows draws its own
+menus' glass solid there (`$zeren.menu.solid`, as Windows draws its own
 non-activated menus). In-window glass keeps its blur.
 
 **Seen on:** zgx `99a50ad5`, unchanged at `e46ff6fc`; Windows 11 26200.

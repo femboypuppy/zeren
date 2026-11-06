@@ -5,14 +5,14 @@
 //! directory. Typed text arrives through the focused field's input handler,
 //! where the platform delivers typing.
 //!
-//!     cargo build -p zeron-ui --example new-project-path-fixture \
+//!     cargo build -p zeren-ui --example new-project-path-fixture \
 //!         --features project-path-fixture
 //!     target/debug/examples/new-project-path-fixture /tmp/new-project-path
 //!
 //! Writes PNG stills, `new-project-path.mp4` (needs `ffmpeg` on PATH) and
 //! `result.txt`, the checks made against the palette and the engine's
 //! registry. The window is shown and activated for the run, about a minute.
-//! The scratch home is `/tmp/zeron-demo/ana`, and only its folders are
+//! The scratch home is `/tmp/zeren-demo/ana`, and only its folders are
 //! created; the Locations step lists the boot volume alone (see
 //! [`BootVolumeOnly`]). The engine has no agent harnesses, so no installed
 //! agent CLI is started.
@@ -29,10 +29,10 @@ use std::{
     sync::{Arc, Mutex, mpsc},
     time::{Duration, Instant},
 };
-use zeron_ui::*;
+use zeren_ui::*;
 
 const FPS: u32 = 30;
-const HOME: &str = "/tmp/zeron-demo/ana";
+const HOME: &str = "/tmp/zeren-demo/ana";
 const WINDOW: (f32, f32) = (1100.0, 760.0);
 
 /// The scratch home: everyday folders and a few repositories (`.git`).
@@ -43,10 +43,10 @@ const TREE: &[&str] = &[
     "Music",
     "Pictures",
     "notes",
-    "code/opensource/zeron/.git",
-    "code/opensource/zeron/apps",
-    "code/opensource/zeron/crates",
-    "code/opensource/zeron/docs",
+    "code/opensource/zeren/.git",
+    "code/opensource/zeren/apps",
+    "code/opensource/zeren/crates",
+    "code/opensource/zeren/docs",
     "code/opensource/gpui/.git",
     "code/opensource/helix/.git",
     "code/work/api/.git",
@@ -64,16 +64,16 @@ fn main() -> anyhow::Result<()> {
     // neutral device name.
     unsafe {
         std::env::set_var("HOME", HOME);
-        std::env::set_var("ZERON_DEVICE_NAME", "Studio Mac");
+        std::env::set_var("ZEREN_DEVICE_NAME", "Studio Mac");
     }
     tracing_subscriber::fmt().with_env_filter("warn").init();
     let temp = tempfile::tempdir()?;
     let runtime = tokio::runtime::Runtime::new()?;
     let core = runtime.block_on(async {
-        zeron_engine::EngineCore::assemble(
+        zeren_engine::EngineCore::assemble(
             &temp.path().join("engine"),
-            Arc::new(zeron_engine::HarnessRegistry::new()),
-            zeron_proto::HarnessId::Mock,
+            Arc::new(zeren_engine::HarnessRegistry::new()),
+            zeren_proto::HarnessId::Mock,
             None,
         )
     })?;
@@ -84,7 +84,7 @@ fn main() -> anyhow::Result<()> {
         .port();
     // Publishes the IPC bearer where the attaching viewport looks for it.
     let service = Arc::new(BootVolumeOnly(core.rpc_service()));
-    let _ipc = runtime.block_on(zeron_engine::serve_ipc(ipc_port, &data, service))?;
+    let _ipc = runtime.block_on(zeren_engine::serve_ipc(ipc_port, &data, service))?;
     let boot = EngineBootConfig {
         data_dir: data.clone(),
         ipc_port,
@@ -92,7 +92,7 @@ fn main() -> anyhow::Result<()> {
         edge_token: None,
         org_id: None,
         workos_client_id: None,
-        default_harness: zeron_proto::HarnessId::Mock,
+        default_harness: zeren_proto::HarnessId::Mock,
     };
     let handle = runtime.block_on(state::EngineHandle::bootstrap(boot.clone()))?;
     let device = core.device_id.clone();
@@ -105,7 +105,7 @@ fn main() -> anyhow::Result<()> {
             gpui_tokio::init(cx);
             gpui_base::init(cx);
             let mut settings = settings::UiSettings::default();
-            settings.surface = zeron_theme::SurfacePreference::Opaque;
+            settings.surface = zeren_theme::SurfacePreference::Opaque;
             settings.github_star_banner_dismissed = true;
             settings::init(settings.clone(), data.clone(), cx);
             let fonts = typography::register_fonts(cx);
@@ -143,8 +143,8 @@ fn main() -> anyhow::Result<()> {
             let state = cx.new(|_| {
                 let mut s = state::AppState::new();
                 s.fixture_attachment_engine(handle);
-                s.connection = zeron_proto::view::ConnectionStatus::Ready;
-                s.workspace_scope = Some(zeron_proto::WorkspaceScope::Development);
+                s.connection = zeren_proto::view::ConnectionStatus::Ready;
+                s.workspace_scope = Some(zeren_proto::WorkspaceScope::Development);
                 s.local_device_id = Some(device.clone());
                 s.devices = serde_json::from_value(serde_json::json!([
                     {"id": device, "name": "Studio Mac", "platform": "macos", "lastSeenAt": null}
@@ -215,23 +215,23 @@ fn main() -> anyhow::Result<()> {
 /// The engine as the window sees it, except that the Locations step lists
 /// the boot volume alone: the film and stills don't depend on, or show,
 /// what the capturing machine has mounted.
-struct BootVolumeOnly(Arc<dyn zeron_rpc::RpcService>);
+struct BootVolumeOnly(Arc<dyn zeren_rpc::RpcService>);
 
 #[async_trait::async_trait]
-impl zeron_rpc::RpcService for BootVolumeOnly {
+impl zeren_rpc::RpcService for BootVolumeOnly {
     async fn handle(
         &self,
         method: &str,
         params: serde_json::Value,
-    ) -> Result<zeron_rpc::RpcReply, zeron_rpc::RpcError> {
+    ) -> Result<zeren_rpc::RpcReply, zeren_rpc::RpcError> {
         Ok(match self.0.handle(method, params).await? {
-            zeron_rpc::RpcReply::Value(mut listing)
-                if method == zeron_rpc::methods::LIST_DRIVES =>
+            zeren_rpc::RpcReply::Value(mut listing)
+                if method == zeren_rpc::methods::LIST_DRIVES =>
             {
                 if let Some(drives) = listing["drives"].as_array_mut() {
                     drives.retain(|drive| drive["path"] == "/");
                 }
-                zeron_rpc::RpcReply::Value(listing)
+                zeren_rpc::RpcReply::Value(listing)
             }
             reply => reply,
         })
@@ -463,7 +463,7 @@ impl Run {
     async fn film(
         &self,
         cx: &mut AsyncApp,
-        registry: &zeron_engine::WorkspaceHost,
+        registry: &zeren_engine::WorkspaceHost,
         device: &str,
     ) -> anyhow::Result<Vec<String>> {
         pause(cx, 1500).await;
@@ -520,7 +520,7 @@ impl Run {
     async fn scenes(
         &self,
         cx: &mut AsyncApp,
-        registry: &zeron_engine::WorkspaceHost,
+        registry: &zeren_engine::WorkspaceHost,
         device: &str,
     ) -> anyhow::Result<()> {
         let home = HOME;
@@ -554,15 +554,15 @@ impl Run {
         self.expect(
             cx,
             "⇥ completes each folder from the device's real listing",
-            "field=Some(\"~/code/opensource/zeron/\")",
+            "field=Some(\"~/code/opensource/zeren/\")",
         )?;
         self.still(cx, "03-completed-path")?;
         self.press(cx, "cmd-enter", "⌘↵")?;
         pause(cx, 1600).await;
-        let zeron = format!("{home}/code/opensource/zeron");
+        let zeren = format!("{home}/code/opensource/zeren");
         self.expect_closed(cx, "⌘↵ opens the typed folder and adds it as a project")?;
-        self.expect_project(registry, device, &zeron)?;
-        self.expect_selected(cx, &zeron)?;
+        self.expect_project(registry, device, &zeren)?;
+        self.expect_selected(cx, &zeren)?;
         self.still(cx, "04-project-added")?;
 
         // 2 · Browsing, then editing the open folder's path.
@@ -838,7 +838,7 @@ impl Run {
     /// The engine's own registry holds the project: the device and folder.
     fn expect_project(
         &self,
-        registry: &zeron_engine::WorkspaceHost,
+        registry: &zeren_engine::WorkspaceHost,
         device: &str,
         path: &str,
     ) -> anyhow::Result<()> {

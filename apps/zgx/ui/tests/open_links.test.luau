@@ -1,4 +1,4 @@
--- "Open links in Zeron": a web link in a reply goes to the app's opener
+-- "Open links in Zeren": a web link in a reply goes to the app's opener
 -- (the shell's: the panel's browser tab) when one is set, and to the system
 -- otherwise; a file link is never the opener's. On ui/chat_fixture.luau.
 

@@ -33,10 +33,10 @@ const settle = async (provider: SandboxProvider, id: string, want: SandboxState)
 describe.each(providers)("%s provider contract", (_name, make) => {
   it("creates idempotently, runs, stops, resumes, meters and deletes", async () => {
     const provider = make();
-    const request = { idempotencyKey: "dev-g1", env: { ZERON_X: "1" }, machine: "default" as const, ttlSeconds: 7200 };
+    const request = { idempotencyKey: "dev-g1", env: { ZEREN_X: "1" }, machine: "default" as const, ttlSeconds: 7200 };
     const { sandboxId } = await provider.create(request);
     expect((await provider.create(request)).sandboxId).toBe(sandboxId);
-    await expect(provider.create({ ...request, env: { ZERON_X: "2" } })).rejects.toMatchObject({ kind: "conflict" });
+    await expect(provider.create({ ...request, env: { ZEREN_X: "2" } })).rejects.toMatchObject({ kind: "conflict" });
 
     expect(await settle(provider, sandboxId, "ready")).toBe("ready");
     expect((await provider.exec(sandboxId, { command: "true", timeoutSeconds: 10 })).exitCode).toBe(0);

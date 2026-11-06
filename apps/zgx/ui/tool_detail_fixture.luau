@@ -24,7 +24,7 @@ local ToolDetail = require("@ds/tool_detail")
 local fetches = ui.state("test_tool_fetches", "")
 local fail = ui.state("test_tool_fail", false)
 local generation = ui.state("test_tool_generation", 1)
-local stream = ui.state("test_tool_stream", "Compiling zeron\n")
+local stream = ui.state("test_tool_stream", "Compiling zeren\n")
 local whole = ui.state("test_tool_whole", "ok")
 local release = ui.state("test_tool_release", 0)
 

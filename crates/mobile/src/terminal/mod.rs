@@ -2,7 +2,7 @@
 //!
 //! A [`TerminalSession`] joins three things: the client's [`TerminalLink`]
 //! (output stream with resume, batched numbered input), the desktop's own
-//! emulator and echo predictor (`zeron-term`), and the platform's
+//! emulator and echo predictor (`zeren-term`), and the platform's
 //! [`TerminalListener`]. The platform pulls a [`TerminalFrame`] — rows of
 //! styled runs with colors resolved for the appearance — and paints it on a
 //! monospace grid; keys, touches and scrolling come back through here so
@@ -19,7 +19,7 @@
 //!   full-screen program's screen, taps as clicks when it tracks the
 //!   pointer, focus changes when it wants them.
 //!
-//! [`TerminalLink`]: zeron_client::TerminalLink
+//! [`TerminalLink`]: zeren_client::TerminalLink
 
 mod color;
 mod keys;
@@ -29,9 +29,9 @@ use std::sync::{Arc, Mutex, Weak};
 use std::time::Instant;
 
 pub use keys::{KeyModifiers, TerminalKey};
-use zeron_client as zc;
-use zeron_term::emulator::{CellColor, CellSnapshot, CursorShape, Emulator, SelectionType, Side};
-use zeron_term::predict::Predictor;
+use zeren_client as zc;
+use zeren_term::emulator::{CellColor, CellSnapshot, CursorShape, Emulator, SelectionType, Side};
+use zeren_term::predict::Predictor;
 
 use crate::client_ffi::{CoreClient, CoreError, CoreResult};
 

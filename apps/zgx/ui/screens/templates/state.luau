@@ -1,26 +1,26 @@
 --!strict
--- Your templates, as the host publishes them (src/plugins/live.rs): Zeron's
+-- Your templates, as the host publishes them (src/plugins/live.rs): Zeren's
 -- own first, then each one made here, which is in use, and how each stands.
 --
 --   state.now:get()   { state = "loading" | "ready", active = id, dir,
 --                       list = { Template } }
 --   state.previews:get()  each template's preview themes by its id: one a
---                         changed appearance (light, then dark), Zeron's
+--                         changed appearance (light, then dark), Zeren's
 --                         own two for one that changes none
 --   state.use(id)            a promise: the window changes to it, in place
---   state.create(name)       a promise of the new one's id (a copy of Zeron's)
+--   state.create(name)       a promise of the new one's id (a copy of Zeren's)
 --   state.duplicate(id)      a promise of the copy's id
---   state.delete(id)         a promise (Zeron's own can't be)
+--   state.delete(id)         a promise (Zeren's own can't be)
 --   state.open_folder(id)    its folder in Finder
 --   state.yours(t)           whether you (or your agents) made it
 --   state.export(id, path)   a promise of `{ path, files }`: it, signed as
---                            yours, as one .zeron-template file
+--                            yours, as one .zeren-template file
 --   state.import(from)       from a file (`path`, or `{ path }`) or a link
---                            (`{ url }`: a .zeron-template's, or a GitHub
+--                            (`{ url }`: a .zeren-template's, or a GitHub
 --                            repository or release with one): a promise of
 --                            `{ installed = id, name }` (yours), or
 --                            `{ pending = name }` (someone else's: the host
---                            opens Zeron's consent window for it)
+--                            opens Zeren's consent window for it)
 --   state.check_updates()    a promise: each one from a package checked
 --                            where it came from for a newer version
 --   state.update(id)         a promise of `{ updated, name, version, from }`:
@@ -38,12 +38,12 @@ export type Template = {
 	description: string?,
 	author: string?,
 	version: string?,
-	-- The Zeron it was made from.
-	zeron_version: string?,
+	-- The Zeren it was made from.
+	zeren_version: string?,
 	builtin: boolean,
 	active: boolean,
-	-- "ok" | "broken" (it can't run: Zeron's own shows) | "errors" (some of
-	-- its files fall back) | "out_of_date" (made for another Zeron: Zeron
+	-- "ok" | "broken" (it can't run: Zeren's own shows) | "errors" (some of
+	-- its files fall back) | "out_of_date" (made for another Zeren: Zeren
 	-- has updated since)
 	status: string,
 	error: string?,
@@ -55,7 +55,7 @@ export type Template = {
 	update: { version: string, refused: string? }?,
 	-- The colours its preview is drawn in (src/plugins/looks.rs): each
 	-- appearance it changes, as its theme file and its palette over it.
-	-- None for one that changes no colour of Zeron's.
+	-- None for one that changes no colour of Zeren's.
 	look: Look?,
 }
 export type Scheme = { theme: { type: string?, extends: string?, tokens: any }?, palette: any? }
@@ -77,7 +77,7 @@ end)
 
 -- Each template's preview themes: its look registered once a change, each
 -- appearance it changes as a theme of its own (its theme file over zgx's,
--- its palette over that or over Zeron's, through ds/palettes as the window
+-- its palette over that or over Zeren's, through ds/palettes as the window
 -- wears it), so its preview is drawn in its tokens as the window would be.
 local registered: { [string]: string } = {}
 local function register(name: string, stamp: string, spec: any)
@@ -114,12 +114,12 @@ end
 M.previews = ui.state("templates_previews", {} :: { [string]: { string } })
 ui.effect(function()
 	local list = M.list:get()
-	-- Zeron's own first: what an appearance a template leaves alone shows.
+	-- Zeren's own first: what an appearance a template leaves alone shows.
 	-- (Its own theme names until the host has said its look.)
-	local own = { light = "zeron-light", dark = "zeron-dark" }
+	local own = { light = "zeren-light", dark = "zeren-dark" }
 	local out: { [string]: { string } } = {}
 	for _, t in list do
-		if t.id == "zeron" and t.look then
+		if t.id == "zeren" and t.look then
 			local names = wear(t.id, t.look, own)
 			if #names == 2 then
 				own = { light = names[1], dark = names[2] }
@@ -127,7 +127,7 @@ ui.effect(function()
 		end
 	end
 	for _, t in list do
-		local names = if t.look and t.id ~= "zeron" then wear(t.id, t.look, own) else {}
+		local names = if t.look and t.id ~= "zeren" then wear(t.id, t.look, own) else {}
 		out[t.id] = if #names > 0 then names else { own.light, own.dark }
 	end
 	M.previews:set(out)
@@ -135,7 +135,7 @@ end)
 
 -- Yours: made on this device, by you or an agent you asked (theirs say
 -- "you", or nothing, written by hand), or installed from a package you
--- signed. Zeron's own is built in; someone else's says who.
+-- signed. Zeren's own is built in; someone else's says who.
 function M.yours(t: Template): boolean
 	if t.builtin then
 		return false

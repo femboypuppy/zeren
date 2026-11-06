@@ -165,7 +165,7 @@ test("a picture smaller than the window shows at its own size, never enlarged", 
 	expect(v.w).to_be(64)
 end)
 
-test("with motion reduced (Zeron's own setting), it opens and closes as a short crossfade, nothing travelling", function()
+test("with motion reduced (Zeren's own setting), it opens and closes as a short crossfade, nothing travelling", function()
 	local app = open_box()
 	app:set_state("ds/motion.luau::motion_reduce", true)
 	app:frames(5)

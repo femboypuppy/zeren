@@ -24,7 +24,7 @@ local failed = ui.state("ex_un_failed", false)
 
 -- Usernames already spoken for, and the ones nobody gets.
 local TAKEN = { theo = true, priya = true, jonas = true, ada = true, graham = true, sam = true, lin = true }
-local RESERVED = { admin = true, zeron = true, api = true, www = true, support = true, help = true, settings = true, login = true, signup = true, about = true, me = true }
+local RESERVED = { admin = true, zeren = true, api = true, www = true, support = true, help = true, settings = true, login = true, signup = true, about = true, me = true }
 local MIN, MAX = 3, 20
 
 -- What was typed, as a username is kept: lowercase, no leading @, no
@@ -147,18 +147,18 @@ return {
 					line_height = "$font.line.sm",
 					color = function()
 						local c = check:get()
-						return if c == "taken" or c == "reserved" or c == "invalid" or c == "start" then "$zeron.tone.danger.ink" else "$text.secondary"
+						return if c == "taken" or c == "reserved" or c == "invalid" or c == "start" then "$zeren.tone.danger.ink" else "$text.secondary"
 					end,
 				},
 			},
 			ui.row {
 				items = "center",
 				status("checking", ds.ProgressRing { size = 12, tone = "neutral", label = "Checking the username" }, "Checking", "$text.tertiary"),
-				status("available", mark("check-circle"), "Available", "$zeron.tone.success.ink"),
-				status("taken", mark("close-circle"), "Taken", "$zeron.tone.danger.ink"),
-				status("reserved", mark("close-circle"), "Reserved", "$zeron.tone.danger.ink"),
-				status("invalid", mark("info-circle"), "Letters, digits, _ and - only", "$zeron.tone.danger.ink"),
-				status("start", mark("info-circle"), "Start with a letter or digit", "$zeron.tone.danger.ink"),
+				status("available", mark("check-circle"), "Available", "$zeren.tone.success.ink"),
+				status("taken", mark("close-circle"), "Taken", "$zeren.tone.danger.ink"),
+				status("reserved", mark("close-circle"), "Reserved", "$zeren.tone.danger.ink"),
+				status("invalid", mark("info-circle"), "Letters, digits, _ and - only", "$zeren.tone.danger.ink"),
+				status("start", mark("info-circle"), "Start with a letter or digit", "$zeren.tone.danger.ink"),
 				status("short", nil, `At least {MIN} characters`, "$text.tertiary"),
 				status("long", nil, `At most {MAX} characters`, "$text.tertiary"),
 			},
@@ -204,7 +204,7 @@ return {
 							else "It's your card's address, and it's yours for good."
 					end,
 					tone = function()
-						return if failed:get() then "$zeron.tone.danger.ink" else "$text.secondary"
+						return if failed:get() then "$zeren.tone.danger.ink" else "$text.secondary"
 					end,
 					ui.column {
 						w_full = true,

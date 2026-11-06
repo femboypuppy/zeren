@@ -78,7 +78,7 @@ impl std::fmt::Display for CaptureError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::PermissionRequired => f.write_str(
-                "Window capture permission is required. Open Zeron Settings → Appshots for the platform-specific recovery step.",
+                "Window capture permission is required. Open Zeren Settings → Appshots for the platform-specific recovery step.",
             ),
             Self::SelfCapture => f.write_str("Switch to another app to capture an Appshot."),
             Self::NoEligibleWindow => f.write_str("No application window is available to capture."),
@@ -146,7 +146,7 @@ pub fn validate_capture_dimensions(width: u32, height: u32) -> Result<usize, Cap
     let pixels = u64::from(width) * u64::from(height);
     let rgba = pixels * 4;
     if pixels > MAX_CAPTURE_PIXELS || rgba > MAX_CAPTURE_RGBA_BYTES {
-        return Err(format!("The captured window ({width}×{height}) exceeds Zeron's capture budget.").into());
+        return Err(format!("The captured window ({width}×{height}) exceeds Zeren's capture budget.").into());
     }
     Ok(rgba as usize)
 }
@@ -234,7 +234,7 @@ pub struct Staged {
 
 pub fn stage(captured: Captured, dir: &std::path::Path) -> Result<Staged, CaptureError> {
     if captured.png.len() as u64 > MAX_IMAGE_BYTES {
-        return Err("The captured window is larger than Zeron's 24 MB image limit.".into());
+        return Err("The captured window is larger than Zeren's 24 MB image limit.".into());
     }
     let png = trim_padding(&captured.png)?.unwrap_or(captured.png);
     let size = png_dimensions(&png).ok_or("The captured window is not a valid PNG image.")?;
@@ -266,7 +266,7 @@ pub fn stage(captured: Captured, dir: &std::path::Path) -> Result<Staged, Captur
 
 /// Where Appshots are kept: the system's temporary folder.
 fn appshot_dir() -> PathBuf {
-    std::env::temp_dir().join("zeron-zgx-appshots")
+    std::env::temp_dir().join("zeren-zgx-appshots")
 }
 
 pub fn xml_escape(value: &str) -> String {
@@ -505,8 +505,8 @@ impl Appshots {
         macos::refresh_global_shortcut(self.active());
     }
 
-    /// A capture, as the shortcut asks for one: never while Zeron is in
-    /// front (the window there is Zeron's own), one at a time.
+    /// A capture, as the shortcut asks for one: never while Zeren is in
+    /// front (the window there is Zeren's own), one at a time.
     fn capture(self: &Rc<Self>, capturer: Capturer) {
         if self.capturing.get() || !self.prefs.borrow().enabled {
             return;
@@ -538,7 +538,7 @@ impl Appshots {
 fn play_sound() {
     static SOUND: &[u8] = include_bytes!("../../../../crates/ui/assets/sounds/appshot.wav");
     std::thread::spawn(|| {
-        let path = std::env::temp_dir().join(format!("zeron-zgx-appshot-{}.wav", std::process::id()));
+        let path = std::env::temp_dir().join(format!("zeren-zgx-appshot-{}.wav", std::process::id()));
         if std::fs::write(&path, SOUND).is_ok() {
             let _ = std::process::Command::new(if cfg!(target_os = "macos") { "afplay" } else { "paplay" })
                 .arg(&path)

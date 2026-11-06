@@ -46,7 +46,7 @@ local function said(text: string): () -> ()
 	end
 end
 
--- A session's menu, as Zeron's sidebar has it (shell.rs's chat menu), and
+-- A session's menu, as Zeren's sidebar has it (shell.rs's chat menu), and
 -- more: what it would copy, where it would move it, and the keys for each.
 local function session_menu(s: Session): { Entry }
 	local is_pinned = pinned:peek()[s.id] == true
@@ -269,9 +269,9 @@ local SESSION_ROW = ui.variants {
 	compound = {
 		{
 			selected = true,
-			bg = "$zeron.selected.flat.bg",
-			hover = { bg = "$zeron.selected.flat.bg" },
-			active = { bg = "$zeron.selected.flat.bg" },
+			bg = "$zeren.selected.flat.bg",
+			hover = { bg = "$zeren.selected.flat.bg" },
+			active = { bg = "$zeren.selected.flat.bg" },
 		},
 	},
 	defaults = { selected = false },
@@ -336,7 +336,7 @@ local function message(m: Message): Node
 				px = if user then "$space.3" else "$space.1",
 				py = "$space.2",
 				rounded = "$radius.lg",
-				bg = if user then "$zeron.secondary.bg" else "#00000000",
+				bg = if user then "$zeren.secondary.bg" else "#00000000",
 				ds.Text { m.text, wrap = true, tone = if m.streaming then "secondary" else "primary" },
 			},
 		},
@@ -430,16 +430,16 @@ return {
 							w_full = true,
 							h = 220,
 							p = "$space.1",
-							gap = "$zeron.list.gap",
+							gap = "$zeren.list.gap",
 							rounded = "$radius.lg",
-							bg = "$zeron.secondary.bg",
+							bg = "$zeren.secondary.bg",
 							table.unpack(sessions),
 						},
 					}
 				),
 				block(
 					"FILES",
-					ui.column { w = 320, gap = "$zeron.list.gap", table.unpack(files) }
+					ui.column { w = 320, gap = "$zeren.list.gap", table.unpack(files) }
 				),
 			},
 			block("MESSAGES", ui.column { w = 664, gap = "$space.3", table.unpack(messages) }),
@@ -484,9 +484,9 @@ return {
 					px = "$space.3",
 					items = "center",
 					rounded = "$radius.md",
-					bg = "$zeron.secondary.bg",
-					hover = { bg = "$zeron.secondary.hover" },
-					active = { bg = "$zeron.secondary.active" },
+					bg = "$zeren.secondary.bg",
+					hover = { bg = "$zeren.secondary.hover" },
+					active = { bg = "$zeren.secondary.active" },
 					ds.Text { "Right-click at the corner", style = "caption", tone = "secondary" },
 				},
 			},

@@ -51,7 +51,7 @@ return {
 					p = "$space.1",
 					w = 300,
 					ui.row {
-						gap = "$zeron.space.hair",
+						gap = "$zeren.space.hair",
 						items = "center",
 						ui.text { "Find", grow = 1, px = "$space.2", text_size = "$font.size.sm", color = "$text.tertiary" },
 						ds.ToggleButton { on = case, label = "Match Case", text = "Aa", size = "sm", tooltip_side = "bottom" },

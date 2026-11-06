@@ -17,7 +17,7 @@ local MESSAGE: { Item } = {
 
 -- Every shape and size.
 local SHAPES: { Item } = {
-	{ src = "assets/favicons/zeron.png", name = "zeron.png (64 × 64)" },
+	{ src = "assets/favicons/zeren.png", name = "zeren.png (64 × 64)" },
 	{ src = "assets/lightbox/tall.png", name = "tall.png (520 × 1800)" },
 	{ src = "assets/art/plate-2-bluehour.jpg", name = "plate-2-bluehour.jpg (2100 × 700)" },
 	{ src = "assets/lightbox/pixels.png", name = "pixels.png (1200 × 800)" },
@@ -42,7 +42,7 @@ local function cargo_images(): ({ Item }, { [string]: number })
 	return out, at
 end
 
--- A message's thumbnail: Zeron's size and corner, a hairline over its edge.
+-- A message's thumbnail: Zeren's size and corner, a hairline over its edge.
 local function thumb(group: string, items: { Item }, i: number, w: string, h: string, radius: string): Node
 	local r = ui.theme.get(string.sub(radius, 2)) :: number
 	return Lightbox.Thumb {
@@ -70,7 +70,7 @@ end
 local function strip(group: string, items: { Item }): Node
 	local nodes: { Node } = {}
 	for i = 1, #items do
-		table.insert(nodes, thumb(group, items, i, "$zeron.prose.thumb.w", "$zeron.prose.thumb.h", "$zeron.prose.thumb.radius"))
+		table.insert(nodes, thumb(group, items, i, "$zeren.prose.thumb.w", "$zeren.prose.thumb.h", "$zeren.prose.thumb.radius"))
 	end
 	return kit.row(table.unpack(nodes))
 end
@@ -86,9 +86,9 @@ return {
 				"THE COMPOSER'S CHIPS",
 				ui.div {
 					w = 420,
-					rounded = "$zeron.composer.radius",
-					bg = "$zeron.composer.tint",
-					pb = "$zeron.composer.chip.inset",
+					rounded = "$zeren.composer.radius",
+					bg = "$zeren.composer.tint",
+					pb = "$zeren.composer.chip.inset",
 					cargo.Strip {
 						items = CARGO,
 						on_open = function(id: string)
@@ -98,7 +98,7 @@ return {
 							end
 						end,
 						source = function(item: cargo.Item): { [string]: any }?
-							return Lightbox.source("lb-cargo", item.id, ui.theme.get("zeron.composer.chip.radius") :: number)
+							return Lightbox.source("lb-cargo", item.id, ui.theme.get("zeren.composer.chip.radius") :: number)
 						end,
 					},
 				}

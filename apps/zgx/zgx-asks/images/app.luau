@@ -1,4 +1,4 @@
--- Repro: pictures as a lightbox shows them (Zeron's, apps/zgx/ui/ds/lightbox).
+-- Repro: pictures as a lightbox shows them (Zeren's, apps/zgx/ui/ds/lightbox).
 --
 -- 1. A GIF in `ui.image`: a runtime error, not a picture (and, once it
 --    decodes, a still one).

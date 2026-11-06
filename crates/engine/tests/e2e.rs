@@ -9,18 +9,18 @@ use async_trait::async_trait;
 use futures::StreamExt;
 use futures::stream::BoxStream;
 
-use zeron_doc::{
+use zeren_doc::{
     MessagePart, MessageRole, MessageStatus, SegmentWriter, SessionCommandEntry,
     SessionCommandPayload, SessionCommandStatus, SessionDoc, SessionMessageEntry, SubagentStatus,
 };
-use zeron_engine::{EngineCore, EngineRpc, HarnessRegistry, RunJournal};
-use zeron_harness::mock::MockHarness;
-use zeron_harness::{Harness, HarnessError, RunControls};
-use zeron_proto::{
+use zeren_engine::{EngineCore, EngineRpc, HarnessRegistry, RunJournal};
+use zeren_harness::mock::MockHarness;
+use zeren_harness::{Harness, HarnessError, RunControls};
+use zeren_proto::{
     AgentEvent, DoneStatus, HarnessId, Model, ReasoningLevel, RunRequest, SandboxLevel,
     SessionStatus, SteeringMode, ToolCall,
 };
-use zeron_sync::DocsStore;
+use zeren_sync::DocsStore;
 
 const CHAT: &str = "chat-e2e";
 const VIEWER: &str = "viewer-device";
@@ -477,7 +477,7 @@ fn queue_as_viewer(doc: &SessionDoc, id: &str, payload: SessionCommandPayload) {
         doc.read_entries()
             .expect("read entries")
             .last()
-            .map(|m| zeron_doc::CommandBasedOn {
+            .map(|m| zeren_doc::CommandBasedOn {
                 turn_id: Some(m.id.clone()),
                 frontier: None,
             });
@@ -788,9 +788,9 @@ async fn interrupt_stamps_streaming_entry_aborted() {
         "interrupted activity projection",
     )
     .await;
-    let tools = zeron_mcp::Tools::new(Arc::new(zeron_mcp::Zeron::with_client(
-        zeron_rpc::memory_client(core.rpc_service()),
-        zeron_mcp::Origin::default(),
+    let tools = zeren_mcp::Tools::new(Arc::new(zeren_mcp::Zeren::with_client(
+        zeren_rpc::memory_client(core.rpc_service()),
+        zeren_mcp::Origin::default(),
     )));
     let waited = tools
         .call(
@@ -929,7 +929,7 @@ async fn steer_with_no_live_run_falls_back_to_new_turn() {
     .await;
 
     // No live run anymore (mock finishes instantly): a steer command must fall back to
-    // dispatch-as-next-turn, per zeron's executor.
+    // dispatch-as-next-turn, per zeren's executor.
     queue_as_viewer(
         handle.doc(),
         "cmd-steer-1",
@@ -1140,9 +1140,9 @@ async fn processed_commands_are_skipped_on_redelivery() {
     let entry = commands.iter().find(|c| c.id == "cmd-crashed").unwrap();
     let is_processed = |id: &str| store.is_processed(id).unwrap_or(false);
     let never_past = |_: &str| false;
-    let verdict = zeron_doc::evaluate_command(
+    let verdict = zeren_doc::evaluate_command(
         entry,
-        &zeron_doc::EvaluationContext {
+        &zeren_doc::EvaluationContext {
             is_processed: &is_processed,
             now_ms: chrono::Utc::now().timestamp_millis(),
             entries: &commands,
@@ -1150,7 +1150,7 @@ async fn processed_commands_are_skipped_on_redelivery() {
             turn_is_past: &never_past,
         },
     );
-    assert_eq!(verdict, zeron_doc::CommandDisposition::Skip);
+    assert_eq!(verdict, zeren_doc::CommandDisposition::Skip);
 }
 
 /// The v0.2.12 field report: a send whose command was consumed by the ledger
@@ -1484,17 +1484,17 @@ async fn rpc_surface_over_in_memory_transport() {
             script: mock_script(),
         }),
     );
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
 
     // ListHarnesses + ListModels.
     let harnesses = client
-        .call(zeron_rpc::methods::LIST_HARNESSES, serde_json::Value::Null)
+        .call(zeren_rpc::methods::LIST_HARNESSES, serde_json::Value::Null)
         .await
         .unwrap();
     assert_eq!(harnesses[0]["id"], "mock");
     let models = client
         .call(
-            zeron_rpc::methods::LIST_MODELS,
+            zeren_rpc::methods::LIST_MODELS,
             serde_json::json!({"harness": "mock"}),
         )
         .await
@@ -1503,7 +1503,7 @@ async fn rpc_surface_over_in_memory_transport() {
 
     // WatchSessions + WatchDocMessages streams.
     let mut sessions_stream = client
-        .subscribe(zeron_rpc::methods::WATCH_SESSIONS, serde_json::Value::Null)
+        .subscribe(zeren_rpc::methods::WATCH_SESSIONS, serde_json::Value::Null)
         .await
         .unwrap();
     let first_sessions = tokio::time::timeout(Duration::from_secs(5), sessions_stream.recv())
@@ -1514,7 +1514,7 @@ async fn rpc_surface_over_in_memory_transport() {
 
     let mut messages_stream = client
         .subscribe(
-            zeron_rpc::methods::WATCH_DOC_MESSAGES,
+            zeren_rpc::methods::WATCH_DOC_MESSAGES,
             serde_json::json!({"chatId": CHAT}),
         )
         .await
@@ -1537,7 +1537,7 @@ async fn rpc_surface_over_in_memory_transport() {
     .unwrap();
     let queued = client
         .call(
-            zeron_rpc::methods::QUEUE_COMMAND,
+            zeren_rpc::methods::QUEUE_COMMAND,
             serde_json::json!({"chatId": CHAT, "command": command}),
         )
         .await
@@ -1554,8 +1554,8 @@ async fn rpc_surface_over_in_memory_transport() {
             .await
             .expect("doc messages before timeout")
             .expect("stream alive");
-        let frame: zeron_doc::TranscriptFrame = serde_json::from_value(item).unwrap();
-        zeron_doc::apply_transcript_frame(&mut materialized, frame).unwrap();
+        let frame: zeren_doc::TranscriptFrame = serde_json::from_value(item).unwrap();
+        zeren_doc::apply_transcript_frame(&mut materialized, frame).unwrap();
         if materialized.len() == 2 && materialized[1].status == Some(MessageStatus::Complete) {
             break materialized;
         }
@@ -1611,7 +1611,7 @@ impl Harness for EchoAnswerHarness {
     ) -> Result<BoxStream<'static, Result<AgentEvent, HarnessError>>, HarnessError> {
         let (tx, rx) = tokio::sync::mpsc::channel::<Result<AgentEvent, HarnessError>>(16);
         tokio::spawn(async move {
-            let answers = (controls.request_input)(vec![zeron_proto::UserInputQuestion {
+            let answers = (controls.request_input)(vec![zeren_proto::UserInputQuestion {
                 id: "q1".into(),
                 header: "Pick".into(),
                 question: "Which one?".into(),
@@ -1642,7 +1642,7 @@ impl Harness for EchoAnswerHarness {
 
 /// The input part a settled transcript records for [`EchoAnswerHarness`]'s
 /// question.
-fn recorded_answers(core: &EngineCore) -> Option<Vec<zeron_proto::UserInputAnswer>> {
+fn recorded_answers(core: &EngineCore) -> Option<Vec<zeren_proto::UserInputAnswer>> {
     entries(core).iter().find_map(|e| {
         e.parts.iter().find_map(|p| match p {
             MessagePart::Input {
@@ -1749,7 +1749,7 @@ async fn closing_a_dead_runs_question_records_it_without_a_new_turn() {
             parts: vec![MessagePart::Input {
                 id: "req-dead".into(),
                 request_id: "req-dead".into(),
-                questions: vec![zeron_proto::UserInputQuestion {
+                questions: vec![zeren_proto::UserInputQuestion {
                     id: "q1".into(),
                     header: "Pick".into(),
                     question: "Which one?".into(),
@@ -1854,7 +1854,7 @@ async fn respond_input_resolves_pending_question() {
         "cmd-answer-1",
         SessionCommandPayload::RespondInput {
             request_id,
-            answers: vec![zeron_proto::UserInputAnswer {
+            answers: vec![zeren_proto::UserInputAnswer {
                 question_id: "q1".into(),
                 labels: vec!["b".into()],
             }],
@@ -1880,7 +1880,7 @@ async fn respond_input_resolves_pending_question() {
     // The input part is marked resolved and records what the run received.
     assert_eq!(
         recorded_answers(&core),
-        Some(vec![zeron_proto::UserInputAnswer {
+        Some(vec![zeren_proto::UserInputAnswer {
             question_id: "q1".into(),
             labels: vec!["b".into()],
         }])
@@ -1928,7 +1928,7 @@ async fn wrong_id_respond_is_rejected_and_correct_answer_still_resumes() {
         ) -> Result<BoxStream<'static, Result<AgentEvent, HarnessError>>, HarnessError> {
             let (tx, rx) = tokio::sync::mpsc::channel::<Result<AgentEvent, HarnessError>>(16);
             tokio::spawn(async move {
-                let answers = (controls.request_input)(vec![zeron_proto::UserInputQuestion {
+                let answers = (controls.request_input)(vec![zeren_proto::UserInputQuestion {
                     id: "q1".into(),
                     header: "Pick".into(),
                     question: "Which one?".into(),
@@ -2000,7 +2000,7 @@ async fn wrong_id_respond_is_rejected_and_correct_answer_still_resumes() {
         "cmd-answer-bogus",
         SessionCommandPayload::RespondInput {
             request_id: "bogus-id".into(),
-            answers: vec![zeron_proto::UserInputAnswer {
+            answers: vec![zeren_proto::UserInputAnswer {
                 question_id: "q1".into(),
                 labels: vec!["a".into()],
             }],
@@ -2047,7 +2047,7 @@ async fn wrong_id_respond_is_rejected_and_correct_answer_still_resumes() {
         "cmd-answer-right",
         SessionCommandPayload::RespondInput {
             request_id,
-            answers: vec![zeron_proto::UserInputAnswer {
+            answers: vec![zeren_proto::UserInputAnswer {
                 question_id: "q1".into(),
                 labels: vec!["b".into()],
             }],
@@ -2121,7 +2121,7 @@ async fn interrupt_unblocks_a_run_awaiting_input() {
                     // Blocks on the question; an interrupt fails the resolver
                     // (empty answers) and cancels the token — like a real CLI
                     // being torn down, the stream then ends WITHOUT a Done.
-                    let _ = (controls.request_input)(vec![zeron_proto::UserInputQuestion {
+                    let _ = (controls.request_input)(vec![zeren_proto::UserInputQuestion {
                         id: "q1".into(),
                         header: "Pick".into(),
                         question: "Which one?".into(),
@@ -2270,7 +2270,7 @@ async fn harness_emitted_input_twin_is_dropped_and_answer_resumes() {
         ) -> Result<BoxStream<'static, Result<AgentEvent, HarnessError>>, HarnessError> {
             let (tx, rx) = tokio::sync::mpsc::channel::<Result<AgentEvent, HarnessError>>(16);
             tokio::spawn(async move {
-                let question = zeron_proto::UserInputQuestion {
+                let question = zeren_proto::UserInputQuestion {
                     id: "q1".into(),
                     header: "Pick".into(),
                     question: "Which one?".into(),
@@ -2379,7 +2379,7 @@ async fn harness_emitted_input_twin_is_dropped_and_answer_resumes() {
         "cmd-answer-twin",
         SessionCommandPayload::RespondInput {
             request_id,
-            answers: vec![zeron_proto::UserInputAnswer {
+            answers: vec![zeren_proto::UserInputAnswer {
                 question_id: "q1".into(),
                 labels: vec!["a".into()],
             }],
@@ -2477,7 +2477,7 @@ async fn attachment_upload_then_run_threads_refs_and_paths() {
             seen: seen.clone(),
         }),
     );
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
 
     // Chunked upload exactly as the composer sends it: base64 split across
     // positional UploadChunk slots, then UploadCommit → the durable path.
@@ -2487,7 +2487,7 @@ async fn attachment_upload_then_run_threads_refs_and_paths() {
     for (seq, data) in [(0, first), (1, second)] {
         client
             .call(
-                zeron_rpc::methods::UPLOAD_CHUNK,
+                zeren_rpc::methods::UPLOAD_CHUNK,
                 serde_json::json!({ "uploadId": "e2e-att", "seq": seq, "data": data }),
             )
             .await
@@ -2495,7 +2495,7 @@ async fn attachment_upload_then_run_threads_refs_and_paths() {
     }
     let committed = client
         .call(
-            zeron_rpc::methods::UPLOAD_COMMIT,
+            zeren_rpc::methods::UPLOAD_COMMIT,
             serde_json::json!({ "uploadId": "e2e-att", "fileName": "red.png" }),
         )
         .await
@@ -2507,7 +2507,7 @@ async fn attachment_upload_then_run_threads_refs_and_paths() {
         "committed file holds the exact reassembled bytes"
     );
 
-    // Run with the zeron `withAttachments` transport: refs embedded in the
+    // Run with the zeren `withAttachments` transport: refs embedded in the
     // prompt text (this is what persists), paths on the additive field.
     let prompt = format!(
         "what color is this?\n\nAttached images (local files — open them to view):\n- {path}"
@@ -2560,7 +2560,7 @@ async fn attachment_upload_then_run_threads_refs_and_paths() {
     // Read-back over the same RPC surface the transcript uses.
     let chunk = client
         .call(
-            zeron_rpc::methods::READ_ATTACHMENT_CHUNK,
+            zeren_rpc::methods::READ_ATTACHMENT_CHUNK,
             serde_json::json!({ "path": path, "offset": 0 }),
         )
         .await
@@ -2575,7 +2575,7 @@ async fn attachment_upload_then_run_threads_refs_and_paths() {
 /// color — it can only know it by SEEING the inline image block (the sandbox
 /// prompt forbids opening the file). Ignored by default: needs an installed,
 /// authenticated `claude` CLI and spends real tokens.
-/// Run with: `cargo test -p zeron-engine --test e2e -- --ignored`
+/// Run with: `cargo test -p zeren-engine --test e2e -- --ignored`
 #[tokio::test(flavor = "multi_thread")]
 #[ignore = "requires installed+authenticated claude CLI; spends tokens"]
 async fn real_claude_sees_uploaded_image_inline() {
@@ -2588,7 +2588,7 @@ async fn real_claude_sees_uploaded_image_inline() {
 
     let core = EngineCore::assemble(
         &dir,
-        Arc::new(zeron_engine::default_registry()),
+        Arc::new(zeren_engine::default_registry()),
         HarnessId::ClaudeCode,
         None,
     )
@@ -2603,17 +2603,17 @@ async fn real_claude_sees_uploaded_image_inline() {
 
     // 8×8 solid-red PNG, uploaded exactly as the composer does.
     const RED_PNG_B64: &str = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAEklEQVR4nGP4z8CAB+GTG2wAAJP0GeGuMDBnAAAAAElFTkSuQmCC";
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     client
         .call(
-            zeron_rpc::methods::UPLOAD_CHUNK,
+            zeren_rpc::methods::UPLOAD_CHUNK,
             serde_json::json!({ "uploadId": "real-img", "seq": 0, "data": RED_PNG_B64 }),
         )
         .await
         .expect("UploadChunk");
     let committed = client
         .call(
-            zeron_rpc::methods::UPLOAD_COMMIT,
+            zeren_rpc::methods::UPLOAD_COMMIT,
             serde_json::json!({ "uploadId": "real-img", "fileName": "swatch.png" }),
         )
         .await
@@ -3089,7 +3089,7 @@ async fn context_usage_settles_after_done_without_reopening_the_turn() {
     .await;
     assert_eq!(
         handle.doc().context_usage(),
-        Some(zeron_proto::ContextUsage {
+        Some(zeren_proto::ContextUsage {
             tokens: Some(0),
             window: Some(200000)
         })
@@ -3185,7 +3185,7 @@ async fn pending_steer_handoff_does_not_publish_a_completion() {
                     .steer(CHAT, "redirect", Some("user-steer".into()))
                     .await
                     .unwrap(),
-                zeron_engine::sessions::SteerOutcome::Accepted
+                zeren_engine::sessions::SteerOutcome::Accepted
             );
         }
         let before_done = core.sessions.session_status(CHAT).unwrap().updated_at;
@@ -3257,7 +3257,7 @@ async fn pending_steer_handoff_does_not_publish_a_completion() {
 /// Real drive_run + journal + Loro, with an isolated Codex source root.
 #[tokio::test]
 async fn generated_image_is_materialized_before_publication_and_survives_reopen() {
-    use zeron_engine::{DocHost, DocHostConfig, SessionsEngine, Uploads};
+    use zeren_engine::{DocHost, DocHostConfig, SessionsEngine, Uploads};
     let dir = tempfile::tempdir().unwrap();
     let source_root = dir.path().join("codex/generated_images");
     std::fs::create_dir_all(&source_root).unwrap();
@@ -3394,7 +3394,7 @@ async fn real_image_generation_profile_smoke() {
     let dir = tempfile::tempdir().unwrap();
     let core = EngineCore::assemble(
         dir.path(),
-        registry_with(Arc::new(zeron_harness::CodexHarness::new())),
+        registry_with(Arc::new(zeren_harness::CodexHarness::new())),
         HarnessId::Codex,
         None,
     )
@@ -3640,11 +3640,11 @@ async fn publish_visual_lands_in_the_live_turn() {
             events: std::sync::Mutex::new(Some(rx)),
         }),
     );
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     const SCRIPT: &str = r#"return ui.text { "chart", size = "lg" }"#;
     let publish = |chat: &str, script: &str| {
         client.call(
-            zeron_rpc::methods::PUBLISH_VISUAL,
+            zeren_rpc::methods::PUBLISH_VISUAL,
             serde_json::json!({
                 "chatId": chat,
                 "title": "  Latency  ",
@@ -3736,7 +3736,7 @@ async fn publish_image_lands_in_the_live_turn() {
             events: std::sync::Mutex::new(Some(rx)),
         }),
     );
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     let png = {
         let mut bytes = std::io::Cursor::new(Vec::new());
         image::DynamicImage::new_rgb8(3, 2)
@@ -3746,7 +3746,7 @@ async fn publish_image_lands_in_the_live_turn() {
     };
     let publish = |bytes: &[u8]| {
         client.call(
-            zeron_rpc::methods::PUBLISH_IMAGE,
+            zeren_rpc::methods::PUBLISH_IMAGE,
             serde_json::json!({
                 "chatId": CHAT,
                 "name": "before.png",
@@ -3839,7 +3839,7 @@ async fn publish_image_lands_in_the_live_turn() {
 
 /// An image a reply names in Markdown reads only from inside that one chat's
 /// working folder, and never through a folder that would open too much:
-/// home or above, Zeron's own data, a chat another device runs.
+/// home or above, Zeren's own data, a chat another device runs.
 #[tokio::test]
 async fn chat_images_come_only_from_their_chats_own_folder() {
     use base64::Engine as _;
@@ -3850,7 +3850,7 @@ async fn chat_images_come_only_from_their_chats_own_folder() {
             events: std::sync::Mutex::new(None),
         }),
     );
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     let png = {
         let mut bytes = std::io::Cursor::new(Vec::new());
         image::DynamicImage::new_rgb8(3, 2)
@@ -3879,7 +3879,7 @@ async fn chat_images_come_only_from_their_chats_own_folder() {
         (
             "scratch",
             here.as_str(),
-            Some("~/.zeron/scratch/2026-10-25-a1b2c3d4".into()),
+            Some("~/.zeren/scratch/2026-10-25-a1b2c3d4".into()),
         ),
     ] {
         core.workspace
@@ -3888,7 +3888,7 @@ async fn chat_images_come_only_from_their_chats_own_folder() {
     }
     let read = |chat: &str, path: &std::path::Path| {
         client.call(
-            zeron_rpc::methods::READ_CHAT_IMAGE_CHUNK,
+            zeren_rpc::methods::READ_CHAT_IMAGE_CHUNK,
             serde_json::json!({ "chatId": chat, "path": path, "offset": 0 }),
         )
     };
@@ -3914,7 +3914,7 @@ async fn chat_images_come_only_from_their_chats_own_folder() {
         ("ours", after.as_path(), "outside the chat's folder"),
         ("theirs", before.as_path(), "outside the chat's folder"),
         ("root", before.as_path(), "home folder, above it"),
-        ("data", before.as_path(), "around Zeron's data"),
+        ("data", before.as_path(), "around Zeren's data"),
         ("remote", before.as_path(), "another device"),
         ("missing", before.as_path(), "chat not found"),
     ] {
@@ -4011,17 +4011,17 @@ async fn a_commands_whole_output_is_read_from_its_hosts_journal() {
     else {
         panic!("no tail: {tool:?}");
     };
-    assert_eq!(tail.lines().count(), zeron_doc::COMMAND_TAIL_MAX_LINES);
+    assert_eq!(tail.lines().count(), zeren_doc::COMMAND_TAIL_MAX_LINES);
     assert_eq!(*lines, 301);
 
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     let read = |chat: &str, tool: &str| {
         client.call(
-            zeron_rpc::methods::READ_TOOL_OUTPUT,
+            zeren_rpc::methods::READ_TOOL_OUTPUT,
             serde_json::json!({ "chatId": chat, "toolId": tool, "offset": 0 }),
         )
     };
-    let chunk: zeron_proto::ToolOutputChunk =
+    let chunk: zeren_proto::ToolOutputChunk =
         serde_json::from_value(read(CHAT, "t1").await.expect("the whole output")).unwrap();
     assert!(chunk.done && !chunk.trimmed);
     assert_eq!((chunk.lines, chunk.exit_code), (301, Some(0)));

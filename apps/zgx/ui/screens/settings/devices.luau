@@ -1,6 +1,6 @@
 -- Settings → Devices: the computers your sessions sync across, the
 -- shipping app's Devices (crates/ui settings/devices.rs): this one first,
--- each with its system, the Zeron it runs, and whether it's there now or
+-- each with its system, the Zeren it runs, and whether it's there now or
 -- when it last was; and renaming one, which every device then shows. Cloud's
 -- machines aren't listed (they come and go with their sessions).
 --
@@ -32,7 +32,7 @@ local PLATFORMS: { [string]: string } = {
 	android = "Android",
 }
 
--- What the line under a device's name says: its system, its Zeron, and
+-- What the line under a device's name says: its system, its Zeren, and
 -- whether it's there (in the locale shown: read where it's drawn).
 function M.describe(d: sessions.Device, now: number): string
 	local parts = { PLATFORMS[d.platform] or d.platform }

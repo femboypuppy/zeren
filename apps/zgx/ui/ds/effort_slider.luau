@@ -47,7 +47,7 @@ local H, KNOB = 24, 18
 -- How often the field redraws as it drifts.
 local FPS = 12
 
--- A level's look: its colour (a zeron.effort token) and its field: how
+-- A level's look: its colour (a zeren.effort token) and its field: how
 -- dense the glyphs get at the thumb, how far the density wanders, how fast
 -- it drifts.
 type Look = { token: string, to: number, wander: number, drift: number }
@@ -76,7 +76,7 @@ end
 -- the characters draw on a pale track). A wash of it is the token under an
 -- opacity, so it follows the theme where it sits.
 local function ink(look: Look): string
-	return `$zeron.effort.{look.token}`
+	return `$zeren.effort.{look.token}`
 end
 
 -- The field: cells of 6 by 8 font pixels (a pixel a whole number of device
@@ -365,7 +365,7 @@ return ui.component(function(props: Props): Node
 		relative = true,
 		rounded = "$radius.md",
 		cursor = "pointer",
-		bg = "$zeron.slider.track",
+		bg = "$zeren.slider.track",
 		-- (zgx has no slider role for a node of the script's own; ui.slider
 		-- is its native one.)
 		label = props.label or props.title or locale.t("ds.effort_slider.reasoning"),
@@ -468,7 +468,7 @@ return ui.component(function(props: Props): Node
 					top = 0,
 					right = 0,
 					bottom = 0,
-					opacity = "$zeron.slider.tint",
+					opacity = "$zeren.slider.tint",
 					bg = function()
 						return ink(look(index()))
 					end,
@@ -483,7 +483,7 @@ return ui.component(function(props: Props): Node
 					bottom = 0,
 					rounded = "$radius.sm",
 					border = 1,
-					opacity = "$zeron.slider.ring",
+					opacity = "$zeren.slider.ring",
 					pointer_events = "none",
 					border_color = function()
 						return ink(look(index()))
@@ -519,7 +519,7 @@ return ui.component(function(props: Props): Node
 					w = grow(KNOB - 4, KNOB - 2),
 					h = grow(H - 6, H - 4),
 					rounded = "$radius.sm",
-					bg = "$zeron.primary.bg",
+					bg = "$zeren.primary.bg",
 					ui.div {
 						absolute = true,
 						w = 2,
@@ -527,7 +527,7 @@ return ui.component(function(props: Props): Node
 						rounded = "$radius.full",
 						left = grow(6, 7),
 						top = grow(5, 6),
-						bg = "$zeron.primary.text",
+						bg = "$zeren.primary.text",
 					},
 				},
 			},
@@ -552,7 +552,7 @@ return ui.component(function(props: Props): Node
 			ui.column {
 				grow = 1,
 				min_w = 0,
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				ui.text {
 					props.title,
 					font = "$font.mono",

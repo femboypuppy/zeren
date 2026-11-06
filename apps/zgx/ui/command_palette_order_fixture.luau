@@ -26,6 +26,6 @@ local function items(): { CommandPalette.Item }
 end
 
 local open = ui.state("test_palette_open", true)
-local root: CommandPalette.Page = { id = "root", title = "Zeron", items = items }
+local root: CommandPalette.Page = { id = "root", title = "Zeren", items = items }
 
 return CommandPalette { open = open, root = root, recent = ui.state("test_palette_recent", {} :: { string }) }

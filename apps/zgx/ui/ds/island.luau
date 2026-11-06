@@ -1,4 +1,4 @@
--- An island's look and measure (the theme's `zeron.island`), for every
+-- An island's look and measure (the theme's `zeren.island`), for every
 -- island: the title bar's controls over the page, the sidebar's rail. One
 -- definition, so the two are the same thing turned: the rail as wide as the
 -- title bar's island is tall, its controls the same size, as far apart, as
@@ -19,13 +19,13 @@ end
 
 function M.metrics(): Metrics
 	return {
-		radius = n("zeron.island.radius", 12),
-		inset = n("zeron.island.inset", 6),
-		pad = n("zeron.island.pad", 4),
-		control = n("zeron.island.control", 24),
-		gap = n("zeron.island.gap", 2),
-		group = n("zeron.island.group", 8),
-		blur = n("zeron.island.blur", 20),
+		radius = n("zeren.island.radius", 12),
+		inset = n("zeren.island.inset", 6),
+		pad = n("zeren.island.pad", 4),
+		control = n("zeren.island.control", 24),
+		gap = n("zeren.island.gap", 2),
+		group = n("zeren.island.group", 8),
+		blur = n("zeren.island.blur", 20),
 	}
 end
 
@@ -39,14 +39,14 @@ end
 -- Its glass, or with glass turned solid (ds/material: the Opaque setting,
 -- or the system's transparency off), the menus' solid fill, unblurred.
 function M.glass(props: { [any]: any }): { [any]: any }
-	props.rounded = "$zeron.island.radius"
+	props.rounded = "$zeren.island.radius"
 	props.bg = function()
-		return if material.see_through() then "$zeron.island.tint" else "$zeron.menu.solid"
+		return if material.see_through() then "$zeren.island.tint" else "$zeren.menu.solid"
 	end
 	props.backdrop_blur = function()
-		return if material.see_through() then "$zeron.island.blur" else 0
+		return if material.see_through() then "$zeren.island.blur" else 0
 	end
-	props.shadow = "$zeron.island.shadow"
+	props.shadow = "$zeren.island.shadow"
 	return props
 end
 

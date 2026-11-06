@@ -1,15 +1,15 @@
 --!strict
 -- Installing someone else's template: what it is, who signed it, that its
--- signature checks out, and plainly what it can do: a template is Zeron's
--- own code, so it runs with everything Zeron can. Its window is its own
+-- signature checks out, and plainly what it can do: a template is Zeren's
+-- own code, so it runs with everything Zeren can. Its window is its own
 -- (ui/template_consent.luau): no plugin and no template runs there, and
 -- only that window can install anything (`templates.decide`), so nothing
--- standing in for Zeron's screens can say yes on your behalf.
+-- standing in for Zeren's screens can say yes on your behalf.
 --
 -- The host publishes what to show as `template_consent`:
 --   { item = Pending?, busy = boolean, error = string? }
 -- (a package as the engine lists it waiting: `pending, id, name,
--- description, version, zeron_version, key, files, ignored, hash, source,
+-- description, version, zeren_version, key, files, ignored, hash, source,
 -- from = { kind, url?, ref? } (where it came from: a file, a link),
 -- author = { kind = "you" | "verified" | "unknown", username?, reason? }`)
 -- and answers `templates.decide { pending, allow, hash }` (the hash it was
@@ -23,7 +23,7 @@
 -- agent made, changed or switched to, or signed by "you" and never kept)
 -- shows the same sheet, as a keep: `templates.decide { keep, allow, hash }`,
 -- `hash` the digest of its files as shown (src/plugins/preview.rs). Kept,
--- it runs with Zeron's powers until its files change.
+-- it runs with Zeren's powers until its files change.
 
 local ds = require("@ds")
 local words = require("@screens/plugins/words")
@@ -36,7 +36,7 @@ local function item(): any
 	return consent:get().item
 end
 
--- Who signed it, as Zeron's directory knows the key.
+-- Who signed it, as Zeren's directory knows the key.
 local function signer(it: any): Node
 	local kind = it.author and it.author.kind
 	if kind == "you" then
@@ -71,14 +71,14 @@ local function fact(icon: string, title: string | Message, detail: (string | Mes
 		gap = "$space.3",
 		items = "start",
 		ui.div {
-			pt = "$zeron.space.hair",
+			pt = "$zeren.space.hair",
 			color = if tone then tone else "$text.secondary",
 			ds.Icon { name = icon :: any, size = 16 },
 		},
 		ui.column {
 			grow = 1,
 			min_w = 0,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			ui.text { title, text_size = "$font.size.md", line_height = "$font.line.md", color = "$text.primary", wrap = true },
 			if detail
 				then ui.text { detail, text_size = "$font.size.sm", line_height = "$font.line.sm", color = "$text.secondary", wrap = true }
@@ -101,7 +101,7 @@ local function body(key: string): Node
 	local it = item()
 	local unknown = not (it.author and (it.author.kind == "you" or it.author.kind == "verified"))
 	local ignored: { string } = it.ignored or {}
-	local made_for = if it.zeron_version and it.zeron_version ~= "" then it.zeron_version else nil
+	local made_for = if it.zeren_version and it.zeren_version ~= "" then it.zeren_version else nil
 	local files = tonumber(it.files) or 0
 	local keep = it.keep ~= nil
 	local answer = function(allow: boolean)
@@ -162,7 +162,7 @@ local function body(key: string): Node
 			then ds.Callout {
 				tone = "warning",
 				title = ui.t("plugins.words.unverified"),
-				-- (The host's reason as it gives it; else Zeron's words, with
+				-- (The host's reason as it gives it; else Zeren's words, with
 				-- where it came from.)
 				body = (it.author and it.author.reason) or (function(): any
 					local where = words.where(it.from)
@@ -182,7 +182,7 @@ local function body(key: string): Node
 					"shield-check",
 					ui.t("templates.consent.signature"),
 					ui.t("templates.consent.signature_detail", { key = short(it.key) }),
-					"$zeron.tone.success.ink"
+					"$zeren.tone.success.ink"
 				),
 			if keep then nil else fact(
 				"file-code",
@@ -210,7 +210,7 @@ local function body(key: string): Node
 					return consent:get().error or ""
 				end,
 				text_size = "$font.size.sm",
-				color = "$zeron.tone.danger.ink",
+				color = "$zeren.tone.danger.ink",
 				wrap = true,
 			}),
 			ui.row {

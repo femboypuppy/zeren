@@ -1,4 +1,4 @@
--- Reduce motion (ds/motion: the system's setting or Zeron's own,
+-- Reduce motion (ds/motion: the system's setting or Zeren's own,
 -- `motion_reduce`): what a state change shows is there on the next frame,
 -- with no travel after it. The sidebar's fold and the panel's opening land
 -- at once.

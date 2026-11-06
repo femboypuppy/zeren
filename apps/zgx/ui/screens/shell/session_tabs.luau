@@ -253,7 +253,7 @@ local function tile(id: string): Node
 			-- (Solid under its wash, so what's behind it doesn't show through; the
 			-- one in front's shadow falls on those behind.)
 			bg = function(): string
-				return if stacked() then "$zeron.menu.solid" else "#00000000"
+				return if stacked() then "$zeren.menu.solid" else "#00000000"
 			end,
 			shadow = function(): any
 				return if stacked() and at == 1 then "$shadow.sm" else false
@@ -332,13 +332,13 @@ local Tab = ui.component(function(props: { chat: string }): Node
 			shrink = 0,
 			pl = ui.raw(4, "as far in as the tile is from its top"),
 			pr = ui.raw(4, "the tab's inset"),
-			gap = "$zeron.space.tight",
+			gap = "$zeren.space.tight",
 			items = "center",
 			rounded = "$radius.lg",
 			cursor = "pointer",
 			bg = function(): string
 				if active() then
-					return "$zeron.selected.flat.bg"
+					return "$zeren.selected.flat.bg"
 				end
 				return if hovered:get() or held:get() then "$hover" else "#00000000"
 			end,
@@ -376,7 +376,7 @@ local Tab = ui.component(function(props: { chat: string }): Node
 						h = TILE,
 						rounded = "$radius.sm",
 						rotate = if count >= 2 then fan.turn else 0,
-						bg = if count >= 2 then "$zeron.menu.solid" else "#00000000",
+						bg = if count >= 2 then "$zeren.menu.solid" else "#00000000",
 						shadow = if count >= 2 and at == 1 then "$shadow.sm" else false,
 						pane_tile(id, at),
 					})
@@ -390,10 +390,10 @@ local Tab = ui.component(function(props: { chat: string }): Node
 						h = TAB_H,
 						pl = ui.raw(4, "as far in as the tile is from its top"),
 						pr = ui.raw(4, "the tab's inset"),
-						gap = "$zeron.space.tight",
+						gap = "$zeren.space.tight",
 						items = "center",
 						rounded = "$radius.lg",
-						bg = if active() then "$zeron.selected.flat.bg" else "#00000000",
+						bg = if active() then "$zeren.selected.flat.bg" else "#00000000",
 						color = if active() then "$text.primary" else "$text.secondary",
 						ui.div(places),
 						ds.FadeText { title(id), max_w = LABEL_MAX, min_w = 0, grow = 1, text_size = "$font.size.sm", weight = "$font.weight.medium" },
@@ -528,7 +528,7 @@ function M.Strip(props: { window_x: () -> number, start: () -> number, right: ()
 		end
 		local left = 0
 		-- (The tabs' own gap, the strip's hair.)
-		local gap = (ui.theme.get("zeron.space.hair") :: number?) or 2
+		local gap = (ui.theme.get("zeren.space.hair") :: number?) or 2
 		for _, id in list do
 			local w = tab_refs[id].width
 			if splits.current_key() == id then
@@ -593,7 +593,7 @@ function M.Strip(props: { window_x: () -> number, start: () -> number, right: ()
 				fade_x = bands,
 				ui.row {
 					ref = content,
-					gap = "$zeron.space.hair",
+					gap = "$zeren.space.hair",
 					items = "center",
 					ui.each(shown, function(id: string): Node
 						return Tab { chat = id }
@@ -602,7 +602,7 @@ function M.Strip(props: { window_x: () -> number, start: () -> number, right: ()
 							return id
 						end,
 						direction = "row",
-						gap = "$zeron.space.hair",
+						gap = "$zeren.space.hair",
 						animate = motion.layout(SLIDE),
 					}),
 				},

@@ -1,5 +1,5 @@
 //! Live mode against an in-process edge (tests/support/mock_edge.rs): the
-//! registry through zeron-sync's mock server (the production merge fn) and a
+//! registry through zeren-sync's mock server (the production merge fn) and a
 //! chat2 room speaking the real frame protocol. The test plays the host
 //! engine: it seeds registry rows through its own `RegistryClient` and
 //! answers commands by injecting Loro updates into the room.
@@ -12,17 +12,17 @@ use std::time::{Duration, Instant};
 use chrono::Utc;
 use loro::{ExportMode, LoroDoc};
 use support::mock_edge::MockEdge;
-use zeron_client::events::NullListener;
-use zeron_client::{
+use zeren_client::events::NullListener;
+use zeren_client::{
     ChatIndicator, Client, ClientConfig, ConnectivityState, Credentials, MessageRole, SendOutcome,
     SendRequest,
 };
-use zeron_doc::{
+use zeren_doc::{
     MessagePart, RegistryDoc, SessionCommandPayload, SessionCommandStatus, SessionDoc,
     SessionMessageEntry,
 };
-use zeron_proto::{Chat, ChatConfig, Device, HarnessId, SandboxLevel, Space};
-use zeron_sync::RegistryClient;
+use zeren_proto::{Chat, ChatConfig, Device, HarnessId, SandboxLevel, Space};
+use zeren_sync::RegistryClient;
 
 const HOST: &str = "dev-mac";
 const CHAT: &str = "chat-live";
@@ -45,7 +45,7 @@ fn host_rows(now: chrono::DateTime<Utc>) -> (Device, Space, Chat) {
         created_at: Some(now),
         version: Some(env!("CARGO_PKG_VERSION").into()),
         cursor_sdk_version: None,
-        capabilities: zeron_client::rpc::capability::ALL_QUEUE
+        capabilities: zeren_client::rpc::capability::ALL_QUEUE
             .iter()
             .map(|c| (*c).to_owned())
             .collect(),
@@ -71,7 +71,7 @@ fn host_rows(now: chrono::DateTime<Utc>) -> (Device, Space, Chat) {
         cwd: Some("/Users/dev/live".into()),
         branch: Some("main".into()),
         checkout_id: None,
-        source_context: Some(zeron_proto::ConversationSourceContext {
+        source_context: Some(zeren_proto::ConversationSourceContext {
             checkout_id: "co-live".into(),
             repo_root: "/Users/dev/live".into(),
             cwd: "/Users/dev/live".into(),
@@ -123,12 +123,12 @@ impl HostRegistry {
             .await
             .unwrap();
         client.nudge();
-        client.set_presence(zeron_client_now());
+        client.set_presence(zeren_client_now());
         Self { doc, client }
     }
 }
 
-fn zeron_client_now() -> i64 {
+fn zeren_client_now() -> i64 {
     Utc::now().timestamp_millis()
 }
 
@@ -266,7 +266,7 @@ fn host_answers(edge: &MockEdge, host_doc: &LoroDoc) -> Option<String> {
     session
         .set_command_status(&command_id, SessionCommandStatus::Applied, None)
         .unwrap();
-    let now = zeron_client_now();
+    let now = zeren_client_now();
     let entry = |id: &str, role, device: &str, text: &str| SessionMessageEntry {
         id: id.into(),
         role,
@@ -276,7 +276,7 @@ fn host_answers(edge: &MockEdge, host_doc: &LoroDoc) -> Option<String> {
         }],
         created_at: now,
         device_id: device.into(),
-        status: Some(zeron_doc::MessageStatus::Complete),
+        status: Some(zeren_doc::MessageStatus::Complete),
         continuation_of: None,
         duration_ms: None,
     };
@@ -339,7 +339,7 @@ async fn session_send_round_trips_through_the_chat_room() {
     );
     assert_eq!(
         session.composer().send_state,
-        Some(zeron_client::SendState::Sending)
+        Some(zeren_client::SendState::Sending)
     );
     assert_ne!(
         client.workspace().session(CHAT).unwrap().indicator,
@@ -431,7 +431,7 @@ async fn sends_survive_a_room_outage_and_deliver_on_rejoin() {
     tokio::time::sleep(Duration::from_millis(1500)).await;
     assert!(edge.rows(CHAT).is_empty(), "room refused");
     assert_eq!(session.snapshot().pending.len(), 1, "durable echo stays");
-    let store = zeron_sync::DocsStore::open(dir.path()).unwrap();
+    let store = zeren_sync::DocsStore::open(dir.path()).unwrap();
     assert!(
         store
             .sync_job_version(CHAT, "viewer-delivery")
@@ -546,21 +546,21 @@ struct HostService {
     spaces: Mutex<Vec<String>>,
 }
 
-const HOST_IMAGE: &str = "/Users/dev/.zeron/uploads/host.png";
+const HOST_IMAGE: &str = "/Users/dev/.zeren/uploads/host.png";
 
 fn host_image() -> Vec<u8> {
     (0..100_000u32).map(|i| (i * 7 % 251) as u8).collect()
 }
 
 #[async_trait::async_trait]
-impl zeron_rpc::RpcService for HostService {
+impl zeren_rpc::RpcService for HostService {
     async fn handle(
         &self,
         method: &str,
         params: serde_json::Value,
-    ) -> Result<zeron_rpc::RpcReply, zeron_rpc::RpcError> {
+    ) -> Result<zeren_rpc::RpcReply, zeren_rpc::RpcError> {
         use serde_json::json;
-        use zeron_rpc::{RpcReply, methods as m};
+        use zeren_rpc::{RpcReply, methods as m};
         let value = match method {
             m::LIST_HARNESSES => json!([
                 {"id": "claude-code", "name": "Claude Code", "supportsSteering": true,
@@ -601,7 +601,7 @@ impl zeron_rpc::RpcService for HostService {
                     .lock()
                     .unwrap()
                     .push((id.clone(), name.clone(), unb64(&data)));
-                json!({ "path": format!("/Users/dev/.zeron/uploads/{}-{name}", &id[..8]) })
+                json!({ "path": format!("/Users/dev/.zeren/uploads/{}-{name}", &id[..8]) })
             }
             m::READ_ATTACHMENT_CHUNK => {
                 let offset = params["offset"].as_u64().unwrap_or(0) as usize;
@@ -631,7 +631,7 @@ impl zeron_rpc::RpcService for HostService {
                 );
                 return Ok(RpcReply::Stream(Box::pin(stream)));
             }
-            other => return Err(zeron_rpc::RpcError::UnknownMethod(other.to_owned())),
+            other => return Err(zeren_rpc::RpcError::UnknownMethod(other.to_owned())),
         };
         Ok(RpcReply::Value(value))
     }
@@ -642,11 +642,11 @@ async fn host_rpcs_ride_the_device_relay() {
     let edge = MockEdge::start().await;
     let _host = HostRegistry::start(&edge).await;
     let service = Arc::new(HostService::default());
-    let _relay = zeron_rpc::HostRelay::spawn(
-        zeron_rpc::HostRelayConfig::new(
+    let _relay = zeren_rpc::HostRelay::spawn(
+        zeren_rpc::HostRelayConfig::new(
             edge.edge_url(),
             HOST,
-            Arc::new(zeron_rpc::StaticToken("t".into())),
+            Arc::new(zeren_rpc::StaticToken("t".into())),
         ),
         service.clone(),
         Arc::new(|_| true),
@@ -664,7 +664,7 @@ async fn host_rpcs_ride_the_device_relay() {
         tokio::time::sleep(Duration::from_millis(50)).await;
     }
 
-    let harnesses = zeron_client::runtime::run({
+    let harnesses = zeren_client::runtime::run({
         let client = client.clone();
         async move { Ok(client.list_harnesses(HOST).await) }
     })
@@ -678,7 +678,7 @@ async fn host_rpcs_ride_the_device_relay() {
 
     let c = client.clone();
     let models =
-        zeron_client::runtime::run(async move { Ok(c.list_models(HOST, "claude-code").await) })
+        zeren_client::runtime::run(async move { Ok(c.list_models(HOST, "claude-code").await) })
             .await
             .unwrap();
     assert_eq!(models.len(), 1, "[1m] variant folded: {models:?}");
@@ -686,13 +686,13 @@ async fn host_rpcs_ride_the_device_relay() {
 
     let c = client.clone();
     let refs =
-        zeron_client::runtime::run(async move { c.list_refs(HOST, "/Users/dev/live").await })
+        zeren_client::runtime::run(async move { c.list_refs(HOST, "/Users/dev/live").await })
             .await
             .unwrap();
     assert_eq!(refs[1].worktree_path.as_deref(), Some("/wt/live"));
 
     let c = client.clone();
-    let folders = zeron_client::runtime::run(async move { c.list_folders(HOST, None).await })
+    let folders = zeren_client::runtime::run(async move { c.list_folders(HOST, None).await })
         .await
         .unwrap();
     assert!(folders.entries[0].is_repo);
@@ -703,7 +703,7 @@ async fn host_rpcs_ride_the_device_relay() {
     let seen = progress.clone();
     let c = client.clone();
     let upload = data.clone();
-    let path = zeron_client::runtime::run(async move {
+    let path = zeren_client::runtime::run(async move {
         c.upload_attachment(
             HOST,
             "photo 1.png",
@@ -723,7 +723,7 @@ async fn host_rpcs_ride_the_device_relay() {
     // Chunked attachment read.
     let c = client.clone();
     let image =
-        zeron_client::runtime::run(async move { c.read_attachment(HOST, HOST_IMAGE).await })
+        zeren_client::runtime::run(async move { c.read_attachment(HOST, HOST_IMAGE).await })
             .await
             .unwrap();
     assert_eq!(*image, host_image());
@@ -758,7 +758,7 @@ async fn host_rpcs_ride_the_device_relay() {
     session
         .send(SendRequest {
             text: "look at this".into(),
-            attachments: vec![zeron_client::OutgoingAttachment {
+            attachments: vec![zeren_client::OutgoingAttachment {
                 name: "shot.png".into(),
                 mime_type: "image/png".into(),
                 data: vec![1, 2, 3, 4, 5],
@@ -770,7 +770,7 @@ async fn host_rpcs_ride_the_device_relay() {
     let pending = session.snapshot().pending[0].clone();
     assert_eq!(pending.visible_text, "look at this");
     let reference = pending.images[0].clone();
-    let (upload_id, name) = zeron_client::attachments::parse_pending_ref(&reference).unwrap();
+    let (upload_id, name) = zeren_client::attachments::parse_pending_ref(&reference).unwrap();
     let (upload_id, name) = (upload_id.to_owned(), name.to_owned());
     let start = Instant::now();
     loop {
@@ -793,7 +793,7 @@ async fn host_rpcs_ride_the_device_relay() {
     // New project: asked of the owning host (Mutate createSpace).
     let c = client.clone();
     let space_id =
-        zeron_client::runtime::run(
+        zeren_client::runtime::run(
             async move { c.create_project(HOST, "/Users/dev/new", true).await },
         )
         .await
@@ -814,8 +814,8 @@ async fn phone_born_sessions_reach_the_host_before_their_first_command() {
         tokio::time::sleep(Duration::from_millis(20)).await;
     }
     let chat_id = client
-        .create_session(zeron_client::NewSession {
-            target: zeron_client::SessionTarget::Project {
+        .create_session(zeren_client::NewSession {
+            target: zeren_client::SessionTarget::Project {
                 space_id: SPACE.into(),
             },
             config: None,
@@ -869,7 +869,7 @@ async fn acked_command_recovers_failed_host_wake_without_opening_the_chat() {
     session
         .send(SendRequest::text("wake the cold host"))
         .unwrap();
-    let store = zeron_sync::DocsStore::open(dir.path()).unwrap();
+    let store = zeren_sync::DocsStore::open(dir.path()).unwrap();
     let start = Instant::now();
     while edge.rows(CHAT).is_empty() || store.has_pending_chat_updates(CHAT).unwrap() {
         assert!(start.elapsed() < Duration::from_secs(10));
@@ -926,7 +926,7 @@ async fn a_refused_host_wake_settles_instead_of_retrying_forever() {
     session
         .send(SendRequest::text("to a foreign host"))
         .unwrap();
-    let store = zeron_sync::DocsStore::open(dir.path()).unwrap();
+    let store = zeren_sync::DocsStore::open(dir.path()).unwrap();
     let start = Instant::now();
     while edge.rows(CHAT).is_empty()
         || store.has_pending_chat_updates(CHAT).unwrap()
@@ -974,8 +974,8 @@ async fn immediate_exit_after_first_send_recovers_new_chat_on_each_host_platform
         let client = phone(&edge, dir.path());
         await_chat(&client, CHAT).await;
         let chat = client
-            .create_session(zeron_client::NewSession {
-                target: zeron_client::SessionTarget::Project {
+            .create_session(zeren_client::NewSession {
+                target: zeren_client::SessionTarget::Project {
                     space_id: SPACE.into(),
                 },
                 config: Some(ChatConfig {
@@ -1000,9 +1000,9 @@ async fn immediate_exit_after_first_send_recovers_new_chat_on_each_host_platform
             panic!()
         };
         // No background flush, debounce sleep, or incoming host acknowledgement.
-        let store = zeron_sync::DocsStore::open(dir.path()).unwrap();
+        let store = zeren_sync::DocsStore::open(dir.path()).unwrap();
         let bytes = store
-            .load_snapshot(zeron_doc::REGISTRY_DOC_ID)
+            .load_snapshot(zeren_doc::REGISTRY_DOC_ID)
             .unwrap()
             .unwrap();
         let saved = RegistryDoc::from_bytes(&bytes, "ios-live").unwrap();
@@ -1021,7 +1021,7 @@ async fn immediate_exit_after_first_send_recovers_new_chat_on_each_host_platform
             restarted.workspace().session(&chat).is_some(),
             "{platform}: new registry row was not durable"
         );
-        let store = zeron_sync::DocsStore::open(dir.path()).unwrap();
+        let store = zeren_sync::DocsStore::open(dir.path()).unwrap();
         let start = Instant::now();
         while edge.rows(&chat).is_empty()
             || edge.nudges(&chat) == 0
@@ -1093,7 +1093,7 @@ async fn stalled_wakes_yield_delivery_capacity_to_later_chats() {
         .unwrap()
         .send(SendRequest::text("healthy destination"))
         .unwrap();
-    let store = zeron_sync::DocsStore::open(dir.path()).unwrap();
+    let store = zeren_sync::DocsStore::open(dir.path()).unwrap();
     let start = Instant::now();
     while edge.nudges("z-healthy") == 0
         || store

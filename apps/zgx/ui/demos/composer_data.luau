@@ -33,7 +33,7 @@ local FILES: { Mentions.Item } = {
 	{ value = "apps/zgx/ui/ds/composer.luau", label = "composer.luau", detail = "apps/zgx/ui/ds", file = true },
 	{ value = "apps/zgx/ui/ds/composer_dock.luau", label = "composer_dock.luau", detail = "apps/zgx/ui/ds", file = true },
 	{ value = "apps/zgx/ui/gallery.luau", label = "gallery.luau", detail = "apps/zgx/ui", file = true },
-	{ value = "apps/zgx/ui/ds/themes/zeron-dark.json", label = "zeron-dark.json", detail = "apps/zgx/ui/ds/themes", file = true },
+	{ value = "apps/zgx/ui/ds/themes/zeren-dark.json", label = "zeren-dark.json", detail = "apps/zgx/ui/ds/themes", file = true },
 	{ value = "apps/zgx/README.md", label = "README.md", detail = "apps/zgx", file = true },
 	{ value = "Cargo.toml", label = "Cargo.toml", detail = "", file = true },
 }
@@ -73,7 +73,7 @@ local IMAGE_ART: Cargo = { id = "c-art", kind = "image", name = "plate-1-night.j
 local IMAGE_FOREST: Cargo = { id = "c-forest", kind = "image", name = "forest-back.jpg", src = "assets/cards/forest/back.webp", meta = "JPEG · 640 KB" }
 local FILE_DOCK: Cargo = { id = "c-dock", kind = "file", name = "composer_dock.rs", meta = "Rust · 48 KB" }
 local FILE_QUEUE: Cargo = { id = "c-queue", kind = "file", name = "message_queue.rs", meta = "Rust · 12 KB" }
-local FILE_THEME: Cargo = { id = "c-theme", kind = "file", name = "zeron-dark.json", meta = "JSON · 9 KB" }
+local FILE_THEME: Cargo = { id = "c-theme", kind = "file", name = "zeren-dark.json", meta = "JSON · 9 KB" }
 local FILE_LOG: Cargo = { id = "c-log", kind = "file", name = "crash-2026-10-29.log", meta = "Log · 3 KB" }
 local PASTED: Cargo = { id = "c-paste", kind = "text", name = "Pasted text", meta = "412 lines · 18 KB" }
 local PASTED_SHORT: Cargo = { id = "c-paste-2", kind = "text", name = "Pasted text", meta = "36 lines · 2 KB" }
@@ -140,7 +140,7 @@ function M.todos(): { Dock.Todo }
 		{ id = "t4", text = "Fold the running tray when nothing runs", state = "pending" },
 		{ id = "t5", text = "Capture every state in dark and light", state = "pending" },
 		{ id = "t6", text = "Check frames while typing a long draft", state = "pending" },
-		{ id = "t7", text = "Write up what Zeron's composer has that ours doesn't", state = "pending" },
+		{ id = "t7", text = "Write up what Zeren's composer has that ours doesn't", state = "pending" },
 	}
 end
 
@@ -155,7 +155,7 @@ end
 -- What is running: a test run, a dev server, a subagent.
 function M.tasks(): { Dock.Task }
 	return {
-		{ id = "k1", kind = "terminal", name = "cargo test -p zeron-ui", detail = "composer::queue", since = ago(134) },
+		{ id = "k1", kind = "terminal", name = "cargo test -p zeren-ui", detail = "composer::queue", since = ago(134) },
 		{ id = "k2", kind = "process", name = "vite dev", detail = ":5173", since = ago(1812) },
 		{ id = "k3", kind = "agent", name = "Reviewing the diff", detail = "14 files read", since = ago(41) },
 		-- A described command: its name, then the command itself, long.
@@ -163,7 +163,7 @@ function M.tasks(): { Dock.Task }
 			id = "k4",
 			kind = "process",
 			name = "Build with the webkitgtk feature",
-			detail = "cd ~/dev/zeron/apps/zgx && cargo build --release -j 4 --features webkitgtk 2>&1 | tee build.log",
+			detail = "cd ~/dev/zeren/apps/zgx && cargo build --release -j 4 --features webkitgtk 2>&1 | tee build.log",
 			since = ago(420),
 		},
 	}
@@ -175,7 +175,7 @@ local QUESTION: Ask.Question = {
 	options = {
 		{ value = "main", label = "main", detail = "The default branch · 12 commits ahead" },
 		{ value = "release", label = "release/v0.2.130", detail = "Tagged yesterday · the release train" },
-		{ value = "keep", label = "Keep it where it is", detail = "zeron/zgx-onboarding-design-system" },
+		{ value = "keep", label = "Keep it where it is", detail = "zeren/zgx-onboarding-design-system" },
 	},
 }
 
@@ -196,7 +196,7 @@ local QUESTION_MULTI: Ask.Question = {
 local APPROVAL: Ask.Approval = {
 	title = "Run this command?",
 	command = "cargo test --workspace -- --nocapture",
-	cwd = "~/.zeron/worktrees/comet-native/swift-delta",
+	cwd = "~/.zeren/worktrees/comet-native/swift-delta",
 	detail = "Runs every crate's tests; about four minutes.",
 }
 
@@ -206,7 +206,7 @@ local NOTICES: { [string]: Notice } = {
 	reconnecting = { tone = "info", spinner = true, text = "Reconnecting — messages will send once the connection recovers." },
 	sending = { tone = "neutral", spinner = true, text = "Sending…" },
 	error = { tone = "danger", text = "Send failed: devbox didn't answer." },
-	too_large = { tone = "danger", text = "Zeron.app.zip is too large (24 MB max)." },
+	too_large = { tone = "danger", text = "Zeren.app.zip is too large (24 MB max)." },
 	too_many = { tone = "warning", text = "Up to 20 files at a time. 2 were left out." },
 	restored = { tone = "neutral", text = "Draft restored from Tuesday." },
 	archived = { tone = "neutral", text = "This chat is archived." },

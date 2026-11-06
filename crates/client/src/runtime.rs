@@ -25,10 +25,10 @@ pub fn shared() -> &'static Runtime {
     RUNTIME.get_or_init(|| {
         tokio::runtime::Builder::new_multi_thread()
             .worker_threads(2)
-            .thread_name("zeron-client")
+            .thread_name("zeren-client")
             .enable_all()
             .build()
-            .expect("zeron-client runtime")
+            .expect("zeren-client runtime")
     })
 }
 

@@ -24,17 +24,17 @@ use tokio_tungstenite::tungstenite::handshake::server::{
     Request as WsRequest, Response as WsResponse,
 };
 
-use zeron_doc::SessionCommandPayload;
-use zeron_engine::{
+use zeren_doc::SessionCommandPayload;
+use zeren_engine::{
     BranchHeadContext, ChangeRequestError, CheckoutChangeRequestLookup, CheckoutChangeRequests,
     CheckoutSourceContext, EngineCore, HarnessRegistry,
 };
-use zeron_harness::{Harness, HarnessError, RunControls};
-use zeron_proto::{
+use zeren_harness::{Harness, HarnessError, RunControls};
+use zeren_proto::{
     AgentEvent, ChangeRequestState, ChangeRequestSummary, DoneStatus, HarnessId, Model,
     ReasoningLevel, RunRequest, SandboxLevel, SteeringMode,
 };
-use zeron_rpc::{
+use zeren_rpc::{
     DeviceFrameHeader, HostRelay, HostRelayConfig, LinkCache, LinkCacheConfig, RpcError, RpcReply,
     RpcService, StaticToken, decode_device_frame, encode_device_frame, methods,
 };
@@ -288,7 +288,7 @@ fn change_request_lookup(root: &std::path::Path) -> Arc<StaticChangeRequestLooku
                 "feature/status",
                 Some("origin/feature/status"),
                 Some("origin"),
-                Some("https://github.com/acme/zeron.git"),
+                Some("https://github.com/acme/zeren.git"),
             ),
             default_branch: Some("main".into()),
         },
@@ -296,7 +296,7 @@ fn change_request_lookup(root: &std::path::Path) -> Arc<StaticChangeRequestLooku
             provider: "github".into(),
             number: 90,
             title: "Stream checkout pull request".into(),
-            url: "https://github.com/acme/zeron/pull/90".into(),
+            url: "https://github.com/acme/zeren/pull/90".into(),
             state: ChangeRequestState::Open,
             base_ref: "main".into(),
             head_ref: "feature/status".into(),
@@ -416,7 +416,7 @@ async fn checkout_change_request_stream_matches_locally_and_through_device_routi
     let lookup = change_request_lookup(&checkout);
     core_b.change_requests =
         CheckoutChangeRequests::new(core_b.repos.clone(), "device-b", lookup.clone());
-    let local_client = zeron_rpc::memory_client(core_b.rpc_service());
+    let local_client = zeren_rpc::memory_client(core_b.rpc_service());
     let rejected = match local_client
         .subscribe_checked(
             methods::WATCH_CHECKOUT_CHANGE_REQUEST,
@@ -443,7 +443,7 @@ async fn checkout_change_request_stream_matches_locally_and_through_device_routi
         LinkCacheConfig::new(relay_url.clone(), Arc::new(StaticToken("test-user".into())));
     link_config.probe_timeout = Duration::from_secs(5);
     core_a.set_links(LinkCache::new(link_config));
-    let client = zeron_rpc::memory_client(core_a.rpc_service());
+    let client = zeren_rpc::memory_client(core_a.rpc_service());
 
     let deadline = tokio::time::Instant::now() + Duration::from_secs(15);
     let mut remote = loop {
@@ -548,7 +548,7 @@ async fn checkout_change_request_accepts_a_local_chats_source_root() {
     core.workspace
         .set_chat_source_context(
             "chat-outside-projects",
-            &zeron_proto::ConversationSourceContext {
+            &zeren_proto::ConversationSourceContext {
                 checkout_id: "checkout".into(),
                 repo_root: repo_root.to_string_lossy().into_owned(),
                 cwd: app.to_string_lossy().into_owned(),
@@ -558,7 +558,7 @@ async fn checkout_change_request_accepts_a_local_chats_source_root() {
             },
         )
         .expect("source context");
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
 
     let mut watch = client
         .subscribe_checked(
@@ -610,7 +610,7 @@ async fn unsupported_remote_change_request_watch_keeps_the_shared_device_link() 
         LinkCacheConfig::new(relay_url, Arc::new(StaticToken("test-user".into())));
     link_config.probe_timeout = Duration::from_secs(5);
     core.set_links(LinkCache::new(link_config));
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
 
     // The host can take a moment to attach to the room. Once attached, an old
     // host rejects only the capability added by this version.
@@ -685,7 +685,7 @@ async fn git_status_is_computed_on_the_checkout_host_through_the_relay() {
         .create_chat("remote-chat", Some("remote-space"), None, None, None)
         .unwrap();
     host.diff_sync.reconcile_now().await;
-    let local_client = zeron_rpc::memory_client(host.rpc_service());
+    let local_client = zeren_rpc::memory_client(host.rpc_service());
     let mut local = local_client
         .subscribe_checked(
             methods::WATCH_WORKSPACE_GIT_STATUS,
@@ -712,7 +712,7 @@ async fn git_status_is_computed_on_the_checkout_host_through_the_relay() {
     let mut config = LinkCacheConfig::new(relay_url, Arc::new(StaticToken("test-user".into())));
     config.probe_timeout = Duration::from_secs(5);
     consumer.set_links(LinkCache::new(config));
-    let client = zeron_rpc::memory_client(consumer.rpc_service());
+    let client = zeren_rpc::memory_client(consumer.rpc_service());
     // The consumer has no corresponding space/chat: resolving locally must fail.
     assert!(
         client
@@ -774,7 +774,7 @@ async fn target_device_id_routes_over_the_relay() {
         .write_user_message("m-b-1", "hello from B", 1_000)
         .expect("write user message");
 
-    let client = zeron_rpc::memory_client(core_a.rpc_service());
+    let client = zeren_rpc::memory_client(core_a.rpc_service());
 
     // Our own id in targetDeviceId: handled locally, no forward.
     let local = client
@@ -819,7 +819,7 @@ async fn target_device_id_routes_over_the_relay() {
         .uploads
         .import_generated_image(&source, &generated_root, "chat-remote\0image")
         .unwrap();
-    let local_b = zeron_rpc::memory_client(core_b.rpc_service());
+    let local_b = zeren_rpc::memory_client(core_b.rpc_service());
     let local_image = local_b
         .call(
             methods::READ_ATTACHMENT_CHUNK,
@@ -1030,7 +1030,7 @@ async fn target_device_id_routes_over_the_relay() {
     git(&project_root, &["init", "-b", "main"]).await;
     std::fs::write(project_root.join("README.md"), "host B\n").expect("seed repo on B");
     std::fs::write(
-        project_root.join("zeron.json"),
+        project_root.join("zeren.json"),
         r#"{"actions":[{"name":"Lint","command":"pnpm lint","icon":"lint"}]}"#,
     )
     .expect("project file");
@@ -1067,7 +1067,7 @@ async fn target_device_id_routes_over_the_relay() {
                 "targetDeviceId": "device-b",
                 "action": {
                     "name": "Lint",
-                    "command": "printf 'remote-action\\n' > action-marker; if [ -n \"$ZERON_WORKTREE_PATH\" ]; then printf 'ROOT=%s\\nWT=%s\\nCWD=%s\\n' \"$ZERON_PROJECT_ROOT\" \"$ZERON_WORKTREE_PATH\" \"$PWD\" > setup-marker; fi; printf 'remote-action\\n'",
+                    "command": "printf 'remote-action\\n' > action-marker; if [ -n \"$ZEREN_WORKTREE_PATH\" ]; then printf 'ROOT=%s\\nWT=%s\\nCWD=%s\\n' \"$ZEREN_PROJECT_ROOT\" \"$ZEREN_WORKTREE_PATH\" \"$PWD\" > setup-marker; fi; printf 'remote-action\\n'",
                     "icon": "lint",
                     "runOnWorktreeCreate": true,
                 },
@@ -1403,7 +1403,7 @@ async fn exercise_terminal_relay(projectless: bool) {
         LinkCacheConfig::new(relay_url.clone(), Arc::new(StaticToken("test-user".into())));
     link_config.probe_timeout = Duration::from_secs(5);
     core_a.set_links(LinkCache::new(link_config));
-    let client = zeron_rpc::memory_client(core_a.rpc_service());
+    let client = zeren_rpc::memory_client(core_a.rpc_service());
 
     // OpenTerminal forwards to B once the relay session is up.
     let deadline = tokio::time::Instant::now() + Duration::from_secs(15);
@@ -1436,7 +1436,7 @@ async fn exercise_terminal_relay(projectless: bool) {
         let chat = core_b.workspace.chat("chat-term").unwrap().unwrap();
         let chat_cwd = chat.cwd.clone().unwrap();
         assert!(
-            zeron_proto::projectless::is_scratch_cwd(&chat_cwd),
+            zeren_proto::projectless::is_scratch_cwd(&chat_cwd),
             "{chat_cwd}"
         );
         assert_eq!(chat.space_id, None);
@@ -1558,7 +1558,7 @@ async fn workspace_file_surface_proxies_over_the_relay() {
         LinkCacheConfig::new(relay_url, Arc::new(StaticToken("test-user".into())));
     link_config.probe_timeout = Duration::from_secs(5);
     core_a.set_links(LinkCache::new(link_config));
-    let client = zeron_rpc::memory_client(core_a.rpc_service());
+    let client = zeren_rpc::memory_client(core_a.rpc_service());
 
     let deadline = tokio::time::Instant::now() + Duration::from_secs(15);
     let listing = loop {
@@ -1684,7 +1684,7 @@ async fn workspace_file_surface_proxies_over_the_relay() {
 
     let large_svg = format!(
         r#"<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><!--{}--><rect width="20" height="20" fill="red"/></svg>"#,
-        " ".repeat(zeron_proto::WORKSPACE_IMAGE_CHUNK_BYTES)
+        " ".repeat(zeren_proto::WORKSPACE_IMAGE_CHUNK_BYTES)
     );
     std::fs::write(repo_b.join("remote-image.svg"), &large_svg).unwrap();
     let image_request = serde_json::json!({
@@ -1802,7 +1802,7 @@ async fn workspace_file_surface_proxies_over_the_relay() {
 async fn remote_target_without_links_fails_clearly() {
     let dirs = tempfile::tempdir().expect("tempdir");
     let core = assemble(&dirs.path().join("solo"), "device-solo");
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     for (method, params) in [
         (
             methods::LIST_PROJECT_ACTIONS,
@@ -1907,8 +1907,8 @@ async fn queue_watch_and_single_consumption_route_to_the_remote_chat_host() {
         LinkCacheConfig::new(relay_url, Arc::new(StaticToken("test-user".into())));
     link_config.probe_timeout = Duration::from_secs(5);
     core_a.set_links(LinkCache::new(link_config));
-    let remote_client = zeron_rpc::memory_client(core_a.rpc_service());
-    let local_client = zeron_rpc::memory_client(core_b.rpc_service());
+    let remote_client = zeren_rpc::memory_client(core_a.rpc_service());
+    let local_client = zeren_rpc::memory_client(core_b.rpc_service());
 
     // The opening stream frame is the authoritative whole-list snapshot a
     // remote Desktop/iOS client uses to repair or initialize its queue.
@@ -2059,7 +2059,7 @@ async fn workspace_entry_mutations_are_forwarded_to_the_owning_plain_folder() {
             false,
         )
         .unwrap();
-    let client = zeron_rpc::memory_client(viewer.rpc_service());
+    let client = zeren_rpc::memory_client(viewer.rpc_service());
     let page = client
         .call(
             methods::LIST_WORKSPACE_DIRECTORY,
@@ -2102,7 +2102,7 @@ async fn workspace_entry_mutations_are_forwarded_to_the_owning_plain_folder() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn mcp_standalone_session_executes_on_the_selected_device() {
     use serde_json::json;
-    use zeron_mcp::{Origin, Tools, Zeron};
+    use zeren_mcp::{Origin, Tools, Zeren};
 
     let (relay_url, relay) = fake_device_room().await;
     let dirs = tempfile::tempdir().unwrap();
@@ -2112,8 +2112,8 @@ async fn mcp_standalone_session_executes_on_the_selected_device() {
     let remote_dir = dirs.path().join("b");
     std::fs::create_dir_all(&remote_dir).unwrap();
     std::fs::write(remote_dir.join("device-id"), "device-b").unwrap();
-    let profile = zeron_engine::EngineProfile::development(&remote_dir, "dev-org", "dev-user");
-    let remote_store = zeron_sync::DocsStore::open(profile.store_root()).unwrap();
+    let profile = zeren_engine::EngineProfile::development(&remote_dir, "dev-org", "dev-user");
+    let remote_store = zeren_sync::DocsStore::open(profile.store_root()).unwrap();
     let b = EngineCore::assemble_with_profile(
         profile,
         registry_for(HarnessId::Codex),
@@ -2121,15 +2121,15 @@ async fn mcp_standalone_session_executes_on_the_selected_device() {
         None,
     )
     .unwrap();
-    let registry = zeron_sync::registry::mock_server::MockRegistryServer::start().await;
+    let registry = zeren_sync::registry::mock_server::MockRegistryServer::start().await;
     a.workspace.connect_registry_url(&registry.url());
     b.workspace.connect_registry_url(&registry.url());
     let host = b.start_host_relay(&relay_url);
     let mut config = LinkCacheConfig::new(relay_url, Arc::new(StaticToken("test-user".into())));
     config.probe_timeout = Duration::from_secs(5);
     a.set_links(LinkCache::new(config));
-    let client = zeron_rpc::memory_client(a.rpc_service());
-    let tools = Tools::new(Arc::new(Zeron::with_client(
+    let client = zeren_rpc::memory_client(a.rpc_service());
+    let tools = Tools::new(Arc::new(Zeren::with_client(
         client,
         Origin {
             chat_id: Some("coordinator".into()),
@@ -2287,16 +2287,16 @@ impl RpcService for OneStatus {
         &self,
         method: &str,
         _params: serde_json::Value,
-    ) -> Result<zeron_rpc::RpcReply, RpcError> {
+    ) -> Result<zeren_rpc::RpcReply, RpcError> {
         if method == methods::UPDATE_STATUS {
             let item = serde_json::json!({ "currentVersion": self.0 });
-            return Ok(zeron_rpc::RpcReply::Stream(
+            return Ok(zeren_rpc::RpcReply::Stream(
                 futures::stream::once(async move { item })
                     .chain(futures::stream::pending())
                     .boxed(),
             ));
         }
-        zeron_rpc::RpcReply::value(&serde_json::json!({}))
+        zeren_rpc::RpcReply::value(&serde_json::json!({}))
     }
 }
 
@@ -2320,7 +2320,7 @@ async fn update_status_follows_another_device_through_its_restart() {
         LinkCacheConfig::new(relay_url.clone(), Arc::new(StaticToken("test-user".into())));
     link_config.probe_timeout = Duration::from_secs(5);
     core.set_links(LinkCache::new(link_config));
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
 
     let params = serde_json::json!({ "targetDeviceId": "other-device" });
     let deadline = tokio::time::Instant::now() + Duration::from_secs(15);
@@ -2361,7 +2361,7 @@ async fn updating_a_device_that_cannot_be_reached_says_so_plainly() {
     let mut link_config = LinkCacheConfig::new(relay_url, Arc::new(StaticToken("test-user".into())));
     link_config.probe_timeout = Duration::from_secs(2);
     core.set_links(LinkCache::new(link_config));
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     let error = client
         .call(
             methods::APPLY_UPDATE,

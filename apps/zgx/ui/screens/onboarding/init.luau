@@ -117,9 +117,9 @@ return function(): Node
 	-- Not while the intro hands over: its copy of this window, which has no
 	-- account, shows Sign in, and the two must match until it's gone; the
 	-- step moves on as the window becomes yours.
-	-- Once, and outside the effect: what it starts (a call to Zeron) is no
+	-- Once, and outside the effect: what it starts (a call to Zeren) is no
 	-- dependency of it. The same after a hot reload in the middle of a
-	-- sign-in (Sign in still waiting on the browser, or on Zeron's
+	-- sign-in (Sign in still waiting on the browser, or on Zeren's
 	-- answers): the load that asked is gone, and with it what it would
 	-- have done with the answers, so this load asks again.
 	local skipped = false

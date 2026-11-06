@@ -19,7 +19,7 @@ ZGX = os.path.dirname(HERE)
 ROOT = subprocess.check_output(["git", "rev-parse", "--show-toplevel"], cwd=ZGX, text=True).strip()
 OUT = os.path.join(ZGX, "ui", "demos", "files_snapshot.luau")
 # Where the demo says the checkout lives: no one's real home folder.
-SHOWN_ROOT = "~/code/zeron"
+SHOWN_ROOT = "~/code/zeren"
 
 # Whose text comes along. Every file is listed (path, size, status), but only
 # some carry their text, so the demo stays small: the files the page is built
@@ -33,7 +33,7 @@ CURATED = [
     ".gitignore",
     "apps/zgx/README.md",
     "apps/zgx/Cargo.toml",
-    # One big file to open: Zeron's preview.rs, 5,000 lines.
+    # One big file to open: Zeren's preview.rs, 5,000 lines.
     "crates/ui/src/files/preview.rs",
     "crates/ui/src/files/tree.rs",
     "apps/zgx/src/files.rs",

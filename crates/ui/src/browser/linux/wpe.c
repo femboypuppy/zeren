@@ -1,6 +1,6 @@
 #define _GNU_SOURCE
 // WPE WebKit runs in its own process behind a WPEPlatform implemented here, so
-// Zeron is the compositor: WebKit renders dma-bufs on GPUI's GPU, in a layout
+// Zeren is the compositor: WebKit renders dma-bufs on GPUI's GPU, in a layout
 // GPUI can import, GPUI copies their damaged regions into a persistent atlas
 // tile, and GPUI's own frame callbacks drive WebKit's vblank. Frames GPUI cannot
 // import, and those of pages rendered without a GPU, cross through a
@@ -61,14 +61,14 @@ struct _Page {
     WPEScreen *screen;
     gboolean visible;
     gchar *error;
-    int width, height; // device pixels, as Zeron lays the page out
+    int width, height; // device pixels, as Zeren lays the page out
     double scale;
     WebKitOptionMenu *options;
     gchar *context_link;
     double pointer_x, pointer_y; // logical pixels
     guint buttons;               // pressed buttons as WPE modifiers
-    WPEBuffer *rendered;         // shown to Zeron, waits for "presented"
-    GHashTable *held;            // buffer id -> WPEBuffer Zeron may still read
+    WPEBuffer *rendered;         // shown to Zeren, waits for "presented"
+    GHashTable *held;            // buffer id -> WPEBuffer Zeren may still read
     gboolean readback;           // deliver GPU frames through the mirror
     int mirror_fd;
     guint8 *mirror;
@@ -78,10 +78,10 @@ struct _Page {
 
 // ---------------------------------------------------------------- protocol
 static void send_packet_fd(char kind, guint id, const void *data, gsize length, int fd) {
-    // Zeron would drop the connection, and every page with it, over one
+    // Zeren would drop the connection, and every page with it, over one
     // page's huge title or copy.
     if (length > MAX_PACKET) {
-        g_printerr("zeron-wpe: dropping a '%c' packet of %zu bytes\n", kind, length);
+        g_printerr("zeren-wpe: dropping a '%c' packet of %zu bytes\n", kind, length);
         return;
     }
     guint8 header[9] = {(guint8)kind};
@@ -197,7 +197,7 @@ static void im_focus(WebKitInputMethodContext *ctx, gboolean focused) {
 static void im_focus_in(WebKitInputMethodContext *ctx) { im_focus(ctx, TRUE); }
 static void im_focus_out(WebKitInputMethodContext *ctx) { im_focus(ctx, FALSE); }
 static void im_cursor(WebKitInputMethodContext *ctx, int x, int y, int w, int h) {
-    // WPE reports logical pixels; Zeron's input handler expects device pixels.
+    // WPE reports logical pixels; Zeren's input handler expects device pixels.
     Page *p = g_hash_table_lookup(pages, GUINT_TO_POINTER(((BrowserIM *)ctx)->id));
     double scale = p ? p->scale : 1;
     JsonBuilder *b = json_builder_new();
@@ -246,7 +246,7 @@ static void browser_im_init(BrowserIM *im) { im->preedit = g_strdup(""); }
 
 // ---------------------------------------------------------------- clipboard
 // WebKit's own copy and paste (keyboard shortcuts, menus, page script) go
-// through this clipboard. Local content is forwarded to GPUI's; Zeron pushes
+// through this clipboard. Local content is forwarded to GPUI's; Zeren pushes
 // the system text before any paste it forwards.
 typedef struct {
     WPEClipboard parent;
@@ -292,7 +292,7 @@ static void set_system_clipboard(WPEClipboard *clipboard, const char *text) {
         g_ptr_array_add(formats, (gpointer)g_intern_static_string("text/plain;charset=utf-8"));
     }
     // Not local: WebKit reads it back through z_clipboard_read and it is not
-    // echoed to Zeron, which would replace richer system content with text.
+    // echoed to Zeren, which would replace richer system content with text.
     WPE_CLIPBOARD_GET_CLASS(clipboard)->changed(clipboard, formats, FALSE, NULL);
     g_ptr_array_unref(formats);
 }
@@ -489,13 +489,13 @@ static gboolean ensure_mirror(Page *p, int width, int height) {
         return TRUE;
     close_mirror(p);
     size_t size = (size_t)width * height * 4;
-    int fd = memfd_create("zeron-browser-frame", MFD_CLOEXEC | MFD_ALLOW_SEALING);
+    int fd = memfd_create("zeren-browser-frame", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0 || ftruncate(fd, size) < 0) {
         if (fd >= 0)
             close(fd);
         return FALSE;
     }
-    // Zeron maps the mirror read-only and checks it is never resized.
+    // Zeren maps the mirror read-only and checks it is never resized.
     fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW | F_SEAL_SEAL);
     void *map = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (map == MAP_FAILED) {
@@ -578,13 +578,13 @@ static gboolean shares_gpu(WPEBuffer *buffer) {
            contains_modifier(importable, wpe_buffer_dma_buf_get_modifier(dmabuf));
 }
 static guint register_dmabuf(Page *p, WPEBuffer *buffer) {
-    BufferTag *tag = g_object_get_data(G_OBJECT(buffer), "zeron-buffer");
+    BufferTag *tag = g_object_get_data(G_OBJECT(buffer), "zeren-buffer");
     if (tag)
         return tag->id;
     tag = g_new0(BufferTag, 1);
     tag->id = next_buffer++;
     tag->page = p->id;
-    g_object_set_data_full(G_OBJECT(buffer), "zeron-buffer", tag, forget_buffer);
+    g_object_set_data_full(G_OBJECT(buffer), "zeren-buffer", tag, forget_buffer);
     WPEBufferDMABuf *dmabuf = WPE_BUFFER_DMA_BUF(buffer);
     JsonBuilder *b = json_builder_new();
     json_builder_begin_object(b);
@@ -631,7 +631,7 @@ static gboolean z_view_render_buffer(WPEView *view, WPEBuffer *buffer, const WPE
         if (!mirror_frame(p, buffer, damage, n)) {
             // WebKit renders again but would never reuse this buffer.
             wpe_view_buffer_released(view, buffer);
-            // No frame reaches Zeron: say why once, rather than show nothing.
+            // No frame reaches Zeren: say why once, rather than show nothing.
             if (!p->error) {
                 p->error = g_strdup("This page's frames could not be shown.");
                 state(p);
@@ -706,7 +706,7 @@ static gboolean has_extension(EGLDisplay egl, const char *name) {
     return FALSE;
 }
 // The AR24 layouts WebKit can render into on this GPU: EGL renders to them and
-// GBM allocates them in one plane, as Zeron takes one fd per buffer. GPUs
+// GBM allocates them in one plane, as Zeren takes one fd per buffer. GPUs
 // differ: NVIDIA renders only to its tiled layouts.
 static GArray *renderable_modifiers(ZDisplay *d) {
     GArray *modifiers = g_array_new(FALSE, FALSE, sizeof(guint64));
@@ -757,7 +757,7 @@ static void probe_gpu(ZDisplay *d) {
         d->gbm ? eglGetPlatformDisplay(EGL_PLATFORM_GBM_KHR, d->gbm, NULL) : EGL_NO_DISPLAY;
     EGLint major = 0, minor = 0;
     if (!primary || egl == EGL_NO_DISPLAY || !eglInitialize(egl, &major, &minor)) {
-        g_printerr("zeron-wpe: no usable EGL on %s (0x%x), using shared memory\n", render_node,
+        g_printerr("zeren-wpe: no usable EGL on %s (0x%x), using shared memory\n", render_node,
                    eglGetError());
         if (egl != EGL_NO_DISPLAY)
             eglTerminate(egl);
@@ -768,7 +768,7 @@ static void probe_gpu(ZDisplay *d) {
     d->egl = egl;
     GArray *renderable = renderable_modifiers(d);
     if (!renderable->len) {
-        g_printerr("zeron-wpe: %s renders no shareable AR24 layout, using shared memory\n",
+        g_printerr("zeren-wpe: %s renders no shareable AR24 layout, using shared memory\n",
                    render_node);
         g_array_unref(renderable);
         eglTerminate(egl);
@@ -786,7 +786,7 @@ static void probe_gpu(ZDisplay *d) {
     }
     d->shared = d->modifiers->len > 0;
     if (!d->shared) {
-        g_printerr("zeron-wpe: Zeron imports none of the layouts %s renders, reading frames back\n",
+        g_printerr("zeren-wpe: Zeren imports none of the layouts %s renders, reading frames back\n",
                    render_node);
         g_array_unref(d->modifiers);
         d->modifiers = g_array_ref(renderable);
@@ -843,13 +843,13 @@ static gboolean read_back(Page *p, WPEBuffer *buffer, const WPERectangle *damage
             "glEGLImageTargetRenderbufferStorageOES");
     }
     if (!d->gl || !storage || !eglMakeCurrent(d->egl, EGL_NO_SURFACE, EGL_NO_SURFACE, d->gl)) {
-        g_printerr("zeron-wpe: no GL context to read frames back (0x%x)\n", eglGetError());
+        g_printerr("zeren-wpe: no GL context to read frames back (0x%x)\n", eglGetError());
         return FALSE;
     }
     GError *error = NULL;
     EGLImage image = wpe_buffer_import_to_egl_image(buffer, &error);
     if (!image) {
-        g_printerr("zeron-wpe: frame readback failed: %s\n", error ? error->message : "?");
+        g_printerr("zeren-wpe: frame readback failed: %s\n", error ? error->message : "?");
         g_clear_error(&error);
         eglMakeCurrent(d->egl, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         return FALSE;
@@ -909,7 +909,7 @@ static WPEClipboard *z_display_get_clipboard(WPEDisplay *display) {
     return d->clipboard;
 }
 // No use_explicit_sync: without it WebKit waits for each frame's rendering
-// fence before rendering a buffer here, and Zeron copies frames without one.
+// fence before rendering a buffer here, and Zeren copies frames without one.
 static void z_display_class_init(ZDisplayClass *klass) {
     WPEDisplayClass *c = WPE_DISPLAY_CLASS(klass);
     c->connect = z_display_connect;
@@ -1156,7 +1156,7 @@ static const char *string(JsonObject *o, const char *key) {
                : "";
 }
 static guint32 event_time(void) { return (guint32)(g_get_monotonic_time() / 1000); }
-// Zeron sends GDK modifier masks, shared with the WebKitGTK helper.
+// Zeren sends GDK modifier masks, shared with the WebKitGTK helper.
 static WPEModifiers modifiers(JsonObject *o) {
     guint mods = number(o, "mods"), wpe = 0;
     if (mods & 1)
@@ -1282,7 +1282,7 @@ static void resize(Page *p, JsonObject *o) {
     // WebKit lays out in logical pixels and renders them at the device scale.
     // Round up: GPUI clips a page that overflows by a fraction of a pixel,
     // where rounding down would leave a seam along its right and bottom edges.
-    // Never past the largest frame Zeron takes, though.
+    // Never past the largest frame Zeren takes, though.
     int most = (int)(MAX_DIMENSION / scale);
     wpe_toplevel_resize(toplevel, CLAMP((int)ceil(w / scale - 0.01), 1, most),
                         CLAMP((int)ceil(h / scale - 0.01), 1, most));
@@ -1322,14 +1322,14 @@ static void command(JsonObject *o) {
     } else if (!strcmp(cmd, "released")) {
         release_held(p, number(o, "buffer"));
     } else if (!strcmp(cmd, "readback")) {
-        // Zeron could not import this frame: resend it, and every later one,
+        // Zeren could not import this frame: resend it, and every later one,
         // through shared memory.
         guint buffer = number(o, "buffer");
         WPEBuffer *held = g_hash_table_lookup(p->held, GUINT_TO_POINTER(buffer));
         p->readback = TRUE;
         if (!held || !mirror_frame(p, held, NULL, 0)) {
             if (held)
-                g_printerr("zeron-wpe: page %u has no usable frame path\n", p->id);
+                g_printerr("zeren-wpe: page %u has no usable frame path\n", p->id);
             // No frame comes to acknowledge: let WebKit render the next.
             present(p);
         }
@@ -1438,7 +1438,7 @@ static gboolean read_commands(gint fd, GIOCondition condition, gpointer unused) 
         memcpy(&length, input->data, 4);
         length = GUINT32_FROM_LE(length);
         if (length > MAX_PACKET) {
-            g_printerr("zeron-wpe: command of %u bytes exceeds the protocol limit\n", length);
+            g_printerr("zeren-wpe: command of %u bytes exceeds the protocol limit\n", length);
             g_main_loop_quit(loop);
             return G_SOURCE_REMOVE;
         }
@@ -1490,7 +1490,7 @@ static gboolean configure_storage(const char *profile) {
     g_free(lock_path);
     if (profile_lock < 0 || flock(profile_lock, LOCK_EX | LOCK_NB) < 0) {
         startup_error("Browser profile is in use by another process or cannot be locked. Close "
-                      "the other Zeron instance and reopen this tab.");
+                      "the other Zeren instance and reopen this tab.");
         return FALSE;
     }
     gchar *data = g_build_filename(profile, "data", NULL);
@@ -1568,7 +1568,7 @@ int main(int argc, char **argv) {
             importable = parse_modifiers(argv[i + 1]);
     }
     if (!take_socket()) {
-        g_printerr("zeron-wpe: standard input must be the Zeron protocol socket\n");
+        g_printerr("zeren-wpe: standard input must be the Zeren protocol socket\n");
         return 1;
     }
     loop = g_main_loop_new(NULL, FALSE);
@@ -1586,7 +1586,7 @@ int main(int argc, char **argv) {
         return 1;
     configure_settings();
     ticks = g_async_queue_new();
-    GThread *vblank = g_thread_new("zeron-vblank", vblank_thread, NULL);
+    GThread *vblank = g_thread_new("zeren-vblank", vblank_thread, NULL);
     JsonBuilder *b = json_builder_new();
     json_builder_begin_object(b);
     ZDisplay *d = (ZDisplay *)display;

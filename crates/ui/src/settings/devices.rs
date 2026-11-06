@@ -10,8 +10,8 @@ use gpui::{
 };
 use std::time::Duration;
 
-use zeron_proto::WorkspaceScope;
-use zeron_rpc::methods;
+use zeren_proto::WorkspaceScope;
+use zeren_rpc::methods;
 
 use crate::composer::{ComposerInput, ComposerInputEvent};
 use crate::popover;
@@ -264,7 +264,7 @@ impl popover::ScrollRailHost for DevicesPage {
     }
 }
 
-/// Human platform label (zeron settings.devices.tsx `platformLabel`).
+/// Human platform label (zeren settings.devices.tsx `platformLabel`).
 pub fn platform_label(platform: &str) -> &str {
     match platform {
         "macos" | "darwin" => "macOS",
@@ -273,7 +273,7 @@ pub fn platform_label(platform: &str) -> &str {
         "web" => "Web",
         "ios" => "iOS",
         "android" => "Android",
-        zeron_proto::CLOUD_PLATFORM => crate::cloud::CLOUD_LABEL,
+        zeren_proto::CLOUD_PLATFORM => crate::cloud::CLOUD_LABEL,
         other => other,
     }
 }
@@ -314,7 +314,7 @@ impl Render for DevicesPage {
             .enumerate()
             .partition(|(_, (device, _))| local_id.as_deref() == Some(device.id.as_str()));
         let device_row = |ix: usize,
-                          (device, presence): (zeron_proto::Device, crate::cloud::Presence),
+                          (device, presence): (zeren_proto::Device, crate::cloud::Presence),
                           first: bool| {
             let is_cloud = crate::cloud::is_cloud(&device);
             let is_local = local_id.as_deref() == Some(device.id.as_str());

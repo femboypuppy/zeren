@@ -13,18 +13,18 @@
 //!   or a template's consent, src/plugins/consent.rs) never touches it, and
 //!   a window closing puts back the bar of the one under it. (Before Nov 3
 //!   every window set its own: the consent sheet a plugin asks for as it's
-//!   added set a bar with none of Zeron's commands, and when it closed
+//!   added set a bar with none of Zeren's commands, and when it closed
 //!   nothing set the main window's back. Every shortcut was gone until a
 //!   relaunch: src/menu_bar_tests.rs.)
 //! - **It refuses a whole bar for one bad item**, keeping the last: a
 //!   label or action empty, an action twice, a shortcut a menu can't name
 //!   (`⌘?`, `⌘é`) or one named twice. So the bar is made to be one it
-//!   takes, item by item (`Bar::of`): Zeron's commands first, then the
+//!   takes, item by item (`Bar::of`): Zeren's commands first, then the
 //!   plugins', each command once, each shortcut once (as the menu names
-//!   it: `meta+k` is `cmd+k` on a Mac). Zeron's always keep theirs; a
+//!   it: `meta+k` is `cmd+k` on a Mac). Zeren's always keep theirs; a
 //!   plugin's that is taken, or no key at all, is left off that one item,
 //!   which stays in the menu, and its plugin's row on the Plugins page says
-//!   so (`Dropped`). Should the platform refuse a bar anyway, Zeron's own
+//!   so (`Dropped`). Should the platform refuse a bar anyway, Zeren's own
 //!   goes in, never nothing, and it says so loudly.
 //!
 //! Each change makes the whole bar again from the one window's commands and
@@ -70,9 +70,9 @@ pub enum Role {
 }
 
 /// The host's own command ids: no script's command may have one.
-pub const HOST_COMMANDS: &str = "zeron.";
+pub const HOST_COMMANDS: &str = "zeren.";
 
-/// A plugin's command (zgx names each `<plugin>/<id>`; Zeron's have no `/`).
+/// A plugin's command (zgx names each `<plugin>/<id>`; Zeren's have no `/`).
 pub fn is_plugins(command: &Command) -> bool {
     command.id.contains('/')
 }
@@ -93,8 +93,8 @@ pub struct Dropped {
 /// Why a plugin command has no shortcut.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Why {
-    /// It's Zeron's: the title of Zeron's command with it.
-    Zerons(String),
+    /// It's Zeren's: the title of Zeren's command with it.
+    Zerens(String),
     /// Another plugin (its id) had it first.
     Plugins(String),
     /// It isn't a key a menu can show (`cmd+é`, `cmd+?`, a misspelling).
@@ -107,11 +107,11 @@ pub enum Why {
 /// One window's menu bar, made to be one the platform takes.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Bar {
-    /// Zeron's commands and the plugins'.
+    /// Zeren's commands and the plugins'.
     pub menus: Vec<AppMenu>,
-    /// Zeron's alone: what goes in should the platform refuse `menus`.
+    /// Zeren's alone: what goes in should the platform refuse `menus`.
     pub own: Vec<AppMenu>,
-    /// The reserved commands' shortcuts (Zeron's alone reserve).
+    /// The reserved commands' shortcuts (Zeren's alone reserve).
     pub reserved: Vec<MenuAccelerator>,
     /// The plugin commands shown without their shortcut, and why.
     pub dropped: Vec<Dropped>,
@@ -131,7 +131,7 @@ impl Bar {
         for (at, command) in commands.iter().enumerate().filter(|(_, c)| is_plugins(c)) {
             menus.add(at, command);
         }
-        // What zgx took off before the list reached here: a key Zeron's (or
+        // What zgx took off before the list reached here: a key Zeren's (or
         // an earlier plugin's) commands have, spelled the same.
         let find = |id: &str| commands.iter().position(|c| c.id == id);
         for d in dropped.iter().filter(|d| !d.plugin.is_empty()) {
@@ -139,7 +139,7 @@ impl Bar {
                 // (Nothing holds it: zgx refused it for what it is.)
                 _ if d.holder.is_empty() => Why::NoModifier,
                 Some((plugin, _)) => Why::Plugins(plugin.to_string()),
-                None => Why::Zerons(find(&d.holder).map_or_else(|| d.holder.clone(), |at| commands[at].title.clone())),
+                None => Why::Zerens(find(&d.holder).map_or_else(|| d.holder.clone(), |at| commands[at].title.clone())),
             };
             let at = find(&d.command).unwrap_or(usize::MAX);
             let title = commands.get(at).map(|c| c.title.clone()).unwrap_or_default();
@@ -169,7 +169,7 @@ impl Bar {
 #[derive(Clone, Default)]
 struct Menus {
     menus: Vec<AppMenu>,
-    /// Actions in the bar so far (no script's is `zeron.`: the host's own,
+    /// Actions in the bar so far (no script's is `zeren.`: the host's own,
     /// added by `finish`, are unique by that).
     ids: HashSet<String>,
     /// Shortcuts in the bar so far, as the platform names them (its
@@ -195,17 +195,17 @@ impl Menus {
         }
         let title = clean(&command.title);
         if command.id.is_empty() || command.id.contains('\0') || title.is_empty() {
-            eprintln!("zeron-zgx: menus: `{}` has no id or title a menu can show; left out", command.id);
+            eprintln!("zeren-zgx: menus: `{}` has no id or title a menu can show; left out", command.id);
             return;
         }
-        // `zeron.` is the host's: a script's (a template's) command by such
+        // `zeren.` is the host's: a script's (a template's) command by such
         // an id would be a second item with the host's action.
         if command.id.starts_with(HOST_COMMANDS) {
-            eprintln!("zeron-zgx: menus: {} is the host's; the script's is left out", command.id);
+            eprintln!("zeren-zgx: menus: {} is the host's; the script's is left out", command.id);
             return;
         }
         if !self.ids.insert(command.id.clone()) {
-            eprintln!("zeron-zgx: menus: {} is declared twice; shown once", command.id);
+            eprintln!("zeren-zgx: menus: {} is declared twice; shown once", command.id);
             return;
         }
         let mut item = AppMenuEntry::item(title.clone(), command.id.as_str());
@@ -213,7 +213,7 @@ impl Menus {
             match self.claim(command, key) {
                 Ok(accelerator) => item = item.accelerator(accelerator),
                 Err(why) => {
-                    eprintln!("zeron-zgx: menus: {}'s shortcut `{key}` left off ({why:?})", command.id);
+                    eprintln!("zeren-zgx: menus: {}'s shortcut `{key}` left off ({why:?})", command.id);
                     if let Some((plugin, _)) = command.id.split_once('/') {
                         self.dropped.push((at, Dropped { plugin: plugin.to_string(), key: key.to_string(), title, why }));
                     }
@@ -239,7 +239,7 @@ impl Menus {
         if let Some(holder) = self.keys.get(&name) {
             return Err(match holder.split_once('/') {
                 Some((plugin, _)) => Why::Plugins(plugin.to_string()),
-                None => Why::Zerons(self.title_of(holder)),
+                None => Why::Zerens(self.title_of(holder)),
             });
         }
         self.keys.insert(name, command.id.clone());
@@ -260,7 +260,7 @@ impl Menus {
     }
 
     /// The bar, with the host's own after the scripts' View items:
-    /// "Use Zeron v3" (the default's way back), which no template can take
+    /// "Use Zeren v3" (the default's way back), which no template can take
     /// away, and, with a template in preview, "Keep <name>…" (its ellipsis
     /// the macOS one for an item that asks before acting: it opens the keep
     /// sheet).
@@ -279,7 +279,7 @@ impl Menus {
         if let Some(preview) = preview {
             entries.push(AppMenuEntry::item(format!("Keep {}…", clean(&preview.name)), plugins::KEEP_TEMPLATE));
         }
-        entries.push(AppMenuEntry::item("Use Zeron v3", plugins::USE_ZERON_TEMPLATE));
+        entries.push(AppMenuEntry::item("Use Zeren v3", plugins::USE_ZEREN_TEMPLATE));
         self.menus.retain(|m| !m.entries.is_empty());
         self.menus
     }
@@ -307,7 +307,7 @@ pub fn accelerator(text: &str) -> Option<MenuAccelerator> {
             "alt" | "opt" | "option" => modifiers.alt = true,
             "shift" => modifiers.shift = true,
             other => {
-                eprintln!("zeron-zgx: menus: unknown modifier `{other}` in `{text}`");
+                eprintln!("zeren-zgx: menus: unknown modifier `{other}` in `{text}`");
                 return None;
             }
         }
@@ -325,7 +325,7 @@ pub fn accelerator(text: &str) -> Option<MenuAccelerator> {
         "space" => Key::Space,
         single if single.chars().count() == 1 => Key::Character(single.into()),
         other => {
-            eprintln!("zeron-zgx: menus: unknown key `{other}` in `{text}`");
+            eprintln!("zeren-zgx: menus: unknown key `{other}` in `{text}`");
             return None;
         }
     };
@@ -434,18 +434,18 @@ impl MenuBar {
             return;
         }
         if let Err(error) = self.platform.set_menus(bar.menus.clone()) {
-            // Never a bar without Zeron's shortcuts: `Bar::of` made one the
+            // Never a bar without Zeren's shortcuts: `Bar::of` made one the
             // platform should take, so this is a bug to find.
-            eprintln!("zeron-zgx: MENU BAR REFUSED: {error}. Zeron's own commands alone instead; plugins' are out of the menu bar until the next change.");
+            eprintln!("zeren-zgx: MENU BAR REFUSED: {error}. Zeren's own commands alone instead; plugins' are out of the menu bar until the next change.");
             if let Err(error) = self.platform.set_menus(bar.own.clone()) {
-                eprintln!("zeron-zgx: MENU BAR REFUSED AGAIN (Zeron's own): {error}. The host's items alone.");
+                eprintln!("zeren-zgx: MENU BAR REFUSED AGAIN (Zeren's own): {error}. The host's items alone.");
                 if let Err(error) = self.platform.set_menus(Bar::host_only(None)) {
-                    eprintln!("zeron-zgx: menus: {error}");
+                    eprintln!("zeren-zgx: menus: {error}");
                 }
             }
         }
         if let Err(error) = self.platform.set_reserved_shortcuts(bar.reserved.clone()) {
-            eprintln!("zeron-zgx: reserved shortcuts: {error}");
+            eprintln!("zeren-zgx: reserved shortcuts: {error}");
         }
         // A plugin whose shortcut is left off says so on its Plugins row.
         plugins::shortcuts_taken(bar.dropped.clone());

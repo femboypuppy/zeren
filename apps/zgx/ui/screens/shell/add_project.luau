@@ -144,7 +144,7 @@ end
 -- folder above listed it.)
 local folder_page: (device: string, path: string?, title: string, git: boolean, home: boolean) -> Page
 
--- Searching under a device's home (Zeron's "In Home"): its folders anywhere
+-- Searching under a device's home (Zeren's "In Home"): its folders anywhere
 -- under it, through the engine's index. The first ask on Home starts the
 -- index (an empty query), so the first real search is quick; closing New
 -- project lets it go. Two letters or more, not a path; asked again while it

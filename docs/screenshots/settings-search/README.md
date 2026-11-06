@@ -8,12 +8,12 @@ searched here. ⌘F and Enter go through the window's real key dispatch; the
 queries are set on the field.
 
 ```bash
-ZERON_OPEN_ROUTE=settings/general cargo run -p zeron-ui \
+ZEREN_OPEN_ROUTE=settings/general cargo run -p zeren-ui \
   --example settings-search-fixture --features appshots-fixture -- <output-dir> [name]
 ```
 
-`ZERON_PALETTE_LIGHT=1` selects the light palette, `ZERON_FIXTURE_FROSTED=1`
-the frosted surface and `ZERON_FIXTURE_SIZE=<w>x<h>` the window size.
+`ZEREN_PALETTE_LIGHT=1` selects the light palette, `ZEREN_FIXTURE_FROSTED=1`
+the frosted surface and `ZEREN_FIXTURE_SIZE=<w>x<h>` the window size.
 
 ## Behavior
 
@@ -56,7 +56,7 @@ the frosted surface and `ZERON_FIXTURE_SIZE=<w>x<h>` the window size.
 
 ## Verification
 
-- `cargo test -p zeron-ui --lib -- settings::search shell::settings_search`
+- `cargo test -p zeren-ui --lib -- settings::search shell::settings_search`
   covers ranking, typos, highlights and hidden pages; the landing math, glide,
   hand-back, reduced motion, fallback, seek limit and window scoping; and, on
   the real Shell, the keyboard flow end to end, shortcut hits, the keyboard

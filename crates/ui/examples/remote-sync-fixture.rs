@@ -10,7 +10,7 @@
 //! this machine.
 //!
 //! ```sh
-//! cargo run -p zeron-ui --features appshots-fixture --example remote-sync-fixture -- <dir> <scene>
+//! cargo run -p zeren-ui --features appshots-fixture --example remote-sync-fixture -- <dir> <scene>
 //! ```
 //!
 //! Scenes: `cold-open`, `revisit`, `outage`, `outage-draft`, `side-chat`,
@@ -19,9 +19,9 @@ use futures::{StreamExt, stream};
 use gpui::{AppContext, AsyncApp, Bounds, WindowBounds, WindowOptions, px, size};
 use serde_json::{Value, json};
 use std::{collections::HashMap, path::Path, sync::Arc, time::Duration};
-use zeron_proto::{ChatConnectivity, ChatSyncState, Connectivity, ConnectivityState};
-use zeron_rpc::{RpcError, RpcReply, RpcService, methods};
-use zeron_ui::*;
+use zeren_proto::{ChatConnectivity, ChatSyncState, Connectivity, ConnectivityState};
+use zeren_rpc::{RpcError, RpcReply, RpcService, methods};
+use zeren_ui::*;
 
 const HOST: &str = "omarchy";
 const CHAT: &str = "remote-chat";
@@ -202,10 +202,10 @@ fn main() -> anyhow::Result<()> {
     let temp = tempfile::tempdir()?;
     let runtime = tokio::runtime::Runtime::new()?;
     let core = runtime.block_on(async {
-        zeron_engine::EngineCore::assemble(
+        zeren_engine::EngineCore::assemble(
             &temp.path().join("engine"),
-            Arc::new(zeron_engine::default_registry()),
-            zeron_proto::HarnessId::ClaudeCode,
+            Arc::new(zeren_engine::default_registry()),
+            zeren_proto::HarnessId::ClaudeCode,
             None,
         )
     })?;
@@ -215,9 +215,9 @@ fn main() -> anyhow::Result<()> {
     let config = json!({"harness": "claude-code", "model": null, "reasoning": null, "sandbox": "workspace-write"});
     let chat = |id: &str, title: &str, parent: Option<&str>, last: i64, preview: &str| {
         json!({"id": id, "deviceId": HOST, "title": title, "archived": false,
-            "cwd": "/home/dev/zeron", "branch": "main", "checkoutId": null, "config": config,
+            "cwd": "/home/dev/zeren", "branch": "main", "checkoutId": null, "config": config,
             "lastMessagePreview": preview, "lastMessageAt": at(last), "createdAt": at(last + 30),
-            "lastSeenAt": at(last), "spaceId": "zeron", "roomGen": 2, "parentChatId": parent})
+            "lastSeenAt": at(last), "spaceId": "zeren", "roomGen": 2, "parentChatId": parent})
     };
     let chats = json!([
         chat(
@@ -247,7 +247,7 @@ fn main() -> anyhow::Result<()> {
         {"id": HOST, "name": HOST, "platform": "linux", "lastSeenAt": now},
     ]);
     let spaces = json!([
-        {"id": "zeron", "deviceId": HOST, "path": "/home/dev/zeron", "name": "zeron",
+        {"id": "zeren", "deviceId": HOST, "path": "/home/dev/zeren", "name": "zeren",
          "gitDetected": true, "createdAt": at(60 * 24)},
     ]);
     let conversation = json!([
@@ -269,7 +269,7 @@ fn main() -> anyhow::Result<()> {
     let ipc_port = port();
     let data = temp.path().join("ui");
     std::fs::create_dir(&data)?;
-    let _ipc = runtime.block_on(zeron_engine::serve_ipc(ipc_port, &data, service))?;
+    let _ipc = runtime.block_on(zeren_engine::serve_ipc(ipc_port, &data, service))?;
     let boot = EngineBootConfig {
         data_dir: data.clone(),
         ipc_port,
@@ -277,7 +277,7 @@ fn main() -> anyhow::Result<()> {
         edge_token: None,
         org_id: None,
         workos_client_id: None,
-        default_harness: zeron_proto::HarnessId::ClaudeCode,
+        default_harness: zeren_proto::HarnessId::ClaudeCode,
     };
     let failure = Arc::new(std::sync::Mutex::new(None));
     let result = failure.clone();
@@ -338,7 +338,7 @@ fn main() -> anyhow::Result<()> {
                 let run: anyhow::Result<()> = async {
                     let mut waited = 0;
                     while !state.read_with(cx, |s, _| {
-                        matches!(s.connection, zeron_proto::view::ConnectionStatus::Ready)
+                        matches!(s.connection, zeren_proto::view::ConnectionStatus::Ready)
                             && s.chats_synced
                     }) {
                         anyhow::ensure!(waited < 20_000, "the engine never attached");

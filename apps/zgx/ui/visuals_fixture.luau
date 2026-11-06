@@ -2,7 +2,7 @@
 -- shipping app's crates/visual): every node type, from the shipping app's
 -- demo visuals (crates/client/src/demo/visuals.rs) and the visual crate's
 -- own examples, and two that fail. For src/visuals_tests.rs and a look in
--- a window: `zeron-zgx fixture=visuals_fixture.luau --inspect`. Commands
+-- a window: `zeren-zgx fixture=visuals_fixture.luau --inspect`. Commands
 -- switch the theme. `only=<name>` (an arg) shows one of them alone.
 
 ui.theme.strict("warn")
@@ -193,11 +193,11 @@ end
 
 ui.command { id = "theme_light", title = "Light theme", run = function()
 	ui.theme.follow_system(false)
-	ui.theme.current:set("zeron-light")
+	ui.theme.current:set("zeren-light")
 end }
 ui.command { id = "theme_dark", title = "Dark theme", run = function()
 	ui.theme.follow_system(false)
-	ui.theme.current:set("zeron-dark")
+	ui.theme.current:set("zeren-dark")
 end }
 
 local only = nil :: string?
@@ -230,7 +230,7 @@ return ui.scroll {
 		id = "reply",
 		selectable = true,
 		w_full = true,
-		max_w = "$zeron.prose.measure",
+		max_w = "$zeren.prose.measure",
 		p = "$space.6",
 		gap = "$space.7",
 		blocks,

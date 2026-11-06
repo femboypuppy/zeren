@@ -1,5 +1,5 @@
 //! Signing in to an agent added from the ACP registry, the same for every
-//! one: its own sign-in ([`zeron_harness::AcpHarness::sign_in_registry`]),
+//! one: its own sign-in ([`zeren_harness::AcpHarness::sign_in_registry`]),
 //! run here on the device it's added to, its browser captured. The page it
 //! asks for is reported by the login's polls and opened by the app on the
 //! device the person is at; a `localhost` redirect from that browser reaches
@@ -9,12 +9,12 @@
 //! ends saying so, with the command to run in a terminal on this device.
 //!
 //! Registry agents keep their logins themselves: there is no account of
-//! Zeron's to save, list or switch.
+//! Zeren's to save, list or switch.
 
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use zeron_proto::{AgentLoginMode, AgentLoginStart, HarnessId, RegistryAgent};
+use zeren_proto::{AgentLoginMode, AgentLoginStart, HarnessId, RegistryAgent};
 
 use super::{AgentAccounts, EngineError, LoginFlow, TaskLoginState, lock, new_id};
 
@@ -30,11 +30,11 @@ impl AgentAccounts {
     ) -> Result<AgentLoginStart, EngineError> {
         let harness = HarnessId::Registry(agent);
         self.reap_spawned_flows(harness);
-        let record = zeron_harness::acp_registry::record(agent)
+        let record = zeren_harness::acp_registry::record(agent)
             .ok_or_else(|| EngineError::Other(format!("{} isn't added on this device", agent.registry_id())))?;
         let acp = match lock(&self.inner.cli_overrides).get(&harness) {
-            Some(path) => zeron_harness::AcpHarness::registry(agent, &record.name).with_executable(path.clone()),
-            None => zeron_harness::AcpHarness::registry(agent, &record.name),
+            Some(path) => zeren_harness::AcpHarness::registry(agent, &record.name).with_executable(path.clone()),
+            None => zeren_harness::AcpHarness::registry(agent, &record.name),
         };
         let login_id = new_id();
         let home = self.login_home(&login_id)?;
@@ -49,10 +49,10 @@ impl AgentAccounts {
         let browser = super::ensure_recording_browser(&self.inner.config.root_dir());
         #[cfg(not(unix))]
         let browser = None;
-        let options = zeron_harness::acp::SignInOptions {
+        let options = zeren_harness::acp::SignInOptions {
             browser,
             method: method.map(str::to_owned),
-            env: vec![("ZERON_LOGIN_URL_FILE".into(), url_file.clone().into())],
+            env: vec![("ZEREN_LOGIN_URL_FILE".into(), url_file.clone().into())],
             url_filter: None,
         };
         let state = Arc::new(Mutex::new(TaskLoginState {
@@ -88,13 +88,13 @@ impl AgentAccounts {
             let printed = Arc::new(Mutex::new(String::new()));
             let outcome = acp
                 .sign_in_registry(options, move |progress| match progress {
-                    zeron_harness::acp::SignInProgress::OpenBrowser(url) => {
+                    zeren_harness::acp::SignInProgress::OpenBrowser(url) => {
                         let mut state = lock(&progress_state);
                         if state.url.is_none() {
                             state.url = Some(url);
                         }
                     }
-                    zeron_harness::acp::SignInProgress::Output(line) => {
+                    zeren_harness::acp::SignInProgress::Output(line) => {
                         let mut text = lock(&printed);
                         if text.len() < 64 * 1024 {
                             text.push_str(&line);
@@ -111,10 +111,10 @@ impl AgentAccounts {
                 .await
                 .map_err(|error| {
                     let text = error.to_string();
-                    match text.find(zeron_harness::acp::NEEDS_TERMINAL) {
+                    match text.find(zeren_harness::acp::NEEDS_TERMINAL) {
                         Some(at) => format!(
                             "{TERMINAL_PREFIX}{}",
-                            &text[at + zeron_harness::acp::NEEDS_TERMINAL.len()..]
+                            &text[at + zeren_harness::acp::NEEDS_TERMINAL.len()..]
                         ),
                         None => text,
                     }

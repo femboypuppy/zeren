@@ -70,7 +70,7 @@ end
 -- The failing check's log, open in the block when something failed.
 local FAILED_LOG = {
 	"FAIL badge renders a pull request's state (ui/ds/badge.test.luau:88)",
-	"  expected ink $zeron.pr.open, got $zeron.tone.neutral.ink",
+	"  expected ink $zeren.pr.open, got $zeren.tone.neutral.ink",
 	"FAIL badge keeps a colour given outright (ui/ds/badge.test.luau:102)",
 	"  expected #2ea043, got #8b949e",
 	"316 passed, 2 failed in 4m 02s",
@@ -161,7 +161,7 @@ return {
 			local block = git.checks_block { list = checks, open = git.checks_open, log = if failed then git.log(FAILED_LOG) else nil }
 			local description = ds.Settings.Section {
 				title = "Description",
-				ui.column { w_full = true, px = "$space.4", py = "$space.3", rounded = "$radius.xl", bg = "$zeron.settings.card", border = 1, border_color = "$zeron.settings.edge", Markdown { text = git.PR.body } },
+				ui.column { w_full = true, px = "$space.4", py = "$space.3", rounded = "$radius.xl", bg = "$zeren.settings.card", border = 1, border_color = "$zeren.settings.edge", Markdown { text = git.PR.body } },
 			}
 			return ui.column {
 				w_full = true,

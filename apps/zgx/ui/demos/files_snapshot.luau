@@ -2,8 +2,8 @@
 -- demo shows them. Don't edit; run the script again.
 
 return {
-	root = "~/code/zeron",
-	name = "zeron",
+	root = "~/code/zeren",
+	name = "zeren",
 	-- A line a file: its path, its size in bytes, its git status.
 	files = [[
 .github/CODEOWNERS	959	
@@ -45,67 +45,67 @@ apps/android/.gitignore	68
 apps/android/README.md	7748	
 apps/android/app/build.gradle.kts	5688	
 apps/android/app/src/main/AndroidManifest.xml	3605	
-apps/android/app/src/main/java/sh/zeron/android/MainActivity.kt	4568	
-apps/android/app/src/main/java/sh/zeron/android/ZeronApplication.kt	910	
-apps/android/app/src/main/java/sh/zeron/android/core/AppModel.kt	32693	
-apps/android/app/src/main/java/sh/zeron/android/core/Cloud.kt	17611	
-apps/android/app/src/main/java/sh/zeron/android/core/CredentialStore.kt	4552	
-apps/android/app/src/main/java/sh/zeron/android/core/DeliveryService.kt	3736	
-apps/android/app/src/main/java/sh/zeron/android/core/Drafts.kt	588	
-apps/android/app/src/main/java/sh/zeron/android/core/Fonts.kt	3863	
-apps/android/app/src/main/java/sh/zeron/android/core/Terminals.kt	7650	
-apps/android/app/src/main/java/sh/zeron/android/core/Wallpaper.kt	6794	
-apps/android/app/src/main/java/sh/zeron/android/design/BrandMarks.kt	28712	
-apps/android/app/src/main/java/sh/zeron/android/design/Palette.kt	4947	
-apps/android/app/src/main/java/sh/zeron/android/design/Theme.kt	8822	
-apps/android/app/src/main/java/sh/zeron/android/design/WallpaperHero.kt	4187	
-apps/android/app/src/main/java/sh/zeron/android/design/ZeronIcons.kt	4207	
-apps/android/app/src/main/java/sh/zeron/android/terminal/TerminalGlyphs.kt	10239	
-apps/android/app/src/main/java/sh/zeron/android/terminal/TerminalView.kt	28099	
-apps/android/app/src/main/java/sh/zeron/android/transcript/RowModel.kt	8434	
-apps/android/app/src/main/java/sh/zeron/android/transcript/Transcript.kt	16278	
-apps/android/app/src/main/java/sh/zeron/android/transcript/TranscriptState.kt	9803	
-apps/android/app/src/main/java/sh/zeron/android/transcript/Visual.kt	20508	
-apps/android/app/src/main/java/sh/zeron/android/transcript/Widgets.kt	18640	
-apps/android/app/src/main/java/sh/zeron/android/ui/AgentAccountsScreen.kt	23713	
-apps/android/app/src/main/java/sh/zeron/android/ui/ArchivedScreen.kt	6199	
-apps/android/app/src/main/java/sh/zeron/android/ui/BillingScreen.kt	18057	
-apps/android/app/src/main/java/sh/zeron/android/ui/CloudRepoPicker.kt	9137	
-apps/android/app/src/main/java/sh/zeron/android/ui/CloudSettingsScreen.kt	9121	
-apps/android/app/src/main/java/sh/zeron/android/ui/CloudUI.kt	13985	
-apps/android/app/src/main/java/sh/zeron/android/ui/Companions.kt	24282	
-apps/android/app/src/main/java/sh/zeron/android/ui/Components.kt	8111	
-apps/android/app/src/main/java/sh/zeron/android/ui/Composer.kt	24772	
-apps/android/app/src/main/java/sh/zeron/android/ui/ComposerModel.kt	5096	
-apps/android/app/src/main/java/sh/zeron/android/ui/ComposerParts.kt	16825	
-apps/android/app/src/main/java/sh/zeron/android/ui/ComposerSurface.kt	8956	
-apps/android/app/src/main/java/sh/zeron/android/ui/Expressive.kt	10285	
-apps/android/app/src/main/java/sh/zeron/android/ui/GitHubConnect.kt	10451	
-apps/android/app/src/main/java/sh/zeron/android/ui/ImageViewer.kt	7368	
-apps/android/app/src/main/java/sh/zeron/android/ui/ModelPicker.kt	21450	
-apps/android/app/src/main/java/sh/zeron/android/ui/NewProjectScreen.kt	11452	
-apps/android/app/src/main/java/sh/zeron/android/ui/NewSessionScreen.kt	31086	
-apps/android/app/src/main/java/sh/zeron/android/ui/OnboardingScreen.kt	30458	
-apps/android/app/src/main/java/sh/zeron/android/ui/ProvidersScreen.kt	14102	
-apps/android/app/src/main/java/sh/zeron/android/ui/QuestionPanel.kt	10947	
-apps/android/app/src/main/java/sh/zeron/android/ui/SearchScreen.kt	5239	
-apps/android/app/src/main/java/sh/zeron/android/ui/SessionScreen.kt	27227	
-apps/android/app/src/main/java/sh/zeron/android/ui/SessionsScreen.kt	33899	
-apps/android/app/src/main/java/sh/zeron/android/ui/SettingsScreen.kt	19428	
-apps/android/app/src/main/java/sh/zeron/android/ui/SignInScreen.kt	4688	
-apps/android/app/src/main/java/sh/zeron/android/ui/SubagentScreen.kt	10930	
-apps/android/app/src/main/java/sh/zeron/android/ui/TabletShell.kt	11487	
-apps/android/app/src/main/java/sh/zeron/android/ui/TerminalScreen.kt	26012	
-apps/android/app/src/main/java/sh/zeron/android/ui/ZeronRoot.kt	26493	
-apps/android/app/src/main/java/sh/zeron/android/voice/VoiceCallService.kt	8195	
-apps/android/app/src/main/java/sh/zeron/android/voice/VoiceController.kt	29553	
-apps/android/app/src/main/java/sh/zeron/android/voice/VoiceControls.kt	15014	
-apps/android/app/src/main/java/sh/zeron/android/voice/VoiceHost.kt	4163	
-apps/android/app/src/main/java/sh/zeron/android/voice/VoiceMedia.kt	4760	
-apps/android/app/src/main/java/sh/zeron/android/voice/VoiceOrbView.kt	5025	
-apps/android/app/src/main/java/sh/zeron/android/voice/VoicePeer.kt	18328	
-apps/android/app/src/main/java/sh/zeron/android/voice/VoiceSettingsScreen.kt	12533	
-apps/android/app/src/main/java/sh/zeron/android/voice/VoiceStageScreen.kt	19096	
+apps/android/app/src/main/java/sh/zeren/android/MainActivity.kt	4568	
+apps/android/app/src/main/java/sh/zeren/android/ZerenApplication.kt	910	
+apps/android/app/src/main/java/sh/zeren/android/core/AppModel.kt	32693	
+apps/android/app/src/main/java/sh/zeren/android/core/Cloud.kt	17611	
+apps/android/app/src/main/java/sh/zeren/android/core/CredentialStore.kt	4552	
+apps/android/app/src/main/java/sh/zeren/android/core/DeliveryService.kt	3736	
+apps/android/app/src/main/java/sh/zeren/android/core/Drafts.kt	588	
+apps/android/app/src/main/java/sh/zeren/android/core/Fonts.kt	3863	
+apps/android/app/src/main/java/sh/zeren/android/core/Terminals.kt	7650	
+apps/android/app/src/main/java/sh/zeren/android/core/Wallpaper.kt	6794	
+apps/android/app/src/main/java/sh/zeren/android/design/BrandMarks.kt	28712	
+apps/android/app/src/main/java/sh/zeren/android/design/Palette.kt	4947	
+apps/android/app/src/main/java/sh/zeren/android/design/Theme.kt	8822	
+apps/android/app/src/main/java/sh/zeren/android/design/WallpaperHero.kt	4187	
+apps/android/app/src/main/java/sh/zeren/android/design/ZerenIcons.kt	4207	
+apps/android/app/src/main/java/sh/zeren/android/terminal/TerminalGlyphs.kt	10239	
+apps/android/app/src/main/java/sh/zeren/android/terminal/TerminalView.kt	28099	
+apps/android/app/src/main/java/sh/zeren/android/transcript/RowModel.kt	8434	
+apps/android/app/src/main/java/sh/zeren/android/transcript/Transcript.kt	16278	
+apps/android/app/src/main/java/sh/zeren/android/transcript/TranscriptState.kt	9803	
+apps/android/app/src/main/java/sh/zeren/android/transcript/Visual.kt	20508	
+apps/android/app/src/main/java/sh/zeren/android/transcript/Widgets.kt	18640	
+apps/android/app/src/main/java/sh/zeren/android/ui/AgentAccountsScreen.kt	23713	
+apps/android/app/src/main/java/sh/zeren/android/ui/ArchivedScreen.kt	6199	
+apps/android/app/src/main/java/sh/zeren/android/ui/BillingScreen.kt	18057	
+apps/android/app/src/main/java/sh/zeren/android/ui/CloudRepoPicker.kt	9137	
+apps/android/app/src/main/java/sh/zeren/android/ui/CloudSettingsScreen.kt	9121	
+apps/android/app/src/main/java/sh/zeren/android/ui/CloudUI.kt	13985	
+apps/android/app/src/main/java/sh/zeren/android/ui/Companions.kt	24282	
+apps/android/app/src/main/java/sh/zeren/android/ui/Components.kt	8111	
+apps/android/app/src/main/java/sh/zeren/android/ui/Composer.kt	24772	
+apps/android/app/src/main/java/sh/zeren/android/ui/ComposerModel.kt	5096	
+apps/android/app/src/main/java/sh/zeren/android/ui/ComposerParts.kt	16825	
+apps/android/app/src/main/java/sh/zeren/android/ui/ComposerSurface.kt	8956	
+apps/android/app/src/main/java/sh/zeren/android/ui/Expressive.kt	10285	
+apps/android/app/src/main/java/sh/zeren/android/ui/GitHubConnect.kt	10451	
+apps/android/app/src/main/java/sh/zeren/android/ui/ImageViewer.kt	7368	
+apps/android/app/src/main/java/sh/zeren/android/ui/ModelPicker.kt	21450	
+apps/android/app/src/main/java/sh/zeren/android/ui/NewProjectScreen.kt	11452	
+apps/android/app/src/main/java/sh/zeren/android/ui/NewSessionScreen.kt	31086	
+apps/android/app/src/main/java/sh/zeren/android/ui/OnboardingScreen.kt	30458	
+apps/android/app/src/main/java/sh/zeren/android/ui/ProvidersScreen.kt	14102	
+apps/android/app/src/main/java/sh/zeren/android/ui/QuestionPanel.kt	10947	
+apps/android/app/src/main/java/sh/zeren/android/ui/SearchScreen.kt	5239	
+apps/android/app/src/main/java/sh/zeren/android/ui/SessionScreen.kt	27227	
+apps/android/app/src/main/java/sh/zeren/android/ui/SessionsScreen.kt	33899	
+apps/android/app/src/main/java/sh/zeren/android/ui/SettingsScreen.kt	19428	
+apps/android/app/src/main/java/sh/zeren/android/ui/SignInScreen.kt	4688	
+apps/android/app/src/main/java/sh/zeren/android/ui/SubagentScreen.kt	10930	
+apps/android/app/src/main/java/sh/zeren/android/ui/TabletShell.kt	11487	
+apps/android/app/src/main/java/sh/zeren/android/ui/TerminalScreen.kt	26012	
+apps/android/app/src/main/java/sh/zeren/android/ui/ZerenRoot.kt	26493	
+apps/android/app/src/main/java/sh/zeren/android/voice/VoiceCallService.kt	8195	
+apps/android/app/src/main/java/sh/zeren/android/voice/VoiceController.kt	29553	
+apps/android/app/src/main/java/sh/zeren/android/voice/VoiceControls.kt	15014	
+apps/android/app/src/main/java/sh/zeren/android/voice/VoiceHost.kt	4163	
+apps/android/app/src/main/java/sh/zeren/android/voice/VoiceMedia.kt	4760	
+apps/android/app/src/main/java/sh/zeren/android/voice/VoiceOrbView.kt	5025	
+apps/android/app/src/main/java/sh/zeren/android/voice/VoicePeer.kt	18328	
+apps/android/app/src/main/java/sh/zeren/android/voice/VoiceSettingsScreen.kt	12533	
+apps/android/app/src/main/java/sh/zeren/android/voice/VoiceStageScreen.kt	19096	
 apps/android/app/src/main/res/drawable/ic_launcher_inset.xml	186	
 apps/android/app/src/main/res/mipmap-anydpi/ic_launcher.xml	258	
 apps/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png	495361	
@@ -131,7 +131,7 @@ apps/android/icons/keyboard-hide.svg	591
 apps/android/icons/layers.svg	699	
 apps/android/icons/menu.svg	208	
 apps/android/icons/share.svg	361	
-apps/android/icons/zeron.svg	1976	
+apps/android/icons/zeren.svg	1976	
 apps/android/screenshots/accounts-cloud.png	74075	
 apps/android/screenshots/accounts-device.png	91162	
 apps/android/screenshots/attach-staged.png	159399	
@@ -316,1090 +316,1090 @@ apps/card-web/tools/png-strip.mjs	1626
 apps/card-web/tools/serve.mjs	3407	
 apps/card-web/tools/weigh.mjs	3122	
 apps/ios/CoreFFI/module.modulemap	136	
-apps/ios/CoreFFI/zeron_coreFFI.h	161400	
+apps/ios/CoreFFI/zeren_coreFFI.h	161400	
 apps/ios/README.md	8647	
-apps/ios/Zeron.entitlements	246	
-apps/ios/Zeron.xcodeproj/project.pbxproj	24313	
-apps/ios/Zeron.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved	382	
-apps/ios/Zeron.xcodeproj/xcshareddata/xcschemes/Zeron.xcscheme	3266	
-apps/ios/Zeron/App/AppDelegate.swift	1147	
-apps/ios/Zeron/App/AppModel.swift	40192	
-apps/ios/Zeron/App/PushNotifications.swift	7204	
-apps/ios/Zeron/App/SceneDelegate.swift	9544	
-apps/ios/Zeron/Assets.xcassets/AccentColor.colorset/Contents.json	316	
-apps/ios/Zeron/Assets.xcassets/AppIcon.appiconset/AppIcon1024.png	1803905	
-apps/ios/Zeron/Assets.xcassets/AppIcon.appiconset/Contents.json	205	
-apps/ios/Zeron/Assets.xcassets/Contents.json	53	
-apps/ios/Zeron/Assets.xcassets/FileIcons/Contents.json	114	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-component.imageset/Contents.json	242	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-component.imageset/fileicon-files-angular-component.svg	403	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-directive.imageset/Contents.json	461	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-directive.imageset/fileicon-files-angular-directive-dark.svg	407	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-directive.imageset/fileicon-files-angular-directive.svg	407	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-guard.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-guard.imageset/fileicon-files-angular-guard-dark.svg	407	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-guard.imageset/fileicon-files-angular-guard.svg	407	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-module.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-module.imageset/fileicon-files-angular-module-dark.svg	407	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-module.imageset/fileicon-files-angular-module.svg	407	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-pipe.imageset/Contents.json	451	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-pipe.imageset/fileicon-files-angular-pipe-dark.svg	407	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-pipe.imageset/fileicon-files-angular-pipe.svg	407	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-service.imageset/Contents.json	240	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular-service.imageset/fileicon-files-angular-service.svg	403	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-angular.imageset/fileicon-files-angular.svg	403	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-animate.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-animate.imageset/fileicon-files-animate.svg	3214	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-astro.imageset/Contents.json	437	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-astro.imageset/fileicon-files-astro-dark.svg	2422	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-astro.imageset/fileicon-files-astro.svg	2422	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-audio.imageset/Contents.json	437	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-audio.imageset/fileicon-files-audio-dark.svg	424	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-audio.imageset/fileicon-files-audio.svg	424	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-babel.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-babel.imageset/fileicon-files-babel.svg	1892	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-biome.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-biome.imageset/fileicon-files-biome.svg	387	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-blue.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-blue.imageset/fileicon-files-brackets-blue-dark.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-blue.imageset/fileicon-files-brackets-blue.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-gray.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-gray.imageset/fileicon-files-brackets-gray-dark.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-gray.imageset/fileicon-files-brackets-gray.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-green.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-green.imageset/fileicon-files-brackets-green-dark.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-green.imageset/fileicon-files-brackets-green.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-orange.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-orange.imageset/fileicon-files-brackets-orange-dark.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-orange.imageset/fileicon-files-brackets-orange.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-pink.imageset/Contents.json	238	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-pink.imageset/fileicon-files-brackets-pink.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-purple.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-purple.imageset/fileicon-files-brackets-purple-dark.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-purple.imageset/fileicon-files-brackets-purple.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-red.imageset/Contents.json	237	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-red.imageset/fileicon-files-brackets-red.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-sky.imageset/Contents.json	237	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-sky.imageset/fileicon-files-brackets-sky.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-yellow.imageset/Contents.json	240	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-brackets-yellow.imageset/fileicon-files-brackets-yellow.svg	1490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-browserslist.imageset/Contents.json	237	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-browserslist.imageset/fileicon-files-browserslist.svg	3204	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-bruno.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-bruno.imageset/fileicon-files-bruno.svg	3900	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-bun.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-bun.imageset/fileicon-files-bun.svg	9098	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-c.imageset/Contents.json	226	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-c.imageset/fileicon-files-c.svg	1492	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-caddy.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-caddy.imageset/fileicon-files-caddy.svg	4003	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-capacitor.imageset/Contents.json	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-capacitor.imageset/fileicon-files-capacitor.svg	442	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-clapper.imageset/Contents.json	441	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-clapper.imageset/fileicon-files-clapper-dark.svg	482	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-clapper.imageset/fileicon-files-clapper.svg	482	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-claude.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-claude.imageset/fileicon-files-claude.svg	9517	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-clojure.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-clojure.imageset/fileicon-files-clojure.svg	2642	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cloudflare-workers.imageset/Contents.json	243	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cloudflare-workers.imageset/fileicon-files-cloudflare-workers.svg	1517	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cmake.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cmake.imageset/fileicon-files-cmake.svg	356	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-blue.imageset/Contents.json	445	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-blue.imageset/fileicon-files-code-blue-dark.svg	502	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-blue.imageset/fileicon-files-code-blue.svg	502	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-gray.imageset/Contents.json	445	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-gray.imageset/fileicon-files-code-gray-dark.svg	502	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-gray.imageset/fileicon-files-code-gray.svg	502	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-green.imageset/Contents.json	447	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-green.imageset/fileicon-files-code-green-dark.svg	502	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-green.imageset/fileicon-files-code-green.svg	502	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-orange.imageset/Contents.json	449	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-orange.imageset/fileicon-files-code-orange-dark.svg	496	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-orange.imageset/fileicon-files-code-orange.svg	496	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-pink.imageset/Contents.json	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-pink.imageset/fileicon-files-code-pink.svg	502	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-purple.imageset/Contents.json	449	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-purple.imageset/fileicon-files-code-purple-dark.svg	502	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-purple.imageset/fileicon-files-code-purple.svg	502	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-red.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-red.imageset/fileicon-files-code-red.svg	496	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-sky.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-sky.imageset/fileicon-files-code-sky.svg	502	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-yellow.imageset/Contents.json	236	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-code-yellow.imageset/fileicon-files-code-yellow.svg	496	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-coffeescript.imageset/Contents.json	451	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-coffeescript.imageset/fileicon-files-coffeescript-dark.svg	782	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-coffeescript.imageset/fileicon-files-coffeescript.svg	782	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-coldfusion.imageset/Contents.json	235	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-coldfusion.imageset/fileicon-files-coldfusion.svg	2058	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-compressed.imageset/Contents.json	235	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-compressed.imageset/fileicon-files-compressed.svg	1003	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-contentlayer.imageset/Contents.json	451	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-contentlayer.imageset/fileicon-files-contentlayer-dark.svg	2708	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-contentlayer.imageset/fileicon-files-contentlayer.svg	2708	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cplus.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cplus.imageset/fileicon-files-cplus.svg	1908	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-crystal.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-crystal.imageset/fileicon-files-crystal.svg	300	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-csharp.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-csharp.imageset/fileicon-files-csharp.svg	1771	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-csv.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-csv.imageset/fileicon-files-csv.svg	6308	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cucumber.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cucumber.imageset/fileicon-files-cucumber.svg	4132	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cuda.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cuda.imageset/fileicon-files-cuda.svg	1397	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cursor.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cursor.imageset/fileicon-files-cursor.svg	794	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cypress.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-cypress.imageset/fileicon-files-cypress.svg	1631	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-dart.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-dart.imageset/fileicon-files-dart.svg	843	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-database.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-database.imageset/fileicon-files-database.svg	4865	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-deno.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-deno.imageset/fileicon-files-deno-dark.svg	2026	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-deno.imageset/fileicon-files-deno.svg	2026	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker-green.imageset/Contents.json	237	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker-green.imageset/fileicon-files-docker-green.svg	5200	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker-orange.imageset/Contents.json	238	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker-orange.imageset/fileicon-files-docker-orange.svg	5200	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker-pink.imageset/Contents.json	236	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker-pink.imageset/fileicon-files-docker-pink.svg	5199	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker-purple.imageset/Contents.json	238	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker-purple.imageset/fileicon-files-docker-purple.svg	5200	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker-red.imageset/Contents.json	235	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker-red.imageset/fileicon-files-docker-red.svg	5198	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker-yellow.imageset/Contents.json	238	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker-yellow.imageset/fileicon-files-docker-yellow.svg	5201	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docker.imageset/fileicon-files-docker.svg	3562	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-document.imageset/Contents.json	443	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-document.imageset/fileicon-files-document-dark.svg	437	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-document.imageset/fileicon-files-document.svg	437	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docusaurus.imageset/Contents.json	235	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-docusaurus.imageset/fileicon-files-docusaurus.svg	19660	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-drawio.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-drawio.imageset/fileicon-files-drawio.svg	539	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-drizzle.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-drizzle.imageset/fileicon-files-drizzle.svg	1166	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-dts.imageset/Contents.json	433	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-dts.imageset/fileicon-files-dts-dark.svg	2901	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-dts.imageset/fileicon-files-dts.svg	2901	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-dune.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-dune.imageset/fileicon-files-dune-dark.svg	1007	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-dune.imageset/fileicon-files-dune.svg	1007	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-earthfile.imageset/Contents.json	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-earthfile.imageset/fileicon-files-earthfile.svg	3322	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-editorconfig.imageset/Contents.json	237	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-editorconfig.imageset/fileicon-files-editorconfig.svg	8957	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-elixir.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-elixir.imageset/fileicon-files-elixir-dark.svg	779	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-elixir.imageset/fileicon-files-elixir.svg	779	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-erlang.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-erlang.imageset/fileicon-files-erlang.svg	839	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-eslint.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-eslint.imageset/fileicon-files-eslint.svg	1523	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-exe.imageset/Contents.json	433	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-exe.imageset/fileicon-files-exe-dark.svg	1328	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-exe.imageset/fileicon-files-exe.svg	1328	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-expressive-code.imageset/Contents.json	240	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-expressive-code.imageset/fileicon-files-expressive-code.svg	48148	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-firebase.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-firebase.imageset/fileicon-files-firebase.svg	1370	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-font.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-font.imageset/fileicon-files-font-dark.svg	3714	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-font.imageset/fileicon-files-font.svg	3714	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-fortran.imageset/Contents.json	441	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-fortran.imageset/fileicon-files-fortran-dark.svg	2626	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-fortran.imageset/fileicon-files-fortran.svg	2626	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-fresh.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-fresh.imageset/fileicon-files-fresh.svg	3034	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-fsharp.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-fsharp.imageset/fileicon-files-fsharp.svg	646	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-func.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-func.imageset/fileicon-files-func-dark.svg	800	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-func.imageset/fileicon-files-func.svg	800	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gatsby.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gatsby.imageset/fileicon-files-gatsby-dark.svg	832	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gatsby.imageset/fileicon-files-gatsby.svg	832	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gdextension.imageset/Contents.json	449	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gdextension.imageset/fileicon-files-gdextension-dark.svg	1366	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gdextension.imageset/fileicon-files-gdextension.svg	1366	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gdignore.imageset/Contents.json	443	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gdignore.imageset/fileicon-files-gdignore-dark.svg	1366	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gdignore.imageset/fileicon-files-gdignore.svg	1366	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gdproject.imageset/Contents.json	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gdproject.imageset/fileicon-files-gdproject.svg	1366	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gdscript.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gdscript.imageset/fileicon-files-gdscript.svg	1366	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gdshader.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gdshader.imageset/fileicon-files-gdshader.svg	1366	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gear.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gear.imageset/fileicon-files-gear-dark.svg	1168	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gear.imageset/fileicon-files-gear.svg	1168	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gif.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gif.imageset/fileicon-files-gif.svg	1291	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-git.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-git.imageset/fileicon-files-git.svg	1119	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-github.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-github.imageset/fileicon-files-github-dark.svg	1407	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-github.imageset/fileicon-files-github.svg	1407	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gitlab.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gitlab.imageset/fileicon-files-gitlab.svg	1933	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gleam.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gleam.imageset/fileicon-files-gleam.svg	5299	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-globe.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-globe.imageset/fileicon-files-globe.svg	668	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-green.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-green.imageset/fileicon-files-go-green.svg	3198	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-orange.imageset/Contents.json	445	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-orange.imageset/fileicon-files-go-orange-dark.svg	3198	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-orange.imageset/fileicon-files-go-orange.svg	3198	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-pink.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-pink.imageset/fileicon-files-go-pink.svg	3198	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-purple.imageset/Contents.json	445	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-purple.imageset/fileicon-files-go-purple-dark.svg	3198	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-purple.imageset/fileicon-files-go-purple.svg	3198	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-red.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-red.imageset/fileicon-files-go-red.svg	3198	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-yellow.imageset/Contents.json	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go-yellow.imageset/fileicon-files-go-yellow.svg	3198	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go.imageset/Contents.json	227	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-go.imageset/fileicon-files-go.svg	3223	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gradle.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gradle.imageset/fileicon-files-gradle.svg	3215	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-graphql.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-graphql.imageset/fileicon-files-graphql.svg	2102	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gulp.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-gulp.imageset/fileicon-files-gulp.svg	543	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-h.imageset/Contents.json	226	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-h.imageset/fileicon-files-h.svg	694	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-haml.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-haml.imageset/fileicon-files-haml-dark.svg	2899	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-haml.imageset/fileicon-files-haml.svg	2899	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-haskell.imageset/Contents.json	441	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-haskell.imageset/fileicon-files-haskell-dark.svg	487	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-haskell.imageset/fileicon-files-haskell.svg	487	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-http.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-http.imageset/fileicon-files-http-dark.svg	1942	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-http.imageset/fileicon-files-http.svg	1942	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-hugo.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-hugo.imageset/fileicon-files-hugo.svg	62148	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-i18n.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-i18n.imageset/fileicon-files-i18n.svg	674	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ignore.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ignore.imageset/fileicon-files-ignore-dark.svg	1036	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ignore.imageset/fileicon-files-ignore.svg	1036	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-illustrator.imageset/Contents.json	236	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-illustrator.imageset/fileicon-files-illustrator.svg	847	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-image.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-image.imageset/fileicon-files-image.svg	403	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ionic.imageset/Contents.json	437	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ionic.imageset/fileicon-files-ionic-dark.svg	1216	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ionic.imageset/fileicon-files-ionic.svg	1216	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-java.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-java.imageset/fileicon-files-java.svg	835	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-jenkins.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-jenkins.imageset/fileicon-files-jenkins.svg	22368	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-jest.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-jest.imageset/fileicon-files-jest.svg	3915	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-js-test.imageset/Contents.json	441	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-js-test.imageset/fileicon-files-js-test-dark.svg	2518	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-js-test.imageset/fileicon-files-js-test.svg	2518	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-js.imageset/Contents.json	227	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-js.imageset/fileicon-files-js.svg	2518	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-julia-markdown.imageset/Contents.json	239	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-julia-markdown.imageset/fileicon-files-julia-markdown.svg	721	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-julia.imageset/Contents.json	437	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-julia.imageset/fileicon-files-julia-dark.svg	789	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-julia.imageset/fileicon-files-julia.svg	789	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-keystatic.imageset/Contents.json	445	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-keystatic.imageset/fileicon-files-keystatic-dark.svg	469	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-keystatic.imageset/fileicon-files-keystatic.svg	469	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-knip.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-knip.imageset/fileicon-files-knip.svg	3192	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-kotlin.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-kotlin.imageset/fileicon-files-kotlin-dark.svg	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-kotlin.imageset/fileicon-files-kotlin.svg	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-kubb.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-kubb.imageset/fileicon-files-kubb.svg	90663	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-laravel.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-laravel.imageset/fileicon-files-laravel.svg	3156	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-license.imageset/Contents.json	441	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-license.imageset/fileicon-files-license-dark.svg	808	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-license.imageset/fileicon-files-license.svg	808	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-link.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-link.imageset/fileicon-files-link-dark.svg	1051	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-link.imageset/fileicon-files-link.svg	1051	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-liquid.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-liquid.imageset/fileicon-files-liquid.svg	324	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-lock.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-lock.imageset/fileicon-files-lock-dark.svg	1150	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-lock.imageset/fileicon-files-lock.svg	1150	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-lua.imageset/Contents.json	433	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-lua.imageset/fileicon-files-lua-dark.svg	780	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-lua.imageset/fileicon-files-lua.svg	780	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-luau.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-luau.imageset/fileicon-files-luau.svg	770	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-lunaria.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-lunaria.imageset/fileicon-files-lunaria.svg	5360	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-markdoc.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-markdoc.imageset/fileicon-files-markdoc.svg	849	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-markdown.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-markdown.imageset/fileicon-files-markdown.svg	330	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-maven.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-maven.imageset/fileicon-files-maven.svg	2925	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-mdx.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-mdx.imageset/fileicon-files-mdx.svg	362	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-minecraft.imageset/Contents.json	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-minecraft.imageset/fileicon-files-minecraft.svg	561	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-mongo.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-mongo.imageset/fileicon-files-mongo.svg	715	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest-controller.imageset/Contents.json	240	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest-controller.imageset/fileicon-files-nest-controller.svg	12523	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest-decorator.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest-decorator.imageset/fileicon-files-nest-decorator-dark.svg	12523	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest-decorator.imageset/fileicon-files-nest-decorator.svg	12523	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest-guard.imageset/Contents.json	235	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest-guard.imageset/fileicon-files-nest-guard.svg	12523	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest-middleware.imageset/Contents.json	240	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest-middleware.imageset/fileicon-files-nest-middleware.svg	12523	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest-service.imageset/Contents.json	237	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest-service.imageset/fileicon-files-nest-service.svg	12523	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nest.imageset/fileicon-files-nest.svg	12523	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-netlify.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-netlify.imageset/fileicon-files-netlify.svg	1468	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-next.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-next.imageset/fileicon-files-next-dark.svg	730	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-next.imageset/fileicon-files-next.svg	730	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nim.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nim.imageset/fileicon-files-nim.svg	1207	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nix.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nix.imageset/fileicon-files-nix.svg	1061	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-node.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-node.imageset/fileicon-files-node.svg	2446	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nodemon.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nodemon.imageset/fileicon-files-nodemon.svg	2116	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-notebook.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-notebook.imageset/fileicon-files-notebook.svg	359	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-npm.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-npm.imageset/fileicon-files-npm.svg	621	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nunjucks.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nunjucks.imageset/fileicon-files-nunjucks.svg	570	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nuxt.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nuxt.imageset/fileicon-files-nuxt.svg	1224	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nx.imageset/Contents.json	431	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nx.imageset/fileicon-files-nx-dark.svg	2729	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-nx.imageset/fileicon-files-nx.svg	2729	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ocaml.imageset/Contents.json	437	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ocaml.imageset/fileicon-files-ocaml-dark.svg	4456	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ocaml.imageset/fileicon-files-ocaml.svg	4456	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-orval.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-orval.imageset/fileicon-files-orval.svg	12399	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-oxc.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-oxc.imageset/fileicon-files-oxc.svg	1145	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-panda.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-panda.imageset/fileicon-files-panda.svg	2020	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-patch.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-patch.imageset/fileicon-files-patch.svg	1738	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-pdf.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-pdf.imageset/fileicon-files-pdf.svg	7623	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-perl.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-perl.imageset/fileicon-files-perl-dark.svg	4711	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-perl.imageset/fileicon-files-perl.svg	4711	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-photoshop.imageset/Contents.json	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-photoshop.imageset/fileicon-files-photoshop.svg	1318	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-php.imageset/Contents.json	433	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-php.imageset/fileicon-files-php-dark.svg	2874	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-php.imageset/fileicon-files-php.svg	2874	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-pkl.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-pkl.imageset/fileicon-files-pkl.svg	3520	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-pnpm.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-pnpm.imageset/fileicon-files-pnpm-dark.svg	1915	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-pnpm.imageset/fileicon-files-pnpm.svg	1915	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-postcss.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-postcss.imageset/fileicon-files-postcss.svg	842	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-prettier.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-prettier.imageset/fileicon-files-prettier.svg	5215	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-prisma.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-prisma.imageset/fileicon-files-prisma.svg	641	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-proto.imageset/Contents.json	437	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-proto.imageset/fileicon-files-proto-dark.svg	1325	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-proto.imageset/fileicon-files-proto.svg	1325	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-pug.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-pug.imageset/fileicon-files-pug.svg	9882	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-pulumi.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-pulumi.imageset/fileicon-files-pulumi-dark.svg	2760	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-pulumi.imageset/fileicon-files-pulumi.svg	2760	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-puppeteer.imageset/Contents.json	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-puppeteer.imageset/fileicon-files-puppeteer.svg	13786	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-puzzle.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-puzzle.imageset/fileicon-files-puzzle.svg	962	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-python.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-python.imageset/fileicon-files-python.svg	1678	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-r.imageset/Contents.json	429	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-r.imageset/fileicon-files-r-dark.svg	1263	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-r.imageset/fileicon-files-r.svg	1263	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-razor.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-razor.imageset/fileicon-files-razor.svg	1303	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-react-test.imageset/Contents.json	447	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-react-test.imageset/fileicon-files-react-test-dark.svg	1004	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-react-test.imageset/fileicon-files-react-test.svg	1004	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-react-ts.imageset/Contents.json	443	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-react-ts.imageset/fileicon-files-react-ts-dark.svg	956	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-react-ts.imageset/fileicon-files-react-ts.svg	956	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-react.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-react.imageset/fileicon-files-react.svg	956	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-actions.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-actions.imageset/fileicon-files-redux-actions-dark.svg	2169	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-actions.imageset/fileicon-files-redux-actions.svg	2169	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-effects.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-effects.imageset/fileicon-files-redux-effects-dark.svg	2169	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-effects.imageset/fileicon-files-redux-effects.svg	2169	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-facade.imageset/Contents.json	237	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-facade.imageset/fileicon-files-redux-facade.svg	2169	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-reducer.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-reducer.imageset/fileicon-files-redux-reducer-dark.svg	2169	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-reducer.imageset/fileicon-files-redux-reducer.svg	2169	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-selector.imageset/Contents.json	239	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-redux-selector.imageset/fileicon-files-redux-selector.svg	2169	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rescript-interface.imageset/Contents.json	243	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rescript-interface.imageset/fileicon-files-rescript-interface.svg	2380	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rescript.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rescript.imageset/fileicon-files-rescript.svg	1821	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-resource.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-resource.imageset/fileicon-files-resource.svg	629	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-robot.imageset/Contents.json	437	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-robot.imageset/fileicon-files-robot-dark.svg	1326	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-robot.imageset/fileicon-files-robot.svg	1326	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rolldown.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rolldown.imageset/fileicon-files-rolldown.svg	549	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rome.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rome.imageset/fileicon-files-rome-dark.svg	2270	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rome.imageset/fileicon-files-rome.svg	2270	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rsbuild.imageset/Contents.json	232	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rsbuild.imageset/fileicon-files-rsbuild.svg	68569	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rslib.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rslib.imageset/fileicon-files-rslib.svg	141111	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rspack.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rspack.imageset/fileicon-files-rspack.svg	92069	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ruby.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ruby.imageset/fileicon-files-ruby.svg	1284	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rust.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rust.imageset/fileicon-files-rust-dark.svg	9930	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-rust.imageset/fileicon-files-rust.svg	9930	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-sanity.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-sanity.imageset/fileicon-files-sanity-dark.svg	828	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-sanity.imageset/fileicon-files-sanity.svg	828	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-sass.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-sass.imageset/fileicon-files-sass.svg	5436	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-sbt.imageset/Contents.json	433	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-sbt.imageset/fileicon-files-sbt-dark.svg	578	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-sbt.imageset/fileicon-files-sbt.svg	578	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-scala.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-scala.imageset/fileicon-files-scala.svg	1993	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-severless.imageset/Contents.json	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-severless.imageset/fileicon-files-severless.svg	467	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-shadcn.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-shadcn.imageset/fileicon-files-shadcn-dark.svg	331	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-shadcn.imageset/fileicon-files-shadcn.svg	331	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-shell.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-shell.imageset/fileicon-files-shell.svg	342	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-slint.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-slint.imageset/fileicon-files-slint.svg	865	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-solidity.imageset/Contents.json	443	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-solidity.imageset/fileicon-files-solidity-dark.svg	1064	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-solidity.imageset/fileicon-files-solidity.svg	1064	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-statamic-antlers.imageset/Contents.json	241	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-statamic-antlers.imageset/fileicon-files-statamic-antlers.svg	1494	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-storybook.imageset/Contents.json	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-storybook.imageset/fileicon-files-storybook.svg	1993	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-stylelint.imageset/Contents.json	445	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-stylelint.imageset/fileicon-files-stylelint-dark.svg	2379	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-stylelint.imageset/fileicon-files-stylelint.svg	2379	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-stylus.imageset/Contents.json	231	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-stylus.imageset/fileicon-files-stylus.svg	698	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-supabase.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-supabase.imageset/fileicon-files-supabase.svg	1132	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svelte-service.imageset/Contents.json	239	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svelte-service.imageset/fileicon-files-svelte-service.svg	16727	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svelte-ts.imageset/Contents.json	445	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svelte-ts.imageset/fileicon-files-svelte-ts-dark.svg	14726	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svelte-ts.imageset/fileicon-files-svelte-ts.svg	14726	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svelte.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svelte.imageset/fileicon-files-svelte-dark.svg	14674	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svelte.imageset/fileicon-files-svelte.svg	14674	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svg.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svg.imageset/fileicon-files-svg.svg	438	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svx.imageset/Contents.json	433	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svx.imageset/fileicon-files-svx-dark.svg	362	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-svx.imageset/fileicon-files-svx.svg	362	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-swc.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-swc.imageset/fileicon-files-swc.svg	3077	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-swift.imageset/Contents.json	437	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-swift.imageset/fileicon-files-swift-dark.svg	1624	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-swift.imageset/fileicon-files-swift.svg	1624	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-tailwind.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-tailwind.imageset/fileicon-files-tailwind.svg	916	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-taskfile.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-taskfile.imageset/fileicon-files-taskfile.svg	388	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-tauri.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-tauri.imageset/fileicon-files-tauri.svg	1875	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-terraform.imageset/Contents.json	445	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-terraform.imageset/fileicon-files-terraform-dark.svg	358	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-terraform.imageset/fileicon-files-terraform.svg	358	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-tex.imageset/Contents.json	433	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-tex.imageset/fileicon-files-tex-dark.svg	644	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-tex.imageset/fileicon-files-tex.svg	644	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-text.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-text.imageset/fileicon-files-text-dark.svg	297	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-text.imageset/fileicon-files-text.svg	297	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ts-test.imageset/Contents.json	441	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ts-test.imageset/fileicon-files-ts-test-dark.svg	1977	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ts-test.imageset/fileicon-files-ts-test.svg	1977	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ts-types.imageset/Contents.json	443	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ts-types.imageset/fileicon-files-ts-types-dark.svg	1977	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ts-types.imageset/fileicon-files-ts-types.svg	1977	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ts.imageset/Contents.json	431	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ts.imageset/fileicon-files-ts-dark.svg	1977	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-ts.imageset/fileicon-files-ts.svg	1977	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-tsconfig.imageset/Contents.json	443	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-tsconfig.imageset/fileicon-files-tsconfig-dark.svg	2269	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-tsconfig.imageset/fileicon-files-tsconfig.svg	2269	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-turborepo.imageset/Contents.json	234	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-turborepo.imageset/fileicon-files-turborepo.svg	1229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-twig.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-twig.imageset/fileicon-files-twig.svg	1078	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-typst.imageset/Contents.json	230	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-typst.imageset/fileicon-files-typst.svg	344	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-unocss.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-unocss.imageset/fileicon-files-unocss-dark.svg	1031	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-unocss.imageset/fileicon-files-unocss.svg	1031	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-uv.imageset/Contents.json	431	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-uv.imageset/fileicon-files-uv-dark.svg	473	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-uv.imageset/fileicon-files-uv.svg	473	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-v.imageset/Contents.json	429	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-v.imageset/fileicon-files-v-dark.svg	1368	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-v.imageset/fileicon-files-v.svg	1368	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vanilla-extract.imageset/Contents.json	240	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vanilla-extract.imageset/fileicon-files-vanilla-extract.svg	6630	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vercel.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vercel.imageset/fileicon-files-vercel-dark.svg	155	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vercel.imageset/fileicon-files-vercel.svg	155	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-video.imageset/Contents.json	437	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-video.imageset/fileicon-files-video-dark.svg	490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-video.imageset/fileicon-files-video.svg	490	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-visual-studio.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-visual-studio.imageset/fileicon-files-visual-studio-dark.svg	2980	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-visual-studio.imageset/fileicon-files-visual-studio.svg	2980	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vite.imageset/Contents.json	435	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vite.imageset/fileicon-files-vite-dark.svg	711	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vite.imageset/fileicon-files-vite.svg	711	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vitest.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vitest.imageset/fileicon-files-vitest-dark.svg	516	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vitest.imageset/fileicon-files-vitest.svg	516	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vue.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-vue.imageset/fileicon-files-vue.svg	314	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-webgpu.imageset/Contents.json	439	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-webgpu.imageset/fileicon-files-webgpu-dark.svg	396	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-webgpu.imageset/fileicon-files-webgpu.svg	396	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-webpack.imageset/Contents.json	441	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-webpack.imageset/fileicon-files-webpack-dark.svg	2661	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-webpack.imageset/fileicon-files-webpack.svg	2661	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-xml.imageset/Contents.json	433	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-xml.imageset/fileicon-files-xml-dark.svg	704	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-xml.imageset/fileicon-files-xml.svg	704	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-yaml.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-yaml.imageset/fileicon-files-yaml.svg	255	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-yarn.imageset/Contents.json	229	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-yarn.imageset/fileicon-files-yarn.svg	8511	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-yummacss.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-yummacss.imageset/fileicon-files-yummacss.svg	874	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-zig.imageset/Contents.json	228	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-files-zig.imageset/fileicon-files-zig.svg	368	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-actions.imageset/Contents.json	459	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-actions.imageset/fileicon-folders-folder-actions-dark.svg	2691	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-actions.imageset/fileicon-folders-folder-actions.svg	2691	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-android.imageset/Contents.json	459	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-android.imageset/fileicon-folders-folder-android-dark.svg	6278	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-android.imageset/fileicon-folders-folder-android.svg	6278	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-angular.imageset/Contents.json	459	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-angular.imageset/fileicon-folders-folder-angular-dark.svg	846	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-angular.imageset/fileicon-folders-folder-angular.svg	846	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-app.imageset/Contents.json	451	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-app.imageset/fileicon-folders-folder-app-dark.svg	1401	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-app.imageset/fileicon-folders-folder-app.svg	1401	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-assets.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-assets.imageset/fileicon-folders-folder-assets-dark.svg	1260	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-assets.imageset/fileicon-folders-folder-assets.svg	1260	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-aws.imageset/Contents.json	451	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-aws.imageset/fileicon-folders-folder-aws-dark.svg	2814	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-aws.imageset/fileicon-folders-folder-aws.svg	2814	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-azure.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-azure.imageset/fileicon-folders-folder-azure-dark.svg	1316	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-azure.imageset/fileicon-folders-folder-azure.svg	1316	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-blue-code.imageset/Contents.json	463	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-blue-code.imageset/fileicon-folders-folder-blue-code-dark.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-blue-code.imageset/fileicon-folders-folder-blue-code.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-blue-outline.imageset/Contents.json	469	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-blue-outline.imageset/fileicon-folders-folder-blue-outline-dark.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-blue-outline.imageset/fileicon-folders-folder-blue-outline.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-blue.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-blue.imageset/fileicon-folders-folder-blue-dark.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-blue.imageset/fileicon-folders-folder-blue.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-bruno.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-bruno.imageset/fileicon-folders-folder-bruno-dark.svg	4242	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-bruno.imageset/fileicon-folders-folder-bruno.svg	4242	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-build.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-build.imageset/fileicon-folders-folder-build-dark.svg	1273	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-build.imageset/fileicon-folders-folder-build.svg	1273	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-changeset.imageset/Contents.json	463	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-changeset.imageset/fileicon-folders-folder-changeset-dark.svg	1350	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-changeset.imageset/fileicon-folders-folder-changeset.svg	1350	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-claude.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-claude.imageset/fileicon-folders-folder-claude-dark.svg	10095	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-claude.imageset/fileicon-folders-folder-claude.svg	10095	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-config.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-config.imageset/fileicon-folders-folder-config-dark.svg	1637	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-config.imageset/fileicon-folders-folder-config.svg	1637	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-constants.imageset/Contents.json	463	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-constants.imageset/fileicon-folders-folder-constants-dark.svg	784	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-constants.imageset/fileicon-folders-folder-constants.svg	784	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-context.imageset/Contents.json	459	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-context.imageset/fileicon-folders-folder-context-dark.svg	778	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-context.imageset/fileicon-folders-folder-context.svg	778	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-core.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-core.imageset/fileicon-folders-folder-core-dark.svg	3832	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-core.imageset/fileicon-folders-folder-core.svg	3832	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-cursor.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-cursor.imageset/fileicon-folders-folder-cursor-dark.svg	1247	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-cursor.imageset/fileicon-folders-folder-cursor.svg	1247	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-cypress.imageset/Contents.json	459	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-cypress.imageset/fileicon-folders-folder-cypress-dark.svg	4612	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-cypress.imageset/fileicon-folders-folder-cypress.svg	4612	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-database.imageset/Contents.json	461	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-database.imageset/fileicon-folders-folder-database-dark.svg	1533	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-database.imageset/fileicon-folders-folder-database.svg	1533	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-docker.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-docker.imageset/fileicon-folders-folder-docker-dark.svg	4053	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-docker.imageset/fileicon-folders-folder-docker.svg	4053	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-documents.imageset/Contents.json	463	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-documents.imageset/fileicon-folders-folder-documents-dark.svg	1090	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-documents.imageset/fileicon-folders-folder-documents.svg	1090	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-drizzle.imageset/Contents.json	459	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-drizzle.imageset/fileicon-folders-folder-drizzle-dark.svg	1612	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-drizzle.imageset/fileicon-folders-folder-drizzle.svg	1612	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-effects.imageset/Contents.json	459	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-effects.imageset/fileicon-folders-folder-effects-dark.svg	2691	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-effects.imageset/fileicon-folders-folder-effects.svg	2691	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-expo.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-expo.imageset/fileicon-folders-folder-expo-dark.svg	1278	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-expo.imageset/fileicon-folders-folder-expo.svg	1278	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-facade.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-facade.imageset/fileicon-folders-folder-facade-dark.svg	2691	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-facade.imageset/fileicon-folders-folder-facade.svg	2691	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-firebase.imageset/Contents.json	461	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-firebase.imageset/fileicon-folders-folder-firebase-dark.svg	1822	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-firebase.imageset/fileicon-folders-folder-firebase.svg	1822	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-fonts.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-fonts.imageset/fileicon-folders-folder-fonts-dark.svg	4414	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-fonts.imageset/fileicon-folders-folder-fonts.svg	4414	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-github.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-github.imageset/fileicon-folders-folder-github-dark.svg	1865	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-github.imageset/fileicon-folders-folder-github.svg	1865	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gitlab.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gitlab.imageset/fileicon-folders-folder-gitlab-dark.svg	2426	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gitlab.imageset/fileicon-folders-folder-gitlab.svg	2426	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-globe.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-globe.imageset/fileicon-folders-folder-globe-dark.svg	1145	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-globe.imageset/fileicon-folders-folder-globe.svg	1145	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-godot.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-godot.imageset/fileicon-folders-folder-godot-dark.svg	1580	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-godot.imageset/fileicon-folders-folder-godot.svg	1580	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gradle.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gradle.imageset/fileicon-folders-folder-gradle-dark.svg	3664	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gradle.imageset/fileicon-folders-folder-gradle.svg	3664	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-graphql.imageset/Contents.json	459	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-graphql.imageset/fileicon-folders-folder-graphql-dark.svg	2591	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-graphql.imageset/fileicon-folders-folder-graphql.svg	2591	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gray-code.imageset/Contents.json	463	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gray-code.imageset/fileicon-folders-folder-gray-code-dark.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gray-code.imageset/fileicon-folders-folder-gray-code.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gray-outline.imageset/Contents.json	469	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gray-outline.imageset/fileicon-folders-folder-gray-outline-dark.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gray-outline.imageset/fileicon-folders-folder-gray-outline.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gray.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gray.imageset/fileicon-folders-folder-gray-dark.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-gray.imageset/fileicon-folders-folder-gray.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-green-code.imageset/Contents.json	465	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-green-code.imageset/fileicon-folders-folder-green-code-dark.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-green-code.imageset/fileicon-folders-folder-green-code.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-green-outline.imageset/Contents.json	471	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-green-outline.imageset/fileicon-folders-folder-green-outline-dark.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-green-outline.imageset/fileicon-folders-folder-green-outline.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-green.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-green.imageset/fileicon-folders-folder-green-dark.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-green.imageset/fileicon-folders-folder-green.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-helpers.imageset/Contents.json	459	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-helpers.imageset/fileicon-folders-folder-helpers-dark.svg	2685	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-helpers.imageset/fileicon-folders-folder-helpers.svg	2685	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-hooks.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-hooks.imageset/fileicon-folders-folder-hooks-dark.svg	1084	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-hooks.imageset/fileicon-folders-folder-hooks.svg	1084	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-i18n.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-i18n.imageset/fileicon-folders-folder-i18n-dark.svg	1174	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-i18n.imageset/fileicon-folders-folder-i18n.svg	1174	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-images.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-images.imageset/fileicon-folders-folder-images-dark.svg	927	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-images.imageset/fileicon-folders-folder-images.svg	927	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-interceptors.imageset/Contents.json	469	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-interceptors.imageset/fileicon-folders-folder-interceptors-dark.svg	715	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-interceptors.imageset/fileicon-folders-folder-interceptors.svg	715	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-interfaces.imageset/Contents.json	465	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-interfaces.imageset/fileicon-folders-folder-interfaces-dark.svg	1600	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-interfaces.imageset/fileicon-folders-folder-interfaces.svg	1600	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-ios.imageset/Contents.json	451	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-ios.imageset/fileicon-folders-folder-ios-dark.svg	1549	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-ios.imageset/fileicon-folders-folder-ios.svg	1549	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-js.imageset/Contents.json	449	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-js.imageset/fileicon-folders-folder-js-dark.svg	3023	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-js.imageset/fileicon-folders-folder-js.svg	3023	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-layout.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-layout.imageset/fileicon-folders-folder-layout-dark.svg	1284	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-layout.imageset/fileicon-folders-folder-layout.svg	1284	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-lock.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-lock.imageset/fileicon-folders-folder-lock-dark.svg	1717	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-lock.imageset/fileicon-folders-folder-lock.svg	1717	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-mail.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-mail.imageset/fileicon-folders-folder-mail-dark.svg	901	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-mail.imageset/fileicon-folders-folder-mail.svg	901	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-maven.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-maven.imageset/fileicon-folders-folder-maven-dark.svg	3391	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-maven.imageset/fileicon-folders-folder-maven.svg	3391	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-middleware.imageset/Contents.json	465	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-middleware.imageset/fileicon-folders-folder-middleware-dark.svg	1429	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-middleware.imageset/fileicon-folders-folder-middleware.svg	1429	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-models.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-models.imageset/fileicon-folders-folder-models-dark.svg	1600	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-models.imageset/fileicon-folders-folder-models.svg	1600	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-modules.imageset/Contents.json	459	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-modules.imageset/fileicon-folders-folder-modules-dark.svg	1481	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-modules.imageset/fileicon-folders-folder-modules.svg	1481	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-mongo.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-mongo.imageset/fileicon-folders-folder-mongo-dark.svg	1198	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-mongo.imageset/fileicon-folders-folder-mongo.svg	1198	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-netlify.imageset/Contents.json	459	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-netlify.imageset/fileicon-folders-folder-netlify-dark.svg	1882	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-netlify.imageset/fileicon-folders-folder-netlify.svg	1882	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-next.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-next.imageset/fileicon-folders-folder-next-dark.svg	2023	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-next.imageset/fileicon-folders-folder-next.svg	2023	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-nginx.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-nginx.imageset/fileicon-folders-folder-nginx-dark.svg	1956	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-nginx.imageset/fileicon-folders-folder-nginx.svg	1956	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-node-modules.imageset/Contents.json	469	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-node-modules.imageset/fileicon-folders-folder-node-modules-dark.svg	3083	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-node-modules.imageset/fileicon-folders-folder-node-modules.svg	3083	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-open.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-open.imageset/fileicon-folders-folder-open-dark.svg	407	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-open.imageset/fileicon-folders-folder-open.svg	407	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-1.imageset/Contents.json	471	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-1.imageset/fileicon-folders-folder-orange-code-1-dark.svg	1008	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-1.imageset/fileicon-folders-folder-orange-code-1.svg	1008	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-2.imageset/Contents.json	471	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-2.imageset/fileicon-folders-folder-orange-code-2-dark.svg	1008	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-2.imageset/fileicon-folders-folder-orange-code-2.svg	1008	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-3.imageset/Contents.json	471	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-3.imageset/fileicon-folders-folder-orange-code-3-dark.svg	1008	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-3.imageset/fileicon-folders-folder-orange-code-3.svg	1008	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-4.imageset/Contents.json	471	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-4.imageset/fileicon-folders-folder-orange-code-4-dark.svg	1008	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-4.imageset/fileicon-folders-folder-orange-code-4.svg	1008	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code.imageset/Contents.json	467	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code.imageset/fileicon-folders-folder-orange-code-dark.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code.imageset/fileicon-folders-folder-orange-code.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-outline.imageset/Contents.json	473	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-outline.imageset/fileicon-folders-folder-orange-outline-dark.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-outline.imageset/fileicon-folders-folder-orange-outline.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange.imageset/fileicon-folders-folder-orange-dark.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-orange.imageset/fileicon-folders-folder-orange.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-pink-code.imageset/Contents.json	463	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-pink-code.imageset/fileicon-folders-folder-pink-code-dark.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-pink-code.imageset/fileicon-folders-folder-pink-code.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-pink-outline.imageset/Contents.json	469	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-pink-outline.imageset/fileicon-folders-folder-pink-outline-dark.svg	654	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-pink-outline.imageset/fileicon-folders-folder-pink-outline.svg	654	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-pink.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-pink.imageset/fileicon-folders-folder-pink-dark.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-pink.imageset/fileicon-folders-folder-pink.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-pipes.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-pipes.imageset/fileicon-folders-folder-pipes-dark.svg	1220	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-pipes.imageset/fileicon-folders-folder-pipes.svg	1220	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-prisma.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-prisma.imageset/fileicon-folders-folder-prisma-dark.svg	1133	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-prisma.imageset/fileicon-folders-folder-prisma.svg	1133	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-providers.imageset/Contents.json	463	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-providers.imageset/fileicon-folders-folder-providers-dark.svg	1637	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-providers.imageset/fileicon-folders-folder-providers.svg	1637	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-purple-code.imageset/Contents.json	467	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-purple-code.imageset/fileicon-folders-folder-purple-code-dark.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-purple-code.imageset/fileicon-folders-folder-purple-code.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-purple-outline.imageset/Contents.json	473	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-purple-outline.imageset/fileicon-folders-folder-purple-outline-dark.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-purple-outline.imageset/fileicon-folders-folder-purple-outline.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-purple.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-purple.imageset/fileicon-folders-folder-purple-dark.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-purple.imageset/fileicon-folders-folder-purple.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-react.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-react.imageset/fileicon-folders-folder-react-dark.svg	1644	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-react.imageset/fileicon-folders-folder-react.svg	1644	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-red-code.imageset/Contents.json	461	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-red-code.imageset/fileicon-folders-folder-red-code-dark.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-red-code.imageset/fileicon-folders-folder-red-code.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-red-outline.imageset/Contents.json	467	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-red-outline.imageset/fileicon-folders-folder-red-outline-dark.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-red-outline.imageset/fileicon-folders-folder-red-outline.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-red.imageset/Contents.json	451	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-red.imageset/fileicon-folders-folder-red-dark.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-red.imageset/fileicon-folders-folder-red.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-redis.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-redis.imageset/fileicon-folders-folder-redis-dark.svg	107092	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-redis.imageset/fileicon-folders-folder-redis.svg	107092	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-reducer.imageset/Contents.json	459	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-reducer.imageset/fileicon-folders-folder-reducer-dark.svg	2691	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-reducer.imageset/fileicon-folders-folder-reducer.svg	2691	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-router.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-router.imageset/fileicon-folders-folder-router-dark.svg	983	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-router.imageset/fileicon-folders-folder-router.svg	983	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-sass.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-sass.imageset/fileicon-folders-folder-sass-dark.svg	5933	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-sass.imageset/fileicon-folders-folder-sass.svg	5933	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-selector.imageset/Contents.json	461	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-selector.imageset/fileicon-folders-folder-selector-dark.svg	2691	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-selector.imageset/fileicon-folders-folder-selector.svg	2691	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-services.imageset/Contents.json	461	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-services.imageset/fileicon-folders-folder-services-dark.svg	1637	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-services.imageset/fileicon-folders-folder-services.svg	1637	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-shared.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-shared.imageset/fileicon-folders-folder-shared-dark.svg	2094	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-shared.imageset/fileicon-folders-folder-shared.svg	2094	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-sky-code.imageset/Contents.json	461	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-sky-code.imageset/fileicon-folders-folder-sky-code-dark.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-sky-code.imageset/fileicon-folders-folder-sky-code.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-sky-outline.imageset/Contents.json	467	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-sky-outline.imageset/fileicon-folders-folder-sky-outline-dark.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-sky-outline.imageset/fileicon-folders-folder-sky-outline.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-sky.imageset/Contents.json	451	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-sky.imageset/fileicon-folders-folder-sky-dark.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-sky.imageset/fileicon-folders-folder-sky.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-src.imageset/Contents.json	451	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-src.imageset/fileicon-folders-folder-src-dark.svg	1008	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-src.imageset/fileicon-folders-folder-src.svg	1008	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-supabase.imageset/Contents.json	461	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-supabase.imageset/fileicon-folders-folder-supabase-dark.svg	1614	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-supabase.imageset/fileicon-folders-folder-supabase.svg	1614	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-target.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-target.imageset/fileicon-folders-folder-target-dark.svg	1396	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-target.imageset/fileicon-folders-folder-target.svg	1396	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-tauri.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-tauri.imageset/fileicon-folders-folder-tauri-dark.svg	2308	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-tauri.imageset/fileicon-folders-folder-tauri.svg	2308	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-tina.imageset/Contents.json	453	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-tina.imageset/fileicon-folders-folder-tina-dark.svg	1731	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-tina.imageset/fileicon-folders-folder-tina.svg	1731	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-utils.imageset/Contents.json	455	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-utils.imageset/fileicon-folders-folder-utils-dark.svg	1576	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-utils.imageset/fileicon-folders-folder-utils.svg	1576	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-vercel.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-vercel.imageset/fileicon-folders-folder-vercel-dark.svg	649	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-vercel.imageset/fileicon-folders-folder-vercel.svg	649	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-vscode.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-vscode.imageset/fileicon-folders-folder-vscode-dark.svg	5051	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-vscode.imageset/fileicon-folders-folder-vscode.svg	5051	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow-code.imageset/Contents.json	467	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow-code.imageset/fileicon-folders-folder-yellow-code-dark.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow-code.imageset/fileicon-folders-folder-yellow-code.svg	1000	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow-outline.imageset/Contents.json	473	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow-outline.imageset/fileicon-folders-folder-yellow-outline-dark.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow-outline.imageset/fileicon-folders-folder-yellow-outline.svg	655	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow.imageset/Contents.json	457	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow.imageset/fileicon-folders-folder-yellow-dark.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow.imageset/fileicon-folders-folder-yellow.svg	636	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-zed.imageset/Contents.json	451	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-zed.imageset/fileicon-folders-folder-zed-dark.svg	1404	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder-zed.imageset/fileicon-folders-folder-zed.svg	1404	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder.imageset/Contents.json	443	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder.imageset/fileicon-folders-folder-dark.svg	392	
-apps/ios/Zeron/Assets.xcassets/FileIcons/fileicon-folders-folder.imageset/fileicon-folders-folder.svg	392	
-apps/ios/Zeron/Assets.xcassets/LaunchBackground.colorset/Contents.json	547	
-apps/ios/Zeron/Assets.xcassets/TabIcons/Contents.json	63	
-apps/ios/Zeron/Assets.xcassets/TabIcons/tab-chat.imageset/Contents.json	273	
-apps/ios/Zeron/Assets.xcassets/TabIcons/tab-chat.imageset/tab-chat.svg	1010	
-apps/ios/Zeron/Assets.xcassets/TabIcons/tab-settings.imageset/Contents.json	277	
-apps/ios/Zeron/Assets.xcassets/TabIcons/tab-settings.imageset/tab-settings.svg	1743	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/Contents.json	114	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-alt-arrow-down.imageset/Contents.json	274	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-alt-arrow-down.imageset/tool-alt-arrow-down.svg	213	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-alt-arrow-right.imageset/Contents.json	275	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-alt-arrow-right.imageset/tool-alt-arrow-right.svg	211	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-arrow-up-right.imageset/Contents.json	274	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-arrow-up-right.imageset/tool-arrow-up-right.svg	235	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-bot.imageset/Contents.json	263	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-bot.imageset/tool-bot.svg	928	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-chat-round-line.imageset/Contents.json	275	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-chat-round-line.imageset/tool-chat-round-line.svg	582	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-checklist.imageset/Contents.json	269	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-checklist.imageset/tool-checklist.svg	308	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-document-add.imageset/Contents.json	272	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-document-add.imageset/tool-document-add.svg	810	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-document.imageset/Contents.json	268	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-document.imageset/tool-document.svg	391	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-folder-with-files.imageset/Contents.json	277	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-folder-with-files.imageset/tool-folder-with-files.svg	684	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-git-branch.imageset/Contents.json	270	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-git-branch.imageset/tool-git-branch.svg	512	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-global.imageset/Contents.json	266	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-global.imageset/tool-global.svg	712	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-magnifer.imageset/Contents.json	268	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-magnifer.imageset/tool-magnifer.svg	234	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-pen.imageset/Contents.json	263	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-pen.imageset/tool-pen.svg	600	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-terminal.imageset/Contents.json	268	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-terminal.imageset/tool-terminal.svg	385	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-widget.imageset/Contents.json	266	
-apps/ios/Zeron/Assets.xcassets/ToolIcons/tool-widget.imageset/tool-widget.svg	842	
-apps/ios/Zeron/Assets.xcassets/github-mark.imageset/Contents.json	234	
-apps/ios/Zeron/Assets.xcassets/github-mark.imageset/github-mark.svg	665	
-apps/ios/Zeron/Assets.xcassets/zeron-logo.imageset/Contents.json	233	
-apps/ios/Zeron/Assets.xcassets/zeron-logo.imageset/zeron-logo.svg	1976	
-apps/ios/Zeron/Cloud/AgentAccountsViewController.swift	34665	
-apps/ios/Zeron/Cloud/BillingViewController.swift	25320	
-apps/ios/Zeron/Cloud/CloudRepoPickerViewController.swift	7650	
-apps/ios/Zeron/Cloud/CloudRoutes.swift	1572	
-apps/ios/Zeron/Cloud/CloudSettingsViewController.swift	9475	
-apps/ios/Zeron/Cloud/CloudStore.swift	15480	
-apps/ios/Zeron/Cloud/CloudUI.swift	11906	
-apps/ios/Zeron/Cloud/GitHubConnectViewController.swift	7071	
-apps/ios/Zeron/Cloud/OnboardingViewController.swift	31544	
-apps/ios/Zeron/Cloud/ProvidersViewController.swift	19782	
-apps/ios/Zeron/Companions/CompanionStrip.swift	6551	
-apps/ios/Zeron/Companions/CompanionsViewController.swift	25246	
-apps/ios/Zeron/Companions/SubagentViewController.swift	11652	
-apps/ios/Zeron/Companions/TerminalGlyphs.swift	10312	
-apps/ios/Zeron/Companions/TerminalKeyBar.swift	8779	
-apps/ios/Zeron/Companions/TerminalStore.swift	7781	
-apps/ios/Zeron/Companions/TerminalView.swift	27289	
-apps/ios/Zeron/Companions/TerminalViewController.swift	18176	
-apps/ios/Zeron/Composer/AttachmentPicker.swift	5669	
-apps/ios/Zeron/Composer/ComposerBar.swift	31926	
-apps/ios/Zeron/Composer/Mentions.swift	4794	
-apps/ios/Zeron/Composer/QuestionPanel.swift	18270	
-apps/ios/Zeron/Core/Fonts.swift	6457	
-apps/ios/Zeron/Core/Generated/zeron_core.swift	696834	
-apps/ios/Zeron/Debug/Signposts.swift	1090	
-apps/ios/Zeron/Debug/TerminalProbe.swift	6462	
-apps/ios/Zeron/Debug/TranscriptLabViewController.swift	12763	
-apps/ios/Zeron/Design/BrandMarks.swift	23992	
-apps/ios/Zeron/Design/EdgeFade.swift	4996	
-apps/ios/Zeron/Design/Glass.swift	2524	
-apps/ios/Zeron/Design/HermesMark.swift	19882	
-apps/ios/Zeron/Design/Palette.swift	6038	
-apps/ios/Zeron/Design/ProjectTile.swift	2457	
-apps/ios/Zeron/Design/StatusGlyph.swift	10410	
-apps/ios/Zeron/Design/Toast.swift	5877	
-apps/ios/Zeron/Design/Wallpaper.swift	16270	
-apps/ios/Zeron/Fonts/Geist-Bold.ttf	128824	
-apps/ios/Zeron/Fonts/Geist-BoldItalic.ttf	130600	
-apps/ios/Zeron/Fonts/Geist-Italic.ttf	128284	
-apps/ios/Zeron/Fonts/Geist-Medium.ttf	127660	
-apps/ios/Zeron/Fonts/Geist-MediumItalic.ttf	129904	
-apps/ios/Zeron/Fonts/Geist-SemiBold.ttf	127872	
-apps/ios/Zeron/Fonts/Geist-SemiBoldItalic.ttf	130840	
-apps/ios/Zeron/Fonts/Geist.ttf	126048	
-apps/ios/Zeron/Fonts/GeistMono-Italic.ttf	154508	
-apps/ios/Zeron/Fonts/GeistMono-Medium.ttf	149328	
-apps/ios/Zeron/Fonts/GeistMono-SemiBold.ttf	149700	
-apps/ios/Zeron/Fonts/GeistMono.ttf	148516	
-apps/ios/Zeron/Info.plist	2989	
-apps/ios/Zeron/PrivacyInfo.xcprivacy	1028	
-apps/ios/Zeron/Session/CoreSessionSource.swift	20720	
-apps/ios/Zeron/Session/DraftHandoff.swift	10083	
-apps/ios/Zeron/Session/ModelPickerViewController.swift	37112	
-apps/ios/Zeron/Session/NewSessionViewController.swift	30302	
-apps/ios/Zeron/Session/SessionSource.swift	9721	
-apps/ios/Zeron/Session/SessionViewController.swift	50325	
-apps/ios/Zeron/Shell/MainTabController.swift	10514	
-apps/ios/Zeron/Shell/MoreViewController.swift	17176	
-apps/ios/Zeron/Shell/SignInViewController.swift	7464	
-apps/ios/Zeron/Shell/SplitRootController.swift	21724	
-apps/ios/Zeron/Threads/NewProjectViewController.swift	8501	
-apps/ios/Zeron/Threads/SessionCell.swift	14250	
-apps/ios/Zeron/Threads/SessionListController.swift	34932	
-apps/ios/Zeron/Transcript/FrameRelay.swift	797	
-apps/ios/Zeron/Transcript/ImageViewer.swift	3378	
-apps/ios/Zeron/Transcript/RowModel.swift	12981	
-apps/ios/Zeron/Transcript/RowView.swift	25632	
-apps/ios/Zeron/Transcript/ToolViews.swift	14367	
-apps/ios/Zeron/Transcript/TranscriptListView.swift	35605	
-apps/ios/Zeron/Transcript/VisualView.swift	20275	
-apps/ios/Zeron/Voice/CodexVoicePeer.swift	12029	
-apps/ios/Zeron/Voice/NativeVoiceMedia.swift	3290	
-apps/ios/Zeron/Voice/OrbView.swift	5426	
-apps/ios/Zeron/Voice/RemoteVoiceController.swift	14471	
-apps/ios/Zeron/Voice/Sounds/voice-end.wav	165164	
-apps/ios/Zeron/Voice/Sounds/voice-start.wav	172844	
-apps/ios/Zeron/Voice/ThinkingOrbs-LICENSE.txt	1533	
-apps/ios/Zeron/Voice/VoiceActivityController.swift	4039	
-apps/ios/Zeron/Voice/VoiceControls.swift	9965	
-apps/ios/Zeron/Voice/VoiceStageViewController.swift	21737	
-apps/ios/Zeron/Voice/VoiceViewController.swift	12271	
-apps/ios/Zeron/Voice/WebRTC-LICENSE.txt	1511	
-apps/ios/ZeronLiveActivity/Assets.xcassets/Contents.json	53	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-awaiting-avatar.imageset/Contents.json	275	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-awaiting-avatar.imageset/orb-awaiting-avatar.svg	10139	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-awaiting-inline.imageset/Contents.json	275	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-awaiting-inline.imageset/orb-awaiting-inline.svg	2251	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-connecting-avatar.imageset/Contents.json	277	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-connecting-avatar.imageset/orb-connecting-avatar.svg	11773	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-connecting-inline.imageset/Contents.json	277	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-connecting-inline.imageset/orb-connecting-inline.svg	667	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-listening-avatar.imageset/Contents.json	276	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-listening-avatar.imageset/orb-listening-avatar.svg	9863	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-listening-inline.imageset/Contents.json	276	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-listening-inline.imageset/orb-listening-inline.svg	3114	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-muted-avatar.imageset/Contents.json	272	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-muted-avatar.imageset/orb-muted-avatar.svg	25729	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-muted-inline.imageset/Contents.json	272	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-muted-inline.imageset/orb-muted-inline.svg	6569	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-speaking-avatar.imageset/Contents.json	275	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-speaking-avatar.imageset/orb-speaking-avatar.svg	31709	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-speaking-inline.imageset/Contents.json	275	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-speaking-inline.imageset/orb-speaking-inline.svg	10755	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-working-avatar.imageset/Contents.json	274	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-working-avatar.imageset/orb-working-avatar.svg	37737	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-working-inline.imageset/Contents.json	274	
-apps/ios/ZeronLiveActivity/Assets.xcassets/orb-working-inline.imageset/orb-working-inline.svg	2896	
-apps/ios/ZeronLiveActivity/Info.plist	436	
-apps/ios/ZeronLiveActivity/VoiceLiveActivity.swift	9477	
-apps/ios/ZeronLiveActivity/ZeronLiveActivityBundle.swift	150	
+apps/ios/Zeren.entitlements	246	
+apps/ios/Zeren.xcodeproj/project.pbxproj	24313	
+apps/ios/Zeren.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved	382	
+apps/ios/Zeren.xcodeproj/xcshareddata/xcschemes/Zeren.xcscheme	3266	
+apps/ios/Zeren/App/AppDelegate.swift	1147	
+apps/ios/Zeren/App/AppModel.swift	40192	
+apps/ios/Zeren/App/PushNotifications.swift	7204	
+apps/ios/Zeren/App/SceneDelegate.swift	9544	
+apps/ios/Zeren/Assets.xcassets/AccentColor.colorset/Contents.json	316	
+apps/ios/Zeren/Assets.xcassets/AppIcon.appiconset/AppIcon1024.png	1803905	
+apps/ios/Zeren/Assets.xcassets/AppIcon.appiconset/Contents.json	205	
+apps/ios/Zeren/Assets.xcassets/Contents.json	53	
+apps/ios/Zeren/Assets.xcassets/FileIcons/Contents.json	114	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-component.imageset/Contents.json	242	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-component.imageset/fileicon-files-angular-component.svg	403	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-directive.imageset/Contents.json	461	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-directive.imageset/fileicon-files-angular-directive-dark.svg	407	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-directive.imageset/fileicon-files-angular-directive.svg	407	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-guard.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-guard.imageset/fileicon-files-angular-guard-dark.svg	407	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-guard.imageset/fileicon-files-angular-guard.svg	407	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-module.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-module.imageset/fileicon-files-angular-module-dark.svg	407	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-module.imageset/fileicon-files-angular-module.svg	407	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-pipe.imageset/Contents.json	451	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-pipe.imageset/fileicon-files-angular-pipe-dark.svg	407	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-pipe.imageset/fileicon-files-angular-pipe.svg	407	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-service.imageset/Contents.json	240	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular-service.imageset/fileicon-files-angular-service.svg	403	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-angular.imageset/fileicon-files-angular.svg	403	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-animate.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-animate.imageset/fileicon-files-animate.svg	3214	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-astro.imageset/Contents.json	437	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-astro.imageset/fileicon-files-astro-dark.svg	2422	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-astro.imageset/fileicon-files-astro.svg	2422	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-audio.imageset/Contents.json	437	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-audio.imageset/fileicon-files-audio-dark.svg	424	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-audio.imageset/fileicon-files-audio.svg	424	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-babel.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-babel.imageset/fileicon-files-babel.svg	1892	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-biome.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-biome.imageset/fileicon-files-biome.svg	387	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-blue.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-blue.imageset/fileicon-files-brackets-blue-dark.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-blue.imageset/fileicon-files-brackets-blue.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-gray.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-gray.imageset/fileicon-files-brackets-gray-dark.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-gray.imageset/fileicon-files-brackets-gray.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-green.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-green.imageset/fileicon-files-brackets-green-dark.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-green.imageset/fileicon-files-brackets-green.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-orange.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-orange.imageset/fileicon-files-brackets-orange-dark.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-orange.imageset/fileicon-files-brackets-orange.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-pink.imageset/Contents.json	238	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-pink.imageset/fileicon-files-brackets-pink.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-purple.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-purple.imageset/fileicon-files-brackets-purple-dark.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-purple.imageset/fileicon-files-brackets-purple.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-red.imageset/Contents.json	237	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-red.imageset/fileicon-files-brackets-red.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-sky.imageset/Contents.json	237	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-sky.imageset/fileicon-files-brackets-sky.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-yellow.imageset/Contents.json	240	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-brackets-yellow.imageset/fileicon-files-brackets-yellow.svg	1490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-browserslist.imageset/Contents.json	237	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-browserslist.imageset/fileicon-files-browserslist.svg	3204	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-bruno.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-bruno.imageset/fileicon-files-bruno.svg	3900	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-bun.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-bun.imageset/fileicon-files-bun.svg	9098	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-c.imageset/Contents.json	226	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-c.imageset/fileicon-files-c.svg	1492	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-caddy.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-caddy.imageset/fileicon-files-caddy.svg	4003	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-capacitor.imageset/Contents.json	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-capacitor.imageset/fileicon-files-capacitor.svg	442	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-clapper.imageset/Contents.json	441	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-clapper.imageset/fileicon-files-clapper-dark.svg	482	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-clapper.imageset/fileicon-files-clapper.svg	482	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-claude.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-claude.imageset/fileicon-files-claude.svg	9517	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-clojure.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-clojure.imageset/fileicon-files-clojure.svg	2642	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cloudflare-workers.imageset/Contents.json	243	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cloudflare-workers.imageset/fileicon-files-cloudflare-workers.svg	1517	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cmake.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cmake.imageset/fileicon-files-cmake.svg	356	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-blue.imageset/Contents.json	445	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-blue.imageset/fileicon-files-code-blue-dark.svg	502	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-blue.imageset/fileicon-files-code-blue.svg	502	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-gray.imageset/Contents.json	445	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-gray.imageset/fileicon-files-code-gray-dark.svg	502	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-gray.imageset/fileicon-files-code-gray.svg	502	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-green.imageset/Contents.json	447	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-green.imageset/fileicon-files-code-green-dark.svg	502	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-green.imageset/fileicon-files-code-green.svg	502	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-orange.imageset/Contents.json	449	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-orange.imageset/fileicon-files-code-orange-dark.svg	496	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-orange.imageset/fileicon-files-code-orange.svg	496	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-pink.imageset/Contents.json	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-pink.imageset/fileicon-files-code-pink.svg	502	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-purple.imageset/Contents.json	449	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-purple.imageset/fileicon-files-code-purple-dark.svg	502	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-purple.imageset/fileicon-files-code-purple.svg	502	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-red.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-red.imageset/fileicon-files-code-red.svg	496	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-sky.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-sky.imageset/fileicon-files-code-sky.svg	502	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-yellow.imageset/Contents.json	236	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-code-yellow.imageset/fileicon-files-code-yellow.svg	496	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-coffeescript.imageset/Contents.json	451	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-coffeescript.imageset/fileicon-files-coffeescript-dark.svg	782	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-coffeescript.imageset/fileicon-files-coffeescript.svg	782	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-coldfusion.imageset/Contents.json	235	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-coldfusion.imageset/fileicon-files-coldfusion.svg	2058	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-compressed.imageset/Contents.json	235	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-compressed.imageset/fileicon-files-compressed.svg	1003	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-contentlayer.imageset/Contents.json	451	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-contentlayer.imageset/fileicon-files-contentlayer-dark.svg	2708	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-contentlayer.imageset/fileicon-files-contentlayer.svg	2708	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cplus.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cplus.imageset/fileicon-files-cplus.svg	1908	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-crystal.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-crystal.imageset/fileicon-files-crystal.svg	300	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-csharp.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-csharp.imageset/fileicon-files-csharp.svg	1771	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-csv.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-csv.imageset/fileicon-files-csv.svg	6308	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cucumber.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cucumber.imageset/fileicon-files-cucumber.svg	4132	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cuda.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cuda.imageset/fileicon-files-cuda.svg	1397	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cursor.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cursor.imageset/fileicon-files-cursor.svg	794	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cypress.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-cypress.imageset/fileicon-files-cypress.svg	1631	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-dart.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-dart.imageset/fileicon-files-dart.svg	843	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-database.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-database.imageset/fileicon-files-database.svg	4865	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-deno.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-deno.imageset/fileicon-files-deno-dark.svg	2026	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-deno.imageset/fileicon-files-deno.svg	2026	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker-green.imageset/Contents.json	237	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker-green.imageset/fileicon-files-docker-green.svg	5200	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker-orange.imageset/Contents.json	238	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker-orange.imageset/fileicon-files-docker-orange.svg	5200	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker-pink.imageset/Contents.json	236	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker-pink.imageset/fileicon-files-docker-pink.svg	5199	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker-purple.imageset/Contents.json	238	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker-purple.imageset/fileicon-files-docker-purple.svg	5200	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker-red.imageset/Contents.json	235	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker-red.imageset/fileicon-files-docker-red.svg	5198	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker-yellow.imageset/Contents.json	238	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker-yellow.imageset/fileicon-files-docker-yellow.svg	5201	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docker.imageset/fileicon-files-docker.svg	3562	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-document.imageset/Contents.json	443	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-document.imageset/fileicon-files-document-dark.svg	437	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-document.imageset/fileicon-files-document.svg	437	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docusaurus.imageset/Contents.json	235	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-docusaurus.imageset/fileicon-files-docusaurus.svg	19660	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-drawio.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-drawio.imageset/fileicon-files-drawio.svg	539	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-drizzle.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-drizzle.imageset/fileicon-files-drizzle.svg	1166	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-dts.imageset/Contents.json	433	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-dts.imageset/fileicon-files-dts-dark.svg	2901	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-dts.imageset/fileicon-files-dts.svg	2901	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-dune.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-dune.imageset/fileicon-files-dune-dark.svg	1007	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-dune.imageset/fileicon-files-dune.svg	1007	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-earthfile.imageset/Contents.json	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-earthfile.imageset/fileicon-files-earthfile.svg	3322	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-editorconfig.imageset/Contents.json	237	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-editorconfig.imageset/fileicon-files-editorconfig.svg	8957	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-elixir.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-elixir.imageset/fileicon-files-elixir-dark.svg	779	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-elixir.imageset/fileicon-files-elixir.svg	779	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-erlang.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-erlang.imageset/fileicon-files-erlang.svg	839	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-eslint.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-eslint.imageset/fileicon-files-eslint.svg	1523	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-exe.imageset/Contents.json	433	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-exe.imageset/fileicon-files-exe-dark.svg	1328	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-exe.imageset/fileicon-files-exe.svg	1328	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-expressive-code.imageset/Contents.json	240	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-expressive-code.imageset/fileicon-files-expressive-code.svg	48148	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-firebase.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-firebase.imageset/fileicon-files-firebase.svg	1370	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-font.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-font.imageset/fileicon-files-font-dark.svg	3714	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-font.imageset/fileicon-files-font.svg	3714	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-fortran.imageset/Contents.json	441	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-fortran.imageset/fileicon-files-fortran-dark.svg	2626	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-fortran.imageset/fileicon-files-fortran.svg	2626	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-fresh.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-fresh.imageset/fileicon-files-fresh.svg	3034	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-fsharp.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-fsharp.imageset/fileicon-files-fsharp.svg	646	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-func.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-func.imageset/fileicon-files-func-dark.svg	800	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-func.imageset/fileicon-files-func.svg	800	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gatsby.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gatsby.imageset/fileicon-files-gatsby-dark.svg	832	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gatsby.imageset/fileicon-files-gatsby.svg	832	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gdextension.imageset/Contents.json	449	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gdextension.imageset/fileicon-files-gdextension-dark.svg	1366	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gdextension.imageset/fileicon-files-gdextension.svg	1366	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gdignore.imageset/Contents.json	443	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gdignore.imageset/fileicon-files-gdignore-dark.svg	1366	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gdignore.imageset/fileicon-files-gdignore.svg	1366	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gdproject.imageset/Contents.json	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gdproject.imageset/fileicon-files-gdproject.svg	1366	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gdscript.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gdscript.imageset/fileicon-files-gdscript.svg	1366	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gdshader.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gdshader.imageset/fileicon-files-gdshader.svg	1366	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gear.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gear.imageset/fileicon-files-gear-dark.svg	1168	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gear.imageset/fileicon-files-gear.svg	1168	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gif.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gif.imageset/fileicon-files-gif.svg	1291	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-git.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-git.imageset/fileicon-files-git.svg	1119	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-github.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-github.imageset/fileicon-files-github-dark.svg	1407	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-github.imageset/fileicon-files-github.svg	1407	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gitlab.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gitlab.imageset/fileicon-files-gitlab.svg	1933	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gleam.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gleam.imageset/fileicon-files-gleam.svg	5299	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-globe.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-globe.imageset/fileicon-files-globe.svg	668	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-green.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-green.imageset/fileicon-files-go-green.svg	3198	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-orange.imageset/Contents.json	445	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-orange.imageset/fileicon-files-go-orange-dark.svg	3198	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-orange.imageset/fileicon-files-go-orange.svg	3198	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-pink.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-pink.imageset/fileicon-files-go-pink.svg	3198	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-purple.imageset/Contents.json	445	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-purple.imageset/fileicon-files-go-purple-dark.svg	3198	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-purple.imageset/fileicon-files-go-purple.svg	3198	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-red.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-red.imageset/fileicon-files-go-red.svg	3198	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-yellow.imageset/Contents.json	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go-yellow.imageset/fileicon-files-go-yellow.svg	3198	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go.imageset/Contents.json	227	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-go.imageset/fileicon-files-go.svg	3223	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gradle.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gradle.imageset/fileicon-files-gradle.svg	3215	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-graphql.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-graphql.imageset/fileicon-files-graphql.svg	2102	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gulp.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-gulp.imageset/fileicon-files-gulp.svg	543	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-h.imageset/Contents.json	226	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-h.imageset/fileicon-files-h.svg	694	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-haml.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-haml.imageset/fileicon-files-haml-dark.svg	2899	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-haml.imageset/fileicon-files-haml.svg	2899	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-haskell.imageset/Contents.json	441	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-haskell.imageset/fileicon-files-haskell-dark.svg	487	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-haskell.imageset/fileicon-files-haskell.svg	487	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-http.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-http.imageset/fileicon-files-http-dark.svg	1942	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-http.imageset/fileicon-files-http.svg	1942	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-hugo.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-hugo.imageset/fileicon-files-hugo.svg	62148	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-i18n.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-i18n.imageset/fileicon-files-i18n.svg	674	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ignore.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ignore.imageset/fileicon-files-ignore-dark.svg	1036	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ignore.imageset/fileicon-files-ignore.svg	1036	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-illustrator.imageset/Contents.json	236	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-illustrator.imageset/fileicon-files-illustrator.svg	847	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-image.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-image.imageset/fileicon-files-image.svg	403	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ionic.imageset/Contents.json	437	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ionic.imageset/fileicon-files-ionic-dark.svg	1216	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ionic.imageset/fileicon-files-ionic.svg	1216	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-java.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-java.imageset/fileicon-files-java.svg	835	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-jenkins.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-jenkins.imageset/fileicon-files-jenkins.svg	22368	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-jest.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-jest.imageset/fileicon-files-jest.svg	3915	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-js-test.imageset/Contents.json	441	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-js-test.imageset/fileicon-files-js-test-dark.svg	2518	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-js-test.imageset/fileicon-files-js-test.svg	2518	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-js.imageset/Contents.json	227	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-js.imageset/fileicon-files-js.svg	2518	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-julia-markdown.imageset/Contents.json	239	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-julia-markdown.imageset/fileicon-files-julia-markdown.svg	721	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-julia.imageset/Contents.json	437	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-julia.imageset/fileicon-files-julia-dark.svg	789	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-julia.imageset/fileicon-files-julia.svg	789	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-keystatic.imageset/Contents.json	445	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-keystatic.imageset/fileicon-files-keystatic-dark.svg	469	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-keystatic.imageset/fileicon-files-keystatic.svg	469	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-knip.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-knip.imageset/fileicon-files-knip.svg	3192	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-kotlin.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-kotlin.imageset/fileicon-files-kotlin-dark.svg	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-kotlin.imageset/fileicon-files-kotlin.svg	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-kubb.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-kubb.imageset/fileicon-files-kubb.svg	90663	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-laravel.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-laravel.imageset/fileicon-files-laravel.svg	3156	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-license.imageset/Contents.json	441	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-license.imageset/fileicon-files-license-dark.svg	808	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-license.imageset/fileicon-files-license.svg	808	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-link.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-link.imageset/fileicon-files-link-dark.svg	1051	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-link.imageset/fileicon-files-link.svg	1051	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-liquid.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-liquid.imageset/fileicon-files-liquid.svg	324	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-lock.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-lock.imageset/fileicon-files-lock-dark.svg	1150	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-lock.imageset/fileicon-files-lock.svg	1150	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-lua.imageset/Contents.json	433	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-lua.imageset/fileicon-files-lua-dark.svg	780	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-lua.imageset/fileicon-files-lua.svg	780	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-luau.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-luau.imageset/fileicon-files-luau.svg	770	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-lunaria.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-lunaria.imageset/fileicon-files-lunaria.svg	5360	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-markdoc.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-markdoc.imageset/fileicon-files-markdoc.svg	849	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-markdown.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-markdown.imageset/fileicon-files-markdown.svg	330	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-maven.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-maven.imageset/fileicon-files-maven.svg	2925	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-mdx.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-mdx.imageset/fileicon-files-mdx.svg	362	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-minecraft.imageset/Contents.json	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-minecraft.imageset/fileicon-files-minecraft.svg	561	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-mongo.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-mongo.imageset/fileicon-files-mongo.svg	715	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest-controller.imageset/Contents.json	240	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest-controller.imageset/fileicon-files-nest-controller.svg	12523	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest-decorator.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest-decorator.imageset/fileicon-files-nest-decorator-dark.svg	12523	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest-decorator.imageset/fileicon-files-nest-decorator.svg	12523	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest-guard.imageset/Contents.json	235	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest-guard.imageset/fileicon-files-nest-guard.svg	12523	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest-middleware.imageset/Contents.json	240	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest-middleware.imageset/fileicon-files-nest-middleware.svg	12523	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest-service.imageset/Contents.json	237	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest-service.imageset/fileicon-files-nest-service.svg	12523	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nest.imageset/fileicon-files-nest.svg	12523	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-netlify.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-netlify.imageset/fileicon-files-netlify.svg	1468	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-next.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-next.imageset/fileicon-files-next-dark.svg	730	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-next.imageset/fileicon-files-next.svg	730	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nim.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nim.imageset/fileicon-files-nim.svg	1207	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nix.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nix.imageset/fileicon-files-nix.svg	1061	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-node.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-node.imageset/fileicon-files-node.svg	2446	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nodemon.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nodemon.imageset/fileicon-files-nodemon.svg	2116	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-notebook.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-notebook.imageset/fileicon-files-notebook.svg	359	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-npm.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-npm.imageset/fileicon-files-npm.svg	621	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nunjucks.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nunjucks.imageset/fileicon-files-nunjucks.svg	570	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nuxt.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nuxt.imageset/fileicon-files-nuxt.svg	1224	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nx.imageset/Contents.json	431	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nx.imageset/fileicon-files-nx-dark.svg	2729	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-nx.imageset/fileicon-files-nx.svg	2729	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ocaml.imageset/Contents.json	437	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ocaml.imageset/fileicon-files-ocaml-dark.svg	4456	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ocaml.imageset/fileicon-files-ocaml.svg	4456	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-orval.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-orval.imageset/fileicon-files-orval.svg	12399	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-oxc.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-oxc.imageset/fileicon-files-oxc.svg	1145	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-panda.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-panda.imageset/fileicon-files-panda.svg	2020	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-patch.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-patch.imageset/fileicon-files-patch.svg	1738	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-pdf.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-pdf.imageset/fileicon-files-pdf.svg	7623	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-perl.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-perl.imageset/fileicon-files-perl-dark.svg	4711	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-perl.imageset/fileicon-files-perl.svg	4711	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-photoshop.imageset/Contents.json	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-photoshop.imageset/fileicon-files-photoshop.svg	1318	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-php.imageset/Contents.json	433	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-php.imageset/fileicon-files-php-dark.svg	2874	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-php.imageset/fileicon-files-php.svg	2874	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-pkl.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-pkl.imageset/fileicon-files-pkl.svg	3520	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-pnpm.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-pnpm.imageset/fileicon-files-pnpm-dark.svg	1915	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-pnpm.imageset/fileicon-files-pnpm.svg	1915	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-postcss.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-postcss.imageset/fileicon-files-postcss.svg	842	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-prettier.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-prettier.imageset/fileicon-files-prettier.svg	5215	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-prisma.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-prisma.imageset/fileicon-files-prisma.svg	641	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-proto.imageset/Contents.json	437	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-proto.imageset/fileicon-files-proto-dark.svg	1325	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-proto.imageset/fileicon-files-proto.svg	1325	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-pug.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-pug.imageset/fileicon-files-pug.svg	9882	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-pulumi.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-pulumi.imageset/fileicon-files-pulumi-dark.svg	2760	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-pulumi.imageset/fileicon-files-pulumi.svg	2760	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-puppeteer.imageset/Contents.json	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-puppeteer.imageset/fileicon-files-puppeteer.svg	13786	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-puzzle.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-puzzle.imageset/fileicon-files-puzzle.svg	962	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-python.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-python.imageset/fileicon-files-python.svg	1678	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-r.imageset/Contents.json	429	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-r.imageset/fileicon-files-r-dark.svg	1263	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-r.imageset/fileicon-files-r.svg	1263	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-razor.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-razor.imageset/fileicon-files-razor.svg	1303	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-react-test.imageset/Contents.json	447	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-react-test.imageset/fileicon-files-react-test-dark.svg	1004	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-react-test.imageset/fileicon-files-react-test.svg	1004	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-react-ts.imageset/Contents.json	443	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-react-ts.imageset/fileicon-files-react-ts-dark.svg	956	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-react-ts.imageset/fileicon-files-react-ts.svg	956	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-react.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-react.imageset/fileicon-files-react.svg	956	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-actions.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-actions.imageset/fileicon-files-redux-actions-dark.svg	2169	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-actions.imageset/fileicon-files-redux-actions.svg	2169	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-effects.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-effects.imageset/fileicon-files-redux-effects-dark.svg	2169	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-effects.imageset/fileicon-files-redux-effects.svg	2169	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-facade.imageset/Contents.json	237	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-facade.imageset/fileicon-files-redux-facade.svg	2169	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-reducer.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-reducer.imageset/fileicon-files-redux-reducer-dark.svg	2169	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-reducer.imageset/fileicon-files-redux-reducer.svg	2169	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-selector.imageset/Contents.json	239	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-redux-selector.imageset/fileicon-files-redux-selector.svg	2169	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rescript-interface.imageset/Contents.json	243	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rescript-interface.imageset/fileicon-files-rescript-interface.svg	2380	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rescript.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rescript.imageset/fileicon-files-rescript.svg	1821	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-resource.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-resource.imageset/fileicon-files-resource.svg	629	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-robot.imageset/Contents.json	437	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-robot.imageset/fileicon-files-robot-dark.svg	1326	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-robot.imageset/fileicon-files-robot.svg	1326	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rolldown.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rolldown.imageset/fileicon-files-rolldown.svg	549	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rome.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rome.imageset/fileicon-files-rome-dark.svg	2270	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rome.imageset/fileicon-files-rome.svg	2270	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rsbuild.imageset/Contents.json	232	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rsbuild.imageset/fileicon-files-rsbuild.svg	68569	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rslib.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rslib.imageset/fileicon-files-rslib.svg	141111	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rspack.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rspack.imageset/fileicon-files-rspack.svg	92069	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ruby.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ruby.imageset/fileicon-files-ruby.svg	1284	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rust.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rust.imageset/fileicon-files-rust-dark.svg	9930	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-rust.imageset/fileicon-files-rust.svg	9930	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-sanity.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-sanity.imageset/fileicon-files-sanity-dark.svg	828	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-sanity.imageset/fileicon-files-sanity.svg	828	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-sass.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-sass.imageset/fileicon-files-sass.svg	5436	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-sbt.imageset/Contents.json	433	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-sbt.imageset/fileicon-files-sbt-dark.svg	578	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-sbt.imageset/fileicon-files-sbt.svg	578	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-scala.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-scala.imageset/fileicon-files-scala.svg	1993	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-severless.imageset/Contents.json	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-severless.imageset/fileicon-files-severless.svg	467	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-shadcn.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-shadcn.imageset/fileicon-files-shadcn-dark.svg	331	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-shadcn.imageset/fileicon-files-shadcn.svg	331	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-shell.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-shell.imageset/fileicon-files-shell.svg	342	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-slint.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-slint.imageset/fileicon-files-slint.svg	865	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-solidity.imageset/Contents.json	443	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-solidity.imageset/fileicon-files-solidity-dark.svg	1064	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-solidity.imageset/fileicon-files-solidity.svg	1064	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-statamic-antlers.imageset/Contents.json	241	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-statamic-antlers.imageset/fileicon-files-statamic-antlers.svg	1494	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-storybook.imageset/Contents.json	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-storybook.imageset/fileicon-files-storybook.svg	1993	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-stylelint.imageset/Contents.json	445	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-stylelint.imageset/fileicon-files-stylelint-dark.svg	2379	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-stylelint.imageset/fileicon-files-stylelint.svg	2379	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-stylus.imageset/Contents.json	231	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-stylus.imageset/fileicon-files-stylus.svg	698	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-supabase.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-supabase.imageset/fileicon-files-supabase.svg	1132	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svelte-service.imageset/Contents.json	239	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svelte-service.imageset/fileicon-files-svelte-service.svg	16727	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svelte-ts.imageset/Contents.json	445	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svelte-ts.imageset/fileicon-files-svelte-ts-dark.svg	14726	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svelte-ts.imageset/fileicon-files-svelte-ts.svg	14726	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svelte.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svelte.imageset/fileicon-files-svelte-dark.svg	14674	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svelte.imageset/fileicon-files-svelte.svg	14674	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svg.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svg.imageset/fileicon-files-svg.svg	438	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svx.imageset/Contents.json	433	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svx.imageset/fileicon-files-svx-dark.svg	362	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-svx.imageset/fileicon-files-svx.svg	362	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-swc.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-swc.imageset/fileicon-files-swc.svg	3077	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-swift.imageset/Contents.json	437	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-swift.imageset/fileicon-files-swift-dark.svg	1624	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-swift.imageset/fileicon-files-swift.svg	1624	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-tailwind.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-tailwind.imageset/fileicon-files-tailwind.svg	916	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-taskfile.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-taskfile.imageset/fileicon-files-taskfile.svg	388	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-tauri.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-tauri.imageset/fileicon-files-tauri.svg	1875	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-terraform.imageset/Contents.json	445	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-terraform.imageset/fileicon-files-terraform-dark.svg	358	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-terraform.imageset/fileicon-files-terraform.svg	358	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-tex.imageset/Contents.json	433	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-tex.imageset/fileicon-files-tex-dark.svg	644	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-tex.imageset/fileicon-files-tex.svg	644	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-text.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-text.imageset/fileicon-files-text-dark.svg	297	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-text.imageset/fileicon-files-text.svg	297	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ts-test.imageset/Contents.json	441	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ts-test.imageset/fileicon-files-ts-test-dark.svg	1977	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ts-test.imageset/fileicon-files-ts-test.svg	1977	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ts-types.imageset/Contents.json	443	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ts-types.imageset/fileicon-files-ts-types-dark.svg	1977	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ts-types.imageset/fileicon-files-ts-types.svg	1977	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ts.imageset/Contents.json	431	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ts.imageset/fileicon-files-ts-dark.svg	1977	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-ts.imageset/fileicon-files-ts.svg	1977	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-tsconfig.imageset/Contents.json	443	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-tsconfig.imageset/fileicon-files-tsconfig-dark.svg	2269	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-tsconfig.imageset/fileicon-files-tsconfig.svg	2269	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-turborepo.imageset/Contents.json	234	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-turborepo.imageset/fileicon-files-turborepo.svg	1229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-twig.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-twig.imageset/fileicon-files-twig.svg	1078	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-typst.imageset/Contents.json	230	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-typst.imageset/fileicon-files-typst.svg	344	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-unocss.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-unocss.imageset/fileicon-files-unocss-dark.svg	1031	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-unocss.imageset/fileicon-files-unocss.svg	1031	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-uv.imageset/Contents.json	431	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-uv.imageset/fileicon-files-uv-dark.svg	473	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-uv.imageset/fileicon-files-uv.svg	473	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-v.imageset/Contents.json	429	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-v.imageset/fileicon-files-v-dark.svg	1368	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-v.imageset/fileicon-files-v.svg	1368	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vanilla-extract.imageset/Contents.json	240	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vanilla-extract.imageset/fileicon-files-vanilla-extract.svg	6630	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vercel.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vercel.imageset/fileicon-files-vercel-dark.svg	155	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vercel.imageset/fileicon-files-vercel.svg	155	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-video.imageset/Contents.json	437	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-video.imageset/fileicon-files-video-dark.svg	490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-video.imageset/fileicon-files-video.svg	490	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-visual-studio.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-visual-studio.imageset/fileicon-files-visual-studio-dark.svg	2980	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-visual-studio.imageset/fileicon-files-visual-studio.svg	2980	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vite.imageset/Contents.json	435	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vite.imageset/fileicon-files-vite-dark.svg	711	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vite.imageset/fileicon-files-vite.svg	711	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vitest.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vitest.imageset/fileicon-files-vitest-dark.svg	516	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vitest.imageset/fileicon-files-vitest.svg	516	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vue.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-vue.imageset/fileicon-files-vue.svg	314	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-webgpu.imageset/Contents.json	439	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-webgpu.imageset/fileicon-files-webgpu-dark.svg	396	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-webgpu.imageset/fileicon-files-webgpu.svg	396	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-webpack.imageset/Contents.json	441	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-webpack.imageset/fileicon-files-webpack-dark.svg	2661	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-webpack.imageset/fileicon-files-webpack.svg	2661	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-xml.imageset/Contents.json	433	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-xml.imageset/fileicon-files-xml-dark.svg	704	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-xml.imageset/fileicon-files-xml.svg	704	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-yaml.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-yaml.imageset/fileicon-files-yaml.svg	255	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-yarn.imageset/Contents.json	229	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-yarn.imageset/fileicon-files-yarn.svg	8511	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-yummacss.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-yummacss.imageset/fileicon-files-yummacss.svg	874	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-zig.imageset/Contents.json	228	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-files-zig.imageset/fileicon-files-zig.svg	368	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-actions.imageset/Contents.json	459	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-actions.imageset/fileicon-folders-folder-actions-dark.svg	2691	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-actions.imageset/fileicon-folders-folder-actions.svg	2691	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-android.imageset/Contents.json	459	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-android.imageset/fileicon-folders-folder-android-dark.svg	6278	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-android.imageset/fileicon-folders-folder-android.svg	6278	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-angular.imageset/Contents.json	459	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-angular.imageset/fileicon-folders-folder-angular-dark.svg	846	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-angular.imageset/fileicon-folders-folder-angular.svg	846	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-app.imageset/Contents.json	451	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-app.imageset/fileicon-folders-folder-app-dark.svg	1401	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-app.imageset/fileicon-folders-folder-app.svg	1401	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-assets.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-assets.imageset/fileicon-folders-folder-assets-dark.svg	1260	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-assets.imageset/fileicon-folders-folder-assets.svg	1260	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-aws.imageset/Contents.json	451	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-aws.imageset/fileicon-folders-folder-aws-dark.svg	2814	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-aws.imageset/fileicon-folders-folder-aws.svg	2814	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-azure.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-azure.imageset/fileicon-folders-folder-azure-dark.svg	1316	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-azure.imageset/fileicon-folders-folder-azure.svg	1316	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-blue-code.imageset/Contents.json	463	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-blue-code.imageset/fileicon-folders-folder-blue-code-dark.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-blue-code.imageset/fileicon-folders-folder-blue-code.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-blue-outline.imageset/Contents.json	469	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-blue-outline.imageset/fileicon-folders-folder-blue-outline-dark.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-blue-outline.imageset/fileicon-folders-folder-blue-outline.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-blue.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-blue.imageset/fileicon-folders-folder-blue-dark.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-blue.imageset/fileicon-folders-folder-blue.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-bruno.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-bruno.imageset/fileicon-folders-folder-bruno-dark.svg	4242	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-bruno.imageset/fileicon-folders-folder-bruno.svg	4242	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-build.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-build.imageset/fileicon-folders-folder-build-dark.svg	1273	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-build.imageset/fileicon-folders-folder-build.svg	1273	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-changeset.imageset/Contents.json	463	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-changeset.imageset/fileicon-folders-folder-changeset-dark.svg	1350	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-changeset.imageset/fileicon-folders-folder-changeset.svg	1350	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-claude.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-claude.imageset/fileicon-folders-folder-claude-dark.svg	10095	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-claude.imageset/fileicon-folders-folder-claude.svg	10095	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-config.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-config.imageset/fileicon-folders-folder-config-dark.svg	1637	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-config.imageset/fileicon-folders-folder-config.svg	1637	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-constants.imageset/Contents.json	463	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-constants.imageset/fileicon-folders-folder-constants-dark.svg	784	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-constants.imageset/fileicon-folders-folder-constants.svg	784	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-context.imageset/Contents.json	459	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-context.imageset/fileicon-folders-folder-context-dark.svg	778	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-context.imageset/fileicon-folders-folder-context.svg	778	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-core.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-core.imageset/fileicon-folders-folder-core-dark.svg	3832	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-core.imageset/fileicon-folders-folder-core.svg	3832	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-cursor.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-cursor.imageset/fileicon-folders-folder-cursor-dark.svg	1247	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-cursor.imageset/fileicon-folders-folder-cursor.svg	1247	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-cypress.imageset/Contents.json	459	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-cypress.imageset/fileicon-folders-folder-cypress-dark.svg	4612	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-cypress.imageset/fileicon-folders-folder-cypress.svg	4612	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-database.imageset/Contents.json	461	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-database.imageset/fileicon-folders-folder-database-dark.svg	1533	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-database.imageset/fileicon-folders-folder-database.svg	1533	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-docker.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-docker.imageset/fileicon-folders-folder-docker-dark.svg	4053	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-docker.imageset/fileicon-folders-folder-docker.svg	4053	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-documents.imageset/Contents.json	463	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-documents.imageset/fileicon-folders-folder-documents-dark.svg	1090	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-documents.imageset/fileicon-folders-folder-documents.svg	1090	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-drizzle.imageset/Contents.json	459	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-drizzle.imageset/fileicon-folders-folder-drizzle-dark.svg	1612	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-drizzle.imageset/fileicon-folders-folder-drizzle.svg	1612	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-effects.imageset/Contents.json	459	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-effects.imageset/fileicon-folders-folder-effects-dark.svg	2691	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-effects.imageset/fileicon-folders-folder-effects.svg	2691	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-expo.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-expo.imageset/fileicon-folders-folder-expo-dark.svg	1278	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-expo.imageset/fileicon-folders-folder-expo.svg	1278	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-facade.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-facade.imageset/fileicon-folders-folder-facade-dark.svg	2691	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-facade.imageset/fileicon-folders-folder-facade.svg	2691	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-firebase.imageset/Contents.json	461	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-firebase.imageset/fileicon-folders-folder-firebase-dark.svg	1822	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-firebase.imageset/fileicon-folders-folder-firebase.svg	1822	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-fonts.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-fonts.imageset/fileicon-folders-folder-fonts-dark.svg	4414	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-fonts.imageset/fileicon-folders-folder-fonts.svg	4414	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-github.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-github.imageset/fileicon-folders-folder-github-dark.svg	1865	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-github.imageset/fileicon-folders-folder-github.svg	1865	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gitlab.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gitlab.imageset/fileicon-folders-folder-gitlab-dark.svg	2426	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gitlab.imageset/fileicon-folders-folder-gitlab.svg	2426	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-globe.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-globe.imageset/fileicon-folders-folder-globe-dark.svg	1145	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-globe.imageset/fileicon-folders-folder-globe.svg	1145	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-godot.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-godot.imageset/fileicon-folders-folder-godot-dark.svg	1580	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-godot.imageset/fileicon-folders-folder-godot.svg	1580	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gradle.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gradle.imageset/fileicon-folders-folder-gradle-dark.svg	3664	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gradle.imageset/fileicon-folders-folder-gradle.svg	3664	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-graphql.imageset/Contents.json	459	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-graphql.imageset/fileicon-folders-folder-graphql-dark.svg	2591	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-graphql.imageset/fileicon-folders-folder-graphql.svg	2591	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gray-code.imageset/Contents.json	463	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gray-code.imageset/fileicon-folders-folder-gray-code-dark.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gray-code.imageset/fileicon-folders-folder-gray-code.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gray-outline.imageset/Contents.json	469	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gray-outline.imageset/fileicon-folders-folder-gray-outline-dark.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gray-outline.imageset/fileicon-folders-folder-gray-outline.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gray.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gray.imageset/fileicon-folders-folder-gray-dark.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-gray.imageset/fileicon-folders-folder-gray.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-green-code.imageset/Contents.json	465	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-green-code.imageset/fileicon-folders-folder-green-code-dark.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-green-code.imageset/fileicon-folders-folder-green-code.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-green-outline.imageset/Contents.json	471	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-green-outline.imageset/fileicon-folders-folder-green-outline-dark.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-green-outline.imageset/fileicon-folders-folder-green-outline.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-green.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-green.imageset/fileicon-folders-folder-green-dark.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-green.imageset/fileicon-folders-folder-green.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-helpers.imageset/Contents.json	459	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-helpers.imageset/fileicon-folders-folder-helpers-dark.svg	2685	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-helpers.imageset/fileicon-folders-folder-helpers.svg	2685	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-hooks.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-hooks.imageset/fileicon-folders-folder-hooks-dark.svg	1084	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-hooks.imageset/fileicon-folders-folder-hooks.svg	1084	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-i18n.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-i18n.imageset/fileicon-folders-folder-i18n-dark.svg	1174	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-i18n.imageset/fileicon-folders-folder-i18n.svg	1174	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-images.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-images.imageset/fileicon-folders-folder-images-dark.svg	927	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-images.imageset/fileicon-folders-folder-images.svg	927	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-interceptors.imageset/Contents.json	469	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-interceptors.imageset/fileicon-folders-folder-interceptors-dark.svg	715	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-interceptors.imageset/fileicon-folders-folder-interceptors.svg	715	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-interfaces.imageset/Contents.json	465	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-interfaces.imageset/fileicon-folders-folder-interfaces-dark.svg	1600	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-interfaces.imageset/fileicon-folders-folder-interfaces.svg	1600	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-ios.imageset/Contents.json	451	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-ios.imageset/fileicon-folders-folder-ios-dark.svg	1549	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-ios.imageset/fileicon-folders-folder-ios.svg	1549	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-js.imageset/Contents.json	449	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-js.imageset/fileicon-folders-folder-js-dark.svg	3023	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-js.imageset/fileicon-folders-folder-js.svg	3023	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-layout.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-layout.imageset/fileicon-folders-folder-layout-dark.svg	1284	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-layout.imageset/fileicon-folders-folder-layout.svg	1284	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-lock.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-lock.imageset/fileicon-folders-folder-lock-dark.svg	1717	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-lock.imageset/fileicon-folders-folder-lock.svg	1717	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-mail.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-mail.imageset/fileicon-folders-folder-mail-dark.svg	901	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-mail.imageset/fileicon-folders-folder-mail.svg	901	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-maven.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-maven.imageset/fileicon-folders-folder-maven-dark.svg	3391	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-maven.imageset/fileicon-folders-folder-maven.svg	3391	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-middleware.imageset/Contents.json	465	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-middleware.imageset/fileicon-folders-folder-middleware-dark.svg	1429	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-middleware.imageset/fileicon-folders-folder-middleware.svg	1429	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-models.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-models.imageset/fileicon-folders-folder-models-dark.svg	1600	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-models.imageset/fileicon-folders-folder-models.svg	1600	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-modules.imageset/Contents.json	459	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-modules.imageset/fileicon-folders-folder-modules-dark.svg	1481	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-modules.imageset/fileicon-folders-folder-modules.svg	1481	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-mongo.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-mongo.imageset/fileicon-folders-folder-mongo-dark.svg	1198	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-mongo.imageset/fileicon-folders-folder-mongo.svg	1198	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-netlify.imageset/Contents.json	459	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-netlify.imageset/fileicon-folders-folder-netlify-dark.svg	1882	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-netlify.imageset/fileicon-folders-folder-netlify.svg	1882	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-next.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-next.imageset/fileicon-folders-folder-next-dark.svg	2023	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-next.imageset/fileicon-folders-folder-next.svg	2023	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-nginx.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-nginx.imageset/fileicon-folders-folder-nginx-dark.svg	1956	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-nginx.imageset/fileicon-folders-folder-nginx.svg	1956	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-node-modules.imageset/Contents.json	469	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-node-modules.imageset/fileicon-folders-folder-node-modules-dark.svg	3083	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-node-modules.imageset/fileicon-folders-folder-node-modules.svg	3083	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-open.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-open.imageset/fileicon-folders-folder-open-dark.svg	407	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-open.imageset/fileicon-folders-folder-open.svg	407	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-1.imageset/Contents.json	471	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-1.imageset/fileicon-folders-folder-orange-code-1-dark.svg	1008	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-1.imageset/fileicon-folders-folder-orange-code-1.svg	1008	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-2.imageset/Contents.json	471	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-2.imageset/fileicon-folders-folder-orange-code-2-dark.svg	1008	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-2.imageset/fileicon-folders-folder-orange-code-2.svg	1008	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-3.imageset/Contents.json	471	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-3.imageset/fileicon-folders-folder-orange-code-3-dark.svg	1008	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-3.imageset/fileicon-folders-folder-orange-code-3.svg	1008	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-4.imageset/Contents.json	471	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-4.imageset/fileicon-folders-folder-orange-code-4-dark.svg	1008	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code-4.imageset/fileicon-folders-folder-orange-code-4.svg	1008	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code.imageset/Contents.json	467	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code.imageset/fileicon-folders-folder-orange-code-dark.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-code.imageset/fileicon-folders-folder-orange-code.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-outline.imageset/Contents.json	473	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-outline.imageset/fileicon-folders-folder-orange-outline-dark.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange-outline.imageset/fileicon-folders-folder-orange-outline.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange.imageset/fileicon-folders-folder-orange-dark.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-orange.imageset/fileicon-folders-folder-orange.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-pink-code.imageset/Contents.json	463	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-pink-code.imageset/fileicon-folders-folder-pink-code-dark.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-pink-code.imageset/fileicon-folders-folder-pink-code.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-pink-outline.imageset/Contents.json	469	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-pink-outline.imageset/fileicon-folders-folder-pink-outline-dark.svg	654	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-pink-outline.imageset/fileicon-folders-folder-pink-outline.svg	654	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-pink.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-pink.imageset/fileicon-folders-folder-pink-dark.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-pink.imageset/fileicon-folders-folder-pink.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-pipes.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-pipes.imageset/fileicon-folders-folder-pipes-dark.svg	1220	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-pipes.imageset/fileicon-folders-folder-pipes.svg	1220	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-prisma.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-prisma.imageset/fileicon-folders-folder-prisma-dark.svg	1133	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-prisma.imageset/fileicon-folders-folder-prisma.svg	1133	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-providers.imageset/Contents.json	463	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-providers.imageset/fileicon-folders-folder-providers-dark.svg	1637	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-providers.imageset/fileicon-folders-folder-providers.svg	1637	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-purple-code.imageset/Contents.json	467	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-purple-code.imageset/fileicon-folders-folder-purple-code-dark.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-purple-code.imageset/fileicon-folders-folder-purple-code.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-purple-outline.imageset/Contents.json	473	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-purple-outline.imageset/fileicon-folders-folder-purple-outline-dark.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-purple-outline.imageset/fileicon-folders-folder-purple-outline.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-purple.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-purple.imageset/fileicon-folders-folder-purple-dark.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-purple.imageset/fileicon-folders-folder-purple.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-react.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-react.imageset/fileicon-folders-folder-react-dark.svg	1644	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-react.imageset/fileicon-folders-folder-react.svg	1644	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-red-code.imageset/Contents.json	461	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-red-code.imageset/fileicon-folders-folder-red-code-dark.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-red-code.imageset/fileicon-folders-folder-red-code.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-red-outline.imageset/Contents.json	467	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-red-outline.imageset/fileicon-folders-folder-red-outline-dark.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-red-outline.imageset/fileicon-folders-folder-red-outline.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-red.imageset/Contents.json	451	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-red.imageset/fileicon-folders-folder-red-dark.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-red.imageset/fileicon-folders-folder-red.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-redis.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-redis.imageset/fileicon-folders-folder-redis-dark.svg	107092	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-redis.imageset/fileicon-folders-folder-redis.svg	107092	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-reducer.imageset/Contents.json	459	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-reducer.imageset/fileicon-folders-folder-reducer-dark.svg	2691	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-reducer.imageset/fileicon-folders-folder-reducer.svg	2691	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-router.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-router.imageset/fileicon-folders-folder-router-dark.svg	983	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-router.imageset/fileicon-folders-folder-router.svg	983	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-sass.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-sass.imageset/fileicon-folders-folder-sass-dark.svg	5933	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-sass.imageset/fileicon-folders-folder-sass.svg	5933	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-selector.imageset/Contents.json	461	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-selector.imageset/fileicon-folders-folder-selector-dark.svg	2691	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-selector.imageset/fileicon-folders-folder-selector.svg	2691	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-services.imageset/Contents.json	461	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-services.imageset/fileicon-folders-folder-services-dark.svg	1637	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-services.imageset/fileicon-folders-folder-services.svg	1637	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-shared.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-shared.imageset/fileicon-folders-folder-shared-dark.svg	2094	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-shared.imageset/fileicon-folders-folder-shared.svg	2094	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-sky-code.imageset/Contents.json	461	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-sky-code.imageset/fileicon-folders-folder-sky-code-dark.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-sky-code.imageset/fileicon-folders-folder-sky-code.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-sky-outline.imageset/Contents.json	467	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-sky-outline.imageset/fileicon-folders-folder-sky-outline-dark.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-sky-outline.imageset/fileicon-folders-folder-sky-outline.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-sky.imageset/Contents.json	451	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-sky.imageset/fileicon-folders-folder-sky-dark.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-sky.imageset/fileicon-folders-folder-sky.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-src.imageset/Contents.json	451	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-src.imageset/fileicon-folders-folder-src-dark.svg	1008	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-src.imageset/fileicon-folders-folder-src.svg	1008	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-supabase.imageset/Contents.json	461	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-supabase.imageset/fileicon-folders-folder-supabase-dark.svg	1614	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-supabase.imageset/fileicon-folders-folder-supabase.svg	1614	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-target.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-target.imageset/fileicon-folders-folder-target-dark.svg	1396	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-target.imageset/fileicon-folders-folder-target.svg	1396	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-tauri.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-tauri.imageset/fileicon-folders-folder-tauri-dark.svg	2308	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-tauri.imageset/fileicon-folders-folder-tauri.svg	2308	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-tina.imageset/Contents.json	453	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-tina.imageset/fileicon-folders-folder-tina-dark.svg	1731	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-tina.imageset/fileicon-folders-folder-tina.svg	1731	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-utils.imageset/Contents.json	455	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-utils.imageset/fileicon-folders-folder-utils-dark.svg	1576	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-utils.imageset/fileicon-folders-folder-utils.svg	1576	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-vercel.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-vercel.imageset/fileicon-folders-folder-vercel-dark.svg	649	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-vercel.imageset/fileicon-folders-folder-vercel.svg	649	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-vscode.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-vscode.imageset/fileicon-folders-folder-vscode-dark.svg	5051	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-vscode.imageset/fileicon-folders-folder-vscode.svg	5051	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow-code.imageset/Contents.json	467	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow-code.imageset/fileicon-folders-folder-yellow-code-dark.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow-code.imageset/fileicon-folders-folder-yellow-code.svg	1000	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow-outline.imageset/Contents.json	473	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow-outline.imageset/fileicon-folders-folder-yellow-outline-dark.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow-outline.imageset/fileicon-folders-folder-yellow-outline.svg	655	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow.imageset/Contents.json	457	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow.imageset/fileicon-folders-folder-yellow-dark.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-yellow.imageset/fileicon-folders-folder-yellow.svg	636	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-zed.imageset/Contents.json	451	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-zed.imageset/fileicon-folders-folder-zed-dark.svg	1404	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder-zed.imageset/fileicon-folders-folder-zed.svg	1404	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder.imageset/Contents.json	443	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder.imageset/fileicon-folders-folder-dark.svg	392	
+apps/ios/Zeren/Assets.xcassets/FileIcons/fileicon-folders-folder.imageset/fileicon-folders-folder.svg	392	
+apps/ios/Zeren/Assets.xcassets/LaunchBackground.colorset/Contents.json	547	
+apps/ios/Zeren/Assets.xcassets/TabIcons/Contents.json	63	
+apps/ios/Zeren/Assets.xcassets/TabIcons/tab-chat.imageset/Contents.json	273	
+apps/ios/Zeren/Assets.xcassets/TabIcons/tab-chat.imageset/tab-chat.svg	1010	
+apps/ios/Zeren/Assets.xcassets/TabIcons/tab-settings.imageset/Contents.json	277	
+apps/ios/Zeren/Assets.xcassets/TabIcons/tab-settings.imageset/tab-settings.svg	1743	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/Contents.json	114	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-alt-arrow-down.imageset/Contents.json	274	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-alt-arrow-down.imageset/tool-alt-arrow-down.svg	213	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-alt-arrow-right.imageset/Contents.json	275	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-alt-arrow-right.imageset/tool-alt-arrow-right.svg	211	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-arrow-up-right.imageset/Contents.json	274	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-arrow-up-right.imageset/tool-arrow-up-right.svg	235	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-bot.imageset/Contents.json	263	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-bot.imageset/tool-bot.svg	928	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-chat-round-line.imageset/Contents.json	275	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-chat-round-line.imageset/tool-chat-round-line.svg	582	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-checklist.imageset/Contents.json	269	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-checklist.imageset/tool-checklist.svg	308	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-document-add.imageset/Contents.json	272	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-document-add.imageset/tool-document-add.svg	810	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-document.imageset/Contents.json	268	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-document.imageset/tool-document.svg	391	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-folder-with-files.imageset/Contents.json	277	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-folder-with-files.imageset/tool-folder-with-files.svg	684	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-git-branch.imageset/Contents.json	270	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-git-branch.imageset/tool-git-branch.svg	512	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-global.imageset/Contents.json	266	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-global.imageset/tool-global.svg	712	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-magnifer.imageset/Contents.json	268	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-magnifer.imageset/tool-magnifer.svg	234	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-pen.imageset/Contents.json	263	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-pen.imageset/tool-pen.svg	600	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-terminal.imageset/Contents.json	268	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-terminal.imageset/tool-terminal.svg	385	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-widget.imageset/Contents.json	266	
+apps/ios/Zeren/Assets.xcassets/ToolIcons/tool-widget.imageset/tool-widget.svg	842	
+apps/ios/Zeren/Assets.xcassets/github-mark.imageset/Contents.json	234	
+apps/ios/Zeren/Assets.xcassets/github-mark.imageset/github-mark.svg	665	
+apps/ios/Zeren/Assets.xcassets/zeren-logo.imageset/Contents.json	233	
+apps/ios/Zeren/Assets.xcassets/zeren-logo.imageset/zeren-logo.svg	1976	
+apps/ios/Zeren/Cloud/AgentAccountsViewController.swift	34665	
+apps/ios/Zeren/Cloud/BillingViewController.swift	25320	
+apps/ios/Zeren/Cloud/CloudRepoPickerViewController.swift	7650	
+apps/ios/Zeren/Cloud/CloudRoutes.swift	1572	
+apps/ios/Zeren/Cloud/CloudSettingsViewController.swift	9475	
+apps/ios/Zeren/Cloud/CloudStore.swift	15480	
+apps/ios/Zeren/Cloud/CloudUI.swift	11906	
+apps/ios/Zeren/Cloud/GitHubConnectViewController.swift	7071	
+apps/ios/Zeren/Cloud/OnboardingViewController.swift	31544	
+apps/ios/Zeren/Cloud/ProvidersViewController.swift	19782	
+apps/ios/Zeren/Companions/CompanionStrip.swift	6551	
+apps/ios/Zeren/Companions/CompanionsViewController.swift	25246	
+apps/ios/Zeren/Companions/SubagentViewController.swift	11652	
+apps/ios/Zeren/Companions/TerminalGlyphs.swift	10312	
+apps/ios/Zeren/Companions/TerminalKeyBar.swift	8779	
+apps/ios/Zeren/Companions/TerminalStore.swift	7781	
+apps/ios/Zeren/Companions/TerminalView.swift	27289	
+apps/ios/Zeren/Companions/TerminalViewController.swift	18176	
+apps/ios/Zeren/Composer/AttachmentPicker.swift	5669	
+apps/ios/Zeren/Composer/ComposerBar.swift	31926	
+apps/ios/Zeren/Composer/Mentions.swift	4794	
+apps/ios/Zeren/Composer/QuestionPanel.swift	18270	
+apps/ios/Zeren/Core/Fonts.swift	6457	
+apps/ios/Zeren/Core/Generated/zeren_core.swift	696834	
+apps/ios/Zeren/Debug/Signposts.swift	1090	
+apps/ios/Zeren/Debug/TerminalProbe.swift	6462	
+apps/ios/Zeren/Debug/TranscriptLabViewController.swift	12763	
+apps/ios/Zeren/Design/BrandMarks.swift	23992	
+apps/ios/Zeren/Design/EdgeFade.swift	4996	
+apps/ios/Zeren/Design/Glass.swift	2524	
+apps/ios/Zeren/Design/HermesMark.swift	19882	
+apps/ios/Zeren/Design/Palette.swift	6038	
+apps/ios/Zeren/Design/ProjectTile.swift	2457	
+apps/ios/Zeren/Design/StatusGlyph.swift	10410	
+apps/ios/Zeren/Design/Toast.swift	5877	
+apps/ios/Zeren/Design/Wallpaper.swift	16270	
+apps/ios/Zeren/Fonts/Geist-Bold.ttf	128824	
+apps/ios/Zeren/Fonts/Geist-BoldItalic.ttf	130600	
+apps/ios/Zeren/Fonts/Geist-Italic.ttf	128284	
+apps/ios/Zeren/Fonts/Geist-Medium.ttf	127660	
+apps/ios/Zeren/Fonts/Geist-MediumItalic.ttf	129904	
+apps/ios/Zeren/Fonts/Geist-SemiBold.ttf	127872	
+apps/ios/Zeren/Fonts/Geist-SemiBoldItalic.ttf	130840	
+apps/ios/Zeren/Fonts/Geist.ttf	126048	
+apps/ios/Zeren/Fonts/GeistMono-Italic.ttf	154508	
+apps/ios/Zeren/Fonts/GeistMono-Medium.ttf	149328	
+apps/ios/Zeren/Fonts/GeistMono-SemiBold.ttf	149700	
+apps/ios/Zeren/Fonts/GeistMono.ttf	148516	
+apps/ios/Zeren/Info.plist	2989	
+apps/ios/Zeren/PrivacyInfo.xcprivacy	1028	
+apps/ios/Zeren/Session/CoreSessionSource.swift	20720	
+apps/ios/Zeren/Session/DraftHandoff.swift	10083	
+apps/ios/Zeren/Session/ModelPickerViewController.swift	37112	
+apps/ios/Zeren/Session/NewSessionViewController.swift	30302	
+apps/ios/Zeren/Session/SessionSource.swift	9721	
+apps/ios/Zeren/Session/SessionViewController.swift	50325	
+apps/ios/Zeren/Shell/MainTabController.swift	10514	
+apps/ios/Zeren/Shell/MoreViewController.swift	17176	
+apps/ios/Zeren/Shell/SignInViewController.swift	7464	
+apps/ios/Zeren/Shell/SplitRootController.swift	21724	
+apps/ios/Zeren/Threads/NewProjectViewController.swift	8501	
+apps/ios/Zeren/Threads/SessionCell.swift	14250	
+apps/ios/Zeren/Threads/SessionListController.swift	34932	
+apps/ios/Zeren/Transcript/FrameRelay.swift	797	
+apps/ios/Zeren/Transcript/ImageViewer.swift	3378	
+apps/ios/Zeren/Transcript/RowModel.swift	12981	
+apps/ios/Zeren/Transcript/RowView.swift	25632	
+apps/ios/Zeren/Transcript/ToolViews.swift	14367	
+apps/ios/Zeren/Transcript/TranscriptListView.swift	35605	
+apps/ios/Zeren/Transcript/VisualView.swift	20275	
+apps/ios/Zeren/Voice/CodexVoicePeer.swift	12029	
+apps/ios/Zeren/Voice/NativeVoiceMedia.swift	3290	
+apps/ios/Zeren/Voice/OrbView.swift	5426	
+apps/ios/Zeren/Voice/RemoteVoiceController.swift	14471	
+apps/ios/Zeren/Voice/Sounds/voice-end.wav	165164	
+apps/ios/Zeren/Voice/Sounds/voice-start.wav	172844	
+apps/ios/Zeren/Voice/ThinkingOrbs-LICENSE.txt	1533	
+apps/ios/Zeren/Voice/VoiceActivityController.swift	4039	
+apps/ios/Zeren/Voice/VoiceControls.swift	9965	
+apps/ios/Zeren/Voice/VoiceStageViewController.swift	21737	
+apps/ios/Zeren/Voice/VoiceViewController.swift	12271	
+apps/ios/Zeren/Voice/WebRTC-LICENSE.txt	1511	
+apps/ios/ZerenLiveActivity/Assets.xcassets/Contents.json	53	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-awaiting-avatar.imageset/Contents.json	275	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-awaiting-avatar.imageset/orb-awaiting-avatar.svg	10139	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-awaiting-inline.imageset/Contents.json	275	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-awaiting-inline.imageset/orb-awaiting-inline.svg	2251	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-connecting-avatar.imageset/Contents.json	277	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-connecting-avatar.imageset/orb-connecting-avatar.svg	11773	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-connecting-inline.imageset/Contents.json	277	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-connecting-inline.imageset/orb-connecting-inline.svg	667	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-listening-avatar.imageset/Contents.json	276	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-listening-avatar.imageset/orb-listening-avatar.svg	9863	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-listening-inline.imageset/Contents.json	276	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-listening-inline.imageset/orb-listening-inline.svg	3114	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-muted-avatar.imageset/Contents.json	272	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-muted-avatar.imageset/orb-muted-avatar.svg	25729	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-muted-inline.imageset/Contents.json	272	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-muted-inline.imageset/orb-muted-inline.svg	6569	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-speaking-avatar.imageset/Contents.json	275	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-speaking-avatar.imageset/orb-speaking-avatar.svg	31709	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-speaking-inline.imageset/Contents.json	275	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-speaking-inline.imageset/orb-speaking-inline.svg	10755	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-working-avatar.imageset/Contents.json	274	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-working-avatar.imageset/orb-working-avatar.svg	37737	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-working-inline.imageset/Contents.json	274	
+apps/ios/ZerenLiveActivity/Assets.xcassets/orb-working-inline.imageset/orb-working-inline.svg	2896	
+apps/ios/ZerenLiveActivity/Info.plist	436	
+apps/ios/ZerenLiveActivity/VoiceLiveActivity.swift	9477	
+apps/ios/ZerenLiveActivity/ZerenLiveActivityBundle.swift	150	
 apps/ios/ZeronShared/VoiceActivity.swift	2191	
-apps/ios/ZeronTests/LineBreakAccuracyTests.swift	4147	
-apps/ios/ZeronTests/QueueEditTests.swift	1592	
-apps/ios/ZeronTests/RemoteVoiceLifecycleTests.swift	3193	
-apps/ios/ZeronUITests/AgentSenderTests.swift	2673	
-apps/ios/ZeronUITests/IPadLayoutTests.swift	3308	
-apps/ios/ZeronUITests/LiveStackTests.swift	2219	
-apps/ios/ZeronUITests/ScrollPerformanceTests.swift	3566	
-apps/ios/ZeronUITests/SessionFlowTests.swift	45610	
-apps/ios/ZeronUITests/TransitionTourTests.swift	1825	
-apps/ios/ZeronUITests/VisualFlowTests.swift	2004	
-apps/ios/ZeronUITests/VoiceFlowTests.swift	3016	
+apps/ios/ZerenTests/LineBreakAccuracyTests.swift	4147	
+apps/ios/ZerenTests/QueueEditTests.swift	1592	
+apps/ios/ZerenTests/RemoteVoiceLifecycleTests.swift	3193	
+apps/ios/ZerenUITests/AgentSenderTests.swift	2673	
+apps/ios/ZerenUITests/IPadLayoutTests.swift	3308	
+apps/ios/ZerenUITests/LiveStackTests.swift	2219	
+apps/ios/ZerenUITests/ScrollPerformanceTests.swift	3566	
+apps/ios/ZerenUITests/SessionFlowTests.swift	45610	
+apps/ios/ZerenUITests/TransitionTourTests.swift	1825	
+apps/ios/ZerenUITests/VisualFlowTests.swift	2004	
+apps/ios/ZerenUITests/VoiceFlowTests.swift	3016	
 apps/landing/downloads.test.mjs	3378	
 apps/landing/public/assets/app-screenshot.jpg	861863	
 apps/landing/public/assets/art/mist.webp	221452	
@@ -1429,7 +1429,7 @@ apps/landing/public/assets/icons/native/windows.svg	168
 apps/landing/public/assets/icons/openai-mark.svg	1655	
 apps/landing/public/assets/icons/opencode-mark.svg	255	
 apps/landing/public/assets/icons/pi-mark.svg	271	
-apps/landing/public/assets/icons/zeron-logo.svg	1981	
+apps/landing/public/assets/icons/zeren-logo.svg	1981	
 apps/landing/public/assets/instrument-serif-latin.woff2	21032	
 apps/landing/public/assets/logos/cursor.svg	2428	
 apps/landing/public/assets/logos/thecontextcompany.png	6713	
@@ -1467,8 +1467,8 @@ apps/landing/public/assets/tweets/sahilcodex.jpg	8080
 apps/landing/public/assets/tweets/stlaurentgod.jpg	8519	
 apps/landing/public/assets/tweets/thecto.jpg	8594	
 apps/landing/public/assets/tweets/zebassembly.jpg	9098	
-apps/landing/public/assets/zeron-app-icon.png	33775	
-apps/landing/public/assets/zeron-favicon-v3.png	37909	
+apps/landing/public/assets/zeren-app-icon.png	33775	
+apps/landing/public/assets/zeren-favicon-v3.png	37909	
 apps/landing/public/downloads.js	3102	
 apps/landing/public/favicon.svg	2575	
 apps/landing/public/glyph-field.js	12933	modified
@@ -1479,19 +1479,19 @@ apps/landing/telemetry.test.mjs	10546
 apps/landing/wrangler.jsonc	798	
 apps/www-redirect/src/index.js	164	
 apps/www-redirect/wrangler.jsonc	653	
-apps/zeron/Cargo.toml	1207	
-apps/zeron/build.rs	1114	
-apps/zeron/src/auth_cli.rs	12242	
-apps/zeron/src/background.rs	4829	
-apps/zeron/src/bin/zeron-engine.rs	1169	
-apps/zeron/src/daemon.rs	16844	
-apps/zeron/src/lib.rs	17009	
-apps/zeron/src/main.rs	14660	
-apps/zeron/src/paths.rs	2855	
-apps/zeron/src/plugin_cli.rs	11882	
-apps/zeron/src/update_cli.rs	3396	
-apps/zeron/tests/background_engine.rs	3505	
-apps/zeron/tests/noop_browser.rs	497	
+apps/zeren/Cargo.toml	1207	
+apps/zeren/build.rs	1114	
+apps/zeren/src/auth_cli.rs	12242	
+apps/zeren/src/background.rs	4829	
+apps/zeren/src/bin/zeren-engine.rs	1169	
+apps/zeren/src/daemon.rs	16844	
+apps/zeren/src/lib.rs	17009	
+apps/zeren/src/main.rs	14660	
+apps/zeren/src/paths.rs	2855	
+apps/zeren/src/plugin_cli.rs	11882	
+apps/zeren/src/update_cli.rs	3396	
+apps/zeren/tests/background_engine.rs	3505	
+apps/zeren/tests/noop_browser.rs	497	
 apps/zgx/.cargo/config.toml	185	
 apps/zgx/.gitignore	99	modified
 apps/zgx/Cargo.lock	149606	modified
@@ -1526,8 +1526,8 @@ apps/zgx/plugins-builtin/git/repo.luau	18698	modified
 apps/zgx/plugins-builtin/git/service.luau	34547	modified
 apps/zgx/plugins-builtin/git/view.luau	16698	modified
 apps/zgx/plugins-builtin/git/words.luau	3201	modified
-apps/zgx/plugins-builtin/git/zeron-plugin.json	467	
-apps/zgx/plugins-builtin/git/zeron.luau	44894	
+apps/zgx/plugins-builtin/git/zeren-plugin.json	467	
+apps/zgx/plugins-builtin/git/zeren.luau	44894	
 apps/zgx/plugins-builtin/github/badge.luau	1968	
 apps/zgx/plugins-builtin/github/board.luau	19307	
 apps/zgx/plugins-builtin/github/card_row.luau	1682	
@@ -1544,8 +1544,8 @@ apps/zgx/plugins-builtin/github/panel_row.luau	3954
 apps/zgx/plugins-builtin/github/pulls.luau	18474	
 apps/zgx/plugins-builtin/github/viewer.luau	77627	modified
 apps/zgx/plugins-builtin/github/watch.luau	9652	
-apps/zgx/plugins-builtin/github/zeron-plugin.json	500	
-apps/zgx/plugins-builtin/github/zeron.luau	44894	
+apps/zgx/plugins-builtin/github/zeren-plugin.json	500	
+apps/zgx/plugins-builtin/github/zeren.luau	44894	
 apps/zgx/plugins-builtin/parallax-scenes/art/aurora/far.webp	24276	
 apps/zgx/plugins-builtin/parallax-scenes/art/aurora/near.webp	26242	
 apps/zgx/plugins-builtin/parallax-scenes/art/aurora/sky.webp	40606	
@@ -1596,30 +1596,30 @@ apps/zgx/plugins-builtin/parallax-scenes/init.luau	3844
 apps/zgx/plugins-builtin/parallax-scenes/locales/en.json	383	
 apps/zgx/plugins-builtin/parallax-scenes/locales/zh-Hans.json	373	
 apps/zgx/plugins-builtin/parallax-scenes/scenes.luau	1809	
-apps/zgx/plugins-builtin/parallax-scenes/zeron-plugin.json	2694	modified
-apps/zgx/plugins-builtin/parallax-scenes/zeron.luau	40511	
+apps/zgx/plugins-builtin/parallax-scenes/zeren-plugin.json	2694	modified
+apps/zgx/plugins-builtin/parallax-scenes/zeren.luau	40511	
 apps/zgx/plugins-dev/README.md	11850	
 apps/zgx/plugins-dev/checkout-status/init.luau	1668	
 apps/zgx/plugins-dev/checkout-status/service.luau	1494	
-apps/zgx/plugins-dev/checkout-status/zeron-plugin.json	664	
-apps/zgx/plugins-dev/checkout-status/zeron.luau	40511	
+apps/zgx/plugins-dev/checkout-status/zeren-plugin.json	664	
+apps/zgx/plugins-dev/checkout-status/zeren.luau	40511	
 apps/zgx/plugins-dev/compact-sidebar/init.luau	287	
 apps/zgx/plugins-dev/compact-sidebar/sidebar.luau	2518	
-apps/zgx/plugins-dev/compact-sidebar/zeron-plugin.json	260	
-apps/zgx/plugins-dev/compact-sidebar/zeron.luau	28306	
+apps/zgx/plugins-dev/compact-sidebar/zeren-plugin.json	260	
+apps/zgx/plugins-dev/compact-sidebar/zeren.luau	28306	
 apps/zgx/plugins-dev/focus/init.luau	1521	
-apps/zgx/plugins-dev/focus/zeron-plugin.json	283	
-apps/zgx/plugins-dev/focus/zeron.luau	28306	
+apps/zgx/plugins-dev/focus/zeren-plugin.json	283	
+apps/zgx/plugins-dev/focus/zeren.luau	28306	
 apps/zgx/plugins-dev/install.sh	1551	
 apps/zgx/plugins-dev/md-hello/init.luau	1036	
-apps/zgx/plugins-dev/md-hello/zeron-plugin.json	315	
-apps/zgx/plugins-dev/md-hello/zeron.luau	28306	
+apps/zgx/plugins-dev/md-hello/zeren-plugin.json	315	
+apps/zgx/plugins-dev/md-hello/zeren.luau	28306	
 apps/zgx/plugins-dev/notes-tool/init.luau	993	
-apps/zgx/plugins-dev/notes-tool/zeron-plugin.json	704	
-apps/zgx/plugins-dev/notes-tool/zeron.luau	28306	
+apps/zgx/plugins-dev/notes-tool/zeren-plugin.json	704	
+apps/zgx/plugins-dev/notes-tool/zeren.luau	28306	
 apps/zgx/plugins-dev/ping/init.luau	1812	
-apps/zgx/plugins-dev/ping/zeron-plugin.json	238	
-apps/zgx/plugins-dev/ping/zeron.luau	28306	
+apps/zgx/plugins-dev/ping/zeren-plugin.json	238	
+apps/zgx/plugins-dev/ping/zeren.luau	28306	
 apps/zgx/plugins-dev/rig/down.sh	187	
 apps/zgx/plugins-dev/rig/ipc.mjs	2409	
 apps/zgx/plugins-dev/rig/lib.mjs	9586	modified
@@ -1627,17 +1627,17 @@ apps/zgx/plugins-dev/rig/rig.mjs	19764
 apps/zgx/plugins-dev/rig/up.sh	338	
 apps/zgx/plugins-dev/rig/username.mjs	1111	
 apps/zgx/plugins-dev/session-status/init.luau	1056	
-apps/zgx/plugins-dev/session-status/zeron-plugin.json	246	
-apps/zgx/plugins-dev/session-status/zeron.luau	28306	
+apps/zgx/plugins-dev/session-status/zeren-plugin.json	246	
+apps/zgx/plugins-dev/session-status/zeren.luau	28306	
 apps/zgx/plugins-dev/session-words/init.luau	917	
 apps/zgx/plugins-dev/session-words/locales/en.json	225	
 apps/zgx/plugins-dev/session-words/locales/zh-Hans.json	211	
-apps/zgx/plugins-dev/session-words/zeron-plugin.json	276	
-apps/zgx/plugins-dev/session-words/zeron.luau	36986	
+apps/zgx/plugins-dev/session-words/zeren-plugin.json	276	
+apps/zgx/plugins-dev/session-words/zeren.luau	36986	
 apps/zgx/plugins-dev/settings-demo/init.luau	1435	
-apps/zgx/plugins-dev/settings-demo/zeron-plugin.json	1852	
-apps/zgx/plugins-dev/settings-demo/zeron.luau	32606	
-apps/zgx/plugins-sdk/zeron.luau	44894	
+apps/zgx/plugins-dev/settings-demo/zeren-plugin.json	1852	
+apps/zgx/plugins-dev/settings-demo/zeren.luau	32606	
+apps/zgx/plugins-sdk/zeren.luau	44894	
 apps/zgx/scripts/smoke.sh	6651	
 apps/zgx/scripts/smoke_agent.py	4904	
 apps/zgx/scripts/smoke_rpc.py	2117	
@@ -1843,7 +1843,7 @@ apps/zgx/ui/assets/composer/transcript.png	87785
 apps/zgx/ui/assets/favicons/flint.png	2827	untracked
 apps/zgx/ui/assets/favicons/ios.png	9048	
 apps/zgx/ui/assets/favicons/marigold.png	3405	untracked
-apps/zgx/ui/assets/favicons/zeron.png	1663	
+apps/zgx/ui/assets/favicons/zeren.png	1663	
 apps/zgx/ui/assets/favicons/zgx.png	1526	
 apps/zgx/ui/assets/icons/antigravity-mark.svg	7323	
 apps/zgx/ui/assets/icons/claude-mark.svg	1944	
@@ -2689,7 +2689,7 @@ apps/zgx/ui/assets/icons/ui/widget.svg	847
 apps/zgx/ui/assets/icons/ui/wifi-off.svg	459	
 apps/zgx/ui/assets/icons/ui/worktree.svg	328	
 apps/zgx/ui/assets/icons/ui/wrap-text.svg	564	
-apps/zgx/ui/assets/icons/ui/zeron-logo.svg	1981	
+apps/zgx/ui/assets/icons/ui/zeren-logo.svg	1981	
 apps/zgx/ui/assets/icons/x-mark.svg	254	
 apps/zgx/ui/assets/lightbox/pixels.png	12978	
 apps/zgx/ui/assets/lightbox/tall.png	16116	
@@ -2902,8 +2902,8 @@ apps/zgx/ui/ds/tabs.luau	5732
 apps/zgx/ui/ds/text.luau	1682	
 apps/zgx/ui/ds/text_area.luau	6294	
 apps/zgx/ui/ds/text_field.luau	8952	
-apps/zgx/ui/ds/themes/zeron-dark.json	10967	
-apps/zgx/ui/ds/themes/zeron-light.json	10851	
+apps/zgx/ui/ds/themes/zeren-dark.json	10967	
+apps/zgx/ui/ds/themes/zeren-light.json	10851	
 apps/zgx/ui/ds/tile.luau	5519	modified
 apps/zgx/ui/ds/title_bar.luau	9863	
 apps/zgx/ui/ds/toast.luau	7840	
@@ -2982,7 +2982,7 @@ apps/zgx/ui/screens/chat/session.luau	9921
 apps/zgx/ui/screens/chat/shared.luau	17207	modified
 apps/zgx/ui/screens/chat/store.luau	9816	
 apps/zgx/ui/screens/chat/where.luau	18683	modified
-apps/zgx/ui/screens/chat/zeron_commands.luau	3418	
+apps/zgx/ui/screens/chat/zeren_commands.luau	3418	
 apps/zgx/ui/screens/engine/update.luau	4465	
 apps/zgx/ui/screens/files/api.luau	5801	
 apps/zgx/ui/screens/files/comments.luau	2610	
@@ -3672,7 +3672,7 @@ crates/mcp/src/lib.rs	2946
 crates/mcp/src/tools.rs	139147	
 crates/mcp/src/tools/plugins.rs	58142	
 crates/mcp/src/transcript.rs	14180	
-crates/mcp/src/zeron.rs	37052	
+crates/mcp/src/zeren.rs	37052	
 crates/mobile-bindgen/Cargo.toml	549	
 crates/mobile-bindgen/src/main.rs	48	
 crates/mobile/Cargo.toml	1172	
@@ -3834,7 +3834,7 @@ crates/text/tests/layout.rs	32395
 crates/text/tests/measure.rs	8766	
 crates/text/tests/props.rs	12661	
 crates/theme/Cargo.toml	385	
-crates/theme/src/bin/zeron-theme-import.rs	1748	
+crates/theme/src/bin/zeren-theme-import.rs	1748	
 crates/theme/src/builtins.rs	43639	
 crates/theme/src/lib.rs	24948	
 crates/theme/src/library.rs	29570	
@@ -4343,7 +4343,7 @@ crates/ui/assets/icons/window-minimize.svg	167
 crates/ui/assets/icons/window-restore.svg	317	
 crates/ui/assets/icons/worktree.svg	328	
 crates/ui/assets/icons/wrap-text.svg	564	
-crates/ui/assets/icons/zeron-logo.svg	1981	
+crates/ui/assets/icons/zeren-logo.svg	1981	
 crates/ui/assets/sounds/appshot.wav	128684	
 crates/ui/assets/sounds/attention.wav	124844	
 crates/ui/assets/sounds/done.wav	99884	
@@ -4646,7 +4646,7 @@ dist/macos/Info-dev.plist	1968
 dist/macos/Info-preview.plist	2250	untracked
 dist/macos/Info-unbundled.plist	582	
 dist/macos/Info.plist	2323	
-dist/macos/Zeron.entitlements	546	
+dist/macos/Zeren.entitlements	546	
 dist/macos/dmg-background.png	22764	
 dist/macos/dmg-background@2x.png	82723	
 dist/macos/icon-1024.png	1369459	
@@ -4654,12 +4654,12 @@ dist/macos/icon-preview-1024.png	1048541	untracked
 dist/voice/Codex-LICENSE.txt	10926	
 dist/voice/README.md	1557	
 dist/windows/README.md	520	
-dist/windows/zeron.ico	161180	
-dist/windows/zeron.iss	3959	
-dist/windows/zeron.rc	93	
-dist/zeron.desktop	328	
-dist/zeron.png	1803905	
-dist/zeron.svg	2575	
+dist/windows/zeren.ico	161180	
+dist/windows/zeren.iss	3959	
+dist/windows/zeren.rc	93	
+dist/zeren.desktop	328	
+dist/zeren.png	1803905	
+dist/zeren.svg	2575	
 docs/PARITY.md	12078	
 docs/adr/0001-custom-themes-compile-to-resolved-families.md	2588	
 docs/adr/0002-separate-surface-preference-from-theme-selection.md	799	
@@ -5562,7 +5562,7 @@ target/tmp/	0	ignored]],
 		["apps/android/screenshots/welcome-agents.png"] = { 445, 1000 },
 		["apps/android/screenshots/welcome-appearance.png"] = { 445, 1000 },
 		["apps/android/screenshots/welcome-github.png"] = { 445, 1000 },
-		["apps/ios/Zeron/Assets.xcassets/AppIcon.appiconset/AppIcon1024.png"] = { 1024, 1024 },
+		["apps/ios/Zeren/Assets.xcassets/AppIcon.appiconset/AppIcon1024.png"] = { 1024, 1024 },
 		["apps/landing/public/assets/app-screenshot.jpg"] = { 2560, 1655 },
 		["apps/landing/public/assets/logos/thecontextcompany.png"] = { 684, 59 },
 		["apps/landing/public/assets/logos/unsloth-mask.png"] = { 310, 96 },
@@ -5597,8 +5597,8 @@ target/tmp/	0	ignored]],
 		["apps/landing/public/assets/tweets/stlaurentgod.jpg"] = { 200, 200 },
 		["apps/landing/public/assets/tweets/thecto.jpg"] = { 200, 200 },
 		["apps/landing/public/assets/tweets/zebassembly.jpg"] = { 200, 200 },
-		["apps/landing/public/assets/zeron-app-icon.png"] = { 128, 128 },
-		["apps/landing/public/assets/zeron-favicon-v3.png"] = { 128, 128 },
+		["apps/landing/public/assets/zeren-app-icon.png"] = { 128, 128 },
+		["apps/landing/public/assets/zeren-favicon-v3.png"] = { 128, 128 },
 		["apps/zgx/ui/assets/art/clouds-left.png"] = { 2100, 700 },
 		["apps/zgx/ui/assets/art/clouds-mid.png"] = { 2100, 700 },
 		["apps/zgx/ui/assets/art/clouds-right.png"] = { 2100, 700 },
@@ -5610,7 +5610,7 @@ target/tmp/	0	ignored]],
 		["apps/zgx/ui/assets/favicons/flint.png"] = { 64, 64 },
 		["apps/zgx/ui/assets/favicons/ios.png"] = { 64, 64 },
 		["apps/zgx/ui/assets/favicons/marigold.png"] = { 64, 64 },
-		["apps/zgx/ui/assets/favicons/zeron.png"] = { 64, 64 },
+		["apps/zgx/ui/assets/favicons/zeren.png"] = { 64, 64 },
 		["apps/zgx/ui/assets/favicons/zgx.png"] = { 64, 64 },
 		["apps/zgx/ui/assets/lightbox/pixels.png"] = { 1200, 800 },
 		["apps/zgx/ui/assets/lightbox/tall.png"] = { 520, 1800 },
@@ -5623,7 +5623,7 @@ target/tmp/	0	ignored]],
 		["dist/macos/dmg-background@2x.png"] = { 1320, 800 },
 		["dist/macos/icon-1024.png"] = { 1024, 1024 },
 		["dist/macos/icon-preview-1024.png"] = { 1024, 1024 },
-		["dist/zeron.png"] = { 1024, 1024 },
+		["dist/zeren.png"] = { 1024, 1024 },
 		["docs/media/acp/s1-slash.png"] = { 1280, 800 },
 		["docs/media/acp/s2-run.png"] = { 1280, 800 },
 		["docs/media/acp/s3-group.png"] = { 1280, 800 },
@@ -6002,9 +6002,9 @@ CLAUDE.md
 - **Last known good** — The most recent successfully compiled family retained by a linked theme when its current source is missing or invalid.
 - **Import report** — A per-variant summary of mapped roles, fallbacks, unsupported values, and inferred decisions produced during compilation.
 - **Mapping review** — The optional advanced view of an import report. Normal theme selection and import do not expose token names.
-- **Theme hardening** — Deterministic post-mapping repairs that prefer stronger semantically related source colors, minimally adjust only shared Zeron roles when needed, and record every decision in the mapping review.
+- **Theme hardening** — Deterministic post-mapping repairs that prefer stronger semantically related source colors, minimally adjust only shared Zeren roles when needed, and record every decision in the mapping review.
 - **Theme default accent** — The interaction accent chosen or inferred for a theme variant by its authoring source.
-- **Accent override** — A Zeron preset that replaces interaction roles only; syntax, terminal ANSI, diff, warning, error, and success colors remain owned by the theme.
+- **Accent override** — A Zeren preset that replaces interaction roles only; syntax, terminal ANSI, diff, warning, error, and success colors remain owned by the theme.
 - **Recommended surface treatment** — A theme variant's authored recommendation for whether its surfaces are frosted or opaque. It is used only when the user keeps the surface preference at theme default.
 - **Surface preference** — A device-local choice of theme default, frosted, or opaque that is independent of appearance, theme, and accent selections.
 - **Resolved surface treatment** — The effective frosted or opaque treatment produced by applying the surface preference to the active variant's recommendation.
@@ -6042,7 +6042,7 @@ members = [
     "crates/visual",
     "crates/visual-gpu",
     "crates/zatex",
-    "apps/zeron",
+    "apps/zeren",
 ]
 
 [workspace.package]
@@ -6052,33 +6052,33 @@ license = "MIT"
 publish = false
 
 [workspace.dependencies]
-zeron-voice-session = { path = "crates/voice-session" }
-zeron-orb = { path = "crates/orb" }
-zeron-veil = { path = "crates/veil" }
-zeron-term = { path = "crates/term" }
-zeron-term-link = { path = "crates/term-link" }
-zeron-voice-media = { path = "crates/voice-media" }
-zeron-audio = { path = "crates/audio" }
-zeron-proto = { path = "crates/proto" }
-zeron-preview = { path = "crates/preview" }
-zeron-doc = { path = "crates/doc" }
-zeron-sync = { path = "crates/sync" }
-zeron-harness = { path = "crates/harness" }
-zeron-engine = { path = "crates/engine" }
-zeron-rpc = { path = "crates/rpc" }
-zeron-update = { path = "crates/update" }
-zeron-ui = { path = "crates/ui" }
-zeron-notify = { path = "crates/notify" }
-zeron-syntax = { path = "crates/syntax" }
-zeron-markdown = { path = "crates/markdown" }
-zeron-mobile = { path = "crates/mobile" }
-zeron-client = { path = "crates/client" }
-zeron-theme = { path = "crates/theme" }
-zeron-mcp = { path = "crates/mcp" }
-zeron-text = { path = "crates/text" }
+zeren-voice-session = { path = "crates/voice-session" }
+zeren-orb = { path = "crates/orb" }
+zeren-veil = { path = "crates/veil" }
+zeren-term = { path = "crates/term" }
+zeren-term-link = { path = "crates/term-link" }
+zeren-voice-media = { path = "crates/voice-media" }
+zeren-audio = { path = "crates/audio" }
+zeren-proto = { path = "crates/proto" }
+zeren-preview = { path = "crates/preview" }
+zeren-doc = { path = "crates/doc" }
+zeren-sync = { path = "crates/sync" }
+zeren-harness = { path = "crates/harness" }
+zeren-engine = { path = "crates/engine" }
+zeren-rpc = { path = "crates/rpc" }
+zeren-update = { path = "crates/update" }
+zeren-ui = { path = "crates/ui" }
+zeren-notify = { path = "crates/notify" }
+zeren-syntax = { path = "crates/syntax" }
+zeren-markdown = { path = "crates/markdown" }
+zeren-mobile = { path = "crates/mobile" }
+zeren-client = { path = "crates/client" }
+zeren-theme = { path = "crates/theme" }
+zeren-mcp = { path = "crates/mcp" }
+zeren-text = { path = "crates/text" }
 zatex = { path = "crates/zatex" }
-zeron-visual = { path = "crates/visual" }
-zeron-visual-gpu = { path = "crates/visual-gpu" }
+zeren-visual = { path = "crates/visual" }
+zeren-visual-gpu = { path = "crates/visual-gpu" }
 
 # CRDT
 loro = "1.17"
@@ -6099,7 +6099,7 @@ loro-protocol = "0.3"
 # sidebar); a6c1ad5 adds BackdropBlur + horizontal EdgeFade + glass fixes;
 # 9b672fa bounds renderer GPU memory (region-sized backdrop blur scratch,
 # idle release of blur/path intermediates, instance pool shrink,
-# ZERON_GPU_STATS=1 diagnostics); b687328 adds ImageSource::evict (frees
+# ZEREN_GPU_STATS=1 diagnostics); b687328 adds ImageSource::evict (frees
 # sprite-atlas tiles — remove_asset alone leaked them, see
 # attachments::flush_evicted); ac135eb adds device memory to the stats line;
 # f596cde fixes destination alpha on transparent windows (Porter-Duff OVER,
@@ -6214,10 +6214,10 @@ debug = true
 debug = true
 
 # Scenes rasterize in software every frame the camera moves.
-[profile.dev.package.zeron-visual]
+[profile.dev.package.zeren-visual]
 opt-level = 3
 
-[profile.dev.package.zeron-visual-gpu]
+[profile.dev.package.zeren-visual-gpu]
 opt-level = 3
 
 # Mobile core (scripts/ios/build-core.sh). Always optimized — layout and sync
@@ -6238,21 +6238,21 @@ codegen-units = 1
 strip = "debuginfo"
 ]],
 		["README.ko.md"] = [[
-# Zeron
+# Zeren
 
 코딩 에이전트(Claude Code, Codex, Cursor, Devin, Grok, Hermes, Pi, Antigravity)를 기본적으로 로컬에서 관리하고, 필요하면 여러 기기 간 동기화도 사용할 수 있습니다.
 
 *[English](README.md) | [简体中文](README.zh-CN.md) | 한국어 | [日本語](README.ja.md) | [Español](README.es.md)*
 
-![Zeron 데스크톱 앱](docs/media/readme/app-screenshot.jpg)
+![Zeren 데스크톱 앱](docs/media/readme/app-screenshot.jpg)
 
 ## 데스크톱 앱
 
-[GitHub Releases](https://github.com/zeronsh/zeron/releases/latest)에서 플랫폼에 맞는 최신 버전을 내려받으세요.
+[GitHub Releases](https://github.com/femboypuppy/zeren/releases/latest)에서 플랫폼에 맞는 최신 버전을 내려받으세요.
 
-- **macOS** — `zeron-<version>-macos-arm64.dmg`
-- **Windows** — `zeron-<version>-windows-x86_64-setup.exe`
-- **Linux** — `zeron-<version>-linux-<arch>.tar.gz`의 압축을 풀고 안에 있는 `install.sh` 실행
+- **macOS** — `zeren-<version>-macos-arm64.dmg`
+- **Windows** — `zeren-<version>-windows-x86_64-setup.exe`
+- **Linux** — `zeren-<version>-linux-<arch>.tar.gz`의 압축을 풀고 안에 있는 `install.sh` 실행
 
 계정이나 네트워크 연결이 필요 없으며, 세션은 사용 중인 기기에 저장됩니다. 앱은 자동으로 업데이트됩니다.
 
@@ -6262,15 +6262,15 @@ strip = "debuginfo"
 
 ```bash
 curl -fsSL https://zeron.sh/install.sh | sh
-zeron status
+zeren status
 ```
 
 설치 스크립트는 엔진을 백그라운드 서비스로 실행하며, 재부팅 후에도 자동으로 다시 시작됩니다.
 
 ```bash
-zeron status      # 로컬/동기화 모드와 엔진 상태 확인
-zeron update      # 최신 버전으로 업데이트
-zeron daemon start|stop|restart|status
+zeren status      # 로컬/동기화 모드와 엔진 상태 확인
+zeren update      # 최신 버전으로 업데이트
+zeren daemon start|stop|restart|status
 ```
 
 ## 여러 기기 간 동기화 (선택)
@@ -6278,39 +6278,39 @@ zeron daemon start|stop|restart|status
 로그인하면 한 기기에서 에이전트를 시작하고 다른 기기에서 이어서 보거나 조작할 수 있습니다.
 
 ```bash
-zeron daemon stop
-zeron login        # 로컬 전용 모드로 돌아가려면 zeron logout
-zeron daemon start
+zeren daemon stop
+zeren login        # 로컬 전용 모드로 돌아가려면 zeren logout
+zeren daemon start
 ```
 
 같은 계정에 로그인한 기기끼리는 서로의 워크스페이스 파일을 읽고 쓸 수 있으므로, 신뢰하는 기기에서만 로그인하세요. 기존 로컬 세션은 업로드되지 않습니다.
 
 ## 후원
 
-Zeron을 후원해 주신 [The Context Company](https://www.thecontextcompany.com/)에 감사드립니다. [GitHub에서 후원자가 되어](https://github.com/sponsors/zeronsh) Zeron 개발을 지원하실 수도 있습니다.
+Zeren을 후원해 주신 [The Context Company](https://www.thecontextcompany.com/)에 감사드립니다. [GitHub에서 후원자가 되어](https://github.com/sponsors/zeronsh) Zeren 개발을 지원하실 수도 있습니다.
 
 ---
 
-개발에 참여하고 싶거나 동작 방식이 궁금하다면 [Ask DeepWiki](https://deepwiki.com/zeronsh/zeron) 또는 [ARCHITECTURE.md](ARCHITECTURE.md)를 확인하세요.
+개발에 참여하고 싶거나 동작 방식이 궁금하다면 [Ask DeepWiki](https://deepwiki.com/zeronsh/zeren) 또는 [ARCHITECTURE.md](ARCHITECTURE.md)를 확인하세요.
 
 [MIT License](LICENSE)로 배포됩니다.
 ]],
 		["README.md"] = [[
-# Zeron
+# Zeren
 
 Control your coding agents (Claude Code, Codex, Cursor, Devin, Grok, Hermes, Pi, Antigravity) locally by default, with optional multi-device sync.
 
 *English | [简体中文](README.zh-CN.md) | [한국어](README.ko.md) | [日本語](README.ja.md) | [Español](README.es.md)*
 
-![Zeron desktop app](docs/media/readme/app-screenshot.jpg)
+![Zeren desktop app](docs/media/readme/app-screenshot.jpg)
 
 ## Desktop app
 
-Download the latest release for your platform from [GitHub Releases](https://github.com/zeronsh/zeron/releases/latest):
+Download the latest release for your platform from [GitHub Releases](https://github.com/femboypuppy/zeren/releases/latest):
 
-- **macOS** — `zeron-<version>-macos-arm64.dmg`
-- **Windows** — `zeron-<version>-windows-x86_64-setup.exe`
-- **Linux** — `zeron-<version>-linux-<arch>.tar.gz`, then run its `install.sh`
+- **macOS** — `zeren-<version>-macos-arm64.dmg`
+- **Windows** — `zeren-<version>-windows-x86_64-setup.exe`
+- **Linux** — `zeren-<version>-linux-<arch>.tar.gz`, then run its `install.sh`
 
 No account or network connection is needed; sessions stay on your device. The app updates itself.
 
@@ -6320,15 +6320,15 @@ For servers and other machines without a display, such as a VPS that keeps agent
 
 ```bash
 curl -fsSL https://zeron.sh/install.sh | sh
-zeron status
+zeren status
 ```
 
 The installer starts the engine as a background service that survives reboots.
 
 ```bash
-zeron status      # local/synced mode and engine status
-zeron update      # update to the latest release
-zeron daemon start|stop|restart|status
+zeren status      # local/synced mode and engine status
+zeren update      # update to the latest release
+zeren daemon start|stop|restart|status
 ```
 
 ## Multi-device sync (optional)
@@ -6336,48 +6336,48 @@ zeron daemon start|stop|restart|status
 Sign in to start an agent on one device and follow or drive it from another:
 
 ```bash
-zeron daemon stop
-zeron login        # or: zeron logout to return to local-only
-zeron daemon start
+zeren daemon stop
+zeren login        # or: zeren logout to return to local-only
+zeren daemon start
 ```
 
 Devices signed in to the same account can read and write each other's workspace files, so only sign in devices you trust. Existing local sessions are never uploaded.
 
 ## Sponsors
 
-Thank you to [The Context Company](https://www.thecontextcompany.com/) for sponsoring Zeron. You can help fund Zeron's development too by [becoming a sponsor on GitHub](https://github.com/sponsors/zeronsh).
+Thank you to [The Context Company](https://www.thecontextcompany.com/) for sponsoring Zeren. You can help fund Zeren's development too by [becoming a sponsor on GitHub](https://github.com/sponsors/zeronsh).
 
 ---
 
-Developing or curious how it works? [Ask DeepWiki](https://deepwiki.com/zeronsh/zeron) or check out [ARCHITECTURE.md](ARCHITECTURE.md).
+Developing or curious how it works? [Ask DeepWiki](https://deepwiki.com/zeronsh/zeren) or check out [ARCHITECTURE.md](ARCHITECTURE.md).
 
 Licensed under the [MIT License](LICENSE).
 ]],
 		["apps/zgx/Cargo.toml"] = [=[
-# Zeron's interface in zgx (https://zgx.zeron.sh), starting with onboarding.
+# Zeren's interface in zgx (https://zgx.zeron.sh), starting with onboarding.
 #
 # A workspace of its own, not a member of the root one: zgx builds against
 # patched crates (its `[patch.crates-io]`, mirrored below), and a patch here
 # must not reach gpui's wgpu renderer in the shipping app. It tracks zgx's
-# `main` branch, pinned by commit when Zeron needs one ahead of main.
+# `main` branch, pinned by commit when Zeren needs one ahead of main.
 
 [workspace]
 
 [package]
-name = "zeron-zgx"
+name = "zeren-zgx"
 version = "0.0.0"
 edition = "2024"
 license = "MIT"
 publish = false
 
 [[bin]]
-name = "zeron-zgx"
+name = "zeren-zgx"
 path = "src/main.rs"
 
 [features]
-# Zeron Preview (scripts/package-zgx-preview.sh): the app in its own bundle
-# beside Zeron.app, on the production edge and sign-in, with its own engine
-# (the one in its Contents/MacOS, data in ~/.zeron-preview, port 27664).
+# Zeren Preview (scripts/package-zgx-preview.sh): the app in its own bundle
+# beside Zeren.app, on the production edge and sign-in, with its own engine
+# (the one in its Contents/MacOS, data in ~/.zeren-preview, port 27664).
 # Without it, the app stays on staging (src/auth.rs, src/engine/manager.rs).
 preview = []
 
@@ -6397,7 +6397,7 @@ zgx-script = { git = "https://github.com/zeronsh/zgx", rev = "a2c9cf1e68b7ac2c4e
 # the formats `ui.image` shows (no features of its own: the ones zgx-desktop
 # turns on).
 zgx-gpu = { git = "https://github.com/zeronsh/zgx", rev = "a2c9cf1e68b7ac2c4e100b5951f10f64af33f42b", default-features = false }
-# Each plugin's own database (`zeron.db`, src/plugins/db.rs): SQLite,
+# Each plugin's own database (`zeren.db`, src/plugins/db.rs): SQLite,
 # built in; `limits` to keep one from attaching any other file.
 rusqlite = { version = "0.32", features = ["bundled", "limits"] }
 # `fetch`: zgx's own transport for `ui.fetch` and remote images (HTTP and
@@ -6436,17 +6436,17 @@ base64 = "0.22"
 zatex = { path = "../../crates/zatex", features = ["bundled"] }
 # Imported VS Code themes (src/themes.rs): the shipping app's theme crate,
 # its importer, library file and error words.
-zeron-theme = { path = "../../crates/theme" }
+zeren-theme = { path = "../../crates/theme" }
 # Templates' theme files, JSON with comments, read for their previews
 # (src/plugins/looks.rs), as the theme crate reads them.
 json5 = "0.4"
 # Agent visuals (src/visuals.rs): the shipping app's sandboxed runtime for
 # `show_visual` scripts, and its offscreen GPU renderer for their scenes and
 # shaders (the same wgpu zgx draws with).
-zeron-visual = { path = "../../crates/visual" }
-zeron-visual-gpu = { path = "../../crates/visual-gpu" }
+zeren-visual = { path = "../../crates/visual" }
+zeren-visual-gpu = { path = "../../crates/visual-gpu" }
 # Their frames' pixel loops, optimized in debug builds too (below).
-zeron-zgx-pixels = { path = "pixels" }
+zeren-zgx-pixels = { path = "pixels" }
 
 # The app's macOS appearance (`appearance`): the same objc2 zgx builds on.
 [target.'cfg(target_os = "macos")'.dependencies]
@@ -6489,7 +6489,7 @@ opt-level = 1
 
 # A path dependency in this folder is a member, which `"*"` leaves out: the
 # per-frame pixel loops, optimized (unoptimized, 46 ms a 2x frame).
-[profile.dev.package.zeron-zgx-pixels]
+[profile.dev.package.zeren-zgx-pixels]
 opt-level = 3
 
 [profile.release]
@@ -6497,26 +6497,26 @@ lto = "thin"
 codegen-units = 1
 ]=],
 		["apps/zgx/README.md"] = [[
-# Zeron in zgx
+# Zeren in zgx
 
-Zeron's interface rebuilt on [zgx](https://zgx.zeron.sh), starting with
+Zeren's interface rebuilt on [zgx](https://zgx.zeron.sh), starting with
 onboarding. The interface is Luau (`ui/`): it hot-reloads as it is saved,
 keeping its state, so most work never rebuilds Rust. The Rust host
 (`src/main.rs`) makes windows, registers fonts and answers the scripts'
-actions, and speaks to a Zeron engine (`src/engine/`), which owns the
+actions, and speaks to a Zeren engine (`src/engine/`), which owns the
 account, this Mac's agents and GitHub for Cloud.
 
 ## Running it
 
-**Dev builds talk to Zeron's staging servers, not production.** Signing in
+**Dev builds talk to Zeren's staging servers, not production.** Signing in
 uses staging's edge (`https://staging.zeron.sh`) and sign-in client, and
-the engine zgx starts keeps its data in `~/.zeron-staging`: your production
-account, chats and devices aren't there. `ZERON_ZGX_ENV=production` points a
+the engine zgx starts keeps its data in `~/.zeren-staging`: your production
+account, chats and devices aren't there. `ZEREN_ZGX_ENV=production` points a
 build at production instead (`src/auth.rs` lists the other overrides).
 
 You need Rust 1.85 or newer (edition 2024). We develop on macOS; Linux
 should work but is untested. The app is this folder: `apps/zgx` in
-zeronsh/zeron, or the root of zeronsh/zeron-zgx, which is a copy of it.
+zeronsh/zeren, or the root of zeronsh/zeren-zgx, which is a copy of it.
 
 On macOS you also need Zig 0.16 (`brew install zig@0.16`): Ghostty draws the
 panel's terminals there (zgx-desktop's `ghostty` feature), and zgx builds it
@@ -6525,7 +6525,7 @@ cached in `~/Library/Caches/zgx-ghostty` for every checkout. Without Zig 0.16
 the build stops and says so (`ZIG` points it at another Zig executable).
 
 ```sh
-git clone git@github.com:zeronsh/zeron-zgx.git && cd zeron-zgx
+git clone git@github.com:zeronsh/zeren-zgx.git && cd zeren-zgx
 cargo run --release -- gallery      # the workbench: every component and demo
 ```
 
@@ -6554,12 +6554,12 @@ cargo run --release -- intro        # the same
 cargo run --release -- onboarding   # setup alone, in its window, from sign-in
 cargo run --release -- main         # the main window: sessions, chats, files
 cargo run --release -- gallery      # the design system, dark and light side by side
-ZERON_ZGX_STEP=agents cargo run --release -- onboarding
+ZEREN_ZGX_STEP=agents cargo run --release -- onboarding
 cargo run --release -- gallery --inspect   # devtools for `zgx inspect` / its MCP
 ```
 
 A launch signed in goes straight to setup, and once setup has been finished
-on this Mac (its "Open Zeron"), to the main window; finishing setup opens it
+on this Mac (its "Open Zeren"), to the main window; finishing setup opens it
 too. Signed out, or new, it's the intro and setup again.
 
 ### The engine
@@ -6567,30 +6567,30 @@ too. Signed out, or new, it's the intro and setup again.
 Sign-in, Your agents and Connect GitHub are the engine's, over its local
 IPC: the engine keeps the session (zgx keeps none of its own), finds the
 agents and runs their sign-ins, and runs GitHub's device flow. zgx uses
-the staging engine, port 27871 with its data in `~/.zeron-staging`
+the staging engine, port 27871 with its data in `~/.zeren-staging`
 (`scripts/staging-app.sh`'s): one already running is used as it is,
-otherwise zgx starts `target/debug/zeron-engine` from this checkout's root
-(`cargo build -p zeron --bin zeron-engine` there first), detached, against
+otherwise zgx starts `target/debug/zeren-engine` from this checkout's root
+(`cargo build -p zeren --bin zeren-engine` there first), detached, against
 zgx's edge and sign-in client. Signing in restarts it once, to sync. Never
 the production engine: port 27654 and `~/.comet-native` are refused.
 
 ```sh
-ZERON_ZGX_ENGINE_PORT=27881 ZERON_ZGX_ENGINE_DATA=/tmp/zgx-engine \
-ZERON_ZGX_ENGINE_HOME=/tmp/zgx-home \
+ZEREN_ZGX_ENGINE_PORT=27881 ZEREN_ZGX_ENGINE_DATA=/tmp/zgx-engine \
+ZEREN_ZGX_ENGINE_HOME=/tmp/zgx-home \
   cargo run --release -- onboarding     # an engine of its own, throwaway
 ```
 
-`ZERON_ZGX_ENGINE_HOME` gives the engine zgx starts a home of its own
+`ZEREN_ZGX_ENGINE_HOME` gives the engine zgx starts a home of its own
 (`HOME`, `CLAUDE_CONFIG_DIR`, `CODEX_HOME`), so the agents' logins it reads
-and writes are that folder's, not this Mac's. `ZERON_ZGX_ENGINE_BIN` picks
-another engine; `ZERON_ZGX_ENGINE_SPAWN=0` only uses one that's running.
-`ZERON_ZGX_NO_BROWSER=1` opens no browser for a sign-in (a path instead
+and writes are that folder's, not this Mac's. `ZEREN_ZGX_ENGINE_BIN` picks
+another engine; `ZEREN_ZGX_ENGINE_SPAWN=0` only uses one that's running.
+`ZEREN_ZGX_NO_BROWSER=1` opens no browser for a sign-in (a path instead
 writes the page there, for a test rig). See `src/engine/manager.rs`.
-`ZERON_ZGX_MOCK=1` offers the engine's mock agent in the model picker
-(src/chat.rs), to run a chat without a paid one; `ZERON_MOCK_DELAY_MS`
-and `ZERON_MOCK_REPEAT` on the engine it starts pace and lengthen its replies.
+`ZEREN_ZGX_MOCK=1` offers the engine's mock agent in the model picker
+(src/chat.rs), to run a chat without a paid one; `ZEREN_MOCK_DELAY_MS`
+and `ZEREN_MOCK_REPEAT` on the engine it starts pace and lengthen its replies.
 
-This is a cargo workspace of its own (in zeronsh/zeron, not a member of the
+This is a cargo workspace of its own (in zeronsh/zeren, not a member of the
 root one). zgx
 builds against patched crates (winit, wgpu-hal, accesskit), and a git
 dependency does not carry a patch, so `Cargo.toml` repeats zgx's. Patching
@@ -6609,8 +6609,8 @@ ui/
                      its exit decodes setup's first screen into the real window
   ds/                the design system: the only place values live
     init.luau        what screens import: Text, Button, Surface, Mark, Steps, setup
-    tokens.luau      app tokens (zeron.*), declared in standard tokens; loads themes
-    themes/          zeron-dark.json, zeron-light.json (restyle in place as saved)
+    tokens.luau      app tokens (zeren.*), declared in standard tokens; loads themes
+    themes/          zeren-dark.json, zeren-light.json (restyle in place as saved)
     text.luau        type styles × tones (ui.variants)
     button.luau      primary / secondary / ghost / accent × sm / md / lg
     surface.luau     plain / raised / sunken / overlay; interactive; selected
@@ -6645,7 +6645,7 @@ files/           the session page's files (Pane { project, session }):
                      chimes.luau; host.luau's calls, src/settings.rs's
                      (ui/settings_stub.luau answers them headless)
   assets/            art, icons (paths resolve from ui/)
-fonts/               Instrument Serif (Geist comes from apps/ios/Zeron/Fonts)
+fonts/               Instrument Serif (Geist comes from apps/ios/Zeren/Fonts)
 ```
 
 ## The design system's rules
@@ -6654,7 +6654,7 @@ zgx's design guide has three layers, and this follows them:
 
 1. **Values live in the theme.** Colours, type, radii and spacing are
    tokens: the standard ones (`$text.secondary`, `$space.3`, `$radius.lg`) set
-   by `themes/*.json`, and Zeron's own under `zeron.*`, declared in
+   by `themes/*.json`, and Zeren's own under `zeren.*`, declared in
    `tokens.luau` in terms of standard ones so any theme styles them. To try a
    palette, edit the JSON; every window restyles without reloading scripts.
 2. **Components turn tokens into styles** with `ui.variants` (shadcn's
@@ -6663,8 +6663,8 @@ zgx's design guide has three layers, and this follows them:
    the script.
 3. **Spacing is a scale.** Every padding, margin and gap is a step of
    `space.1`–`space.8` (4, 8, 12, 16, 24, 32, 48, 64), written out in both
-   theme files, or one of two half-steps for controls: `zeron.space.hair` (2)
-   and `zeron.space.snug` (10). Fixed geometry, like a title bar's height or
+   theme files, or one of two half-steps for controls: `zeren.space.hair` (2)
+   and `zeren.space.snug` (10). Fixed geometry, like a title bar's height or
    where a control sits beside the traffic lights, is a named constant, not a
    spacing token.
 4. **The lint keeps screens honest.** Entries call `ui.theme.strict("warn")`
@@ -6746,7 +6746,7 @@ audit; each line names the mistake it keeps out):
 
 - **A component:** run the gallery, edit `ds/*.luau` or a theme file, and
   save. Both themes update side by side.
-- **A step:** `ZERON_ZGX_STEP=<step> … onboarding`. The step is kept across
+- **A step:** `ZEREN_ZGX_STEP=<step> … onboarding`. The step is kept across
   saves, so edit its module and watch it change in place.
 - **A variant of a component:** add an option to its recipe's axis, try it in
   the gallery, then keep it or delete it.
@@ -6799,7 +6799,7 @@ it opened on. From a fullscreen app it is covered and waits; zgx's
 
 ## Plugins and templates
 
-**A plugin is a folder in the engine's data dir:** `<data>/plugins/<id>/`, with its `zeron-plugin.json`, `init.luau` and files. Dropping one in installs it.
+**A plugin is a folder in the engine's data dir:** `<data>/plugins/<id>/`, with its `zeren-plugin.json`, `init.luau` and files. Dropping one in installs it.
 
 **The engine decides what loads** (`crates/engine/src/plugins`):
 - It checks each plugin's signature against the account that owns the key. Every device has its own ed25519 key, registered to the account on the edge.
@@ -6809,46 +6809,46 @@ it opened on. From a fullscreen app it is covered and waits; zgx's
 **The app loads only those snapshots** (`src/plugins`):
 - Each gets the zgx grants its permissions map to (`src/plugins/grants.rs`).
 - Plugins place nodes by selector (`#id`, `.class`, a role and name). The elements are mapped in `src/plugins/elements.rs`, which agents read through `describe_elements`.
-- What a plugin reads of Zeron comes as ids where it's placed, plus records the app keeps for it alone, holding only what its grants allow (`src/plugins/records.rs`): `sessions.read`, `messages.read`, `profile.read`, `account.email` and `files.read`.
+- What a plugin reads of Zeren comes as ids where it's placed, plus records the app keeps for it alone, holding only what its grants allow (`src/plugins/records.rs`): `sessions.read`, `messages.read`, `profile.read`, `account.email` and `files.read`.
 - An edit never runs before the engine has checked it again. Your own plugins are re-signed as they're saved, so they reload at once.
 - Allowing happens in a window of its own with no plugins (`ui/consent.luau`).
 
-**Templates are whole interfaces**, like WordPress themes. Each is a folder, `<data>/templates/<id>/`, holding `zeron-template.json` and any part of Zeron's UI (`app.luau`, `screens/`, `ds/`, `assets/`…). A file it leaves out is Zeron's own.
-- One template is in use at a time. "Zeron", Zeron's own, is always there.
-- Settings → Templates lists them as Plugins lists plugins: Installed (Zeron's own, built in, first) and Yours, a row each with Use and a ⋯ menu (its folder, Duplicate, Delete), and New template (a copy of Zeron's own).
-- One is out of date when it was made for another version of Zeron: its manifest's `zeron_version` against this build's (the root workspace's version, which `build.rs` hands zgx as `ZERON_VERSION`). A save to Zeron's own while developing never makes one out of date; `template_status` still names the files whose Zeron original changed.
-- Agents make and change them through Zeron's MCP server: `list_templates`, `create_template`, `use_template`, `template_status`, `delete_template` and `describe_app`.
+**Templates are whole interfaces**, like WordPress themes. Each is a folder, `<data>/templates/<id>/`, holding `zeren-template.json` and any part of Zeren's UI (`app.luau`, `screens/`, `ds/`, `assets/`…). A file it leaves out is Zeren's own.
+- One template is in use at a time. "Zeren", Zeren's own, is always there.
+- Settings → Templates lists them as Plugins lists plugins: Installed (Zeren's own, built in, first) and Yours, a row each with Use and a ⋯ menu (its folder, Duplicate, Delete), and New template (a copy of Zeren's own).
+- One is out of date when it was made for another version of Zeren: its manifest's `zeren_version` against this build's (the root workspace's version, which `build.rs` hands zgx as `ZEREN_VERSION`). A save to Zeren's own while developing never makes one out of date; `template_status` still names the files whose Zeren original changed.
+- Agents make and change them through Zeren's MCP server: `list_templates`, `create_template`, `use_template`, `template_status`, `delete_template` and `describe_app`.
 
 **How the window runs one** (`src/plugins/live.rs`):
-- The main window always runs from `<data>/templates/.live/`: Zeron's own (`.zeron/`, copied from `ui/`) with the template in use laid over it.
+- The main window always runs from `<data>/templates/.live/`: Zeren's own (`.zeren/`, copied from `ui/`) with the template in use laid over it.
 - Switching, or saving a template's file, rewrites only the files that differ, and the window reloads in place. A module's state is kept wherever both have the file.
 - These are never a template's: `screens/plugins/`, `screens/templates/`, `account/`, `.luaurc`, and the consent window, which always runs from `ui/`.
 - The main window's errors and devtools sources name `.live/…` files. Other windows, and `zgx test ui`, still run `ui/`.
 
 **When a template fails:**
-- A file that fails (at load, at build or later) falls back to Zeron's own for that module alone, with one notice.
-- If its `app.luau` fails, the whole window goes back to Zeron's own and the template shows as broken.
+- A file that fails (at load, at build or later) falls back to Zeren's own for that module alone, with one notice.
+- If its `app.luau` fails, the whole window goes back to Zeren's own and the template shows as broken.
 - Saving the file again retries it.
-- **The way back from any template:** View → **Use Default Interface** (the host's own menu item, which no template can remove), `zeron template use zeron`, or launching with `--zeron-template`.
+- **The way back from any template:** View → **Use Default Interface** (the host's own menu item, which no template can remove), `zeren template use zeren`, or launching with `--zeren-template`.
 
 **Plugins layer on whatever template is in use.** One that aims at an element the template dropped (its id or class) says "Not shown in this template" on the Plugins page. That check is static: only literal selectors are seen. A placed node that needs what its place doesn't give draws nothing, and its row says why.
 
-**When a plugin fails** (at load, at build, or later), Zeron goes on without it, with the window's state kept (`src/plugins/recovery.rs`).
+**When a plugin fails** (at load, at build, or later), Zeren goes on without it, with the window's state kept (`src/plugins/recovery.rs`).
 
 **Examples and how to write one:** `plugins-dev/README.md`. A staging rig of three engines is in `plugins-dev/rig/`.
 
 ```sh
-zeron plugin new my-plugin          # yours, signed; edit init.luau and it reloads
-zeron plugin sign <id-or-path>      # sign one you wrote as yours
-zeron plugin verify <path>          # who made it, and whether it changed
-ZERON_ZGX_REVIEW=<id> …  main       # (dev) that plugin's consent window at launch, with devtools
-ZERON_ZGX_PLUGIN_LOG=1 …            # (dev) tool calls and answers
-zeron template list|use <id>|create <id> [--from F]|status <id>|delete <id>
+zeren plugin new my-plugin          # yours, signed; edit init.luau and it reloads
+zeren plugin sign <id-or-path>      # sign one you wrote as yours
+zeren plugin verify <path>          # who made it, and whether it changed
+ZEREN_ZGX_REVIEW=<id> …  main       # (dev) that plugin's consent window at launch, with devtools
+ZEREN_ZGX_PLUGIN_LOG=1 …            # (dev) tool calls and answers
+zeren template list|use <id>|create <id> [--from F]|status <id>|delete <id>
 ```
 
 ## Not yet
 
-- Release bundles: Zeron's own copy that templates inherit from (`.zeron/`) is made from `ui/`'s source, so a bundled build must ship that source too.
+- Release bundles: Zeren's own copy that templates inherit from (`.zeren/`) is made from `ui/`'s source, so a bundled build must ship that source too.
 - Templates from others: only templates made on this device (by you or your agents) can be used. A template runs with all of the app's powers, so importing someone else's waits for signing and consent like plugins have.
 - The per-screen templates of Oct 31 (`<data>/templates/screens/…`) were development-only and aren't carried over.
 - The engine's manager in full (the shipping app's `managed.rs`: the
@@ -6862,13 +6862,13 @@ zeron template list|use <id>|create <id> [--from F]|status <id>|delete <id>
   production not until it's deployed there (until then the page says the
   change didn't go through).
 - Settings → About & updates updates the engine only where the engine
-  manages its own install (a service install on Linux or a Mac); the Zeron
+  manages its own install (a service install on Linux or a Mac); the Zeren
   app's own engine is updated from the app. No download progress: the
   engine's `ApplyUpdate` answers once it's done. "Check for updates" asks
   the public release feed itself (the engine has no call to check now).
   zgx isn't packaged, so nothing updates it.
 - Clicking a desktop banner opens the shipping app on its chat: the engine
-  posts the banners, and opens whichever app is registered as Zeron. zgx
+  posts the banners, and opens whichever app is registered as Zeren. zgx
   needs registering as the app first.
 ]],
 		["apps/zgx/src/agent_logos.rs"] = [[
@@ -6953,9 +6953,9 @@ thread_local! {
 }
 
 /// Where logos are kept: beside the engine's data (as the browser's icons
-/// are); `$ZERON_ZGX_AGENT_LOGOS` in its place (a fixture with no engine).
+/// are); `$ZEREN_ZGX_AGENT_LOGOS` in its place (a fixture with no engine).
 fn dir() -> Option<PathBuf> {
-    if let Some(dir) = std::env::var_os("ZERON_ZGX_AGENT_LOGOS").filter(|d| !d.is_empty()) {
+    if let Some(dir) = std::env::var_os("ZEREN_ZGX_AGENT_LOGOS").filter(|d| !d.is_empty()) {
         return Some(PathBuf::from(dir));
     }
     crate::engine::data_dir().map(|d| d.join("agent-logos"))
@@ -7072,7 +7072,7 @@ fn find(dir: &Path, want: &Want) -> Option<Logo> {
     std::fs::create_dir_all(dir).ok()?;
     let agent = ureq::AgentBuilder::new()
         .timeout(TIMEOUT)
-        .user_agent("Mozilla/5.0 (Macintosh) Zeron (agent logos)")
+        .user_agent("Mozilla/5.0 (Macintosh) Zeren (agent logos)")
         .build();
     // Its site; else a "repository" that is a site of its own (a vendor's
     // docs page, not a code host).
@@ -7362,8 +7362,8 @@ mod tests {
     }
 
     /// Every agent of the live registry: which logo each finds (or none),
-    /// where from, and how it's drawn. `cargo test --bin zeron-zgx
-    /// live_registry_logos -- --ignored --nocapture`; ZERON_LOGOS_OUT keeps
+    /// where from, and how it's drawn. `cargo test --bin zeren-zgx
+    /// live_registry_logos -- --ignored --nocapture`; ZEREN_LOGOS_OUT keeps
     /// them there (else a scratch folder).
     #[test]
     #[ignore = "fetches every registry agent's site"]
@@ -7373,7 +7373,7 @@ mod tests {
             .unwrap()
             .into_json()
             .unwrap();
-        let dir = std::env::var("ZERON_LOGOS_OUT")
+        let dir = std::env::var("ZEREN_LOGOS_OUT")
             .map(PathBuf::from)
             .unwrap_or_else(|_| std::env::temp_dir().join(format!("agent-logos-{}", std::process::id())));
         std::fs::create_dir_all(&dir).unwrap();
@@ -7446,7 +7446,7 @@ mod tests {
 //! skills for a chat's (or project's) folder on its device, as the shipping
 //! composer finds them (crates/ui/src/composer.rs: `ListCommands` and
 //! `ListSkills`, merged by `invocation_candidates`), each with the canonical
-//! reference a pick puts in the prompt (`zeron_proto::invocation`'s
+//! reference a pick puts in the prompt (`zeren_proto::invocation`'s
 //! `Invocation::link`), which the engine reads at send.
 //!
 //!   chat.invocations { harness, target = { chat? | space?, device?, path? } }
@@ -7587,7 +7587,7 @@ fn merge(commands: Result<Json, String>, skills: Result<Json, String>) -> Result
     }
 }
 
-/// `zeron_proto::invocation`'s name and path rules: what the canonical
+/// `zeren_proto::invocation`'s name and path rules: what the canonical
 /// reference carries unchanged.
 fn valid_name(name: &str) -> bool {
     !name.is_empty() && !name.chars().any(|c| c.is_control() || c.is_whitespace())
@@ -7619,12 +7619,12 @@ fn display_name(name: &str) -> String {
         .join(" ")
 }
 
-/// `Invocation::link`: `[/name](zeron-invoke:<hex of its JSON>)`.
+/// `Invocation::link`: `[/name](zeren-invoke:<hex of its JSON>)`.
 fn link(prefix: char, name: &str, invocation: &Json) -> String {
     let bytes = serde_json::to_vec(invocation).unwrap_or_default();
     let payload: String = bytes.iter().map(|b| format!("{b:02x}")).collect();
     let label = name.replace('\\', "\\\\").replace('[', "\\[").replace(']', "\\]").replace('`', "\\`");
-    format!("[{prefix}{label}](zeron-invoke:{payload})")
+    format!("[{prefix}{label}](zeren-invoke:{payload})")
 }
 
 /// The shipping composer's `invocation_candidates`.
@@ -7688,7 +7688,7 @@ mod tests {
     use super::*;
 
     fn decode(link: &str) -> Json {
-        let hex = link.split("zeron-invoke:").nth(1).unwrap().trim_end_matches(')');
+        let hex = link.split("zeren-invoke:").nth(1).unwrap().trim_end_matches(')');
         let bytes: Vec<u8> = (0..hex.len()).step_by(2).map(|i| u8::from_str_radix(&hex[i..i + 2], 16).unwrap()).collect();
         serde_json::from_slice(&bytes).unwrap()
     }
@@ -7719,9 +7719,9 @@ mod tests {
             &[json!({ "name": "review" })],
             &[json!({ "name": "a[b]", "path": "/s/x.md", "description": "", "enabled": true })],
         );
-        assert!(rows[0].link.starts_with("[/review](zeron-invoke:"));
+        assert!(rows[0].link.starts_with("[/review](zeren-invoke:"));
         assert_eq!(decode(&rows[0].link), json!({ "kind": "command", "name": "review" }));
-        assert!(rows[1].link.starts_with("[$a\\[b\\]](zeron-invoke:"));
+        assert!(rows[1].link.starts_with("[$a\\[b\\]](zeren-invoke:"));
         assert_eq!(decode(&rows[1].link), json!({ "kind": "skill", "name": "a[b]", "path": "/s/x.md" }));
     }
 
@@ -7770,43 +7770,43 @@ mod tests {
 //! place that starts, restarts and refuses engines, so it can grow into the
 //! engine's manager the shipping app has (crates/engine/src/managed.rs).
 //!
-//! For now it is a staging engine: the one at `ZERON_ZGX_ENGINE_PORT`
-//! (27871) with its data in `ZERON_ZGX_ENGINE_DATA` (~/.zeron-staging),
+//! For now it is a staging engine: the one at `ZEREN_ZGX_ENGINE_PORT`
+//! (27871) with its data in `ZEREN_ZGX_ENGINE_DATA` (~/.zeren-staging),
 //! scripts/staging-app.sh's. One already serving that port is used as it
-//! is; otherwise this app starts `zeron-engine` (`ZERON_ZGX_ENGINE_BIN`, or
-//! this checkout's `target/debug/zeron-engine`: `cargo build -p zeron
-//! --bin zeron-engine` at the repository's root) against the same edge and
+//! is; otherwise this app starts `zeren-engine` (`ZEREN_ZGX_ENGINE_BIN`, or
+//! this checkout's `target/debug/zeren-engine`: `cargo build -p zeren
+//! --bin zeren-engine` at the repository's root) against the same edge and
 //! sign-in client as `src/auth.rs`'s, detached, so it outlives the app as
 //! the shipping app's engine does.
 //!
-//!   ZERON_ZGX_ENGINE_PORT=<n>     the engine's IPC port (27871)
-//!   ZERON_ZGX_ENGINE_DATA=<dir>   its data dir (~/.zeron-staging)
-//!   ZERON_ZGX_ENGINE_BIN=<path>   the engine to start when none answers
-//!   ZERON_ZGX_ENGINE_HOME=<dir>   a home of its own for the engine it starts
+//!   ZEREN_ZGX_ENGINE_PORT=<n>     the engine's IPC port (27871)
+//!   ZEREN_ZGX_ENGINE_DATA=<dir>   its data dir (~/.zeren-staging)
+//!   ZEREN_ZGX_ENGINE_BIN=<path>   the engine to start when none answers
+//!   ZEREN_ZGX_ENGINE_HOME=<dir>   a home of its own for the engine it starts
 //!                                 (HOME, CLAUDE_CONFIG_DIR, CODEX_HOME), so
 //!                                 the agents' logins it reads and writes are
 //!                                 that dir's, not this Mac's: for trying
 //!                                 sign-ins with throwaway state
-//!   ZERON_ZGX_ENGINE_SPAWN=0      never start one; only use one that runs
+//!   ZEREN_ZGX_ENGINE_SPAWN=0      never start one; only use one that runs
 //!
 //! Never the production engine: port 27654 and ~/.comet-native are refused,
 //! whatever the variables say.
 //!
-//! Zeron Preview (the `preview` feature: the app in its own bundle beside
-//! Zeron.app, scripts/package-zgx-preview.sh) is production's only: its
+//! Zeren Preview (the `preview` feature: the app in its own bundle beside
+//! Zeren.app, scripts/package-zgx-preview.sh) is production's only: its
 //! edge and sign-in are production's whatever the variables say
-//! (src/auth.rs), and staging's engine (port 27871, ~/.zeron-staging) is
+//! (src/auth.rs), and staging's engine (port 27871, ~/.zeren-staging) is
 //! refused as production's is. It has an engine of its own instead, the
 //! engine variables above still moving it (port, data, binary, home):
-//!   - the one in its bundle (`Contents/MacOS/zeron-engine`, beside this
-//!     app's executable), on port 27664 with its data in ~/.zeron-preview;
+//!   - the one in its bundle (`Contents/MacOS/zeren-engine`, beside this
+//!     app's executable), on port 27664 with its data in ~/.zeren-preview;
 //!   - named "<this Mac's name> · Preview" in the account
-//!     (`ZERON_DEVICE_NAME`; `ZERON_ZGX_DEVICE_NAME` names it otherwise);
+//!     (`ZEREN_DEVICE_NAME`; `ZEREN_ZGX_DEVICE_NAME` names it otherwise);
 //!   - its updater reading the preview channel (`{edge}/releases/preview`,
-//!     `ZERON_RELEASES_URL`), never the Zeron app's manifest: it only
+//!     `ZEREN_RELEASES_URL`), never the Zeren app's manifest: it only
 //!     reports there anyway (an engine in an app bundle never swaps it), and
 //!     About shows that channel's;
-//!   - given its bundle as `ZERON_APP`, so its banners are Zeron Preview's
+//!   - given its bundle as `ZEREN_APP`, so its banners are Zeren Preview's
 //!     and open it, and it restarts into a newer bundle copied over this one
 //!     once nothing runs and the app is up (crates/engine/src/managed.rs).
 //!
@@ -7824,14 +7824,14 @@ const PRODUCTION_PORT: u16 = 27654;
 const PRODUCTION_DATA: &str = ".comet-native";
 
 const STAGING_PORT: u16 = 27871;
-const STAGING_DATA: &str = ".zeron-staging";
+const STAGING_DATA: &str = ".zeren-staging";
 
-/// Zeron Preview's engine: a port and data dir of its own, beside both.
+/// Zeren Preview's engine: a port and data dir of its own, beside both.
 const PREVIEW_PORT: u16 = 27664;
-const PREVIEW_DATA: &str = ".zeron-preview";
-/// The engine's executable in Zeron Preview's bundle, beside this app's
+const PREVIEW_DATA: &str = ".zeren-preview";
+/// The engine's executable in Zeren Preview's bundle, beside this app's
 /// (a name crates/engine's managed.rs knows as an engine's, not the app's).
-const PREVIEW_ENGINE: &str = "zeron-engine";
+const PREVIEW_ENGINE: &str = "zeren-engine";
 
 const PREVIEW: bool = cfg!(feature = "preview");
 
@@ -7848,10 +7848,10 @@ pub struct Config {
     edge: String,
     client: String,
     callback_port: u16,
-    /// Zeron Preview's: its device's name in the account (none: the
+    /// Zeren Preview's: its device's name in the account (none: the
     /// engine's own, this Mac's name).
     device_name: Option<String>,
-    /// Zeron Preview's: the bundle its banners open (`ZERON_APP`).
+    /// Zeren Preview's: the bundle its banners open (`ZEREN_APP`).
     app: Option<PathBuf>,
 }
 
@@ -7859,7 +7859,7 @@ pub struct Config {
 pub type Refusal = String;
 
 /// The file in an engine's data dir holding the build of the engine this
-/// app started there last (`zeron-engine --build-id`): an engine reporting
+/// app started there last (`zeren-engine --build-id`): an engine reporting
 /// that build is one this app started.
 const STARTED: &str = "zgx-started-build";
 
@@ -7870,7 +7870,7 @@ impl Config {
     }
 }
 
-/// Which build `bin` is (`zeron-engine --build-id`), if it says; an engine
+/// Which build `bin` is (`zeren-engine --build-id`), if it says; an engine
 /// from before build ids doesn't.
 pub fn build_of(bin: &Path) -> Option<String> {
     let out = std::process::Command::new(bin)
@@ -7906,15 +7906,15 @@ impl Config {
         client: &str,
         callback_port: u16,
     ) -> Result<Self, Refusal> {
-        let port = match var("ZERON_ZGX_ENGINE_PORT") {
+        let port = match var("ZEREN_ZGX_ENGINE_PORT") {
             Some(raw) => raw
                 .trim()
                 .parse()
-                .map_err(|_| format!("ZERON_ZGX_ENGINE_PORT `{raw}` isn't a port"))?,
+                .map_err(|_| format!("ZEREN_ZGX_ENGINE_PORT `{raw}` isn't a port"))?,
             None if PREVIEW => PREVIEW_PORT,
             None => STAGING_PORT,
         };
-        let data_dir = var("ZERON_ZGX_ENGINE_DATA")
+        let data_dir = var("ZEREN_ZGX_ENGINE_DATA")
             .map(|dir| expand(&dir, home))
             .unwrap_or_else(|| home.join(if PREVIEW { PREVIEW_DATA } else { STAGING_DATA }));
         if port == PRODUCTION_PORT {
@@ -7923,7 +7923,7 @@ impl Config {
         if same_dir(&data_dir, &home.join(PRODUCTION_DATA)) {
             return Err(format!("~/{PRODUCTION_DATA} is the production engine's"));
         }
-        // Zeron Preview is production's only: never staging's engine (signed
+        // Zeren Preview is production's only: never staging's engine (signed
         // into staging), nor any edge but production's.
         if PREVIEW {
             if port == STAGING_PORT {
@@ -7938,17 +7938,17 @@ impl Config {
             }
         }
         let exe = std::env::current_exe().ok();
-        let bin = var("ZERON_ZGX_ENGINE_BIN").map(|p| expand(&p, home)).or_else(|| {
+        let bin = var("ZEREN_ZGX_ENGINE_BIN").map(|p| expand(&p, home)).or_else(|| {
             let built = if PREVIEW {
                 // The bundle's, beside this app's executable.
                 exe.as_deref()?.parent()?.join(PREVIEW_ENGINE)
             } else {
                 // This checkout's: apps/zgx is two below the repository's root.
-                Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/debug/zeron-engine")
+                Path::new(env!("CARGO_MANIFEST_DIR")).join("../../target/debug/zeren-engine")
             };
             built.exists().then_some(built)
         });
-        let device_name = var("ZERON_ZGX_DEVICE_NAME").or_else(|| PREVIEW.then(|| preview_device_name(&computer_name())));
+        let device_name = var("ZEREN_ZGX_DEVICE_NAME").or_else(|| PREVIEW.then(|| preview_device_name(&computer_name())));
         let app = PREVIEW
             .then(|| exe.as_deref()?.ancestors().find(|dir| dir.extension().is_some_and(|ext| ext == "app")).map(Path::to_path_buf))
             .flatten();
@@ -7956,8 +7956,8 @@ impl Config {
             port,
             data_dir,
             bin,
-            home: var("ZERON_ZGX_ENGINE_HOME").map(|dir| expand(&dir, home)),
-            spawn: var("ZERON_ZGX_ENGINE_SPAWN").as_deref() != Some("0"),
+            home: var("ZEREN_ZGX_ENGINE_HOME").map(|dir| expand(&dir, home)),
+            spawn: var("ZEREN_ZGX_ENGINE_SPAWN").as_deref() != Some("0"),
             edge: edge.into(),
             client: client.into(),
             callback_port,
@@ -7970,8 +7970,8 @@ impl Config {
         format!("port {}, data {}", self.port, self.data_dir.display())
     }
 
-    /// Where the engine's updater looks for releases: Zeron Preview's own
-    /// channel (none: the edge's, the Zeron app's).
+    /// Where the engine's updater looks for releases: Zeren Preview's own
+    /// channel (none: the edge's, the Zeren app's).
     fn releases(&self) -> Option<String> {
         PREVIEW.then(|| format!("{}/releases/preview", self.edge.trim_end_matches('/')))
     }
@@ -8002,7 +8002,7 @@ fn computer_name() -> String {
     })
 }
 
-/// Zeron Preview's device, told apart from the Zeron app's on the same Mac.
+/// Zeren Preview's device, told apart from the Zeren app's on the same Mac.
 fn preview_device_name(computer: &str) -> String {
     format!("{} · Preview", computer.trim())
 }
@@ -8040,9 +8040,9 @@ impl Spawner {
             if !self.said_missing {
                 self.said_missing = true;
                 eprintln!(
-                    "zeron-zgx: engine: nothing answers on {} and there's no engine to start: \
-                     build one (`cargo build -p zeron --bin zeron-engine` at the repository's root) \
-                     or set ZERON_ZGX_ENGINE_BIN",
+                    "zeren-zgx: engine: nothing answers on {} and there's no engine to start: \
+                     build one (`cargo build -p zeren --bin zeren-engine` at the repository's root) \
+                     or set ZEREN_ZGX_ENGINE_BIN",
                     config.describe()
                 );
             }
@@ -8051,11 +8051,11 @@ impl Spawner {
         self.last = Some(Instant::now());
         match spawn(config, bin) {
             Ok(()) => {
-                eprintln!("zeron-zgx: engine: started {} ({})", bin.display(), config.describe());
+                eprintln!("zeren-zgx: engine: started {} ({})", bin.display(), config.describe());
                 true
             }
             Err(error) => {
-                eprintln!("zeron-zgx: engine: {} didn't start: {error}", bin.display());
+                eprintln!("zeren-zgx: engine: {} didn't start: {error}", bin.display());
                 false
             }
         }
@@ -8073,35 +8073,35 @@ fn spawn(config: &Config, bin: &Path) -> std::io::Result<()> {
     let _ = std::fs::remove_file(&started);
     let mut command = std::process::Command::new(bin);
     command
-        .env("ZERON_DATA_DIR", &config.data_dir)
-        .env("ZERON_IPC_PORT", config.port.to_string())
-        .env("ZERON_EDGE_URL", &config.edge)
-        .env("ZERON_WORKOS_CLIENT_ID", &config.client)
-        .env("ZERON_CALLBACK_PORT", config.callback_port.to_string())
+        .env("ZEREN_DATA_DIR", &config.data_dir)
+        .env("ZEREN_IPC_PORT", config.port.to_string())
+        .env("ZEREN_EDGE_URL", &config.edge)
+        .env("ZEREN_WORKOS_CLIENT_ID", &config.client)
+        .env("ZEREN_CALLBACK_PORT", config.callback_port.to_string())
         // Not the shipping app's: no app to open from a banner.
-        .env_remove("ZERON_APP")
-        // Nor a chat's (this app run from a Zeron terminal): an engine that
+        .env_remove("ZEREN_APP")
+        // Nor a chat's (this app run from a Zeren terminal): an engine that
         // carries a chat's origin marker lends it to everything it runs, so
         // the shipping engine's preview scan would probe its agents'
         // sign-in callbacks (Gemini CLI's OAuth ends on the first stray
         // request).
-        .env_remove("ZERON_ORIGIN")
-        .env_remove("ZERON_EDGE_TOKEN")
-        .env_remove("ZERON_IPC_TOKEN")
-        .env_remove("ZERON_IPC_TOKEN_FILE")
+        .env_remove("ZEREN_ORIGIN")
+        .env_remove("ZEREN_EDGE_TOKEN")
+        .env_remove("ZEREN_IPC_TOKEN")
+        .env_remove("ZEREN_IPC_TOKEN_FILE")
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null());
-    // Zeron Preview's: its device's name, its release channel and its bundle
-    // (set after the removals above, which `ZERON_APP` would otherwise lose).
+    // Zeren Preview's: its device's name, its release channel and its bundle
+    // (set after the removals above, which `ZEREN_APP` would otherwise lose).
     if let Some(name) = &config.device_name {
-        command.env("ZERON_DEVICE_NAME", name);
+        command.env("ZEREN_DEVICE_NAME", name);
     }
     if let Some(releases) = config.releases() {
-        command.env("ZERON_RELEASES_URL", releases);
+        command.env("ZEREN_RELEASES_URL", releases);
     }
     if let Some(app) = &config.app {
-        command.env("ZERON_APP", app);
+        command.env("ZEREN_APP", app);
     }
     if let Some(home) = &config.home {
         let (claude, codex) = (home.join(".claude"), home.join(".codex"));
@@ -8191,11 +8191,11 @@ mod tests {
         assert!(plain.device_name.as_deref().is_some_and(|n| n.ends_with(" · Preview")));
         // The edge-picking variables do nothing (src/auth.rs); staging's
         // engine is refused.
-        let staged = config(&[("ZERON_ZGX_ENV", "staging"), ("ZERON_ZGX_EDGE", "https://staging.zeron.sh")]).unwrap();
+        let staged = config(&[("ZEREN_ZGX_ENV", "staging"), ("ZEREN_ZGX_EDGE", "https://staging.zeron.sh")]).unwrap();
         assert_eq!(staged.edge, "https://edge.zeron.sh");
-        assert!(config(&[("ZERON_ZGX_ENGINE_PORT", "27871")]).is_err());
-        assert!(config(&[("ZERON_ZGX_ENGINE_DATA", "~/.zeron-staging")]).is_err());
-        assert!(config(&[("ZERON_ZGX_ENGINE_PORT", "27654")]).is_err());
+        assert!(config(&[("ZEREN_ZGX_ENGINE_PORT", "27871")]).is_err());
+        assert!(config(&[("ZEREN_ZGX_ENGINE_DATA", "~/.zeren-staging")]).is_err());
+        assert!(config(&[("ZEREN_ZGX_ENGINE_PORT", "27654")]).is_err());
         // Nor any other edge, should one be handed in.
         assert!(Config::from_vars(|_| None, home, "https://staging.zeron.sh", &prod.client, prod.port).is_err());
     }
@@ -8203,7 +8203,7 @@ mod tests {
     #[test]
     fn home_relative_paths_expand() {
         let home = Path::new("/Users/someone");
-        assert_eq!(expand("~/.zeron-staging", home), home.join(".zeron-staging"));
+        assert_eq!(expand("~/.zeren-staging", home), home.join(".zeren-staging"));
         assert_eq!(expand("/tmp/x", home), PathBuf::from("/tmp/x"));
     }
 }
@@ -8737,7 +8737,7 @@ const IMAGE_CHUNK: usize = 384 * 1024;
 /// folder, which it clears. (What's there a day old goes as the first is
 /// kept, each launch.)
 fn image_dir() -> std::path::PathBuf {
-    std::env::temp_dir().join("zeron-zgx-images")
+    std::env::temp_dir().join("zeren-zgx-images")
 }
 
 /// `bytes` kept as a file named by their hash (one already there is the
@@ -8840,7 +8840,7 @@ fn said(error: String) -> String {
     if engine::outcome(&error) == "offline" {
         "offline".into()
     } else if error.to_ascii_lowercase().contains("unknown method") {
-        "Update Zeron to use this here.".into()
+        "Update Zeren to use this here.".into()
     } else {
         error
     }
@@ -9351,7 +9351,7 @@ impl Files {
             Ok(outcome) => Ok(Self::mutation(&outcome)),
             Err(error) if error.to_ascii_lowercase().contains("unknown method") => {
                 if !self.is_local(target).await {
-                    return Err("That device's Zeron is too old to make files. Update it, then try again.".into());
+                    return Err("That device's Zeren is too old to make files. Update it, then try again.".into());
                 }
                 let root = opt_text(target.field("root")).ok_or("This session has no folder to make files in")?;
                 make(Path::new(&root), &relative, dir)?;
@@ -9402,7 +9402,7 @@ impl Files {
             let params = match me.params(Some(&target)).await {
                 Ok(params) => params,
                 Err(error) => {
-                    eprintln!("zeron-zgx: files: can't follow {key}: {error}");
+                    eprintln!("zeren-zgx: files: can't follow {key}: {error}");
                     return;
                 }
             };
@@ -9601,7 +9601,7 @@ fn make(root: &Path, relative: &str, dir: bool) -> Result<(), String> {
     };
     made.map_err(|error| match error.kind() {
         std::io::ErrorKind::AlreadyExists => "Something already has that name".to_string(),
-        std::io::ErrorKind::PermissionDenied => "Zeron isn't allowed to write there".to_string(),
+        std::io::ErrorKind::PermissionDenied => "Zeren isn't allowed to write there".to_string(),
         _ => error.to_string(),
     })
 }
@@ -9817,7 +9817,7 @@ pub fn step() {
 }
 ]],
 		["apps/zgx/src/i18n_tests.rs"] = [[
-//! Zeron's words (ui/locales) stay whole: every key a script names with a
+//! Zeren's words (ui/locales) stay whole: every key a script names with a
 //! literal `ui.t("…")` (or the design system's `locale.t`/`locale.s`) is in English (the source) and in every translation,
 //! each translation names the same arguments as its English (`{n}`, a
 //! plural's `n`), and every message parses. `zgx lint` checks the same for
@@ -10189,7 +10189,7 @@ enum Close {
     /// ⌘K again: the shell's command shuts it.
     Toggle,
     /// Escape, the scripts having reloaded meanwhile (a save while it's
-    /// open, as other chats save Zeron's files).
+    /// open, as other chats save Zeren's files).
     Reloaded,
     /// Escape, the sessions having changed meanwhile (one starts working,
     /// one finishes, one renamed elsewhere), as the engine's do.
@@ -10410,13 +10410,13 @@ fn a_save_keeps_the_file_trees_row_focused() {
 }
 ]],
 		["apps/zgx/src/plugins/github.rs"] = [[
-//! A plugin's GitHub, lent by proxy ("github"): Zeron's own sign-in does the
+//! A plugin's GitHub, lent by proxy ("github"): Zeren's own sign-in does the
 //! asking, through the engine's GitHub calls (which resolve on the device
 //! where a session's checkout lives), and the plugin hears only what comes
 //! back. No token ever reaches a plugin's scripts, so none can be kept or
 //! sent elsewhere.
 //!
-//! A plugin names the sessions it shows (`zeron.github.watch_pr`); the host
+//! A plugin names the sessions it shows (`zeren.github.watch_pr`); the host
 //! keeps one watch of each one's pull request (`WatchCheckoutChangeRequest`,
 //! pushed by the engine as it changes, never polled by the plugin) and
 //! writes what it hears to `plugin.<id>.github`: `{ [session] = pr | false }`.
@@ -10453,7 +10453,7 @@ pub fn watch_key(params: &Json) -> String {
     )
 }
 
-/// What a plugin asked of GitHub (`zeron.github.pr(url)`, `.diff(url)`), as
+/// What a plugin asked of GitHub (`zeren.github.pr(url)`, `.diff(url)`), as
 /// the engine's call that answers it, or why it may not: reading needs
 /// "github"; and only a pull request's own address on GitHub is asked about.
 pub fn call(asked: &Json, may: impl Fn(&str) -> bool) -> Result<(&'static str, Json), String> {
@@ -10537,7 +10537,7 @@ pub fn call(asked: &Json, may: impl Fn(&str) -> bool) -> Result<(&'static str, J
     if asked["refresh"].as_bool() == Some(true) {
         params["refresh"] = json!(true);
     }
-    // The diff at the revisions the plugin shows (Zeron's viewer asks so),
+    // The diff at the revisions the plugin shows (Zeren's viewer asks so),
     // when both are commit ids.
     let oid = |v: &Json| v.as_str().filter(|s| s.len() == 40 && s.bytes().all(|b| b.is_ascii_hexdigit())).map(str::to_string);
     if method == "GetChangeRequestDiff"
@@ -10624,8 +10624,8 @@ mod tests {
     fn the_branch_its_latest_run_started_on_wins_over_the_one_it_was_made_on() {
         // Made on main; the agent branched off and its next run was stamped
         // on the new branch: that branch's pull request is the chat's.
-        let s = json!({ "cwd": "/w/atlas", "branch": "main", "source_branch": "zeron/readme-pr", "device": "mac" });
-        assert_eq!(watch_params(&s).unwrap()["branch"], json!("zeron/readme-pr"));
+        let s = json!({ "cwd": "/w/atlas", "branch": "main", "source_branch": "zeren/readme-pr", "device": "mac" });
+        assert_eq!(watch_params(&s).unwrap()["branch"], json!("zeren/readme-pr"));
         // Not stamped yet: the one it was made on.
         let s = json!({ "cwd": "/w/atlas", "branch": "main", "device": "mac" });
         assert_eq!(watch_params(&s).unwrap()["branch"], json!("main"));
@@ -10634,11 +10634,11 @@ mod tests {
     #[test]
     fn only_a_pull_request_on_github_is_asked_about_and_only_when_allowed() {
         let ok = |_: &str| true;
-        let url = "https://github.com/zeronsh/zeron/pull/1264";
+        let url = "https://github.com/femboypuppy/zeren/pull/1264";
         assert_eq!(call(&json!({ "op": "pr", "url": url }), ok).unwrap(), ("GetChangeRequest", json!({ "url": url })));
         assert_eq!(call(&json!({ "op": "diff", "url": url, "refresh": true }), ok).unwrap().1, json!({ "url": url, "refresh": true }));
         assert!(call(&json!({ "op": "pr", "url": url }), |_| false).unwrap_err().contains("wasn't allowed"));
-        for bad in ["https://evil.example/zeronsh/zeron/pull/1", "https://github.com/zeronsh/zeron/issues/1", "https://github.com/o/r/pull/1/../../x", "https://github.com/o/r/pull/"] {
+        for bad in ["https://evil.example/zeronsh/zeren/pull/1", "https://github.com/femboypuppy/zeren/issues/1", "https://github.com/o/r/pull/1/../../x", "https://github.com/o/r/pull/"] {
             assert!(call(&json!({ "op": "pr", "url": bad }), ok).is_err(), "{bad}");
         }
         assert!(call(&json!({ "op": "merge", "url": url }), ok).is_err(), "only what's listed");
@@ -10708,7 +10708,7 @@ use super::{Item, expose_own, expose_surface};
 
 fn md_hello(status: &str) -> Item {
     let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("plugins-dev").join("md-hello");
-    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(dir.join("zeron-plugin.json")).unwrap()).unwrap();
+    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(dir.join("zeren-plugin.json")).unwrap()).unwrap();
     Item {
         json: json!({
             "id": "md-hello", "name": manifest["name"], "status": status, "entry": manifest["entry"],
@@ -10928,7 +10928,7 @@ pub fn load(bridge: &Rc<Bridge>) {
                 watch(&b, &device, run);
             }
             Err(error) => {
-                eprintln!("zeron-zgx: plugins: {device}'s plugins unavailable: {error}");
+                eprintln!("zeren-zgx: plugins: {device}'s plugins unavailable: {error}");
                 b.remote.state.set("offline");
                 b.remote.publish();
             }
@@ -11007,9 +11007,9 @@ mod tests {
 }
 ]],
 		["apps/zgx/src/plugins/templates.rs"] = [[
-//! What agents are told of Zeron's interface, to make a template of it: the
+//! What agents are told of Zeren's interface, to make a template of it: the
 //! catalog of screens (each module, its file, what it draws and the elements
-//! it names: `#id`s and `.class`es), written into Zeron's own copy as
+//! it names: `#id`s and `.class`es), written into Zeren's own copy as
 //! `.catalog.json` (`live`). The engine reads it for `describe_app` and
 //! `create_template`.
 //!
@@ -11342,14 +11342,14 @@ mod tests {
             "spaceId": "s",
             "actions": [{ "id": "a1", "name": "Dev", "command": "npm run dev", "icon": "play", "runOnWorktreeCreate": true }],
             "importableActions": [{ "name": "Test", "command": "cargo test", "icon": "test", "runOnWorktreeCreate": false }],
-            "projectFileIssue": "zeron.json: bad",
+            "projectFileIssue": "zeren.json: bad",
         });
         let out = snapshot_for_script(&snapshot);
         assert_eq!(out["actions"][0]["id"], "a1");
         assert_eq!(out["actions"][0]["setup"], true);
         assert!(out["importable"][0].get("id").is_none());
         assert_eq!(out["importable"][0]["icon"], "test");
-        assert_eq!(out["issue"], "zeron.json: bad");
+        assert_eq!(out["issue"], "zeren.json: bad");
         assert!(snapshot_for_script(&json!({ "actions": [], "importableActions": [] })).get("issue").is_none());
     }
 
@@ -11362,11 +11362,11 @@ mod tests {
 ]],
 		["apps/zgx/tools/file_icons.py"] = [=[
 #!/usr/bin/env python3
-"""File icons for the design system: Zeron's Symbols set (crates/ui/assets/
+"""File icons for the design system: Zeren's Symbols set (crates/ui/assets/
 file-icons, miguelsolorio/vscode-symbols, MIT) copied under ui/assets/
 icons/files/, each twice (as drawn for light, and with its darker accents
-lifted for dark, as Zeron's `dark_icon_svg` does), and the theme's lookup
-tables written as ui/ds/file_icons_map.luau. Run it again when Zeron's set
+lifted for dark, as Zeren's `dark_icon_svg` does), and the theme's lookup
+tables written as ui/ds/file_icons_map.luau. Run it again when Zeren's set
 changes:
 
     python3 apps/zgx/tools/file_icons.py
@@ -11385,7 +11385,7 @@ MANIFEST = os.path.join(ROOT, "crates", "ui", "src", "file-icons.json")
 OUT_ASSETS = os.path.join(ZGX, "ui", "assets", "icons", "files")
 OUT_MAP = os.path.join(ZGX, "ui", "ds", "file_icons_map.luau")
 
-# Zeron's lift for dark (file_icons.rs `dark_icon_svg`).
+# Zeren's lift for dark (file_icons.rs `dark_icon_svg`).
 LIFT = [
     ("#64748B", "#CBD5E1"),
     ("#71717A", "#D4D4D8"),
@@ -11436,7 +11436,7 @@ def main():
         return {k: ids[v] for k, v in table.items() if v in ids}
 
     with open(OUT_MAP, "w") as f:
-        f.write("-- Written by tools/file_icons.py from Zeron's Symbols theme\n")
+        f.write("-- Written by tools/file_icons.py from Zeren's Symbols theme\n")
         f.write("-- (crates/ui/src/file-icons.json). Don't edit; run the script again.\n")
         f.write("-- Each name is an icon's path under assets/icons/files/<light|dark>/.\n\n")
         f.write("return {\n")
@@ -11544,7 +11544,7 @@ return M
 -- source_url?, website?, kind? ("binary" | "npx" | "uvx"; nil: no build
 -- for the device), readiness ("ready" | "needs-node" | "needs-uv" |
 -- "no-build"), host?, checksum? (a binary checked against the registry's
--- sha256, or not; nil for a package), built_in? (the harness Zeron drives
+-- sha256, or not; nil for a package), built_in? (the harness Zeren drives
 -- it with), added? (the version there), adding, delisted, own (one of
 -- your own, `own.<slug>`), icon? (SVG) }.
 
@@ -11619,7 +11619,7 @@ end
 return M
 ]],
 		["apps/zgx/ui/app.luau"] = [[
--- Zeron in zgx: the windows' entry. The design lint first (before anything
+-- Zeren in zgx: the windows' entry. The design lint first (before anything
 -- builds), then the design system's themes, then the window's screen: the
 -- host says which (`window`): setup ("onboarding", the default), or the
 -- main window ("main": the shell, screens/shell). Each screen is required
@@ -11632,7 +11632,7 @@ ds.setup()
 require("@app/screens/language")
 
 if ui.shared("window", "onboarding"):peek() == "main" then
-	-- Plugins: their page in Settings, and what they're shown of Zeron.
+	-- Plugins: their page in Settings, and what they're shown of Zeren.
 	require("@app/screens/plugins")
 	local shell = require("@app/screens/shell")
 	return shell()
@@ -12101,7 +12101,7 @@ local function said(text: string): () -> ()
 	end
 end
 
--- A session's menu, as Zeron's sidebar has it (shell.rs's chat menu), and
+-- A session's menu, as Zeren's sidebar has it (shell.rs's chat menu), and
 -- more: what it would copy, where it would move it, and the keys for each.
 local function session_menu(s: Session): { Entry }
 	local is_pinned = pinned:peek()[s.id] == true
@@ -12324,9 +12324,9 @@ local SESSION_ROW = ui.variants {
 	compound = {
 		{
 			selected = true,
-			bg = "$zeron.selected.flat.bg",
-			hover = { bg = "$zeron.selected.flat.bg" },
-			active = { bg = "$zeron.selected.flat.bg" },
+			bg = "$zeren.selected.flat.bg",
+			hover = { bg = "$zeren.selected.flat.bg" },
+			active = { bg = "$zeren.selected.flat.bg" },
 		},
 	},
 	defaults = { selected = false },
@@ -12391,7 +12391,7 @@ local function message(m: Message): Node
 				px = if user then "$space.3" else "$space.1",
 				py = "$space.2",
 				rounded = "$radius.lg",
-				bg = if user then "$zeron.secondary.bg" else "#00000000",
+				bg = if user then "$zeren.secondary.bg" else "#00000000",
 				ds.Text { m.text, wrap = true, tone = if m.streaming then "secondary" else "primary" },
 			},
 		},
@@ -12485,16 +12485,16 @@ return {
 							w_full = true,
 							h = 220,
 							p = "$space.1",
-							gap = "$zeron.list.gap",
+							gap = "$zeren.list.gap",
 							rounded = "$radius.lg",
-							bg = "$zeron.secondary.bg",
+							bg = "$zeren.secondary.bg",
 							table.unpack(sessions),
 						},
 					}
 				),
 				block(
 					"FILES",
-					ui.column { w = 320, gap = "$zeron.list.gap", table.unpack(files) }
+					ui.column { w = 320, gap = "$zeren.list.gap", table.unpack(files) }
 				),
 			},
 			block("MESSAGES", ui.column { w = 664, gap = "$space.3", table.unpack(messages) }),
@@ -12539,9 +12539,9 @@ return {
 					px = "$space.3",
 					items = "center",
 					rounded = "$radius.md",
-					bg = "$zeron.secondary.bg",
-					hover = { bg = "$zeron.secondary.hover" },
-					active = { bg = "$zeron.secondary.active" },
+					bg = "$zeren.secondary.bg",
+					hover = { bg = "$zeren.secondary.hover" },
+					active = { bg = "$zeren.secondary.active" },
 					ds.Text { "Right-click at the corner", style = "caption", tone = "secondary" },
 				},
 			},
@@ -12560,7 +12560,7 @@ local kit = require("@demos/example_kit")
 return {
 	id = "ex_done",
 	title = "All set",
-	about = "The last step of setup: the organization made, what was set up in three lines, and the way in. After it the window closes and Zeron opens on the organization.",
+	about = "The last step of setup: the organization made, what was set up in three lines, and the way in. After it the window closes and Zeren opens on the organization.",
 	demo = function()
 		return kit.stage {
 			w = 680,
@@ -12595,8 +12595,8 @@ return {
 								items = "center",
 								justify = "center",
 								rounded = "$radius.full",
-								bg = "$zeron.tone.success.wash",
-								color = "$zeron.tone.success.ink",
+								bg = "$zeren.tone.success.wash",
+								color = "$zeren.tone.success.ink",
 								ds.Icon { name = "check-circle", size = 16 },
 							},
 						},
@@ -12680,7 +12680,7 @@ end
 -- The failing check's log, open in the block when something failed.
 local FAILED_LOG = {
 	"FAIL badge renders a pull request's state (ui/ds/badge.test.luau:88)",
-	"  expected ink $zeron.pr.open, got $zeron.tone.neutral.ink",
+	"  expected ink $zeren.pr.open, got $zeren.tone.neutral.ink",
 	"FAIL badge keeps a colour given outright (ui/ds/badge.test.luau:102)",
 	"  expected #2ea043, got #8b949e",
 	"316 passed, 2 failed in 4m 02s",
@@ -12771,7 +12771,7 @@ return {
 			local block = git.checks_block { list = checks, open = git.checks_open, log = if failed then git.log(FAILED_LOG) else nil }
 			local description = ds.Settings.Section {
 				title = "Description",
-				ui.column { w_full = true, px = "$space.4", py = "$space.3", rounded = "$radius.xl", bg = "$zeron.settings.card", border = 1, border_color = "$zeron.settings.edge", Markdown { text = git.PR.body } },
+				ui.column { w_full = true, px = "$space.4", py = "$space.3", rounded = "$radius.xl", bg = "$zeren.settings.card", border = 1, border_color = "$zeren.settings.edge", Markdown { text = git.PR.body } },
 			}
 			return ui.column {
 				w_full = true,
@@ -13241,11 +13241,11 @@ local function outline(): Node
 		h = H * ZOOM,
 		shrink = 0,
 		p = "$space.3",
-		rounded = "$zeron.card.radius",
+		rounded = "$zeren.card.radius",
 		border = 1,
 		border_dash = { 4, 4 },
 		border_color = "$border.strong",
-		ui.text { "zeron", font = "$font.sans", weight = "$font.weight.bold", text_size = "$font.size.xs", color = "$text.disabled" },
+		ui.text { "zeren", font = "$font.sans", weight = "$font.weight.bold", text_size = "$font.size.xs", color = "$text.disabled" },
 	}
 end
 
@@ -13442,10 +13442,10 @@ return {
 		["apps/zgx/ui/demos/example_setup_done.luau"] = [[
 -- Setup's ending for this device (onboarding.rs render_done): what was set
 -- up, a line each (the look, sync, GitHub when you're signed in, the
--- agents), and the way into Zeron. Not a numbered step, so no dots. With
+-- agents), and the way into Zeren. Not a numbered step, so no dots. With
 -- no project yet, the way on is adding one (a project is a folder on one
 -- of your devices) and I'll do this later stands beside it; with projects
--- already (synced from another device), it's simply Start using Zeron.
+-- already (synced from another device), it's simply Start using Zeren.
 -- Anything skipped says where it waits ("Not yet · Settings → Cloud").
 --
 -- Each line keeps its place whatever it says; signed out, GitHub's line
@@ -13472,13 +13472,13 @@ end
 return {
 	id = "ex_setup_done",
 	title = "You're all set",
-	about = "The ending of this device's setup: the look, sync, GitHub (signed in only) and the agents, a line each, anything skipped saying where it waits; then Add a project (or I'll do this later), or Start using Zeron when projects came with the account.",
+	about = "The ending of this device's setup: the look, sync, GitHub (signed in only) and the agents, a line each, anything skipped saying where it waits; then Add a project (or I'll do this later), or Start using Zeren when projects came with the account.",
 	demo = function()
 		local function view(account: string): Node
 			local inside = account == "in"
 			local rows: { Node } = {
 				fact("Appearance", function()
-					return "Dark · Zeron"
+					return "Dark · Zeren"
 				end),
 				fact("Sync", function()
 					return if inside then "On" else "Only on this Mac"
@@ -13499,7 +13499,7 @@ return {
 				end, kit.quiet { label = "I'll do this later" }),
 				continue = {
 					label = function()
-						return if projects() then "Start using Zeron" else "Add a project"
+						return if projects() then "Start using Zeren" else "Add a project"
 					end,
 				},
 				kit.form {
@@ -13609,7 +13609,7 @@ return {
 						-- (The intro's own words, art outside the ds, scaled to the still.)
 						font = ui.raw("Instrument Serif", "the intro's own type, art outside the ds"),
 						text_size = ui.raw(56, "the intro's words, at this still's scale"),
-						color = "$zeron.scene.words",
+						color = "$zeren.scene.words",
 					},
 					Onboarding.WayIn { id = "way_in", label = "Get started", size = "lg" }
 				),
@@ -13648,7 +13648,7 @@ local source = ui.state("files_source", "checkout")
 local active = ui.state("files_active", nil :: string?)
 local reveal = ui.state("files_reveal", nil :: string?)
 local doc = ui.state("files_doc", nil :: Doc?)
--- How wide the pane is, tree and file together (0: all there is): Zeron's
+-- How wide the pane is, tree and file together (0: all there is): Zeren's
 -- right pane at its narrowest and its default, where the tree can't sit
 -- beside the file and comes over it instead.
 local pane = ui.state("files_pane", 0)
@@ -13995,7 +13995,7 @@ return {
 			end, function(key: string): Node
 				local which = string.match(key, "^[^|]*") or "checkout"
 				local m = if which == "large" then large() else checkout
-				-- The pane, in a frame: Zeron's right pane at its narrowest
+				-- The pane, in a frame: Zeren's right pane at its narrowest
 				-- and its default, or all there is.
 				return FilesPane {
 					id = "files-pane",
@@ -14014,7 +14014,7 @@ return {
 					h_full = true,
 					rounded = "$radius.xl",
 					-- The bars' buttons sit in the card's corners: concentric.
-					theme = { zeron = { icon_button = { radius = control.nest("$radius.xl", 1, 6) } } },
+					theme = { zeren = { icon_button = { radius = control.nest("$radius.xl", 1, 6) } } },
 					border = 1,
 					border_color = "$border.subtle",
 					bg = "$surface.base",
@@ -14135,14 +14135,14 @@ return {
 		["apps/zgx/ui/demos/git_parts.luau"] = [[
 -- The git journey's pieces, shared by its pages: one pull request from
 -- its commit to its merge (#1142, "Add the design system's primitives",
--- zeron/primitives into main), the people around it, its commits and
+-- zeren/primitives into main), the people around it, its commits and
 -- files, a diff of one file (with a comment on any line of it), its checks
 -- (as a block that folds to one line), what happened to it in order (the
 -- activity), and the header every page of it opens with. The vocabulary
--- is Zeron's (pull_requests.rs row_status: Draft, Open, Approved, Changes
+-- is Zeren's (pull_requests.rs row_status: Draft, Open, Approved, Changes
 -- requested, Merge conflicts; Checks · n).
 --
--- Every page has two widths: the window's, and a side pane's. Zeron's
+-- Every page has two widths: the window's, and a side pane's. Zeren's
 -- right pane is 520 by default and 360 at its narrowest (settings.rs
 -- RIGHT_PANE_MIN); its pull request page tightens its gutters to 16 below
 -- 480 (pull_request_detail.rs NARROW_PAGE, NARROW_PAD_X). The narrow
@@ -14199,7 +14199,7 @@ M.ME, M.THEO, M.PRIYA, M.JONAS = ME, THEO, PRIYA, JONAS
 M.PR = {
 	number = 1142,
 	title = "Add the design system's primitives",
-	branch = "zeron/primitives",
+	branch = "zeren/primitives",
 	base = "main",
 	added = 2480,
 	removed = 61,
@@ -14215,7 +14215,7 @@ M.COMMITS = {
 	{ sha = "3f2c9a1", subject = "Settings pieces, and the token lint" },
 }
 
--- The commit's files: Zeron's statuses, with the lines each adds and takes.
+-- The commit's files: Zeren's statuses, with the lines each adds and takes.
 M.FILES = {
 	{ path = "ui/ds/badge.luau", status = "added", add = 312, del = 0 },
 	{ path = "ui/ds/tokens.luau", status = "modified", add = 64, del = 2 },
@@ -14325,7 +14325,7 @@ local HUNK: { Line } = {
 	{ kind = "hunk", text = "@@ -40,7 +40,9 @@ function M.Badge(props: Props): Node" },
 	{ kind = " ", old = 40, new = 40, text = '	local size = SIZE[props.size or "sm"]' },
 	{ kind = " ", old = 41, new = 41, text = '	local look: Look = props.look or "soft"' },
-	{ kind = "-", old = 42, text = '	local ink = `$zeron.tone.{props.tone or "neutral"}.ink`' },
+	{ kind = "-", old = 42, text = '	local ink = `$zeren.tone.{props.tone or "neutral"}.ink`' },
 	{ kind = "+", new = 42, text = "	local ink = ink_of(props)" },
 	{ kind = "+", new = 43, text = "	-- A colour given outright (a pull request's state) wins over a tone." },
 	{ kind = " ", old = 43, new = 44, text = '	local radius = if props.shape == "pill" then "$radius.full" else size.radius' },
@@ -14345,7 +14345,7 @@ function M.diff(path: string, status: string, add: number, del: number, opts: Di
 	return Git.diff({ path = path, status = status, add = add, del = del }, HUNK, opts)
 end
 
--- A review thread on a line of the change, as Zeron shows one inline: the
+-- A review thread on a line of the change, as Zeren shows one inline: the
 -- design system's band under the line, its words on the code's text edge
 -- (`inset`), joined to a block above it if there is one.
 function M.thread(opts: { inset: number?, joined: boolean?, draft: State<string>, resolved: State<boolean>, changes: boolean? }): Node
@@ -14429,7 +14429,7 @@ local MESSAGE: { Item } = {
 
 -- Every shape and size.
 local SHAPES: { Item } = {
-	{ src = "assets/favicons/zeron.png", name = "zeron.png (64 × 64)" },
+	{ src = "assets/favicons/zeren.png", name = "zeren.png (64 × 64)" },
 	{ src = "assets/lightbox/tall.png", name = "tall.png (520 × 1800)" },
 	{ src = "assets/art/plate-2-bluehour.jpg", name = "plate-2-bluehour.jpg (2100 × 700)" },
 	{ src = "assets/lightbox/pixels.png", name = "pixels.png (1200 × 800)" },
@@ -14454,7 +14454,7 @@ local function cargo_images(): ({ Item }, { [string]: number })
 	return out, at
 end
 
--- A message's thumbnail: Zeron's size and corner, a hairline over its edge.
+-- A message's thumbnail: Zeren's size and corner, a hairline over its edge.
 local function thumb(group: string, items: { Item }, i: number, w: string, h: string, radius: string): Node
 	local r = ui.theme.get(string.sub(radius, 2)) :: number
 	return Lightbox.Thumb {
@@ -14482,7 +14482,7 @@ end
 local function strip(group: string, items: { Item }): Node
 	local nodes: { Node } = {}
 	for i = 1, #items do
-		table.insert(nodes, thumb(group, items, i, "$zeron.prose.thumb.w", "$zeron.prose.thumb.h", "$zeron.prose.thumb.radius"))
+		table.insert(nodes, thumb(group, items, i, "$zeren.prose.thumb.w", "$zeren.prose.thumb.h", "$zeren.prose.thumb.radius"))
 	end
 	return kit.row(table.unpack(nodes))
 end
@@ -14498,9 +14498,9 @@ return {
 				"THE COMPOSER'S CHIPS",
 				ui.div {
 					w = 420,
-					rounded = "$zeron.composer.radius",
-					bg = "$zeron.composer.tint",
-					pb = "$zeron.composer.chip.inset",
+					rounded = "$zeren.composer.radius",
+					bg = "$zeren.composer.tint",
+					pb = "$zeren.composer.chip.inset",
 					cargo.Strip {
 						items = CARGO,
 						on_open = function(id: string)
@@ -14510,7 +14510,7 @@ return {
 							end
 						end,
 						source = function(item: cargo.Item): { [string]: any }?
-							return Lightbox.source("lb-cargo", item.id, ui.theme.get("zeron.composer.chip.radius") :: number)
+							return Lightbox.source("lb-cargo", item.id, ui.theme.get("zeren.composer.chip.radius") :: number)
 						end,
 					},
 				}
@@ -14551,8 +14551,8 @@ return {
 					h = 380,
 					p = "$space.6",
 					onboarding.Hero {
-						art = ui.svg { src = "assets/icons/ui/zeron-logo.svg", w = 40, h = 46, tint = "$text.primary" },
-						title = "Welcome to Zeron",
+						art = ui.svg { src = "assets/icons/ui/zeren-logo.svg", w = 40, h = 46, tint = "$text.primary" },
+						title = "Welcome to Zeren",
 						body = "Every agent you use, on every machine you have, in one place.",
 						foot = ui.text { "Already set up on another Mac? Sign in", text_size = "$font.size.sm", color = "$text.tertiary" },
 						Button { "Get started", size = "lg", w = 280, Icon { name = "arrow-right" } },
@@ -14570,7 +14570,7 @@ return {
 						end,
 						count = 4,
 						title = "Which agents do you use?",
-						body = "Zeron finds the ones installed here. Pick any to set up now; the rest can wait.",
+						body = "Zeren finds the ones installed here. Pick any to set up now; the rest can wait.",
 					},
 					kit.row(
 						Button {
@@ -14663,7 +14663,7 @@ local ds = require("@ds")
 local PEOPLE = {
 	{ seed = "mara", name = "Mara Okafor", email = "mara@halcyon.dev" },
 	{ seed = "theo", name = "Theo Lindqvist", email = "theo.lindqvist@halcyon.dev" },
-	{ seed = "ines", name = "Ines Duarte", email = "ines_duarte+zeron@northwind.io" },
+	{ seed = "ines", name = "Ines Duarte", email = "ines_duarte+zeren@northwind.io" },
 }
 
 return {
@@ -14735,7 +14735,7 @@ return {
 	demo = function()
 		return Settings.Page {
 			title = "Git",
-			description = "How Zeron commits, pushes and keeps your branches in step.",
+			description = "How Zeren commits, pushes and keeps your branches in step.",
 			trail = SearchField { value = query, placeholder = "Search settings", size = "sm", w = 200 },
 			Settings.Section {
 				title = "Commits",
@@ -14743,7 +14743,7 @@ return {
 				Settings.Group {
 					Settings.Row {
 						label = "Sign commits",
-						description = "With the SSH key Zeron made for this device.",
+						description = "With the SSH key Zeren made for this device.",
 						control = Switch { value = sign, label = "Sign commits" },
 					},
 					Settings.Row {
@@ -14753,7 +14753,7 @@ return {
 					},
 					Settings.Row {
 						label = "Author",
-						description = "The name and email on commits Zeron makes for you.",
+						description = "The name and email on commits Zeren makes for you.",
 						stacked = true,
 						control = ui.row {
 							gap = "$space.3",
@@ -14788,7 +14788,7 @@ return {
 							options = { { value = "zed", label = "Zed" }, { value = "cursor", label = "Cursor" }, { value = "code", label = "VS Code" } },
 						},
 					},
-					Settings.Row { label = "Fetch in the background", description = "Every 5 minutes, while Zeron is open.", control = Switch { value = fetch, label = "Fetch" }, disabled = true },
+					Settings.Row { label = "Fetch in the background", description = "Every 5 minutes, while Zeren is open.", control = Switch { value = fetch, label = "Fetch" }, disabled = true },
 				},
 			},
 			Settings.Section {
@@ -14802,7 +14802,7 @@ return {
 				Settings.Group {
 					Settings.Row {
 						label = "Reset Git settings",
-						description = "Back to Zeron's defaults. Your repositories aren't touched.",
+						description = "Back to Zeren's defaults. Your repositories aren't touched.",
 						control = Button { "Reset", tone = "secondary", size = "sm" },
 					},
 					Settings.Row { label = "Sign out of GitHub", danger = true, on_click = function() end },
@@ -14886,13 +14886,13 @@ local function editor(id: string, value: State<string>): Node
 		line_numbers = true,
 		font = "$font.mono",
 		-- The textarea takes its type size as a number, not a token.
-		size = ui.theme.get("zeron.prose.code.size") :: number,
+		size = ui.theme.get("zeren.prose.code.size") :: number,
 		tab = "    ",
 		current_line = "$hover",
 		-- No inset on the scrolling sides: a textarea clips inside its padding.
 		py = 0,
 		pr = 0,
-		line_height = "$zeron.editor.line",
+		line_height = "$zeren.editor.line",
 		w_full = true,
 		h = EDITOR_H,
 		bg = "$surface.sunken",
@@ -14907,8 +14907,8 @@ local function reading(id: string): Node
 	for _, line in Syntax.lines(samples[id] or "", id) do
 		local rich: RichProps = {
 			font = "$font.mono",
-			text_size = "$zeron.prose.code.size",
-			line_height = "$zeron.prose.code.line",
+			text_size = "$zeren.prose.code.size",
+			line_height = "$zeren.prose.code.line",
 			literal = true,
 		}
 		for _, run in line do
@@ -14980,7 +14980,7 @@ local verdict = if #result.failed == 0
 return {
 	id = "syntax",
 	title = "Syntax highlighting",
-	about = "Code coloured as it's typed: every language Zeron shows, incremental line by line.",
+	about = "Code coloured as it's typed: every language Zeren shows, incremental line by line.",
 	demo = function(): Node
 		return ui.column {
 			gap = "$space.4",
@@ -15103,7 +15103,7 @@ local TURNS = 300
 -- a model's usual pace, and a fast one's.
 local SPEEDS: { [string]: number } = { slow = 45, steady = 220, fast = 900 }
 -- How often the reply's text is committed: often enough that it reads as a
--- flow, not lumps (Zeron's 120 ms read as lumps), rarely enough that each
+-- flow, not lumps (Zeren's 120 ms read as lumps), rarely enough that each
 -- commit carries a few words.
 local TICK = 33
 
@@ -15158,8 +15158,8 @@ local function with_tools(list: { Message }): { Message }
 					},
 				},
 			},
-			{ id = "tools-t3", kind = "exec", verb = "Ran", target = "cargo test -p zeron-ui transcript", output = table.concat(LOG, "\n"), output_ref = "gallery/tools-t3", output_bytes = 18432 },
-			{ id = "tools-t4", kind = "exec", verb = "Ran", target = "cargo clippy -p zeron-ui", failed = true, output = "error: could not compile `zeron-ui` (lib) due to 1 previous error\nerror[E0425]: cannot find value `row_ix` in this scope\n  --> crates/ui/src/transcript.rs:7001:31" },
+			{ id = "tools-t3", kind = "exec", verb = "Ran", target = "cargo test -p zeren-ui transcript", output = table.concat(LOG, "\n"), output_ref = "gallery/tools-t3", output_bytes = 18432 },
+			{ id = "tools-t4", kind = "exec", verb = "Ran", target = "cargo clippy -p zeren-ui", failed = true, output = "error: could not compile `zeren-ui` (lib) due to 1 previous error\nerror[E0425]: cannot find value `row_ix` in this scope\n  --> crates/ui/src/transcript.rs:7001:31" },
 		},
 	})
 	return list
@@ -15445,7 +15445,7 @@ return {
 				shrink = 0,
 				ui.column {
 					w_full = true,
-					max_w = ui.theme.get("zeron.prose.measure") :: number,
+					max_w = ui.theme.get("zeren.prose.measure") :: number,
 					min_w = 0,
 					ds.Composer {
 						value = typed,
@@ -15491,13 +15491,13 @@ return {
 }
 ]],
 		["apps/zgx/ui/ds/activity.luau"] = [[
--- What an agent did on its way to a reply, as Zeron's transcript draws its
+-- What an agent did on its way to a reply, as Zeren's transcript draws its
 -- tools (transcript.rs, `activity_rail`): a quiet summary ("Ran 3 commands ·
 -- read 2 files"), the working loader before it while it works, and under it,
 -- open (a click on the summary), a
 -- row a tool: a hairline trunk down the gutter, a rounded elbow off it to
 -- each tool's glyph, then what it did. The sidebar's groups draw the same
--- tree (`$zeron.tree`, 1 point, 6-point elbows).
+-- tree (`$zeren.tree`, 1 point, 6-point elbows).
 --
 -- While the agent works the tree is open and its rows arrive one by one,
 -- each sliding in under the last as the trunk reaches down to it; the
@@ -15536,7 +15536,7 @@ export type Tool = {
 	-- Its call is prose (a thought's words), not code.
 	prose: boolean?,
 	-- Being written now (a thought's words still coming): its fold shows
-	-- the latest lines, as Zeron's streaming thought keeps its tail.
+	-- the latest lines, as Zeren's streaming thought keeps its tail.
 	live: boolean?,
 	added: number?,
 	removed: number?,
@@ -15557,7 +15557,7 @@ export type Props = {
 	live: (() -> boolean)?,
 	-- How long it worked, in seconds, once it is done ("Worked for 42s").
 	worked: (() -> number?)?,
-	-- Its line, as the caller words it (Zeron's grouping, the host's); by
+	-- Its line, as the caller words it (Zeren's grouping, the host's); by
 	-- default, counted from its tools here.
 	summary: (() -> string?)?,
 	-- A name to keep whether the reader opened or folded it under, across
@@ -15585,11 +15585,11 @@ local GLYPH: { [Kind]: Icon.Name } = {
 }
 
 -- The tree, in points: the trunk's x (under the working loader's middle, so
--- the trunk runs down from it), the elbow's radius (Zeron's), where the
+-- the trunk runs down from it), the elbow's radius (Zeren's), where the
 -- branch ends, the glyph's place and size, and the gutter they take before
--- the words. Zeron hangs its tree off a chevron 12 points in; with no
+-- the words. Zeren hangs its tree off a chevron 12 points in; with no
 -- chevron the tree starts at the reply's own left edge. Rows are a little
--- tighter than Zeron's 32: a long run of tools reads as one list, not a
+-- tighter than Zeren's 32: a long run of tools reads as one list, not a
 -- column of chips.
 local LOADER = 16
 local TRUNK, BEND, BRANCH_END = LOADER / 2 + 0.5, 6, 20
@@ -15652,7 +15652,7 @@ local function call_block(now: () -> Tool): Node
 		px = "$space.3",
 		py = "$space.2",
 		rounded = "$radius.md",
-		bg = "$zeron.code.wash",
+		bg = "$zeren.code.wash",
 		ui.text {
 			function(): string
 				return now().call or ""
@@ -15694,7 +15694,7 @@ local GROUPS_CHOSEN = ui.state("activity_groups_chosen", {} :: { [string]: boole
 -- nothing rewraps as it opens.
 --
 -- Being written or settled, the fold is the same: its first lines, fading
--- out at the foot, "Show all N lines" under them. (Zeron's streaming thought
+-- out at the foot, "Show all N lines" under them. (Zeren's streaming thought
 -- keeps its tail, the fade at the top; the user wanted one fold, faded at
 -- the foot, Nov 2 2026.)
 local THOUGHT_LINES = 4
@@ -15709,7 +15709,7 @@ local THOUGHT_GAP = 12
 
 local function thought_row(now: () -> Tool, below: () -> boolean): Node
 	local id = now().id
-	local line = ui.theme.get("zeron.prose.small.line") :: number
+	local line = ui.theme.get("zeren.prose.small.line") :: number
 	local folded_h = THOUGHT_LINES * line
 	local body = ui.ref()
 	local function is_open(): boolean
@@ -15786,7 +15786,7 @@ local function thought_row(now: () -> Tool, below: () -> boolean): Node
 			pointer_events = "none",
 			draw = function(c, _, h)
 				if below() then
-					c:rect(TRUNK - 0.5, 0, 1, h, "$zeron.tree")
+					c:rect(TRUNK - 0.5, 0, 1, h, "$zeren.tree")
 				end
 			end,
 		},
@@ -15846,13 +15846,13 @@ local function thought_row(now: () -> Tool, below: () -> boolean): Node
 						left = 0,
 						bottom = 0,
 						h = THOUGHT_BUTTON,
-						px = "$zeron.space.tight",
+						px = "$zeren.space.tight",
 						items = "center",
 						rounded = "$radius.sm",
-						bg = "$zeron.secondary.bg",
+						bg = "$zeren.secondary.bg",
 						color = "$text.secondary",
-						hover = { bg = "$zeron.secondary.hover", color = "$text.primary" },
-						active = { bg = "$zeron.secondary.active", color = "$text.primary" },
+						hover = { bg = "$zeren.secondary.hover", color = "$text.primary" },
+						active = { bg = "$zeren.secondary.active", color = "$text.primary" },
 						focus = control.ring,
 						cursor = "pointer",
 						selectable = false,
@@ -15917,7 +15917,7 @@ local function row(now: () -> Tool, below: () -> boolean, running: () -> boolean
 			pointer_events = "none",
 			draw = function(c, _, h)
 				local mid = ROW / 2
-				c:fill(tree_line.branch { x = TRUNK, mid = mid, tip = BRANCH_END, h = h, bend = BEND, on = below() }, "$zeron.tree")
+				c:fill(tree_line.branch { x = TRUNK, mid = mid, tip = BRANCH_END, h = h, bend = BEND, on = below() }, "$zeren.tree")
 			end,
 		},
 		ui.button {
@@ -16232,10 +16232,10 @@ return ui.component(function(props: Props): Node
 end)
 ]],
 		["apps/zgx/ui/ds/appearance_picker.luau"] = [[
--- Make it yours: how Zeron looks, chosen in three rows, each seen as it's
+-- Make it yours: how Zeren looks, chosen in three rows, each seen as it's
 -- made. The colour scheme (System, Light, Dark), each a small window drawn
 -- in that scheme; the window's material (Frosted, the desktop showing
--- through it softly, or Opaque); and the accent, Zeron's presets after the
+-- through it softly, or Opaque); and the accent, Zeren's presets after the
 -- theme's own (ds/look). Setup's first step after sign-in is this, and the
 -- gallery's Make it yours draws it too.
 --
@@ -16286,26 +16286,26 @@ local function miniature(on_dark: boolean, chosen_ink: () -> string): Node
 			w_full = true,
 			h = SIDE_ROW,
 			shrink = 0,
-			px = "$zeron.space.hair",
+			px = "$zeren.space.hair",
 			items = "center",
 			rounded = "$radius.sm",
-			bg = if selected then "$zeron.selected.flat.bg" else nil,
+			bg = if selected then "$zeren.selected.flat.bg" else nil,
 			line(w),
 		}
 	end
 	return ui.row {
-		-- (The scheme as worn now: a template's colours, or Zeron's.)
+		-- (The scheme as worn now: a template's colours, or Zeren's.)
 		theme = if on_dark then palettes.scheme.dark else palettes.scheme.light,
 		w = PREVIEW_W,
 		h = PREVIEW_H,
 		shrink = 0,
-		bg = "$zeron.window",
+		bg = "$zeren.window",
 		ui.column {
 			w = SIDE_W,
 			h_full = true,
 			shrink = 0,
 			p = "$space.1",
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			bg = "$hover",
 			side_row(true, "70%"),
 			side_row(false, "55%"),
@@ -16324,7 +16324,7 @@ local function miniature(on_dark: boolean, chosen_ink: () -> string): Node
 				w_full = true,
 				h = COMPOSER,
 				shrink = 0,
-				p = "$zeron.space.hair",
+				p = "$zeren.space.hair",
 				justify = "end",
 				rounded = "$radius.full",
 				border = 1,
@@ -16378,8 +16378,8 @@ local function scheme_card(scheme: State<string>, chosen_ink: () -> string, valu
 		gap = "$space.1",
 		rounded = "$radius.xl",
 		border = 1,
-		bg = "$zeron.option.bg",
-		border_color = "$zeron.option.edge",
+		bg = "$zeren.option.bg",
+		border_color = "$zeren.option.edge",
 		hover = { bg = "$hover" },
 		focus = control.ring,
 		on_click = pick,
@@ -16562,7 +16562,7 @@ return setmetatable({
 })
 ]],
 		["apps/zgx/ui/ds/button.luau"] = [[
--- Buttons, as Zeron's are: 8-point corners (6 small) unless `shape =
+-- Buttons, as Zeren's are: 8-point corners (6 small) unless `shape =
 -- "pill"`. `Button { "Continue", on_click = … }` is the primary; `tone`
 -- picks its weight (`danger` for a confirm that can't be taken back),
 -- `size` its height (`xs`, a header's or a bar's, the panel controls' 24). An icon goes beside the text as a
@@ -16584,44 +16584,44 @@ local recipe = ui.variants {
 		tone = {
 			-- The way on: one per screen.
 			primary = {
-				bg = "$zeron.primary.bg",
-				color = "$zeron.primary.text",
-				hover = { bg = "$zeron.primary.hover" },
-				active = { bg = "$zeron.primary.active" },
+				bg = "$zeren.primary.bg",
+				color = "$zeren.primary.text",
+				hover = { bg = "$zeren.primary.hover" },
+				active = { bg = "$zeren.primary.active" },
 			},
 			-- Beside it: a fill, firmer as it is touched.
 			secondary = {
-				bg = "$zeron.secondary.bg",
+				bg = "$zeren.secondary.bg",
 				color = "$text.primary",
-				hover = { bg = "$zeron.secondary.hover" },
-				active = { bg = "$zeron.secondary.active" },
+				hover = { bg = "$zeren.secondary.hover" },
+				active = { bg = "$zeren.secondary.active" },
 			},
 			-- Back, Skip: text until touched.
 			ghost = {
 				bg = "#00000000",
 				color = "$text.secondary",
-				hover = { bg = "$zeron.secondary.bg", color = "$text.primary" },
-				active = { bg = "$zeron.secondary.hover", color = "$text.primary" },
+				hover = { bg = "$zeren.secondary.bg", color = "$text.primary" },
+				active = { bg = "$zeren.secondary.hover", color = "$text.primary" },
 			},
 			accent = {
 				bg = "$accent",
 				color = "$accent.text",
 				hover = { bg = "$accent.hover" },
-				active = { bg = "$zeron.accent.active" },
+				active = { bg = "$zeren.accent.active" },
 			},
 			-- Delete, Discard: a confirm that can't be taken back.
 			danger = {
-				bg = "$zeron.destructive.bg",
-				color = "$zeron.destructive.text",
-				hover = { bg = "$zeron.destructive.hover" },
-				active = { bg = "$zeron.destructive.active" },
+				bg = "$zeren.destructive.bg",
+				color = "$zeren.destructive.text",
+				hover = { bg = "$zeren.destructive.hover" },
+				active = { bg = "$zeren.destructive.active" },
 			},
 		},
 		size = {
 			-- A header's or a bar's: the panel's controls' height (its icon
 			-- buttons', its chips'), their padding and corner.
-			xs = { h = 24, px = "$zeron.space.tight", rounded = "$radius.lg", text_size = "$font.size.sm" },
-			sm = { h = 28, px = "$zeron.space.snug", rounded = "$radius.md", text_size = "$font.size.sm" },
+			xs = { h = 24, px = "$zeren.space.tight", rounded = "$radius.lg", text_size = "$font.size.sm" },
+			sm = { h = 28, px = "$zeren.space.snug", rounded = "$radius.md", text_size = "$font.size.sm" },
 			md = { h = "$control.height", px = "$space.3", rounded = "$radius.lg", text_size = "$font.size.md" },
 			lg = { h = 40, px = "$space.5", rounded = "$radius.lg", text_size = "$font.size.lg" },
 		},
@@ -16656,11 +16656,11 @@ export type Props = Merge<ContainerProps, {
 
 -- The spinner in each tone's text colour, and at each size.
 local INK: { [string]: string } = {
-	primary = "$zeron.primary.text",
+	primary = "$zeren.primary.text",
 	secondary = "$text.primary",
 	ghost = "$text.secondary",
 	accent = "$accent.text",
-	danger = "$zeron.destructive.text",
+	danger = "$zeren.destructive.text",
 }
 local SPIN: { [string]: number } = { sm = 12, md = 14, lg = 16 }
 
@@ -16722,7 +16722,7 @@ end
 -- window's full height, under the title bar's strip, and ends above the
 -- footer's buttons, dissolving into the window as it goes, so it is cut by
 -- nothing. Each card stands under a scrim of the window's colour
--- (`zeron.wall.scrim`: in the dark, a printed card is dimmed to the room's
+-- (`zeren.wall.scrim`: in the dark, a printed card is dimmed to the room's
 -- light and no brighter than the way on; in light the paper is near the
 -- window's own white and the scrim is clear), lifted from the one card under
 -- the pointer, which then tilts and shows its foil as a card does.
@@ -16869,7 +16869,7 @@ local Card = ui.component(function(p: CardProps): Node
 			holo = p.m.holo,
 			badges = p.m.badges,
 			still = p.still,
-			shadow = "$zeron.wall.shadow",
+			shadow = "$zeren.wall.shadow",
 			on_hover = hover,
 			glint = p.glint,
 		},
@@ -16879,7 +16879,7 @@ local Card = ui.component(function(p: CardProps): Node
 			right = 0,
 			top = 0,
 			bottom = 0,
-			rounded = "$zeron.card.radius",
+			rounded = "$zeren.card.radius",
 			overflow = "hidden",
 			-- (Wallpaper keeps its veil whole: the words stand on it.)
 			fade = if p.veiled then nil else { 0, ART_FADE },
@@ -16888,7 +16888,7 @@ local Card = ui.component(function(p: CardProps): Node
 			ui.div {
 				w_full = true,
 				h_full = true,
-				bg = if p.veiled then "$zeron.wall.veil" else "$zeron.wall.scrim",
+				bg = if p.veiled then "$zeren.wall.veil" else "$zeren.wall.scrim",
 				opacity = ui.tween(lift, { duration = LIFT, ease = "outQuad" }),
 			},
 		},
@@ -17685,13 +17685,13 @@ return M
 ]],
 		["apps/zgx/ui/ds/context_usage.luau"] = [[
 -- How full a model's context is, as the composer's ring shows it and its
--- card says it (Zeron's crates/ui/src/context_usage.rs): what the agent
+-- card says it (Zeren's crates/ui/src/context_usage.rs): what the agent
 -- reports (tokens in it, the window's size, either missing), how full that
 -- is, the ink it reads in (the text's own, amber from three quarters, red
 -- from nine tenths), and the card itself.
 --
 --   context_usage.fraction(u)  0 to 1, or nil while it can't be said
---   context_usage.lines(u)     the card's two lines, as Zeron writes them
+--   context_usage.lines(u)     the card's two lines, as Zeren writes them
 --   context_usage.ink(f)       the ring's and the bar's ink at `f`
 --   Card { usage = fn }        the card (ds/hover_card's), "Context window"
 --                              and how full at its head, a slim bar, the
@@ -17762,7 +17762,7 @@ function M.Card(props: { usage: () -> Usage? }): Node
 		p = "$space.1",
 		gap = 0,
 		ui.row {
-			h = "$zeron.menu.heading",
+			h = "$zeren.menu.heading",
 			px = "$space.2",
 			gap = "$space.2",
 			items = "center",
@@ -17800,7 +17800,7 @@ function M.Card(props: { usage: () -> Usage? }): Node
 				end,
 			}),
 			ui.column {
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				ui.text {
 					function(): string
 						return (M.lines(usage()))
@@ -17894,7 +17894,7 @@ export type DialogProps = {
 	[number]: Child,
 }
 
--- How the panel arrives and leaves (Zeron's dialog-in, its 180; leaving, a
+-- How the panel arrives and leaves (Zeren's dialog-in, its 180; leaving, a
 -- little quicker than it came).
 local IN = { duration = 200, ease = "out(3)" }
 local OUT = { duration = 130, ease = "in(2)" }
@@ -17945,10 +17945,10 @@ local function stage(props: { open: State<boolean>, label: Label, dismissable: b
 		placement = props.placement,
 		p = 0,
 		gap = 0,
-		rounded = "$zeron.dialog.radius",
+		rounded = "$zeren.dialog.radius",
 		bg = "#00000000",
 		border = 0,
-		shadow = "$zeron.dialog.stage",
+		shadow = "$zeren.dialog.stage",
 		dismiss_on_backdrop = props.dismissable,
 		build = function()
 			return ui.column {
@@ -17965,10 +17965,10 @@ end
 local function panel(props: ContainerProps): ContainerProps
 	glass.style(props, "menu")
 	props.bg = function()
-		return if material.frosted:get() then "$zeron.dialog.tint" else "$zeron.dialog.solid"
+		return if material.frosted:get() then "$zeren.dialog.tint" else "$zeren.dialog.solid"
 	end
-	props.rounded = "$zeron.dialog.radius"
-	props.shadow = "$zeron.dialog.shadow"
+	props.rounded = "$zeren.dialog.radius"
+	props.shadow = "$zeren.dialog.shadow"
 	return props
 end
 
@@ -18022,9 +18022,9 @@ local DialogBody = ui.component(function(args: { props: DialogProps, close: () -
 			return false
 		end,
 		ui.column {
-			gap = "$zeron.space.tight",
+			gap = "$zeren.space.tight",
 			if props.icon
-				then ui.div { pb = "$zeron.space.tight", color = "$text.secondary", Icon { name = props.icon, size = 20 } }
+				then ui.div { pb = "$zeren.space.tight", color = "$text.secondary", Icon { name = props.icon, size = 20 } }
 				else nil,
 			ui.text { props.title, heading = 2, text_size = "$font.size.lg", line_height = "$font.line.lg", weight = "$font.weight.semibold", color = "$text.primary", wrap = true },
 			if props.body
@@ -18100,7 +18100,7 @@ M.Dialog = ui.component(function(props: DialogProps): Node
 		open = open,
 		label = props.title,
 		dismissable = props.dismissable ~= false,
-		w = `$zeron.dialog.{props.size or "sm"}`,
+		w = `$zeren.dialog.{props.size or "sm"}`,
 		panel = function(phase: State<number>): Node
 			return DialogBody { props = props, close = close, phase = phase }
 		end,
@@ -18129,7 +18129,7 @@ M.Sheet = ui.component(function(props: SheetProps): Node
 	for _, c in ipairs(props :: any) do
 		table.insert(children, c)
 	end
-	local width = props.size or (ui.theme.get("zeron.dialog.sheet") :: number)
+	local width = props.size or (ui.theme.get("zeren.dialog.sheet") :: number)
 	-- Tall as the window: zgx's modal has no height to take a percentage
 	-- of, but its foot sits `EDGE` off the window's, wherever its top is, so
 	-- where that foot lies says how tall the window is.
@@ -18164,7 +18164,7 @@ M.Sheet = ui.component(function(props: SheetProps): Node
 		open = open,
 		label = props.title,
 		dismissable = true,
-		w = if bottom then "$zeron.dialog.lg" else width,
+		w = if bottom then "$zeren.dialog.lg" else width,
 		h = height,
 		ref = box,
 		placement = { x = if bottom then "center" else "end", y = "end", inset = EDGE },
@@ -18196,7 +18196,7 @@ M.Sheet = ui.component(function(props: SheetProps): Node
 					ui.column {
 						grow = 1,
 						min_w = 0,
-						gap = "$zeron.space.tight",
+						gap = "$zeren.space.tight",
 						ui.text { props.title, heading = 2, text_size = "$font.size.lg", line_height = "$font.line.lg", weight = "$font.weight.semibold", color = "$text.primary" },
 						if props.description
 							then ui.text { props.description, text_size = "$font.size.md", line_height = 20, color = "$text.secondary", wrap = true }
@@ -18296,7 +18296,7 @@ local H, KNOB = 24, 18
 -- How often the field redraws as it drifts.
 local FPS = 12
 
--- A level's look: its colour (a zeron.effort token) and its field: how
+-- A level's look: its colour (a zeren.effort token) and its field: how
 -- dense the glyphs get at the thumb, how far the density wanders, how fast
 -- it drifts.
 type Look = { token: string, to: number, wander: number, drift: number }
@@ -18325,7 +18325,7 @@ end
 -- the characters draw on a pale track). A wash of it is the token under an
 -- opacity, so it follows the theme where it sits.
 local function ink(look: Look): string
-	return `$zeron.effort.{look.token}`
+	return `$zeren.effort.{look.token}`
 end
 
 -- The field: cells of 6 by 8 font pixels (a pixel a whole number of device
@@ -18544,7 +18544,7 @@ return ui.component(function(props: Props): Node
 		relative = true,
 		rounded = "$radius.md",
 		cursor = "pointer",
-		bg = "$zeron.slider.track",
+		bg = "$zeren.slider.track",
 		-- (zgx has no slider role for a node of the script's own; ui.slider
 		-- is its native one.)
 		label = props.label or props.title or locale.t("ds.effort_slider.reasoning"),
@@ -18650,7 +18650,7 @@ return ui.component(function(props: Props): Node
 					top = 0,
 					right = 0,
 					bottom = 0,
-					opacity = "$zeron.slider.tint",
+					opacity = "$zeren.slider.tint",
 					bg = function()
 						return ink(look(index()))
 					end,
@@ -18665,7 +18665,7 @@ return ui.component(function(props: Props): Node
 					bottom = 0,
 					rounded = "$radius.sm",
 					border = 1,
-					opacity = "$zeron.slider.ring",
+					opacity = "$zeren.slider.ring",
 					pointer_events = "none",
 					border_color = function()
 						return ink(look(index()))
@@ -18698,7 +18698,7 @@ return ui.component(function(props: Props): Node
 					w = grow(KNOB - 4, KNOB - 2),
 					h = grow(H - 6, H - 4),
 					rounded = "$radius.sm",
-					bg = "$zeron.primary.bg",
+					bg = "$zeren.primary.bg",
 					ui.div {
 						absolute = true,
 						w = 2,
@@ -18706,7 +18706,7 @@ return ui.component(function(props: Props): Node
 						rounded = "$radius.full",
 						left = grow(6, 7),
 						top = grow(5, 6),
-						bg = "$zeron.primary.text",
+						bg = "$zeren.primary.text",
 					},
 				},
 			},
@@ -18731,7 +18731,7 @@ return ui.component(function(props: Props): Node
 			ui.column {
 				grow = 1,
 				min_w = 0,
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				ui.text {
 					props.title,
 					font = "$font.mono",
@@ -18835,13 +18835,13 @@ local function notes(props: WrapProps): Node?
 			if count.say then
 				local _, warns = count.say(n)
 				if warns then
-					return "$zeron.tone.warning.ink"
+					return "$zeren.tone.warning.ink"
 				end
 			end
 			if count.max and n > count.max then
-				return "$zeron.tone.danger.ink"
+				return "$zeren.tone.danger.ink"
 			elseif count.soft and n > count.soft then
-				return "$zeron.tone.warning.ink"
+				return "$zeren.tone.warning.ink"
 			end
 			return "$text.tertiary"
 		end
@@ -18872,7 +18872,7 @@ local function notes(props: WrapProps): Node?
 				then ui.show(problem, ui.row {
 					gap = "$space.1",
 					items = "center",
-					color = "$zeron.tone.danger.ink",
+					color = "$zeren.tone.danger.ink",
 					live = "polite",
 					-- Half a point up: an icon beside text sits on its
 					-- x-height, not its box.
@@ -18914,7 +18914,7 @@ function M.wrap(props: WrapProps): Node
 	local label = props.label
 	local n = notes(props)
 	return ui.column {
-		gap = "$zeron.space.tight",
+		gap = "$zeren.space.tight",
 		w = props.w,
 		w_full = props.w_full,
 		grow = props.grow,
@@ -18924,7 +18924,7 @@ function M.wrap(props: WrapProps): Node
 		disabled = props.disabled,
 		opacity = if props.disabled
 			then function(): any
-				return if control.value(props.disabled) then "$zeron.disabled" else nil
+				return if control.value(props.disabled) then "$zeren.disabled" else nil
 			end
 			else nil,
 		if label then M.label(label, props.size) else nil,
@@ -18961,19 +18961,19 @@ function M.frame(props: FrameProps): Node
 		border = 1,
 		bg = function()
 			if joined() then
-				return "$zeron.menu.solid"
+				return "$zeren.menu.solid"
 			end
-			return if hovered:get() and not focused:get() then "$zeron.field.hover" else "$zeron.field.bg"
+			return if hovered:get() and not focused:get() then "$zeren.field.hover" else "$zeren.field.bg"
 		end,
 		border_color = function()
 			if invalid() then
-				return "$zeron.field.edge_error"
+				return "$zeren.field.edge_error"
 			elseif focused:get() or joined() then
-				return "$zeron.field.edge_focus"
+				return "$zeren.field.edge_focus"
 			elseif hovered:get() then
-				return "$zeron.field.edge_hover"
+				return "$zeren.field.edge_hover"
 			end
-			return "$zeron.field.edge"
+			return "$zeren.field.edge"
 		end,
 		cursor = "text",
 		-- A press anywhere on it focuses its input: a group round the input
@@ -19040,7 +19040,7 @@ function M.input(props: InputProps, size: control.Size, focused: State<boolean>)
 	p.focus = { border = 0, outline = 0 }
 	p.text_size = control.TEXT[size]
 	p.color = "$text.primary"
-	p.placeholder_color = "$zeron.field.placeholder"
+	p.placeholder_color = "$zeren.field.placeholder"
 	p.caret_color = "$accent"
 	local on_focus, on_blur = props.on_focus, props.on_blur
 	p.on_focus = function(...)
@@ -19063,7 +19063,7 @@ end
 return M
 ]],
 		["apps/zgx/ui/ds/file_tree.luau"] = [=[
--- A project's files as a tree: Zeron's file panel (crates/ui/src/files),
+-- A project's files as a tree: Zeren's file panel (crates/ui/src/files),
 -- and a step past it.
 --
 -- One virtualized list, however many files: only the rows in view are
@@ -19073,7 +19073,7 @@ return M
 -- folder of ten thousand moves only the rows that can show; the rest stand
 -- in as one.
 --
--- Each row: a chevron (folders), the file's icon (Zeron's Symbols set), its
+-- Each row: a chevron (folders), the file's icon (Zeren's Symbols set), its
 -- name fading out where it doesn't fit, and at its end its git status: a
 -- letter in the status's hue (M, A, U, R, D, C), its name in the same ink;
 -- a folder, a dot for the most pressing thing inside it. What git ignores
@@ -19155,7 +19155,7 @@ export type Model = {
 
 -- Geometry: a row (its wash a point in from each edge, so washes never
 -- touch unless they're one selection), its inset from the panel's edge,
--- each level's indent (Zeron's), the chevron's slot and the icon.
+-- each level's indent (Zeren's), the chevron's slot and the icon.
 local ROW = 26
 local PAD_PANE = 8
 -- A 28 control's room in the 40 head band.
@@ -19723,7 +19723,7 @@ function M.float_inset(): number
 end
 -- Its head's height, floating: the filter's and that inset either side.
 function M.float_head(): number
-	return (ui.theme.get("zeron.icon_button.lg") :: number? or 28) + 2 * M.float_inset()
+	return (ui.theme.get("zeren.icon_button.lg") :: number? or 28) + 2 * M.float_inset()
 end
 M.FLOAT_CORNER = FLOAT_CORNER
 
@@ -21007,7 +21007,7 @@ local function component(props: Props): Node
 				for level = d - 1, 0, -1 do
 					local p = nodes[i].parent
 					local x = PAD + INSET + level * INDENT + CHEV / 2
-					local ink = if p == here then "$zeron.files.guide" else "$zeron.tree"
+					local ink = if p == here then "$zeren.files.guide" else "$zeren.tree"
 					local lastk = last_kid(i)
 					if i == id then
 						if lastk then
@@ -21037,7 +21037,7 @@ local function component(props: Props): Node
 			end
 			local st = if n.dir then nil else n.status
 			if st then
-				return `$zeron.git.{st}`
+				return `$zeren.git.{st}`
 			end
 			return if strong() then "$text.primary" else "$text.secondary"
 		end
@@ -21055,7 +21055,7 @@ local function component(props: Props): Node
 					-- (A span's weight takes a number, not a token: the theme's
 					-- medium, read as a number.)
 					spans[#spans + 1] = if run_on
-						then ui.span { run, literal = true, color = "$zeron.match.ink", bg = "$zeron.match.wash", weight = MATCH_WEIGHT }
+						then ui.span { run, literal = true, color = "$zeren.match.ink", bg = "$zeren.match.wash", weight = MATCH_WEIGHT }
 						else ui.span { run, literal = true }
 				end
 				run = ""
@@ -21116,7 +21116,7 @@ local function component(props: Props): Node
 				items = "center",
 				justify = "center",
 				tooltip = locale.s(HOLDS[r]),
-				ui.div { w = 6, h = 6, rounded = "$radius.full", bg = `$zeron.git.{r}`, opacity = 0.9 },
+				ui.div { w = 6, h = 6, rounded = "$radius.full", bg = `$zeren.git.{r}`, opacity = 0.9 },
 			}
 		end
 		local st = n.status
@@ -21131,7 +21131,7 @@ local function component(props: Props): Node
 			align = "center",
 			text_size = "$font.size.xs",
 			weight = "$font.weight.semibold",
-			color = `$zeron.git.{st}`,
+			color = `$zeren.git.{st}`,
 			tabular = true,
 		}
 	end
@@ -21294,16 +21294,16 @@ local function component(props: Props): Node
 			end,
 			bg = function(): string
 				if drop_at:get() == id then
-					return "$zeron.files.drop"
+					return "$zeren.files.drop"
 				end
 				if sel() then
-					return if focused:get() then "$zeron.selected.flat.bg" else "$hover"
+					return if focused:get() then "$zeren.selected.flat.bg" else "$hover"
 				end
 				if active:get() == n.path then
 					return "$hover"
 				end
 				if in_drop(id) then
-					return "$zeron.files.drop"
+					return "$zeren.files.drop"
 				end
 				return if hovered:get() then "$hover" else "#00000000"
 			end,
@@ -21317,7 +21317,7 @@ local function component(props: Props): Node
 			top = 0,
 			h = ROW,
 			items = "center",
-			gap = "$zeron.space.tight",
+			gap = "$zeren.space.tight",
 			opacity = if n.ignored then 0.5 else 1,
 			ui.row {
 				shrink = 0,
@@ -21424,7 +21424,7 @@ local function component(props: Props): Node
 				local card: ContainerProps = {
 					h = ROW,
 					px = "$space.2",
-					gap = "$zeron.space.tight",
+					gap = "$zeren.space.tight",
 					items = "center",
 					rounded = "$radius.md",
 					FileIcon { name = first.name, dir = first.dir, size = ICON },
@@ -21616,7 +21616,7 @@ local function component(props: Props): Node
 				top = 0,
 				h = ROW,
 				items = "center",
-				gap = "$zeron.space.tight",
+				gap = "$zeren.space.tight",
 				ui.row {
 					shrink = 0,
 					items = "center",
@@ -21841,13 +21841,13 @@ local function component(props: Props): Node
 			min_w = 0,
 			-- (As tall as the tools beside it; on its own, the row less its
 			-- air.)
-			h = if as_band then "$zeron.icon_button.lg" else nil,
+			h = if as_band then "$zeren.icon_button.lg" else nil,
 			h_full = if as_band then nil else true,
 			px = "$space.2",
 			gap = "$space.2",
 			items = "center",
 			rounded = if as_band then ui.raw(control.nest(if floating then FLOAT_CORNER else "$radius.xl", 1, BAND_ROOM), "concentric with the pane: its corner less its edge and the band's room") else "$radius.md",
-			bg = "$zeron.secondary.bg",
+			bg = "$zeren.secondary.bg",
 			color = "$text.tertiary",
 			Icon { name = "search", size = 14 },
 			ui.input(EditorMenu.on({
@@ -21930,7 +21930,7 @@ local function component(props: Props): Node
 		-- Its tools, a pair.
 		ui.row {
 			hook = if props.hooks then props.hooks.tools else nil,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			items = "center",
 			shrink = 0,
 			tool("ds.file_tree.show_ignored_files", function(): Icon.Name
@@ -21977,9 +21977,9 @@ local function component(props: Props): Node
 			h = 24,
 			px = "$space.2",
 			rounded = "$radius.lg",
-			bg = "$zeron.secondary.bg",
-			hover = { bg = "$zeron.secondary.hover" },
-			active = { bg = "$zeron.secondary.active" },
+			bg = "$zeren.secondary.bg",
+			hover = { bg = "$zeren.secondary.hover" },
+			active = { bg = "$zeren.secondary.active" },
 			on_click = function()
 				filter:set("")
 			end,
@@ -22006,7 +22006,7 @@ local function component(props: Props): Node
 		px = "$space.2",
 		py = "$space.1",
 		rounded = "$radius.sm",
-		bg = "$zeron.menu.solid",
+		bg = "$zeren.menu.solid",
 		border = 1,
 		border_color = "$danger",
 		shadow = "$shadow.md",
@@ -22170,7 +22170,7 @@ return setmetatable(M, {
 })
 ]=],
 		["apps/zgx/ui/ds/file_viewer.luau"] = [[
--- A file, open: Zeron's preview (crates/ui/src/files/preview.rs), and a step
+-- A file, open: Zeren's preview (crates/ui/src/files/preview.rs), and a step
 -- past it. It lives in a sidebar, usually: a pane 360 to 520 points wide
 -- beside the chat. So its header is made for that, and more room only brings
 -- controls back out.
@@ -22264,7 +22264,7 @@ export type Props = {
 	doc: State<Doc?> | () -> Doc?,
 	-- The project's name, leading the trail.
 	root: string?,
-	-- How big a file opens here (Zeron's 8 MB), for "too big"'s words.
+	-- How big a file opens here (Zeren's 8 MB), for "too big"'s words.
 	limit: number?,
 	on_crumb: ((folder: string) -> ())?,
 	on_reveal: ((path: string) -> ())?,
@@ -22331,7 +22331,7 @@ export type Props = {
 -- foot's, and the pane widths where more comes out of the menu: an image's
 -- zoom and Markdown's words, then Wrap, then the rest.
 local function head_height(head: Head?): number
-	return (ui.theme.get(if head == "stack" then "zeron.files.stack" else "zeron.files.head") :: number?) or 40
+	return (ui.theme.get(if head == "stack" then "zeren.files.stack" else "zeren.files.head") :: number?) or 40
 end
 local FOOT = 26
 local ROOM_SWITCH, ROOM_TOOLS, ROOM_ALL = 440, 440, 640
@@ -22457,10 +22457,10 @@ local function notice(icon: Icon.Name, title: () -> string, body: () -> string, 
 			h = 28,
 			px = "$space.3",
 			rounded = "$radius.lg",
-			bg = if w.primary then "$zeron.primary.bg" else "$zeron.secondary.bg",
-			color = if w.primary then "$zeron.primary.text" else "$text.primary",
-			hover = { bg = if w.primary then "$zeron.primary.hover" else "$zeron.secondary.hover" },
-			active = { bg = if w.primary then "$zeron.primary.active" else "$zeron.secondary.active" },
+			bg = if w.primary then "$zeren.primary.bg" else "$zeren.secondary.bg",
+			color = if w.primary then "$zeren.primary.text" else "$text.primary",
+			hover = { bg = if w.primary then "$zeren.primary.hover" else "$zeren.secondary.hover" },
+			active = { bg = if w.primary then "$zeren.primary.active" else "$zeren.secondary.active" },
 			on_click = w.on_click,
 			ui.text { w.label, text_size = "$font.size.sm", weight = "$font.weight.medium" },
 		})
@@ -22489,7 +22489,7 @@ local function loading(): Node
 			w = if w > 0 then `{math.floor(w * 100)}%` else 0,
 			ml = if i % 3 == 0 then "$space.5" else 0,
 			rounded = "$radius.sm",
-			bg = "$zeron.secondary.bg",
+			bg = "$zeren.secondary.bg",
 		})
 	end
 	bars.on_mount = function(el)
@@ -22772,7 +22772,7 @@ local function image_view(doc: Doc, zoom_label: State<string>, commands: { [stri
 						local l, t = math.max(cx, x0), math.max(cy, y0)
 						local r, b = math.min(cx + CHECK, x1), math.min(cy + CHECK, y1)
 						if r > l and b > t then
-							c:rect(l, t, r - l, b - t, "$zeron.files.checker")
+							c:rect(l, t, r - l, b - t, "$zeren.files.checker")
 						end
 						i += 2
 					end
@@ -23049,7 +23049,7 @@ local function component(props: Props): Node
 				ui.button {
 					label = locale.t("ds.file_viewer.show_in_tree", { name = c.label }),
 					h = tall,
-					px = "$zeron.space.hair",
+					px = "$zeren.space.hair",
 					py = 0,
 					shrink = 0,
 					rounded = "$radius.sm",
@@ -23226,7 +23226,7 @@ local function component(props: Props): Node
 										if SAID[st] then locale.t(SAID[st]) else st,
 										shrink = 0,
 										text_size = "$font.size.xs",
-										color = if st == "ignored" then "$text.tertiary" else `$zeron.git.{st}`,
+										color = if st == "ignored" then "$text.tertiary" else `$zeren.git.{st}`,
 									}
 								end),
 							}
@@ -23265,7 +23265,7 @@ local function component(props: Props): Node
 						ref = words,
 						shrink = 0,
 						ml = function(): any
-							return if nested() then "$zeron.space.hair" else 0
+							return if nested() then "$zeren.space.hair" else 0
 						end,
 						text_size = "$font.size.md",
 						weight = "$font.weight.medium",
@@ -23357,7 +23357,7 @@ local function component(props: Props): Node
 	end
 	local function zoom_controls(): Node
 		return ui.row {
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			items = "center",
 			ui.show(function(): boolean
 				return room() >= ROOM_SWITCH
@@ -23554,7 +23554,7 @@ local function component(props: Props): Node
 		-- (Not keyed: each row's place, `i`, is built in (the keys' light),
 		-- so a row moved is a row built again. A few rows, at most.)
 		w_full = true,
-		gap = "$zeron.list.gap",
+		gap = "$zeren.list.gap",
 	})
 	local menu_rows_and_more: { Node } = {
 		own_group,
@@ -23600,7 +23600,7 @@ local function component(props: Props): Node
 		ui.row {
 			hook = if props.hooks then props.hooks.actions else nil,
 			shrink = 0,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			items = "center",
 			ui.show(function(): boolean
 				return dirty:get() and not readonly
@@ -23613,7 +23613,7 @@ local function component(props: Props): Node
 			-- from one to the other (these come and go with Source) never
 			-- moves the switch under the pointer.
 			ui.show(editing, ui.row {
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				mr = function(): any
 					return if shows({ "markdown" })() then "$space.1" else 0
 				end,
@@ -23627,7 +23627,7 @@ local function component(props: Props): Node
 			ui.show(function(): boolean
 				return has_file() and room() >= ROOM_ALL
 			end, ui.row {
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				items = "center",
 				ui.div { w = 1, h = 16, mx = "$space.1", bg = "$border" },
 				action(
@@ -23882,7 +23882,7 @@ local function component(props: Props): Node
 						ui.column {
 							w_full = true,
 							-- (A theme number: max_w takes points.)
-							max_w = ui.theme.get("zeron.prose.measure") :: number?,
+							max_w = ui.theme.get("zeren.prose.measure") :: number?,
 							px = "$space.6",
 							py = "$space.5",
 							Markdown {
@@ -23999,7 +23999,7 @@ end
 return ui.component(component)
 ]],
 		["apps/zgx/ui/ds/files_pane.luau"] = [[
--- A project's files and the one they show, as one pane: Zeron's files
+-- A project's files and the one they show, as one pane: Zeren's files
 -- panel beside its editor (crates/ui/src/shell/files_panel.rs), here one
 -- surface. The tree at the left, the file beside it, and one band across
 -- the top of both: the tree's filter and tools in its first part, the
@@ -24018,7 +24018,7 @@ return ui.component(component)
 -- the same back. `shown` is the caller's, so it can be remembered.
 --
 -- A pane too narrow to hold both (less than a file's least width beside
--- the tree: Zeron's narrowest pane, 360) hides the tree; shown there, it
+-- the tree: Zeren's narrowest pane, 360) hides the tree; shown there, it
 -- floats over the file instead: a panel of the menus' glass (ds/glass),
 -- one inset in from the pane's start, the band and its foot, its corner
 -- the radius scale's and all in it concentric (FileTree's `float`). It
@@ -24049,7 +24049,7 @@ export type Props = {
 	room: State<number>?,
 	drawer: State<boolean>?,
 	-- Whether the tree has room beside the file, as the window's layout
-	-- says (an app's fit, as Zeron's Files column): not docked, it floats.
+	-- says (an app's fit, as Zeren's Files column): not docked, it floats.
 	-- Not given, the pane decides by its own width (below).
 	docked: (() -> boolean)?,
 	-- Filled with `toggle`, for a command bound outside (it knows which way
@@ -24075,10 +24075,10 @@ M.keys = KEYS
 
 local made = ui.component(function(props: Props): Node
 	local shown = props.shown
-	local tree_w = props.width or num("zeron.files.tree", 288)
-	local view_min = num("zeron.files.view", 360)
-	local head_h = num(if props.head == "stack" then "zeron.files.stack" else "zeron.files.head", 40)
-	local square = num("zeron.icon_button.lg", 28)
+	local tree_w = props.width or num("zeren.files.tree", 288)
+	local view_min = num("zeren.files.view", 360)
+	local head_h = num(if props.head == "stack" then "zeren.files.stack" else "zeren.files.head", 40)
+	local square = num("zeren.icon_button.lg", 28)
 	local pad = num("space.2", 8)
 	-- Room the heads keep at their start: the inset, the toggle, a step.
 	local lead_w = pad + square + pad
@@ -24448,7 +24448,7 @@ return function(props: Props): Node
 end
 ]],
 		["apps/zgx/ui/ds/init.luau"] = [[
--- Zeron's design system, on zgx's primitives. Three layers, as zgx's
+-- Zeren's design system, on zgx's primitives. Three layers, as zgx's
 -- design guide has them: the theme (tokens.luau, themes/*.json) holds every
 -- value; the components here turn tokens into styles with `ui.variants`;
 -- the design lint (`ui.theme.strict`, on in every entry but the intro)
@@ -24631,7 +24631,7 @@ return {
 	GitHubBlock = require("@self/github_block"),
 	-- An agent on a device and its accounts (Settings → Providers' cards).
 	ProviderCard = require("@self/provider_card"),
-	-- An agent's mark: Zeron's own, a registry agent's icon, or its initial.
+	-- An agent's mark: Zeren's own, a registry agent's icon, or its initial.
 	AgentMark = require("@self/agent_mark"),
 	-- The accent the app is drawn in, as the material is (ds.material).
 	look = require("@self/look"),
@@ -24655,7 +24655,7 @@ return {
 --   Divider { label = "or" }           with a word in it
 --   Divider { vertical = true }        between a bar's groups
 --   Link { "Learn more", on_click = … } inline, the accent's ink
---   Breadcrumbs { items = { { label = "zeron" }, { label = "ds" }, { label = "badge.luau" } } }
+--   Breadcrumbs { items = { { label = "zeren" }, { label = "ds" }, { label = "badge.luau" } } }
 --   KeyValue { items = { { key = "Branch", value = "main" }, … } }
 
 local Icon = require("@self/icon")
@@ -24718,12 +24718,12 @@ function M.Link(props: LinkProps): Node
 		label = props[1],
 		focusable = true,
 		cursor = "pointer",
-		gap = "$zeron.space.hair",
+		gap = "$zeren.space.hair",
 		items = "center",
 		shrink = 0,
 		rounded = "$radius.sm",
-		color = if quiet then "$text.secondary" else "$zeron.tone.accent.ink",
-		hover = { underline = true, color = if quiet then "$text.primary" else "$zeron.tone.accent.ink" },
+		color = if quiet then "$text.secondary" else "$zeren.tone.accent.ink",
+		hover = { underline = true, color = if quiet then "$text.primary" else "$zeren.tone.accent.ink" },
 		underline_offset = 3,
 		focus = control.ring,
 		on_click = props.on_click,
@@ -24772,7 +24772,7 @@ function M.Breadcrumbs(props: BreadcrumbsProps): Node
 		}
 		table.insert(out, crumb)
 	end
-	return ui.row { role = "group", label = locale.t("ds.layout.breadcrumbs"), gap = "$zeron.space.hair", items = "center", min_w = 0, table.unpack(out) }
+	return ui.row { role = "group", label = locale.t("ds.layout.breadcrumbs"), gap = "$zeren.space.hair", items = "center", min_w = 0, table.unpack(out) }
 end
 
 -- A key–value list: what something is, a fact a line (a commit's author,
@@ -24856,8 +24856,8 @@ end
 return M
 ]],
 		["apps/zgx/ui/ds/look.luau"] = [[
--- The accent Zeron is drawn in: the theme's own, or one of Zeron's presets
--- (crates/theme AccentPreset), each the theme's (`zeron.accents`, lighter
+-- The accent Zeren is drawn in: the theme's own, or one of Zeren's presets
+-- (crates/theme AccentPreset), each the theme's (`zeren.accents`, lighter
 -- on dark, deeper on light, as AccentPreset::color has them). One setting
 -- for the whole app, kept across launches, as the material is
 -- (ds/material); a window takes it through `theme` (`look.theme()`).
@@ -24871,22 +24871,22 @@ export type Accent = { value: string, label: string, preset: boolean? }
 
 -- An accent, its name read as a string in the locale shown (`a.label`,
 -- through its message as it's asked for: read in a function, it follows).
--- Zeron's own is its name in every language.
+-- Zeren's own is its name in every language.
 local function accent(value: string, preset: boolean?): Accent
 	return setmetatable({ value = value, preset = preset }, {
 		__index = function(_, field: string): string?
 			if field == "label" then
-				return if value == "zeron" then "Zeron" else locale.s(`ds.look.accent.{value}`)
+				return if value == "zeren" then "Zeren" else locale.s(`ds.look.accent.{value}`)
 			end
 			return nil
 		end,
 	}) :: any
 end
 
--- In Zeron's order: the theme's own, then the presets.
+-- In Zeren's order: the theme's own, then the presets.
 M.ACCENTS = {
 	accent("default"),
-	accent("zeron", true),
+	accent("zeren", true),
 	accent("orange", true),
 	accent("amber", true),
 	accent("green", true),
@@ -24907,10 +24907,10 @@ function M.find(value: string): Accent
 end
 
 -- An accent's ink, in whichever scheme draws it. The theme's own is its
--- own token (`zeron.accents.default`, the theme's `accent` as written), so
+-- own token (`zeren.accents.default`, the theme's `accent` as written), so
 -- it keeps its colour inside a window that wears another.
 function M.ink(a: Accent): string
-	return `$zeron.accents.{a.value}`
+	return `$zeren.accents.{a.value}`
 end
 
 -- The tokens a window overrides to wear `value` (the chosen accent by
@@ -24921,12 +24921,12 @@ function M.theme(value: string?): { [string]: any }?
 	if not a.preset then
 		return nil
 	end
-	return { accent = `$zeron.accents.{a.value}` }
+	return { accent = `$zeren.accents.{a.value}` }
 end
 
 -- The interface's text size: its body size in points (the theme's
 -- `font.size.md`, 13, by default), every other text size and line height
--- scaled with it, the conversation's too (`zeron.prose.*`). Code has its
+-- scaled with it, the conversation's too (`zeren.prose.*`). Code has its
 -- own (Settings → Appearance). Kept across launches, for the main window.
 M.TEXT_SIZES = { 12, 13, 14, 15, 16 }
 M.text_size = ui.persist("text_size", 13)
@@ -24935,11 +24935,11 @@ M.text_size = ui.persist("text_size", 13)
 local SIZED = {
 	"font.size.xs", "font.size.sm", "font.size.md", "font.size.lg", "font.size.xl", "font.size.xxl",
 	"font.line.xs", "font.line.sm", "font.line.md", "font.line.lg", "font.line.xl", "font.line.xxl",
-	"zeron.prose.size", "zeron.prose.line",
-	"zeron.prose.h1.size", "zeron.prose.h1.line",
-	"zeron.prose.h2.size", "zeron.prose.h2.line",
-	"zeron.prose.h3.size", "zeron.prose.h3.line",
-	"zeron.prose.small.size", "zeron.prose.small.line",
+	"zeren.prose.size", "zeren.prose.line",
+	"zeren.prose.h1.size", "zeren.prose.h1.line",
+	"zeren.prose.h2.size", "zeren.prose.h2.line",
+	"zeren.prose.h3.size", "zeren.prose.h3.line",
+	"zeren.prose.small.size", "zeren.prose.small.line",
 }
 
 -- The text tokens a window overrides for `size` (the chosen one by
@@ -24963,11 +24963,11 @@ function M.text_theme(size: number?): { [string]: any }?
 	return out
 end
 
--- The palette each scheme wears (ds/palettes; Zeron's own by default):
+-- The palette each scheme wears (ds/palettes; Zeren's own by default):
 -- one for light, one for dark, as the shipping app keeps them.
 M.palette = {
-	light = ui.persist("palette_light", "zeron-light"),
-	dark = ui.persist("palette_dark", "zeron-dark"),
+	light = ui.persist("palette_light", "zeren-light"),
+	dark = ui.persist("palette_dark", "zeren-dark"),
 }
 
 -- The palette's tokens for the scheme showing.
@@ -24999,7 +24999,7 @@ end
 return M
 ]],
 		["apps/zgx/ui/ds/material.luau"] = [[
--- How Zeron's surfaces stand: frosted (the window's glass; menus over the
+-- How Zeren's surfaces stand: frosted (the window's glass; menus over the
 -- platform's frosted material) or opaque (solid colours throughout). One
 -- setting for the whole app, kept across launches; components read it.
 
@@ -25082,18 +25082,18 @@ local OWN = {
 -- same place, with a glyph or without.
 function M.glyph(name: Icon.Name | () -> Icon.Name, ink: string?): Node
 	return ui.div {
-		w = "$zeron.menu.glyph.box",
-		h = "$zeron.menu.glyph.box",
+		w = "$zeren.menu.glyph.box",
+		h = "$zeren.menu.glyph.box",
 		shrink = 0,
 		items = "center",
 		justify = "center",
 		color = ink or "$text.secondary",
-		Icon { name = name, size = (ui.theme.get("zeron.menu.glyph.size") :: number?) or 16 },
+		Icon { name = name, size = (ui.theme.get("zeren.menu.glyph.size") :: number?) or 16 },
 	}
 end
 
 local function empty_glyph(): Node
-	return ui.div { w = "$zeron.menu.glyph.box", h = "$zeron.menu.glyph.box", shrink = 0 }
+	return ui.div { w = "$zeren.menu.glyph.box", h = "$zeren.menu.glyph.box", shrink = 0 }
 end
 
 -- A glyph's box, empty: a row without a glyph among rows with them.
@@ -25118,7 +25118,7 @@ end
 -- A row's corner: concentric with the panel, through its edge and its
 -- group's inset (the token ds/tokens makes of them).
 function M.row_radius(): string
-	return "$zeron.menu.row_radius"
+	return "$zeren.menu.row_radius"
 end
 
 -- A row's look without its content: for a row built by hand (a
@@ -25130,11 +25130,11 @@ function M.look(props: { [any]: any }, tall: boolean?): { [any]: any }
 	props.gap = "$space.2"
 	props.rounded = M.row_radius()
 	if tall then
-		props.min_h = "$zeron.menu.row"
+		props.min_h = "$zeren.menu.row"
 		props.py = "$space.2"
 		props.items = props.items or "start"
 	else
-		props.h = props.h or "$zeron.menu.row"
+		props.h = props.h or "$zeren.menu.row"
 		props.items = props.items or "center"
 	end
 	if props.cursor == nil then
@@ -25204,12 +25204,12 @@ function M.Row(props: RowProps): Node
 	end
 	local hover: Styles? = p.hover
 	if props.danger and enabled and hover and hover.bg == "$hover" then
-		p.hover = { bg = "$zeron.menu.danger" }
-		p.active = { bg = "$zeron.menu.danger" }
+		p.hover = { bg = "$zeren.menu.danger" }
+		p.active = { bg = "$zeren.menu.danger" }
 	end
 	local lit = props.lit
 	if lit then
-		local wash = if props.danger then "$zeron.menu.danger" else "$hover"
+		local wash = if props.danger then "$zeren.menu.danger" else "$hover"
 		local rest: (Color | () -> Color)? = p.bg
 		p.bg = function(): Color
 			if lit() then
@@ -25250,7 +25250,7 @@ function M.Row(props: RowProps): Node
 				ui.column {
 					grow = 1,
 					min_w = 0,
-					gap = "$zeron.space.hair",
+					gap = "$zeren.space.hair",
 					name,
 					ui.text {
 						props.description,
@@ -25285,7 +25285,7 @@ end
 function M.Heading(props: { [any]: any }): Node
 	return ui.row {
 		w_full = true,
-		h = "$zeron.menu.heading",
+		h = "$zeren.menu.heading",
 		px = "$space.2",
 		items = "center",
 		shrink = 0,
@@ -25312,7 +25312,7 @@ function M.Group(props: { heading: (string | Message)?, [any]: any }): Node
 	p.heading = nil
 	p.w_full = true
 	p.p = p.p or "$space.1"
-	p.gap = p.gap or "$zeron.list.gap"
+	p.gap = p.gap or "$zeren.list.gap"
 	p.shrink = 0
 	if heading then
 		p.role = p.role or "group"
@@ -25346,7 +25346,7 @@ return M
 -- a step header (where in the flow this is, and what it asks), and option
 -- cards (a choice made by picking a card: one of them, or several).
 --
---   Hero { title = "Welcome to Zeron", body = "…", art = Mark { … }, …actions }
+--   Hero { title = "Welcome to Zeren", body = "…", art = Mark { … }, …actions }
 --   StepHeader { step = 2, count = 4, title = "Which agents do you use?", body = "…" }
 --   OptionCards { value = state, options = { { value = "claude", title = "Claude", mark = "claude" }, … } }
 --   OptionCards { value = list_state, multiple = true, options = … }
@@ -25391,7 +25391,7 @@ function M.Hero(props: HeroProps): Node
 		ui.column {
 			items = "center",
 			gap = "$space.5",
-			max_w = ui.theme.get("zeron.hero.measure") :: number?,
+			max_w = ui.theme.get("zeren.hero.measure") :: number?,
 			props.art,
 			ui.column {
 				items = "center",
@@ -25478,7 +25478,7 @@ local Card = ui.component(function(props: { option: Option, on: () -> boolean, r
 			items = "center",
 			justify = "center",
 			rounded = "$radius.lg",
-			bg = "$zeron.secondary.bg",
+			bg = "$zeren.secondary.bg",
 			color = function()
 				return if on() then "$text.primary" else "$text.secondary"
 			end,
@@ -25495,21 +25495,21 @@ local Card = ui.component(function(props: { option: Option, on: () -> boolean, r
 		rounded = if props.round then "$radius.full" else "$radius.sm",
 		border = 1,
 		bg = function()
-			return if on() then "$zeron.check.on" else "$zeron.check.bg"
+			return if on() then "$zeren.check.on" else "$zeren.check.bg"
 		end,
 		border_color = function()
 			if on() then
-				return "$zeron.check.on"
+				return "$zeren.check.on"
 			end
-			return if hovered:get() then "$text.tertiary" else "$zeron.check.edge"
+			return if hovered:get() then "$text.tertiary" else "$zeren.check.edge"
 		end,
-		color = "$zeron.check.mark",
+		color = "$zeren.check.mark",
 		if props.round
 			then ui.div {
 				w = 6,
 				h = 6,
 				rounded = "$radius.full",
-				bg = "$zeron.check.mark",
+				bg = "$zeren.check.mark",
 				scale = ui.spring(ui.computed(function(): number
 					return if on() then 1 else 0
 				end), { stiffness = 520, damping = 26 }),
@@ -25524,7 +25524,7 @@ local Card = ui.component(function(props: { option: Option, on: () -> boolean, r
 	local text = ui.column {
 		grow = 1,
 		min_w = 0,
-		gap = "$zeron.space.hair",
+		gap = "$zeren.space.hair",
 		ui.row {
 			gap = "$space.2",
 			items = "center",
@@ -25541,7 +25541,7 @@ local Card = ui.component(function(props: { option: Option, on: () -> boolean, r
 		label = o.title,
 		focusable = not o.disabled,
 		disabled = o.disabled,
-		opacity = if o.disabled then "$zeron.disabled" else nil,
+		opacity = if o.disabled then "$zeren.disabled" else nil,
 		cursor = if o.disabled then nil else "pointer",
 		relative = true,
 		w_full = true,
@@ -25552,9 +25552,9 @@ local Card = ui.component(function(props: { option: Option, on: () -> boolean, r
 		rounded = "$radius.xl",
 		border = 1,
 		bg = function()
-			return if hovered:get() and not on() then "$hover" else "$zeron.option.bg"
+			return if hovered:get() and not on() then "$hover" else "$zeren.option.bg"
 		end,
-		border_color = "$zeron.option.edge",
+		border_color = "$zeren.option.edge",
 		focus = control.ring,
 		on_hover = function(inside: boolean)
 			hovered:set(inside)
@@ -25576,7 +25576,7 @@ local Card = ui.component(function(props: { option: Option, on: () -> boolean, r
 			bottom = -1,
 			rounded = "$radius.xl",
 			border = 2,
-			border_color = "$zeron.option.ring",
+			border_color = "$zeren.option.ring",
 			pointer_events = "none",
 			opacity = ui.tween(ui.computed(function(): number
 				return if on() then 1 else 0
@@ -25713,7 +25713,7 @@ local Radio = ui.component(function(props: { option: Option, value: State<any>, 
 		label = option.label,
 		focusable = not option.disabled,
 		disabled = option.disabled,
-		opacity = if option.disabled then "$zeron.disabled" else nil,
+		opacity = if option.disabled then "$zeren.disabled" else nil,
 		cursor = if option.disabled then nil else "pointer",
 		gap = "$space.2",
 		items = "start",
@@ -25742,19 +25742,19 @@ local Radio = ui.component(function(props: { option: Option, value: State<any>, 
 				items = "center",
 				justify = "center",
 				bg = function()
-					return if chosen() then "$zeron.check.on" else "$zeron.check.bg"
+					return if chosen() then "$zeren.check.on" else "$zeren.check.bg"
 				end,
 				border_color = function()
 					if chosen() then
-						return "$zeron.check.on"
+						return "$zeren.check.on"
 					end
-					return if hovered:get() then "$text.tertiary" else "$zeron.check.edge"
+					return if hovered:get() then "$text.tertiary" else "$zeren.check.edge"
 				end,
 				ui.div {
 					w = 6,
 					h = 6,
 					rounded = "$radius.full",
-					bg = "$zeron.check.mark",
+					bg = "$zeren.check.mark",
 					scale = ui.spring(ui.computed(function(): number
 						return if chosen() then 1 else 0
 					end), { stiffness = 520, damping = 26 }),
@@ -25762,7 +25762,7 @@ local Radio = ui.component(function(props: { option: Option, value: State<any>, 
 			},
 		},
 		ui.column {
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			min_w = 0,
 			grow = 1,
 			ui.text {
@@ -25807,7 +25807,7 @@ return function(props: Props): Node
 		direction = if row then "row" else "column",
 		gap = if row then "$space.5" else "$space.3",
 		disabled = props.disabled,
-		opacity = if props.disabled then "$zeron.disabled" else nil,
+		opacity = if props.disabled then "$zeren.disabled" else nil,
 		table.unpack(items),
 	}
 end
@@ -25848,7 +25848,7 @@ return function(props: Props): Node
 end
 ]],
 		["apps/zgx/ui/ds/session_card.luau"] = [[
--- A session's card, as Zeron's hover card (crates/ui shell/session_hover_card.rs):
+-- A session's card, as Zeren's hover card (crates/ui shell/session_hover_card.rs):
 -- its title (three lines at most), how long ago it moved, where it runs
 -- (this device's glyph, or a remote one), its project and its branch. One
 -- surface, the menus' glass (ds/glass): what floats over the page. It takes
@@ -25858,8 +25858,8 @@ end
 --                 project = fn, branch = fn, session = id }
 --
 -- Plugins add rows under its details (the GitHub plugin's pull request, as
--- Zeron's card has it): `zeron.place { at = ".session-card-end", after = … }`,
--- reading `zeron.need("session")`, the card's session (`session`).
+-- Zeren's card has it): `zeren.place { at = ".session-card-end", after = … }`,
+-- reading `zeren.need("session")`, the card's session (`session`).
 --
 -- Each prop a value or a function of state: `time` a time (`os.time()`
 -- seconds) or text; `device`, `project`, `branch` nil when there's none
@@ -25977,7 +25977,7 @@ function M.Bar(props: Props): Node
 		h = props.h or 10,
 		shrink = 0,
 		rounded = props.rounded or "$radius.sm",
-		bg = "$zeron.secondary.hover",
+		bg = "$zeren.secondary.hover",
 		aria_hidden = true,
 		opacity = ui.loop { from = 0.55, to = 1, duration = 900, yoyo = true, ease = "inOut(2)", fps = 30 },
 	}
@@ -25992,7 +25992,7 @@ function M.Row(props: { lead: number?, title: number?, line: number?, trail: num
 	local lead = props.lead or 32
 	return ui.row {
 		w_full = true,
-		min_h = "$zeron.settings.row",
+		min_h = "$zeren.settings.row",
 		px = "$space.4",
 		py = "$space.3",
 		gap = "$space.3",
@@ -26001,7 +26001,7 @@ function M.Row(props: { lead: number?, title: number?, line: number?, trail: num
 		ui.column {
 			grow = 1,
 			min_w = 0,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			ui.div { h = "$font.line.md", justify = "center", M.Bar { w = props.title or 140 } },
 			if props.line ~= 0 then ui.div { h = "$font.line.sm", justify = "center", M.Bar { w = props.line or 240, h = 8 } } else nil,
 		},
@@ -26197,14 +26197,14 @@ end
 -- The working ring alone, as a spinner: `size` points, in `ink` (a token;
 -- a button's busy state draws it in the button's own text colour).
 function M.Spinner(props: { size: number?, ink: string? }): Node
-	return ring(props.ink or "$zeron.status.working", props.size or 14)
+	return ring(props.ink or "$zeren.status.working", props.size or 14)
 end
 
 -- A state's glyph, `size` points: working and connecting their ring.
 local function glyph(kind: Kind, size: number): Node?
 	local k = KINDS[kind]
 	if kind == "working" or kind == "connecting" then
-		return ring(`$zeron.status.{kind}`, size)
+		return ring(`$zeren.status.{kind}`, size)
 	end
 	return if k.glyph then Icon { name = k.glyph, size = size } else nil
 end
@@ -26217,7 +26217,7 @@ function M.StatusIcon(props: { kind: Kind | () -> Kind, size: number? }): Node
 	local given = props.kind
 	if type(given) ~= "function" then
 		local kind = given :: Kind
-		return ui.div { shrink = 0, color = `$zeron.status.{kind}`, glyph(kind, size) }
+		return ui.div { shrink = 0, color = `$zeren.status.{kind}`, glyph(kind, size) }
 	end
 	local kind = given :: () -> Kind
 	local function drawn(): string
@@ -26227,11 +26227,11 @@ function M.StatusIcon(props: { kind: Kind | () -> Kind, size: number? }): Node
 	return ui.div {
 		shrink = 0,
 		color = function(): string
-			return `$zeron.status.{kind()}`
+			return `$zeren.status.{kind()}`
 		end,
 		ui.switch(drawn, {
-			working = ring("$zeron.status.working", size),
-			connecting = ring("$zeron.status.connecting", size),
+			working = ring("$zeren.status.working", size),
+			connecting = ring("$zeren.status.connecting", size),
 			glyph = ui.show(function(): boolean
 				return KINDS[kind()].glyph ~= nil
 			end, Icon {
@@ -26257,7 +26257,7 @@ M.Status = ui.component(function(props: { kind: Kind, label: string?, since: num
 	return ui.row {
 		gap = "$space.1",
 		items = "center",
-		color = `$zeron.status.{props.kind}`,
+		color = `$zeren.status.{props.kind}`,
 		text_size = "$font.size.sm",
 		weight = "$font.weight.medium",
 		glyph(props.kind, 16),
@@ -26283,7 +26283,7 @@ function M.StatusDot(props: { kind: Kind, size: number? }): Node
 		h = size,
 		shrink = 0,
 		rounded = "$radius.full",
-		bg = `$zeron.status.dot.{props.kind}`,
+		bg = `$zeren.status.dot.{props.kind}`,
 		tooltip = k.long,
 		label = k.long,
 	}
@@ -26312,7 +26312,7 @@ function M.StatusTag(props: { kind: Kind }): Node
 	return ui.row {
 		gap = "$space.1",
 		items = "center",
-		color = `$zeron.status.{props.kind}`,
+		color = `$zeren.status.{props.kind}`,
 		M.StatusDot { kind = props.kind, size = 6 },
 		ui.text { locale.t(NAMES[props.kind][2]), text_size = "$font.size.xs" },
 	}
@@ -26650,7 +26650,7 @@ export type Props = {
 	grow: number?,
 }
 
--- Padding above and below the text inside the frame (zeron.space.tight,
+-- Padding above and below the text inside the frame (zeren.space.tight,
 -- in points for the height's sum).
 local PAD_Y = 6
 
@@ -26665,7 +26665,7 @@ return ui.component(function(props: Props): Node
 	local hovered = ui.use_state(false)
 	local measure = ui.ref()
 	local input_ref = ui.ref()
-	local line = ui.theme.get("zeron.field.line") :: number? or 20
+	local line = ui.theme.get("zeren.field.line") :: number? or 20
 	local rows, max_rows = props.rows or 3, props.max_rows or 10
 	local font = if props.mono then "$font.mono" else nil
 
@@ -26766,7 +26766,7 @@ return ui.component(function(props: Props): Node
 		hovered = hovered,
 		error = props.error,
 		h = ui.tween(height, { duration = 160, ease = "out(3)" }),
-		py = "$zeron.space.tight",
+		py = "$zeren.space.tight",
 		items = "stretch",
 		relative = true,
 		overflow = "hidden",
@@ -26817,11 +26817,11 @@ end)
 -- 50). One tile wherever a project shows: the sidebar, a dropdown, the
 -- composer's project.
 --
--- `Tile { label = "Zeron", hue = "violet", size = 18 }`; `inside` puts a
+-- `Tile { label = "Zeren", hue = "violet", size = 18 }`; `inside` puts a
 -- glyph where the initial goes (pinned's pin), and `hue` may be nil for a
 -- neutral tile (a quiet wash, the glyph in secondary ink). `src` is the
 -- project's own artwork (an image its people chose, else its favicon, as
--- Zeron finds it in the checkout): shown whole in the tile's place, clipped
+-- Zeren finds it in the checkout): shown whole in the tile's place, clipped
 -- to its corner. `emoji` is a picture its people chose: the emoji in the
 -- middle, an even inset all round, on a soft wash of its hue (none: the
 -- neutral wash). Artwork wins over an emoji, an emoji over the initial.
@@ -26895,7 +26895,7 @@ return function(props: Props): Node
 			relative = true,
 			items = "center",
 			justify = "center",
-			bg = "$zeron.secondary.bg",
+			bg = "$zeren.secondary.bg",
 			-- (The hue's own wash over the neutral one, so either theme's
 			-- page shows through the same.)
 			ui.div {
@@ -26943,10 +26943,10 @@ return function(props: Props): Node
 			bg = if type(hue) == "function"
 				then function(): string
 					local h = hue()
-					return if h then `$palette.{h}.500` else "$zeron.secondary.bg"
+					return if h then `$palette.{h}.500` else "$zeren.secondary.bg"
 				end
 				elseif hue then `$palette.{hue}.500`
-				else "$zeron.secondary.bg",
+				else "$zeren.secondary.bg",
 			color = if type(hue) == "function"
 				then function(): string
 					local h = hue()
@@ -27187,10 +27187,10 @@ end)
 -- mark, drawn in one even tone. The lines are the text's ink, faint, so two
 -- strokes laid over each other go darker where they cross: a trunk and an
 -- arm stroked apart double along the curve, where it leaves the trunk. So
--- the two are one outline, filled once (as Zeron's `activity_rail` unions
+-- the two are one outline, filled once (as Zeren's `activity_rail` unions
 -- them), and the tone holds through the joint.
 --
--- `c:fill(tree_line.branch { x = 12, mid = 13, tip = 24, h = 28, bend = 6, on = true }, "$zeron.tree")`
+-- `c:fill(tree_line.branch { x = 12, mid = 13, tip = 24, h = 28, bend = 6, on = true }, "$zeren.tree")`
 -- `on`: the trunk goes on below the arm; `h` is where it stops.
 
 local M = {}
@@ -27230,14 +27230,14 @@ end
 return M
 ]],
 		["apps/zgx/ui/ds/working.luau"] = [[
--- That an agent is working on a reply, as Zeron's transcript says it under
+-- That an agent is working on a reply, as Zeren's transcript says it under
 -- the turn: the working loader, a word for it ("Noodling…") that rolls to
 -- another every seven seconds, and how long it has been at it.
 --
 -- `Working { since = seconds }`: `since` in `ui.now() / 1000` seconds, when
 -- the turn began (or a function of it); `seed` picks where the words start
 -- (a chat's own). `sending`: the message is on its way, its turn not yet
--- begun: "Sending…" and no clock, as Zeron's trailer bridges that gap
+-- begun: "Sending…" and no clock, as Zeren's trailer bridges that gap
 -- (transcript.rs `sending_bridge`); the word and the clock start with the
 -- turn.
 
@@ -27247,10 +27247,10 @@ local locale = require("@self/locale")
 
 export type Props = { since: number | () -> number, seed: number?, sending: (() -> boolean)? }
 
--- Zeron's words (transcript.rs, `FLAVOUR_WORDS`, their keys), each held
+-- Zeren's words (transcript.rs, `FLAVOUR_WORDS`, their keys), each held
 -- this long.
 local WORDS = {
-	"ds.working.words.zeroning",
+	"ds.working.words.zerening",
 	"ds.working.words.thinking",
 	"ds.working.words.pondering",
 	"ds.working.words.scheming",
@@ -27861,7 +27861,7 @@ end, { w_full = true, h_full = true })
 --
 -- `github_fixture.width` narrows the tab to a side pane's width (0: the
 -- window's); `github_fixture.light` draws it light; `github_fixture.template`
--- ("pink") lays a template's few tokens over Zeron's (a hot pink, as
+-- ("pink") lays a template's few tokens over Zeren's (a hot pink, as
 -- people's own do: only some tokens set).
 
 local ds = require("@ds")
@@ -27873,26 +27873,26 @@ local light = ui.state("github_fixture.light", false)
 -- The pull request it shows (a real one, with real gh: any address).
 local address = ui.state("github_fixture.url", "https://github.com/zeronsh/zgx/pull/1264")
 
--- A template that sets only some tokens, over each of Zeron's themes: its
--- accent, its window and its cards (a hot pink), the rest Zeron's own.
+-- A template that sets only some tokens, over each of Zeren's themes: its
+-- accent, its window and its cards (a hot pink), the rest Zeren's own.
 ui.theme.register {
 	name = "pink-light",
 	type = "light",
-	extends = "zeron-light",
+	extends = "zeren-light",
 	tokens = {
 		accent = "#ff2d95",
 		background = "#ffe3f1",
-		zeron = { window = "#ffe3f1", settings = { card = "#fff3f9", edge = "#ffb3d6", rule = "#ffd0e6" } },
+		zeren = { window = "#ffe3f1", settings = { card = "#fff3f9", edge = "#ffb3d6", rule = "#ffd0e6" } },
 	},
 }
 ui.theme.register {
 	name = "pink-dark",
 	type = "dark",
-	extends = "zeron-dark",
+	extends = "zeren-dark",
 	tokens = {
 		accent = "#ff4fa8",
 		background = "#24101c",
-		zeron = { window = "#24101c", settings = { card = "#341628", edge = "#ff4fa83d", rule = "#ff4fa826" } },
+		zeren = { window = "#24101c", settings = { card = "#341628", edge = "#ff4fa83d", rule = "#ff4fa826" } },
 	},
 }
 
@@ -27908,8 +27908,8 @@ end, function(): Node
 		w_full = true,
 		h_full = true,
 		items = "center",
-		theme = if template:peek() == "pink" then `pink-{scheme}` else `zeron-{scheme}`,
-		bg = "$zeron.window",
+		theme = if template:peek() == "pink" then `pink-{scheme}` else `zeren-{scheme}`,
+		bg = "$zeren.window",
 		ui.column {
 			w = if w > 0 then ui.raw(w, "a side pane's width") else nil,
 			w_full = w == 0,
@@ -28149,12 +28149,12 @@ local function fake_web(id: string): any
 		end,
 		run = function(_self: any, js: string)
 			-- (The picker's whole script, or a call into it: its first word.)
-			if string.find(js, "__zeronFind", 1, true) then
+			if string.find(js, "__zerenFind", 1, true) then
 				web_note("find:clear")
-			elseif string.find(js, "__zeronAnnotator.start", 1, true) then
+			elseif string.find(js, "__zerenAnnotator.start", 1, true) then
 				web_note("run:start")
 				-- (The pick's nonce, for the test to post with.)
-				web_nonce:set(tonumber(string.match(js, "__zeronAnnotator%.start%((%d+)") or "0") or 0)
+				web_nonce:set(tonumber(string.match(js, "__zerenAnnotator%.start%((%d+)") or "0") or 0)
 			elseif string.find(js, ".stop()", 1, true) then
 				web_note("run:stop")
 			elseif string.find(js, ".sync(", 1, true) then
@@ -28174,7 +28174,7 @@ local function fake_web(id: string): any
 		-- A script asked for its answer: the find's (three matches, the
 		-- first current; a step moves it), else nothing.
 		eval = function(_self: any, js: string, reply: ((value: any, err: string?) -> ())?)
-			if string.find(js, "__zeronFind", 1, true) then
+			if string.find(js, "__zerenFind", 1, true) then
 				local q = string.match(js, "%.find%((%b\"\")") or string.match(js, "%.find%(('[^']*')")
 				local by = string.match(js, "%.step%((%-?%d+)%)")
 				web_note(if q then `find:{string.sub(q, 2, -2)}` elseif by then `step:{by}` else "find:clear")
@@ -28425,7 +28425,7 @@ ui.command {
 		Panel.open_file(session:peek(), open_path:peek(), nil, open_at:peek())
 	end,
 }
--- A plugin's tab (the Git plugin's, from ZERON_ZGX_DEV_PLUGINS), opened as
+-- A plugin's tab (the Git plugin's, from ZEREN_ZGX_DEV_PLUGINS), opened as
 -- its own rows open it (Panel.open_plugin_tab): for captures beside the
 -- panel's own tabs.
 -- Git's Changes and History, each its own kind of tab, as the plugin asks
@@ -28544,7 +28544,7 @@ return ui.column {
 	h_full = true,
 	p = 24,
 	gap = 16,
-	bg = "$zeron.window",
+	bg = "$zeren.window",
 	ui.row {
 		gap = 16,
 		bare("aspect-cover", false),
@@ -28726,7 +28726,7 @@ ui.command {
 	run = function()
 		local n = find("notes-tool")
 		n.status = "broken"
-		n.error = "Its manifest asks for a permission Zeron doesn't know: teleport"
+		n.error = "Its manifest asks for a permission Zeren doesn't know: teleport"
 		publish()
 	end,
 }
@@ -28796,9 +28796,9 @@ ui.command {
 }
 ui.command {
 	id = "builtin",
-	title = "Zeron's own GitHub arrives",
+	title = "Zeren's own GitHub arrives",
 	run = function()
-		local p = plugin("github", "GitHub", "zeron", "on", { permissions = { "ui.add", "github" } })
+		local p = plugin("github", "GitHub", "zeren", "on", { permissions = { "ui.add", "github" } })
 		local any: any = p
 		any.builtin = true
 		any.allowed = { "github", "ui.add" }
@@ -28827,7 +28827,7 @@ ui.command {
 publish()
 
 -- Light, for pictures of it (src/audit_shots.rs: `!theme_light`).
-ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeron-light") end }
+ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeren-light") end }
 
 return ui.scroll {
 	w_full = true,
@@ -29075,7 +29075,7 @@ return {
 		["apps/zgx/ui/screens/chat/link_menu.luau"] = [[
 -- A chat's links' context menus where they aren't the web's (ds/markdown's
 -- `link_menu`; ds/links makes the entries):
---   a chat mentioned   Open, Copy link (its Zeron link, `zeron://open/…`)
+--   a chat mentioned   Open, Copy link (its Zeren link, `zeren://open/…`)
 --   a file in its folder   Open, Reveal in Finder (the chat on this Mac),
 --                          Copy path (its whole path, on the chat's device)
 --   a file outside it      Copy path
@@ -29096,7 +29096,7 @@ end
 
 return function(open: (target: string) -> (), session: () -> any?): (target: string) -> { Links.Entry }?
 	return function(target: string): { Links.Entry }?
-		local chat = string.match(target, "^zeron%-chat:([%w%-_]+)$")
+		local chat = string.match(target, "^zeren%-chat:([%w%-_]+)$")
 		if chat then
 			return Links.chat {
 				open = function()
@@ -29374,7 +29374,7 @@ function M.queue(id: string, op: { [string]: any })
 	quietly(ui.call("chat.queue", args))
 end
 
--- Words put into the composer's draft (a plugin's `zeron.compose.insert`,
+-- Words put into the composer's draft (a plugin's `zeren.compose.insert`,
 -- a shortcut): at its end, on a line of their own unless `inline`, and
 -- the composer given the keys.
 function M.insert(text: string, inline: boolean?)
@@ -29402,7 +29402,7 @@ end
 
 -- A bare Escape no one else took (a menu, a dialog, a mention list, a
 -- question): with Settings' "Escape stops the agent" on, it stops the
--- chat shown's running turn, as Zeron's does (settings.rs
+-- chat shown's running turn, as Zeren's does (settings.rs
 -- `escape_stops_active_agent`). True if it did.
 function M.escape(): boolean
 	if not prefs.escape_stops:peek() then
@@ -29423,7 +29423,7 @@ return M
 -- A session's files, as the host reaches them (src/files.rs): its folders
 -- listed one at a time, its files read, saved, made, moved and deleted, and
 -- what changes on disk. Each call is a promise (`:after(on_value, on_error)`);
--- an error's message is "offline" when Zeron can't be reached, else a line
+-- an error's message is "offline" when Zeren can't be reached, else a line
 -- for the screen. Tests stub these functions (ui/files_fixture.luau).
 --
 --   api.list(target, dir)          { checkout, can_move, can_delete, truncated,
@@ -29569,7 +29569,7 @@ end
 return M
 ]],
 		["apps/zgx/ui/screens/language.luau"] = [[
--- The language Zeron speaks (Settings → General → Language): the Mac's
+-- The language Zeren speaks (Settings → General → Language): the Mac's
 -- preferred one ("system", zgx's `ui.locale:set(nil)`), or one chosen,
 -- kept across launches. It applies at once: every message (`ui.t`) in the
 -- window follows the locale; what was made with `:get()` follows the next
@@ -29590,9 +29590,9 @@ M.LANGUAGES = {
 
 M.chosen = ui.persist("settings_language", "system")
 
--- The locale the app shows, for plugins' own words (the SDK's `zeron.t`):
+-- The locale the app shows, for plugins' own words (the SDK's `zeren.t`):
 -- a plugin's VM can't follow `ui.locale` as it changes.
-local shown = ui.shared("zeron.locale", "en")
+local shown = ui.shared("zeren.locale", "en")
 
 -- The locale the window asks for: none follows the Mac's.
 -- (`current` read as the locale is set still says the old one: the one
@@ -29628,7 +29628,7 @@ return M
 -- Setup's ending. Signed in: the organization is ready, and what was set up
 -- in a few lines (the organization and your place in it, who was invited
 -- in this run, where its chats live), and the way into it. Without an
--- account: the chats stay on this Mac, and the way into Zeron. Not a
+-- account: the chats stay on this Mac, and the way into Zeren. Not a
 -- numbered step, so no dots. The gallery's All set is the design.
 --
 -- Not wired yet: the shell doesn't exist in this app, so the way in
@@ -29651,8 +29651,8 @@ local function tick(): Node
 		items = "center",
 		justify = "center",
 		rounded = "$radius.full",
-		bg = "$zeron.tone.success.wash",
-		color = "$zeron.tone.success.ink",
+		bg = "$zeren.tone.success.wash",
+		color = "$zeren.tone.success.ink",
 		ds.Icon { name = "check-circle", size = 16 },
 	}
 end
@@ -29714,7 +29714,7 @@ return function(props: Props): Node
 	return Onboarding.Step {
 		back = Onboarding.Back { on_click = props.on_back },
 		continue = {
-			label = (if named then ui.t("onboarding.done.open_org", { org = org }) else ui.t("onboarding.done.open_zeron")) :: any,
+			label = (if named then ui.t("onboarding.done.open_org", { org = org }) else ui.t("onboarding.done.open_zeren")) :: any,
 			max_w = 260,
 			on_click = actions.finish,
 		},
@@ -29733,11 +29733,11 @@ end
 		["apps/zgx/ui/screens/onboarding/org.luau"] = [[
 -- Naming your organization, for someone signed in and in none: one field,
 -- the address the name makes on the line under it, and the way on, which
--- makes it (Zeron's `POST /auth/orgs`, you its first member), works in it
+-- makes it (Zeren's `POST /auth/orgs`, you its first member), works in it
 -- from now on and goes on to inviting to it. An account makes one of its
 -- own; one already in an organization works in that one and passes over
 -- this step and inviting (asked at sign-in, and again here in case the
--- answer came late). The gallery's Name your organization is the design. Zeron has no address to check yet, so
+-- answer came late). The gallery's Name your organization is the design. Zeren has no address to check yet, so
 -- the line says the address and nothing of whether it's free. Gone wrong,
 -- the line under the title says so in the danger's ink and the button
 -- offers another go; nothing else moves.
@@ -29868,7 +29868,7 @@ return function(props: Props): Node
 					else ui.t("onboarding.org.body"):get()
 			end,
 			tone = function()
-				return if failed:get() then "$zeron.tone.danger.ink" else "$text.secondary"
+				return if failed:get() then "$zeren.tone.danger.ink" else "$text.secondary"
 			end,
 			ui.column {
 				w_full = true,
@@ -29899,10 +29899,10 @@ end
 -- Right after sign-in, for an account with no username yet: choosing one.
 -- It's the card's address (zeron.sh/c/mara), so there's no card without
 -- one, and it's chosen once. The gallery's Claim your username
--- (demos/example_username) is the design; this asks Zeron for real.
+-- (demos/example_username) is the design; this asks Zeren for real.
 --
 -- One field; under it the address it makes, then, a beat after the typing
--- stops, what Zeron says of it (free, taken, reserved) or what keeps it
+-- stops, what Zeren says of it (free, taken, reserved) or what keeps it
 -- from being a username yet, said before anyone is asked. The way on opens
 -- only once it's free; it claims the name and goes on to the card. Gone
 -- wrong, the line under the title says so and the button offers another
@@ -29928,14 +29928,14 @@ export type Props = {
 	on_has_one: () -> (),
 }
 
--- How long the typing has to rest before Zeron is asked.
+-- How long the typing has to rest before Zeren is asked.
 local REST = 400
 
 return function(props: Props): Node
 	local typed = ui.use_state("")
 	-- What the address line says: a problem (empty, invalid, start, short,
 	-- long), or "checking", "available", "taken", "reserved", "unknown"
-	-- (Zeron couldn't be asked).
+	-- (Zeren couldn't be asked).
 	local check = ui.use_state("empty")
 	-- Claiming, and what the last claim ended in (an api word), if not a card.
 	local saving = ui.use_state(false)
@@ -30079,7 +30079,7 @@ return function(props: Props): Node
 				line_height = "$font.line.sm",
 				color = function()
 					local c = check:get()
-					return if c == "taken" or c == "reserved" or c == "invalid" or c == "start" then "$zeron.tone.danger.ink" else "$text.secondary"
+					return if c == "taken" or c == "reserved" or c == "invalid" or c == "start" then "$zeren.tone.danger.ink" else "$text.secondary"
 				end,
 			},
 		},
@@ -30089,11 +30089,11 @@ return function(props: Props): Node
 			-- its progress.)
 			-- zgx-lint: allow(untracked-get)
 			status("checking", ds.ProgressRing { size = 12, tone = "neutral", label = ui.t("onboarding.username.checking_label"):get() }, ui.t("onboarding.username.checking"), "$text.tertiary"),
-			status("available", mark("check-circle"), ui.t("onboarding.username.available"), "$zeron.tone.success.ink"),
-			status("taken", mark("close-circle"), ui.t("onboarding.username.taken"), "$zeron.tone.danger.ink"),
-			status("reserved", mark("close-circle"), ui.t("onboarding.username.reserved"), "$zeron.tone.danger.ink"),
-			status("invalid", mark("info-circle"), ui.t("onboarding.username.invalid"), "$zeron.tone.danger.ink"),
-			status("start", mark("info-circle"), ui.t("onboarding.username.start"), "$zeron.tone.danger.ink"),
+			status("available", mark("check-circle"), ui.t("onboarding.username.available"), "$zeren.tone.success.ink"),
+			status("taken", mark("close-circle"), ui.t("onboarding.username.taken"), "$zeren.tone.danger.ink"),
+			status("reserved", mark("close-circle"), ui.t("onboarding.username.reserved"), "$zeren.tone.danger.ink"),
+			status("invalid", mark("info-circle"), ui.t("onboarding.username.invalid"), "$zeren.tone.danger.ink"),
+			status("start", mark("info-circle"), ui.t("onboarding.username.start"), "$zeren.tone.danger.ink"),
 			status("short", nil, ui.t("onboarding.username.short", { n = api.MIN }), "$text.tertiary"),
 			status("long", nil, ui.t("onboarding.username.long", { n = api.MAX }), "$text.tertiary"),
 			status("unknown", mark("info-circle"), ui.t("onboarding.username.unknown"), "$text.tertiary"),
@@ -30130,7 +30130,7 @@ return function(props: Props): Node
 					else ui.t("onboarding.username.body"):get()
 			end,
 			tone = function()
-				return if failed:get() then "$zeron.tone.danger.ink" else "$text.secondary"
+				return if failed:get() then "$zeren.tone.danger.ink" else "$text.secondary"
 			end,
 			ui.column {
 				w_full = true,
@@ -30432,7 +30432,7 @@ return M
 ]],
 		["apps/zgx/ui/screens/plugins/menus.luau"] = [[
 --!strict
--- What plugins add to Zeron's menus. A menu built when it opens asks for
+-- What plugins add to Zeren's menus. A menu built when it opens asks for
 -- its kind's items and puts them at its end, after a separator:
 --
 --   local menus = require("@app/screens/plugins/menus")
@@ -30441,7 +30441,7 @@ return M
 --
 -- Kinds: "session" (a session's row; context { id }) and "file" (a file
 -- or folder's row in the tree, or the open file; context { path, session? }).
--- A plugin adds an item with its SDK's `zeron.menu { kind, id, label, run }`
+-- A plugin adds an item with its SDK's `zeren.menu { kind, id, label, run }`
 -- (it needs "ui.add"); choosing it runs `run(context)` in the plugin.
 -- Items show under their plugin's name, so you can tell whose they are.
 
@@ -30510,7 +30510,7 @@ return M
 --   state.open_folder(id?)    its folder (or the plugins folder) in Finder
 --   state.install({ path? , url?, device? })  a promise of `{ plugin, update,
 --                             added, removed, waiting }`: someone else's plugin
---                             from a .zeron-plugin file (this device only) or a
+--                             from a .zeren-plugin file (this device only) or a
 --                             link; it waits for the consent window unless it's
 --                             signed as yours
 --   state.update(id, device?)  a promise of the same: the update found for it
@@ -30643,7 +30643,7 @@ end
 return M
 ]],
 		["apps/zgx/ui/screens/settings/appearance.luau"] = [[
--- Settings → Appearance: how Zeron looks on this Mac, the shell's own
+-- Settings → Appearance: how Zeren looks on this Mac, the shell's own
 -- look (screens/shell/appearance: the scheme, which setup chose too; a new
 -- chat's wallpaper and its effect) and the window's glass (ds.material).
 
@@ -30702,7 +30702,7 @@ local function thumbnail(): Node
 		overflow = "hidden",
 		border = 1,
 		border_color = "$border",
-		bg = "$zeron.secondary.bg",
+		bg = "$zeren.secondary.bg",
 		ui.presence(function(): string
 			local image = appearance.image:get()
 			return if image then image.path else ""
@@ -30765,7 +30765,7 @@ local function adjust_dialog(): Node
 				relative = true,
 				rounded = "$radius.lg",
 				overflow = "hidden",
-				bg = "$zeron.secondary.bg",
+				bg = "$zeren.secondary.bg",
 				cursor = "grab",
 				role = "img",
 				label = ui.t("settings.appearance.wallpaper.adjust.preview"),
@@ -30862,7 +30862,7 @@ function M.view(): Node
 						} :: any,
 					},
 				}),
-				-- The accent: the theme's own, or one of Zeron's presets, the
+				-- The accent: the theme's own, or one of Zeren's presets, the
 				-- whole window wearing it (ds.look).
 				row("accent", {
 					label = ui.t("settings.appearance.accent.label"),
@@ -30998,7 +30998,7 @@ function M.view(): Node
 		},
 		-- What a new chat opens on: nothing, your picture (the shipping
 		-- app's one image, screens/settings/wallpaper), or what a plugin
-		-- draws there; and Zeron's effect over it.
+		-- draws there; and Zeren's effect over it.
 		ds.Settings.Section {
 			title = ui.t("settings.appearance.new_chat"),
 			description = ui.t("settings.appearance.new_chat_description"),
@@ -31109,7 +31109,7 @@ function M.view(): Node
 								},
 							},
 						})),
-						-- Zeron's effect over your picture (production's list, each
+						-- Zeren's effect over your picture (production's list, each
 						-- saying what it does). A plugin's has its own, on its page.
 						later(function(): boolean
 							return appearance.provider:get() == nil and appearance.wallpaper:get() == "image"
@@ -31301,7 +31301,7 @@ local VisitRow = ui.component(function(props: { visit: data.Visit, now: State<an
 				relative = true,
 				items = "end",
 				justify = "center",
-				h = "$zeron.icon_button.sm",
+				h = "$zeren.icon_button.sm",
 				ui.text {
 					function(): string
 						return locale.clock(it().at)
@@ -32336,7 +32336,7 @@ function M.anchor(key: string, row: Node, fit: boolean?): Node
 			bottom = 0,
 			pointer_events = "none",
 			aria_hidden = true,
-			bg = "$zeron.selected.flat.bg",
+			bg = "$zeren.selected.flat.bg",
 			opacity = function()
 				return if M.lit:get() == key then 1 else 0
 			end,
@@ -32383,7 +32383,7 @@ local function titled(title: string): Node
 			end
 		end
 		table.insert(runs, ui.span { part("before") })
-		table.insert(runs, ui.span { part("match"), bg = "$zeron.match.wash", color = "$zeron.match.ink", radius = ui.raw(2, "a match's tint hugs its letters, inside the line") })
+		table.insert(runs, ui.span { part("match"), bg = "$zeren.match.wash", color = "$zeren.match.ink", radius = ui.raw(2, "a match's tint hugs its letters, inside the line") })
 		table.insert(runs, ui.span { part("after") })
 	end
 	local props: { [any]: any } = { text_size = "$font.size.md", line_height = "$font.line.md" }
@@ -32472,14 +32472,14 @@ function M.Field(): Node
 			selected = on,
 			cursor = "pointer",
 			w_full = true,
-			min_h = "$zeron.menu.row",
+			min_h = "$zeren.menu.row",
 			px = "$space.2",
 			py = "$space.1",
 			gap = "$space.2",
 			items = "center",
 			rounded = "$radius.md",
 			bg = function()
-				return if on() then "$zeron.selected.flat.bg" else "#00000000"
+				return if on() then "$zeren.selected.flat.bg" else "#00000000"
 			end,
 			color = function()
 				return if on() then "$text.primary" else "$text.secondary"
@@ -32512,13 +32512,13 @@ function M.Field(): Node
 		role = "listbox",
 		label = ui.t("settings.search.results"),
 		w_full = true,
-		gap = "$zeron.list.gap",
+		gap = "$zeren.list.gap",
 		ui.each(M.hits, function(_h: Hit, _i: number, hit: State<Hit>): Node
 			return row(hit)
 		end, {
 			key = id_of,
 			w_full = true,
-			gap = "$zeron.list.gap",
+			gap = "$zeren.list.gap",
 		}),
 		ui.show(function()
 			return count() == 0
@@ -32561,8 +32561,8 @@ return M
 -- import (a theme's `.json`, comments allowed, or an extension's
 -- `package.json`), compiled by the shipping app's theme crate (src/themes.rs)
 -- into palettes the window wears (ds/palettes). They're listed in the Light
--- and Dark theme choices under "Imported", after Zeron's "Built in", and
--- each can be renamed or removed here. Removing the one in use puts Zeron's
+-- and Dark theme choices under "Imported", after Zeren's "Built in", and
+-- each can be renamed or removed here. Removing the one in use puts Zeren's
 -- own back.
 --
 --   library.options(kind)   the Light or Dark theme choices, grouped (a function)
@@ -32600,10 +32600,10 @@ M.host = {
 	end,
 }
 
--- Zeron's own for each scheme: what a removed theme gives way to.
-local OWN = { light = "zeron-light", dark = "zeron-dark" }
+-- Zeren's own for each scheme: what a removed theme gives way to.
+local OWN = { light = "zeren-light", dark = "zeren-dark" }
 
--- The Light or Dark theme choices: Zeron's built-in palettes, then yours.
+-- The Light or Dark theme choices: Zeren's built-in palettes, then yours.
 function M.options(kind: string): () -> { any }
 	return function(): { any }
 		local out = {}
@@ -32664,7 +32664,7 @@ local function pick()
 end
 
 -- Entry `id` out of the library: any of its palettes in use gives way to
--- Zeron's own first.
+-- Zeren's own first.
 function M.remove(id: string)
 	for _, entry in palettes.library():peek().entries or {} do
 		if entry.id == id then
@@ -32703,7 +32703,7 @@ local function swatch(palette: () -> any): Node
 		overflow = "hidden",
 		items = "center",
 		justify = "center",
-		gap = "$zeron.space.hair",
+		gap = "$zeren.space.hair",
 		bg = color("background"),
 		ui.div { w = 6, h = 14, rounded = "$radius.full", bg = color("accent") },
 		ui.div { w = 6, h = 10, rounded = "$radius.full", bg = color("text") },
@@ -32886,7 +32886,7 @@ return M
 -- A plugin offers a wallpaper by replacing a new chat's background place
 -- (`#new-chat-background`, in its manifest's `ui.change`; the place provides
 -- `pointer` = { x, y }, 0 to 1) and declaring a `wallpaper` setting, the
--- row Zeron draws on its settings page to use it. Zeron's effect is drawn
+-- row Zeren draws on its settings page to use it. Zeren's effect is drawn
 -- over whatever stands there.
 
 local state = require("@app/screens/onboarding/state")
@@ -32926,7 +32926,7 @@ do
 		-- A retired choice (a scene's name, the wallpaper folder).
 		M.wallpaper:set("none")
 	end
-	-- (Blur went: Zeron's effects are these.)
+	-- (Blur went: Zeren's effects are these.)
 	for _, e in { M.effect, M.plugin_effect } do
 		if not EFFECTS[e:peek()] then
 			e:set("none")
@@ -32998,7 +32998,7 @@ end
 return M
 ]],
 		["apps/zgx/ui/screens/shell/fit_policy.luau"] = [[
--- Zeron's panel fit, the policy alone (no state): its widths and which
+-- Zeren's panel fit, the policy alone (no state): its widths and which
 -- columns a window has room for. screens/shell/fit holds the window's and
 -- reads it; see there. (crates/ui settings.rs, shell/panel_layout.rs
 -- `horizontal_panel_fit`, shell.rs `content_split`, `right_pane_max_width`,
@@ -33006,7 +33006,7 @@ return M
 
 local M = {}
 
--- Zeron's widths (crates/ui settings.rs), in points.
+-- Zeren's widths (crates/ui settings.rs), in points.
 M.SIDEBAR_MIN, M.SIDEBAR_MAX, M.SIDEBAR_DEFAULT = 242, 400, 256
 M.FILES_PANEL_MIN, M.FILES_PANEL_DEFAULT, M.FILES_PANEL_MAX = 220, 286, 440
 M.RIGHT_PANE_MIN, M.RIGHT_PANE_DEFAULT = 360, 520
@@ -33017,7 +33017,7 @@ export type Fit = { sidebar: boolean, right: boolean, files: boolean, sidebar_li
 
 -- The policy: which of the columns show in a window `viewport` wide, the
 -- sidebar preferring `sidebar_width`, the panel expanded or not. (`files_min`:
--- Files' least, Zeron's unless an app's Files column is wider.)
+-- Files' least, Zeren's unless an app's Files column is wider.)
 function M.panels(
 	viewport: number,
 	sidebar_width: number,
@@ -33111,7 +33111,7 @@ return M
 --            the colour;
 --   Image    a picture of yours (chosen, or dropped on the dialog), placed
 --            in the tile's square by dragging and zooming, as Account's
---            photo is, cut here and kept by Zeron's edge.
+--            photo is, cut here and kept by Zeren's edge.
 -- What's chosen is the project's on every device (sessions.set_project_icon).
 --
 --   editor.open(id, start?)  asks about that project
@@ -33356,7 +33356,7 @@ local function head(): Node
 				relative = true,
 				overflow = "hidden",
 				rounded = "$radius.xl",
-				bg = "$zeron.secondary.bg",
+				bg = "$zeren.secondary.bg",
 				placed_picture(PREVIEW),
 			},
 			tile = ds.Tile {
@@ -33655,7 +33655,7 @@ local function image_panel(): Node
 		end,
 		border = 1,
 		border_color = function(): string
-			return if dropping:get() then "$accent" else "$zeron.well.edge"
+			return if dropping:get() then "$accent" else "$zeren.well.edge"
 		end,
 		items = "center",
 		justify = "center",
@@ -33830,7 +33830,7 @@ return M
 ]],
 		["apps/zgx/ui/screens/shell/title_bar.luau"] = [[
 -- The main window's title bar: the design system's (ds.TitleBar: the
--- window's buttons, the sidebar's toggle, back and forward, at Zeron's
+-- window's buttons, the sidebar's toggle, back and forward, at Zeren's
 -- places), over the window's top, its island showing while the sidebar is
 -- collapsed over a new chat's wallpaper. At its other end, the page's own
 -- controls: on a session, its panel's toggle. Plugins place theirs by
@@ -33873,7 +33873,7 @@ local function corner_card(size: number): Node
 			w = (18 + stroke) * s,
 			h = (16 + stroke) * s,
 			rounded = raw((4 + stroke / 2) * s),
-			border = "$zeron.glyph.stroke",
+			border = "$zeren.glyph.stroke",
 			border_color = "$text.secondary",
 		},
 		ui.div {
@@ -33902,9 +33902,9 @@ return function(props: Props): Node
 	local actions = ui.row {
 		id = "titlebar-actions",
 		items = "center",
-		gap = "$zeron.island.gap",
+		gap = "$zeren.island.gap",
 		-- The session's details (its lanes: side chats and subagents), as
-		-- Zeron's titlebar toggle: its count while any run, open or not.
+		-- Zeren's titlebar toggle: its count while any run, open or not.
 		ui.show(
 			function(): boolean
 				local l = lanes()
@@ -33949,7 +33949,7 @@ return function(props: Props): Node
 						items = "center",
 						justify = "center",
 						rounded = "$radius.full",
-						bg = "$zeron.status.working",
+						bg = "$zeren.status.working",
 						pointer_events = "none",
 						ui.text {
 							function(): string
@@ -34016,25 +34016,25 @@ end
 ]],
 		["apps/zgx/ui/screens/templates/state.luau"] = [[
 --!strict
--- Your templates, as the host publishes them (src/plugins/live.rs): Zeron's
+-- Your templates, as the host publishes them (src/plugins/live.rs): Zeren's
 -- own first, then each one made here, which is in use, and how each stands.
 --
 --   state.now:get()   { state = "loading" | "ready", active = id, dir,
 --                       list = { Template } }
 --   state.previews:get()  each template's preview themes by its id: one a
---                         changed appearance (light, then dark), Zeron's
+--                         changed appearance (light, then dark), Zeren's
 --                         own two for one that changes none
 --   state.use(id)            a promise: the window changes to it, in place
---   state.create(name)       a promise of the new one's id (a copy of Zeron's)
+--   state.create(name)       a promise of the new one's id (a copy of Zeren's)
 --   state.duplicate(id)      a promise of the copy's id
---   state.delete(id)         a promise (Zeron's own can't be)
+--   state.delete(id)         a promise (Zeren's own can't be)
 --   state.open_folder(id)    its folder in Finder
 --   state.yours(t)           whether you (or your agents) made it
 --   state.export(id, path)   a promise of `{ path, files }`: it, signed as
---                            yours, as one .zeron-template file
+--                            yours, as one .zeren-template file
 --   state.import(path)       a promise of `{ installed = id }` (yours), or
 --                            `{ pending = name }` (someone else's: the host
---                            opens Zeron's consent window for it)
+--                            opens Zeren's consent window for it)
 --   state.review(name)       a waiting package's consent window
 --   state.pending:get()      packages waiting for you to allow them
 
@@ -34048,24 +34048,24 @@ export type Template = {
 	description: string?,
 	author: string?,
 	version: string?,
-	-- The Zeron it was made from.
-	zeron_version: string?,
+	-- The Zeren it was made from.
+	zeren_version: string?,
 	builtin: boolean,
 	active: boolean,
-	-- "ok" | "broken" (it can't run: Zeron's own shows) | "errors" (some of
-	-- its files fall back) | "out_of_date" (made for another Zeron: Zeron
+	-- "ok" | "broken" (it can't run: Zeren's own shows) | "errors" (some of
+	-- its files fall back) | "out_of_date" (made for another Zeren: Zeren
 	-- has updated since)
 	status: string,
 	error: string?,
 	-- Installed from someone's package: who signed it (`author.kind` "you",
 	-- "verified" with `username`, or "unknown" with `reason`).
 	imported: { key: string, author: any }?,
-	-- One of Zeron's official templates that recolours it (its built-in
+	-- One of Zeren's official templates that recolours it (its built-in
 	-- theme's key).
 	theme: string?,
 	-- The colours its preview is drawn in (src/plugins/looks.rs): each
 	-- appearance it changes, as its theme file and its palette over it.
-	-- None for one that changes no colour of Zeron's.
+	-- None for one that changes no colour of Zeren's.
 	look: Look?,
 }
 export type Scheme = { theme: { type: string?, extends: string?, tokens: any }?, palette: any? }
@@ -34086,7 +34086,7 @@ end)
 
 -- Each template's preview themes: its look registered once a change, each
 -- appearance it changes as a theme of its own (its theme file over zgx's,
--- its palette over that or over Zeron's, through ds/palettes as the window
+-- its palette over that or over Zeren's, through ds/palettes as the window
 -- wears it), so its preview is drawn in its tokens as the window would be.
 local registered: { [string]: string } = {}
 local function register(name: string, stamp: string, spec: any)
@@ -34123,12 +34123,12 @@ end
 M.previews = ui.state("templates_previews", {} :: { [string]: { string } })
 ui.effect(function()
 	local list = M.list:get()
-	-- Zeron's own first: what an appearance a template leaves alone shows.
+	-- Zeren's own first: what an appearance a template leaves alone shows.
 	-- (Its own theme names until the host has said its look.)
-	local own = { light = "zeron-light", dark = "zeron-dark" }
+	local own = { light = "zeren-light", dark = "zeren-dark" }
 	local out: { [string]: { string } } = {}
 	for _, t in list do
-		if t.id == "zeron" and t.look then
+		if t.id == "zeren" and t.look then
 			local names = wear(t.id, t.look, own)
 			if #names == 2 then
 				own = { light = names[1], dark = names[2] }
@@ -34136,7 +34136,7 @@ ui.effect(function()
 		end
 	end
 	for _, t in list do
-		local names = if t.look and t.id ~= "zeron" then wear(t.id, t.look, own) else {}
+		local names = if t.look and t.id ~= "zeren" then wear(t.id, t.look, own) else {}
 		out[t.id] = if #names > 0 then names else { own.light, own.dark }
 	end
 	M.previews:set(out)
@@ -34144,7 +34144,7 @@ end)
 
 -- Yours: made on this device, by you or an agent you asked (theirs say
 -- "you", or nothing, written by hand), or installed from a package you
--- signed. Zeron's own is built in; someone else's says who.
+-- signed. Zeren's own is built in; someone else's says who.
 function M.yours(t: Template): boolean
 	if t.builtin then
 		return false
@@ -34274,8 +34274,8 @@ local engine: { [string]: any } = {
 	GetCommitCredit = { enabled = false, cloud = false },
 	GetWorktreeSettings = {
 		settings = { useCustomDirectory = false },
-		defaultDirectory = "~/.zeron/worktrees",
-		effectiveDirectory = "~/.zeron/worktrees",
+		defaultDirectory = "~/.zeren/worktrees",
+		effectiveDirectory = "~/.zeren/worktrees",
 	},
 	GetTitleSettings = {},
 	GetNativeSubagents = { switchable = { "claude-code" }, off = {} },
@@ -34336,7 +34336,7 @@ local answers: { [string]: (arg: any) -> any } = {
 	end,
 	-- A photo's file: the app's own PNG, whatever the address.
 	["account.photo_file"] = function()
-		return settled("assets/favicons/zeron.png")
+		return settled("assets/favicons/zeren.png")
 	end,
 	["account.remove_photo"] = function()
 		me.avatar = nil
@@ -34499,7 +34499,7 @@ end
 -- A photo picked: the app's own PNG, so a headless host can draw it.
 stub.open_files = function(_opts: any): any
 	log("open_files")
-	return settled({ { path = "assets/favicons/zeron.png", name = "zeron.png", size = 1, type = "image/png" } })
+	return settled({ { path = "assets/favicons/zeren.png", name = "zeren.png", size = 1, type = "image/png" } })
 end
 
 -- The account's own calls (account/api), the same way.
@@ -34664,9 +34664,9 @@ ui.command {
 		local t = require("@ds/look").window_theme() or {}
 		window_theme:set({
 			accent = t.accent,
-			keyword = t["zeron.syntax.keyword"],
+			keyword = t["zeren.syntax.keyword"],
 			body = t["font.size.md"],
-			window = t["zeron.window"],
+			window = t["zeren.window"],
 		})
 	end,
 }
@@ -34722,18 +34722,18 @@ end
 -- A template's own theme files (the hot pink one's, both; the night one's,
 -- only dark).
 local function theme(scheme: string, accent: string, window: string, text: string): state.Scheme
-	return { theme = { type = scheme, extends = `zgx-{scheme}`, tokens = { accent = accent, text = { primary = text }, zeron = { window = window } } } }
+	return { theme = { type = scheme, extends = `zgx-{scheme}`, tokens = { accent = accent, text = { primary = text }, zeren = { window = window } } } }
 end
 
 local model: { state.Template } = {
-	{ id = "zeron", name = "Zeron", description = "Zeron's own interface.", author = "Zeron", version = "0.2.131", zeron_version = "0.2.131", builtin = true, active = true, status = "ok" },
-	-- Zeron's official templates (its built-in themes, kept by each launch:
+	{ id = "zeren", name = "Zeren", description = "Zeren's own interface.", author = "Zeren", version = "0.2.131", zeren_version = "0.2.131", builtin = true, active = true, status = "ok" },
+	-- Zeren's official templates (its built-in themes, kept by each launch:
 	-- src/plugins/theme_templates.rs), each with its look, light then dark.
-	{ id = "theme-tokyo-night", name = "Tokyo Night", description = "Tokyo Night's colours on Zeron's interface.", author = "Zeron", version = "0.2.131", zeron_version = "0.2.131", builtin = true, active = false, status = "ok", theme = "tokyo-night", look = official("tokyo-night-light", "tokyo-night") },
-	{ id = "theme-github", name = "GitHub", description = "GitHub's colours on Zeron's interface.", author = "Zeron", version = "0.2.131", zeron_version = "0.2.131", builtin = true, active = false, status = "ok", theme = "github", look = official("github-light", "github-dark") },
+	{ id = "theme-tokyo-night", name = "Tokyo Night", description = "Tokyo Night's colours on Zeren's interface.", author = "Zeren", version = "0.2.131", zeren_version = "0.2.131", builtin = true, active = false, status = "ok", theme = "tokyo-night", look = official("tokyo-night-light", "tokyo-night") },
+	{ id = "theme-github", name = "GitHub", description = "GitHub's colours on Zeren's interface.", author = "Zeren", version = "0.2.131", zeren_version = "0.2.131", builtin = true, active = false, status = "ok", theme = "github", look = official("github-light", "github-dark") },
 	{ id = "hot-pink", name = "Hot Pink", description = "Everything pink.", author = "you", version = "1.0.0", builtin = false, active = false, status = "ok", look = { stamp = "p1", light = theme("light", "#d6247a", "#fff0f6", "#3d0a22"), dark = theme("dark", "#ff3e9a", "#1a0010", "#ffe0ef") } },
 	{ id = "night", name = "Night", description = "A darker dark.", author = "you", version = "1.0.0", builtin = false, active = false, status = "ok", look = { stamp = "n1", dark = theme("dark", "#22ccaa", "#000000", "#e8fff9") } },
-	{ id = "airy", name = "Airy", description = "More room between things.", author = "you", version = "1.0.0", zeron_version = "0.2.131", builtin = false, active = false, status = "ok" },
+	{ id = "airy", name = "Airy", description = "More room between things.", author = "you", version = "1.0.0", zeren_version = "0.2.131", builtin = false, active = false, status = "ok" },
 }
 
 local function find(id: string): state.Template
@@ -34750,7 +34750,7 @@ local waiting: { state.Pending } = {}
 
 local function publish()
 	local list: { state.Template } = {}
-	local active = "zeron"
+	local active = "zeren"
 	for _, t in model do
 		table.insert(list, table.clone(t))
 		if t.active then
@@ -34813,11 +34813,11 @@ ui.command {
 }
 ui.command {
 	id = "updated",
-	title = "Zeron updates past Airy",
+	title = "Zeren updates past Airy",
 	run = function()
 		local t = find("airy")
 		t.status = "out_of_date"
-		t.zeron_version = "0.2.120"
+		t.zeren_version = "0.2.120"
 		publish()
 	end,
 }
@@ -34868,7 +34868,7 @@ ui.command {
 	id = "waiting",
 	title = "Someone's template waits for you",
 	run = function()
-		table.insert(waiting, { pending = "ledger-1700000000", name = "Ledger", source = "ledger.zeron-template" })
+		table.insert(waiting, { pending = "ledger-1700000000", name = "Ledger", source = "ledger.zeren-template" })
 		publish()
 	end,
 }
@@ -34896,7 +34896,7 @@ local theme_names = ui.state("theme_names", "")
 ui.command { id = "theme_names", title = "List the themes", run = function() theme_names:set(table.concat(ui.theme.names(), ",")) end }
 
 -- Light, for pictures of it (src/audit_shots.rs: `!theme_light`).
-ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeron-light") end }
+ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeren-light") end }
 
 return ui.div {
 	w_full = true,
@@ -34988,7 +34988,7 @@ end)
 ]],
 		["apps/zgx/ui/tests/chat_catalog_device.test.luau"] = [[
 -- The model picker lists the agents and models of the device the chat runs
--- on, as Zeron's does (crates/client `list_harnesses(device)`): the composer
+-- on, as Zeren's does (crates/client `list_harnesses(device)`): the composer
 -- tells the host which device that is as it changes (`store.catalog_on`).
 
 test("a session on another device reads that device's catalog, and back", function()
@@ -35008,7 +35008,7 @@ test("a session on another device reads that device's catalog, and back", functi
 	expect(app:error()).to_be(nil)
 end)
 
--- The connection, as Zeron's composer says it (composer.rs `link_notice`).
+-- The connection, as Zeren's composer says it (composer.rs `link_notice`).
 local LinkNotice = require("../screens/chat/link_notice")
 
 test("the connection notice follows production's cases", function()
@@ -35048,7 +35048,7 @@ test("the composer says when the connection or the chat's host is gone", functio
 end)
 ]],
 		["apps/zgx/ui/tests/chat_links.test.luau"] = [[
--- A transcript's file links, read as Zeron reads them (crates/ui
+-- A transcript's file links, read as Zeren reads them (crates/ui
 -- workspace_links.rs, its tests' cases): screens/chat/file_links `resolve`.
 
 local links = require("../screens/chat/file_links")
@@ -35066,7 +35066,7 @@ test("relative, absolute and file:// links resolve inside the project, with thei
 	expect(at("crates/ui/src/lib.rs")).to_be("crates/ui/src/lib.rs|-|-|in")
 	expect(at("/work/comet/crates/ui/src/lib.rs:42:7")).to_be("crates/ui/src/lib.rs|42|7|in")
 	expect(at("file:///work/comet/README.md#L12")).to_be("README.md|12|-|in")
-	expect(at("zeron-file:src/a%20file%23%5Bx%5D.rs")).to_be("src/a file#[x].rs|-|-|in")
+	expect(at("zeren-file:src/a%20file%23%5Bx%5D.rs")).to_be("src/a file#[x].rs|-|-|in")
 end)
 
 test("paths decode once; unsafe decodes never resolve", function()
@@ -35199,7 +35199,7 @@ end)
 -- folds them back. A thought that fits shows no button. Being written, the
 -- fold shows the latest lines, rising through the window.
 
--- The small prose line (zeron.prose.small.line) and the fold's height.
+-- The small prose line (zeren.prose.small.line) and the fold's height.
 local LINE = 20
 local FOLD = 4 * LINE
 -- The button's height, and its room under the words (ds/activity).
@@ -35562,7 +35562,7 @@ end)
 test("Codex resets: each refusal says why", function()
 	local app = open()
 	local refusals: { [string]: string } = {
-		offline = "Zeron can't reach the device this account is on.",
+		offline = "Zeren can't reach the device this account is on.",
 		signed_out = "Codex couldn't confirm this login. Sign in again first.",
 		missing = "This account is no longer saved on its device.",
 		failed = "Codex didn't confirm it. Trying again won't use two.",
@@ -35803,7 +35803,7 @@ end)
 -- in the space under a reply: zgx's partial repaint, fixed in zgx c43b4e5;
 -- zgx-asks/stale-paint-mounted-mid-scroll has the pixel repro.)
 
-local TEXT = "Yes. I called Zeron’s `show_image` tool three times to display `components.png`, `workbench.png`, and `zgx-effects.png` from the project.\n\n"
+local TEXT = "Yes. I called Zeren’s `show_image` tool three times to display `components.png`, `workbench.png`, and `zgx-effects.png` from the project.\n\n"
 
 local function settle(app: any)
 	app:frames(30)
@@ -36064,7 +36064,7 @@ test("find counts a paragraph's words, not a picture's alt, and no match spans a
 end)
 ]],
 		["apps/zgx/ui/tests/new_project.test.luau"] = [[
--- New project, as Zeron adds one: every way in opens the same palette
+-- New project, as Zeren adds one: every way in opens the same palette
 -- (⌘⇧N, the palette's "New project", the project filter's, the
 -- composer's); its pages walk a device's places and folders through the
 -- engine; "Add this folder" makes the project on that device and lands in a
@@ -36656,7 +36656,7 @@ test("this Mac's actions name no device; another computer's folders aren't offer
 	expect(asked(app, "set_off:focus:true@")).to_be(true)
 	pick(app, "devbox")
 	-- One that can't load there says why, with no folder to show here.
-	expect(app:tree()).to_contain("permission Zeron doesn")
+	expect(app:tree()).to_contain("permission Zeren doesn")
 	expect(app:has('role:button "Show folder"')).to_be(false)
 	-- None there: a link to install one, not this Mac's folder.
 	app:command("devbox_empty")
@@ -36736,7 +36736,7 @@ test("the device choice sits at the top right, centred on the title's line; shor
 	expect(th > 0 and ph > 0).to_be(true)
 	expect(math.abs((py + ph / 2) - (ty + th / 2)) <= 1).to_be(true)
 	-- At the far end of the title's row: past the description's measure.
-	local dx, _, dw = box(app, '"What plugins add to Zeron on each of your computers, and the tools they give your agents."')
+	local dx, _, dw = box(app, '"What plugins add to Zeren on each of your computers, and the tools they give your agents."')
 	expect(px + pw > dx + dw or dw == 0).to_be(true)
 	-- Narrow: under the title, as every page's trail goes.
 	app:resize(420, 900)
@@ -37251,7 +37251,7 @@ end)
 -- made, one in use, one breaking or out of date leave every row (and its
 -- own) the same node; the tabs split what's installed from what's yours;
 -- Use, New template and the ⋯ menu's Show folder, Duplicate and Delete ask
--- the host; Zeron's own can't be deleted. On the page in
+-- the host; Zeren's own can't be deleted. On the page in
 -- ui/templates_fixture.luau.
 
 local function row(app: any, id: string): string?
@@ -37284,22 +37284,22 @@ local function pick(app: any, name: string, item: string)
 	app:frames(20)
 end
 
-test("Zeron's own comes first, built in and in use, with the rows' parts", function()
+test("Zeren's own comes first, built in and in use, with the rows' parts", function()
 	local app = open()
 	local tree = app:tree()
 	expect(tree).to_contain("In use")
-	expect(tree).to_contain("by Zeron")
+	expect(tree).to_contain("by Zeren")
 	expect(tree).to_contain("by you")
 	expect(tree).to_contain("0.2.131")
-	expect(app:has('role:button "More for Zeron"')).to_be(true)
+	expect(app:has('role:button "More for Zeren"')).to_be(true)
 	expect(app:has('#template-airy >> role:button "Use"')).to_be(true)
-	expect(app:has('#template-zeron >> role:button "Use"')).to_be(false)
+	expect(app:has('#template-zeren >> role:button "Use"')).to_be(false)
 	expect(app:has("#templates-hint")).to_be(false)
 end)
 
-test("Zeron's own menu has no Delete; yours does", function()
+test("Zeren's own menu has no Delete; yours does", function()
 	local app = open()
-	app:click('role:button "More for Zeron"')
+	app:click('role:button "More for Zeren"')
 	expect(app:wait('role:menuitem "Duplicate"', { timeout_ms = 15000 })).to_be(true)
 	expect(app:has('role:menuitem "Delete"')).to_be(false)
 	app:key("escape")
@@ -37310,22 +37310,22 @@ end)
 
 test("using one, one arriving, one out of date and one breaking keep every row", function()
 	local app = open()
-	local zeron, airy = row(app, "zeron"), row(app, "airy")
-	expect(zeron).never.to_be_nil()
+	local zeren, airy = row(app, "zeren"), row(app, "airy")
+	expect(zeren).never.to_be_nil()
 	expect(airy).never.to_be_nil()
 	app:click('#template-airy >> role:button "Use"')
 	app:frames(20)
 	expect(calls(app)).to_contain("use:airy")
-	expect(`zeron @{row(app, "zeron")}`).to_be(`zeron @{zeron}`)
+	expect(`zeren @{row(app, "zeren")}`).to_be(`zeren @{zeren}`)
 	expect(`airy @{row(app, "airy")}`).to_be(`airy @{airy}`)
-	expect(app:has('#template-zeron >> role:button "Use"')).to_be(true)
+	expect(app:has('#template-zeren >> role:button "Use"')).to_be(true)
 	app:command("made")
 	app:frames(20)
 	expect(row(app, "dusk")).never.to_be_nil()
 	expect(`airy @{row(app, "airy")}`).to_be(`airy @{airy}`)
 	app:command("updated")
 	app:frames(20)
-	expect(app:tree()).to_contain("Made for Zeron 0.2.120")
+	expect(app:tree()).to_contain("Made for Zeren 0.2.120")
 	expect(`airy @{row(app, "airy")}`).to_be(`airy @{airy}`)
 	app:command("broke")
 	app:frames(20)
@@ -37338,7 +37338,7 @@ test("Yours holds only yours; a search that finds nothing says so", function()
 	app:click('role:tab "Yours"')
 	app:frames(20)
 	expect(row(app, "airy")).never.to_be_nil()
-	expect(row(app, "zeron")).to_be_nil()
+	expect(row(app, "zeren")).to_be_nil()
 	app:type('role:textbox "Search templates"', "nowhere")
 	app:frames(20)
 	expect(app:tree()).to_contain("Nothing matches")
@@ -37353,9 +37353,9 @@ test("Show folder, Duplicate and Delete ask the host", function()
 	app:frames(20)
 	pick(app, "Airy", "Show folder")
 	expect(calls(app)).to_contain("folder:airy")
-	pick(app, "Zeron", "Duplicate")
-	expect(calls(app)).to_contain("duplicate:zeron")
-	expect(app:tree()).to_contain("Zeron copy")
+	pick(app, "Zeren", "Duplicate")
+	expect(calls(app)).to_contain("duplicate:zeren")
+	expect(app:tree()).to_contain("Zeren copy")
 	app:click('role:tab "Installed"')
 	app:frames(20)
 	pick(app, "Airy", "Delete")
@@ -37371,7 +37371,7 @@ test("the palette lists every template, the one in use checked, and picking one 
 	app:frames(20)
 	app:type('role:textbox "Search"', "template")
 	app:frames(30)
-	expect(app:has('role:option "Use template: Zeron"')).to_be(true)
+	expect(app:has('role:option "Use template: Zeren"')).to_be(true)
 	expect(app:has('role:option "Use template: Airy"')).to_be(true)
 	-- A template's name finds it too.
 	app:key("cmd+a")
@@ -37381,7 +37381,7 @@ test("the palette lists every template, the one in use checked, and picking one 
 	app:click('role:option "Use template: Airy"')
 	app:frames(20)
 	expect(calls(app)).to_contain("use:airy")
-	expect(app:has('#template-zeron >> role:button "Use"')).to_be(true)
+	expect(app:has('#template-zeren >> role:button "Use"')).to_be(true)
 end)
 
 test("In use follows the name; Use's room holds, so a row's end holds still", function()
@@ -37398,19 +37398,19 @@ test("In use follows the name; Use's room holds, so a row's end holds still", fu
 		error(`no {what} in {id}'s row`)
 	end
 	-- "In use" sits just past the name, well left of the row's controls.
-	local name_x, name_w = box("zeron", 'text "Zeron"')
-	local in_x = box("zeron", 'text "In use"')
+	local name_x, name_w = box("zeren", 'text "Zeren"')
+	local in_x = box("zeren", 'text "In use"')
 	expect(in_x > name_x + name_w - 1).to_be(true)
 	expect(in_x < name_x + name_w + 40).to_be(true)
 	expect(app:tree("#template-airy"):find('text "In use"', 1, true) ~= nil).to_be(false)
 	-- The ⋯ in one place on every row.
-	local more_x = box("zeron", 'button "More for Zeron"')
+	local more_x = box("zeren", 'button "More for Zeren"')
 	expect(more_x).to_be((box("airy", 'button "More for Airy"')))
 	-- Using Airy moves the badge; the ends stay put.
 	app:click('#template-airy >> role:button "Use"')
 	app:frames(20)
 	expect(app:tree("#template-airy"):find('text "In use"', 1, true) ~= nil).to_be(true)
-	expect(app:tree("#template-zeron"):find('text "In use"', 1, true) ~= nil).to_be(false)
+	expect(app:tree("#template-zeren"):find('text "In use"', 1, true) ~= nil).to_be(false)
 	expect((box("airy", 'button "More for Airy"'))).to_be(more_x)
 end)
 
@@ -37445,11 +37445,11 @@ test("a waiting package is named above the rows, with Review", function()
 	expect(app:has(".template-pending")).to_be(false)
 end)
 
-test("no New template or Import for now; yours can be exported, Zeron's can't", function()
+test("no New template or Import for now; yours can be exported, Zeren's can't", function()
 	local app = open()
 	expect(app:has('role:button "Import"')).to_be(false)
 	expect(app:has('role:button "New template"')).to_be(false)
-	app:click('role:button "More for Zeron"')
+	app:click('role:button "More for Zeren"')
 	expect(app:wait('role:menuitem "Duplicate"', { timeout_ms = 15000 })).to_be(true)
 	expect(app:has('role:menuitem "Export…"')).to_be(false)
 	app:key("escape")
@@ -37543,15 +37543,15 @@ end)
 ]],
 		["apps/zgx/ui/theme.luau"] = [[
 -- The colours the interface wears: a palette for each scheme, which
--- ds/palettes maps onto every colour token (ds/tokens.setup), over Zeron's
+-- ds/palettes maps onto every colour token (ds/tokens.setup), over Zeren's
 -- own themes (ds/themes/*.json), whose glass and shape it keeps.
 --
--- Zeron's own wears its own themes as they are, so this returns nil. A
--- template that recolours Zeron ships only this file (and its manifest),
+-- Zeren's own wears its own themes as they are, so this returns nil. A
+-- template that recolours Zeren ships only this file (and its manifest),
 -- returning `{ name, dark = Palette?, light = Palette? }` in ds/palettes'
 -- shape. With both, the window follows the system's appearance (Settings →
--- Appearance), as Zeron's own does; with one, it wears that one in either
--- scheme. Zeron's built-in themes are templates of this kind
+-- Appearance), as Zeren's own does; with one, it wears that one in either
+-- scheme. Zeren's built-in themes are templates of this kind
 -- (src/plugins/theme_templates.rs).
 
 return nil
@@ -37687,7 +37687,7 @@ use gpui::{
     font, list, point, prelude::*, px,
 };
 use gpui_base::input::{RopeExt as _, TextDecoration, TextDecorationCollection};
-use zeron_proto::{
+use zeren_proto::{
     ReadWorkspaceFileRequest, WorkspaceReadOnlyReason, WriteWorkspaceFileOutcome,
     WriteWorkspaceFileRequest,
 };
@@ -37729,7 +37729,7 @@ const MAX_RETAINED_DOCUMENT_BYTES: usize = 32 * 1024 * 1024;
 
 struct HighlightedFile {
     content_hash: String,
-    document: Arc<zeron_syntax::HighlightedDocument>,
+    document: Arc<zeren_syntax::HighlightedDocument>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38037,12 +38037,12 @@ fn estimated_highlighted_file_bytes(highlight: &HighlightedFile) -> usize {
             document
                 .lines
                 .capacity()
-                .saturating_mul(std::mem::size_of::<Vec<zeron_syntax::HighlightSpan>>()),
+                .saturating_mul(std::mem::size_of::<Vec<zeren_syntax::HighlightSpan>>()),
         )
         .saturating_add(document.lines.iter().fold(0usize, |total, line| {
             total.saturating_add(
                 line.capacity()
-                    .saturating_mul(std::mem::size_of::<zeron_syntax::HighlightSpan>()),
+                    .saturating_mul(std::mem::size_of::<zeren_syntax::HighlightSpan>()),
             )
         }))
 }
@@ -38967,7 +38967,7 @@ impl FilesSurface {
         content_hash: String,
         cx: &mut Context<Self>,
     ) {
-        let Some(language) = zeron_syntax::language_for_path(&path) else {
+        let Some(language) = zeren_syntax::language_for_path(&path) else {
             return;
         };
         let Some((document_key, generation, revision)) = self
@@ -39006,7 +39006,7 @@ impl FilesSurface {
             let highlighted = cx
                 .background_executor()
                 .spawn(async move {
-                    zeron_syntax::highlight(zeron_syntax::HighlightRequest {
+                    zeren_syntax::highlight(zeren_syntax::HighlightRequest {
                         source: &source,
                         path: Some(&request_path),
                         fence_tag: None,
@@ -39104,7 +39104,7 @@ impl FilesSurface {
         revision: u64,
         cx: &mut Context<Self>,
     ) {
-        let Some(language) = zeron_syntax::language_for_path(&path) else {
+        let Some(language) = zeren_syntax::language_for_path(&path) else {
             return;
         };
         let Some((document_key, generation)) = self
@@ -39127,7 +39127,7 @@ impl FilesSurface {
             let highlighted = cx
                 .background_executor()
                 .spawn(async move {
-                    zeron_syntax::highlight(zeron_syntax::HighlightRequest {
+                    zeren_syntax::highlight(zeren_syntax::HighlightRequest {
                         source: &source_for_parse,
                         path: Some(&request_path),
                         fence_tag: None,
@@ -39911,7 +39911,7 @@ impl FilesSurface {
                                 if confirming_reload {
                                     "Discard unsaved changes?"
                                 } else {
-                                    "This file changed outside Zeron."
+                                    "This file changed outside Zeren."
                                 },
                             ))
                             .child(
@@ -41092,15 +41092,15 @@ mod tests {
                 cx,
             );
             let mut document = cached_document("note.md", "# Original");
-            document.set_loaded(zeron_proto::WorkspaceFileText {
+            document.set_loaded(zeren_proto::WorkspaceFileText {
                 checkout_id: "checkout".into(),
                 path: "note.md".into(),
                 text: Some("# Original".into()),
                 content_hash: Some("saved-hash".into()),
                 size: 10,
                 modified_at: None,
-                encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-                line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+                encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+                line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
                 read_only_reason: None,
                 truncated: false,
             });
@@ -41121,9 +41121,9 @@ mod tests {
                     .is_some()
             );
             files.apply_semantic_mutation(
-                &zeron_proto::WorkspaceFileChange {
+                &zeren_proto::WorkspaceFileChange {
                     operation_id: Some("rename-md".into()),
-                    kind: zeron_proto::WorkspaceFileChangeKind::Renamed,
+                    kind: zeren_proto::WorkspaceFileChangeKind::Renamed,
                     path: "note.txt".into(),
                     old_path: Some("note.md".into()),
                 },
@@ -41183,7 +41183,7 @@ mod tests {
         cx.run_until_parked();
         files.update_in(cx, |files, _, cx| {
             let key = DocumentHighlightKey::new(
-                zeron_syntax::language_for_path("note.rs").unwrap(),
+                zeren_syntax::language_for_path("note.rs").unwrap(),
                 "let value = 1;",
             );
             assert!(
@@ -41391,7 +41391,7 @@ mod tests {
             .comment_anchors
             .insert("old.rs".into(), HashMap::new());
         let highlighted = Arc::new(
-            zeron_syntax::highlight(zeron_syntax::HighlightRequest {
+            zeren_syntax::highlight(zeren_syntax::HighlightRequest {
                 source: "fn main() {}",
                 path: Some("old.rs"),
                 fence_tag: None,
@@ -41436,15 +41436,15 @@ mod tests {
             checkout_id: Some("checkout-1".into()),
             path: path.into(),
         });
-        document.set_loaded(zeron_proto::WorkspaceFileText {
+        document.set_loaded(zeren_proto::WorkspaceFileText {
             checkout_id: "checkout-1".into(),
             path: path.into(),
             text: Some(stale_source.into()),
             content_hash: Some(disk_hash.into()),
             size: stale_source.len() as u64,
             modified_at: None,
-            encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-            line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+            encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+            line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
             read_only_reason: None,
             truncated: false,
         });
@@ -41452,7 +41452,7 @@ mod tests {
         let task_generation = document.generation;
         let task_revision = document.revision;
         let stale_highlight_key =
-            DocumentHighlightKey::new(zeron_syntax::LanguageId::Rust, stale_source);
+            DocumentHighlightKey::new(zeren_syntax::LanguageId::Rust, stale_source);
 
         assert!(file_highlight_result_is_current(
             &document,
@@ -41464,7 +41464,7 @@ mod tests {
 
         document.mark_user_edit();
         let current_highlight_key =
-            DocumentHighlightKey::new(zeron_syntax::LanguageId::Rust, updated_source);
+            DocumentHighlightKey::new(zeren_syntax::LanguageId::Rust, updated_source);
 
         assert_ne!(document.revision, task_revision);
         assert_ne!(current_highlight_key, stale_highlight_key);
@@ -41490,15 +41490,15 @@ mod tests {
             checkout_id: Some("checkout-1".into()),
             path: path.into(),
         });
-        document.set_loaded(zeron_proto::WorkspaceFileText {
+        document.set_loaded(zeren_proto::WorkspaceFileText {
             checkout_id: "checkout-1".into(),
             path: path.into(),
             text: Some("fn main() {}".into()),
             content_hash: Some("hash-1".into()),
             size: 12,
             modified_at: None,
-            encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-            line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+            encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+            line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
             read_only_reason: None,
             truncated: false,
         });
@@ -41740,15 +41740,15 @@ mod markdown_buffer_tests {
                     surface.apply_line_navigation(path, None, window, cx);
                     assert!(surface.pending_line_navigation.is_some());
                     surface.preview.documents.get_mut(path).unwrap().set_loaded(
-                        zeron_proto::WorkspaceFileText {
+                        zeren_proto::WorkspaceFileText {
                             checkout_id: "checkout".into(),
                             path: path.into(),
                             text: Some(source.clone()),
                             content_hash: Some("hash".into()),
                             size: source.len() as u64,
                             modified_at: None,
-                            encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-                            line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+                            encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+                            line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
                             read_only_reason: None,
                             truncated: false,
                         },
@@ -41839,15 +41839,15 @@ mod markdown_buffer_tests {
                     Some((90, Some(FileColumn::Character(6))))
                 );
                 surface.preview.documents.get_mut(path).unwrap().set_loaded(
-                    zeron_proto::WorkspaceFileText {
+                    zeren_proto::WorkspaceFileText {
                         checkout_id: "checkout".into(),
                         path: path.into(),
                         text: Some(source.clone()),
                         content_hash: Some("hash".into()),
                         size: source.len() as u64,
                         modified_at: None,
-                        encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-                        line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+                        encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+                        line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
                         read_only_reason: None,
                         truncated: false,
                     },
@@ -41961,15 +41961,15 @@ mod markdown_buffer_tests {
                     checkout_id: Some("checkout".into()),
                     path: path.into(),
                 });
-                document.set_loaded(zeron_proto::WorkspaceFileText {
+                document.set_loaded(zeren_proto::WorkspaceFileText {
                     checkout_id: "checkout".into(),
                     path: path.into(),
                     text: Some(source.clone()),
                     content_hash: Some("hash".into()),
                     size: source.len() as u64,
                     modified_at: None,
-                    encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-                    line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+                    encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+                    line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
                     read_only_reason: None,
                     truncated: false,
                 });
@@ -42052,15 +42052,15 @@ mod markdown_buffer_tests {
                     checkout_id: Some("checkout".into()),
                     path: path.into(),
                 });
-                document.set_loaded(zeron_proto::WorkspaceFileText {
+                document.set_loaded(zeren_proto::WorkspaceFileText {
                     checkout_id: "checkout".into(),
                     path: path.into(),
                     text: Some(source.into()),
                     content_hash: Some("hash".into()),
                     size: source.len() as u64,
                     modified_at: None,
-                    encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-                    line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+                    encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+                    line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
                     read_only_reason: None,
                     truncated: false,
                 });
@@ -42110,15 +42110,15 @@ mod markdown_buffer_tests {
                     checkout_id: Some("checkout".into()),
                     path: path.into(),
                 });
-                document.set_loaded(zeron_proto::WorkspaceFileText {
+                document.set_loaded(zeren_proto::WorkspaceFileText {
                     checkout_id: "checkout".into(),
                     path: path.into(),
                     text: Some(source.clone()),
                     content_hash: Some("hash".into()),
                     size: source.len() as u64,
                     modified_at: None,
-                    encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-                    line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+                    encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+                    line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
                     read_only_reason: Some(WorkspaceReadOnlyReason::MixedLineEndings),
                     truncated: false,
                 });
@@ -42229,15 +42229,15 @@ mod markdown_buffer_tests {
                                 checkout_id: Some("checkout".into()),
                                 path: "README.md".into(),
                             });
-                            document.set_loaded(zeron_proto::WorkspaceFileText {
+                            document.set_loaded(zeren_proto::WorkspaceFileText {
                                 checkout_id: "checkout".into(),
                                 path: "README.md".into(),
                                 text: Some(source.into()),
                                 content_hash: Some("hash".into()),
                                 size: source.len() as u64,
                                 modified_at: None,
-                                encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-                                line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+                                encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+                                line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
                                 read_only_reason: None,
                                 truncated: false,
                             });
@@ -42578,7 +42578,7 @@ mod markdown_buffer_tests {
         surface.update(cx, |surface, _| {
             assert_eq!(surface.system_open_path("src/lib.rs"), None);
             let local = FilesRequestContext {
-                target: zeron_proto::WorkspaceTarget {
+                target: zeren_proto::WorkspaceTarget {
                     chat_id: Some("chat".into()),
                     space_id: None,
                     checkout_path: None,
@@ -42613,7 +42613,7 @@ mod markdown_buffer_tests {
         window
             .update(cx, |surface, window, cx| {
                 surface.request_context = Some(FilesRequestContext {
-                    target: zeron_proto::WorkspaceTarget {
+                    target: zeren_proto::WorkspaceTarget {
                         chat_id: Some("chat".into()),
                         space_id: None,
                         checkout_path: None,
@@ -42627,15 +42627,15 @@ mod markdown_buffer_tests {
                     checkout_id: Some("checkout".into()),
                     path: "drawing.txt".into(),
                 });
-                document.set_loaded(zeron_proto::WorkspaceFileText {
+                document.set_loaded(zeren_proto::WorkspaceFileText {
                     checkout_id: "checkout".into(),
                     path: "drawing.txt".into(),
                     text: Some("disk text".into()),
                     content_hash: Some("disk-hash".into()),
                     size: 9,
                     modified_at: None,
-                    encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-                    line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+                    encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+                    line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
                     read_only_reason: None,
                     truncated: false,
                 });
@@ -42700,15 +42700,15 @@ mod markdown_buffer_tests {
                     checkout_id: Some("checkout".into()),
                     path: "README.md".into(),
                 });
-                document.set_loaded(zeron_proto::WorkspaceFileText {
+                document.set_loaded(zeren_proto::WorkspaceFileText {
                     checkout_id: "checkout".into(),
                     path: "README.md".into(),
                     text: Some("[Docs](https://example.com/docs)".into()),
                     content_hash: Some("hash".into()),
                     size: 32,
                     modified_at: None,
-                    encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-                    line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+                    encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+                    line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
                     read_only_reason: None,
                     truncated: false,
                 });
@@ -42836,15 +42836,15 @@ mod markdown_buffer_tests {
                     checkout_id: Some("checkout".into()),
                     path: "README.md".into(),
                 });
-                document.set_loaded(zeron_proto::WorkspaceFileText {
+                document.set_loaded(zeren_proto::WorkspaceFileText {
                     checkout_id: "checkout".into(),
                     path: "README.md".into(),
                     text: Some("# Disk".into()),
                     content_hash: Some("disk-hash".into()),
                     size: 6,
                     modified_at: None,
-                    encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-                    line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+                    encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+                    line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
                     read_only_reason: None,
                     truncated: false,
                 });
@@ -42938,16 +42938,16 @@ mod reload_highlight_tests {
         rehighlighted_frame: Vec<probe::Event>,
     }
 
-    fn workspace_file(path: &str, text: &str, hash: &str) -> zeron_proto::WorkspaceFileText {
-        zeron_proto::WorkspaceFileText {
+    fn workspace_file(path: &str, text: &str, hash: &str) -> zeren_proto::WorkspaceFileText {
+        zeren_proto::WorkspaceFileText {
             checkout_id: "checkout".into(),
             path: path.into(),
             text: Some(text.into()),
             content_hash: Some(hash.into()),
             size: text.len() as u64,
             modified_at: None,
-            encoding: zeron_proto::WorkspaceTextEncoding::Utf8,
-            line_ending: Some(zeron_proto::WorkspaceLineEnding::Lf),
+            encoding: zeren_proto::WorkspaceTextEncoding::Utf8,
+            line_ending: Some(zeren_proto::WorkspaceLineEnding::Lf),
             read_only_reason: None,
             truncated: false,
         }
@@ -43019,7 +43019,7 @@ mod reload_highlight_tests {
         window
             .update(cx, |surface, _, cx| {
                 if let ReloadHighlight::Cached = highlight {
-                    let document = zeron_syntax::highlight(zeron_syntax::HighlightRequest {
+                    let document = zeren_syntax::highlight(zeren_syntax::HighlightRequest {
                         source: after,
                         path: Some(path),
                         fence_tag: None,
@@ -43027,7 +43027,7 @@ mod reload_highlight_tests {
                     .unwrap();
                     surface.preview.syntax_cache.insert(
                         DocumentHighlightKey::new(
-                            zeron_syntax::language_for_path(path).unwrap(),
+                            zeren_syntax::language_for_path(path).unwrap(),
                             after,
                         ),
                         Arc::new(document),
@@ -43319,7 +43319,7 @@ impl FilesSurface {
             })
             && self.tree.node(path).is_some_and(|n| {
                 n.entry.mutation_revision.is_some()
-                    && n.entry.kind != zeron_proto::WorkspaceEntryKind::Symlink
+                    && n.entry.kind != zeren_proto::WorkspaceEntryKind::Symlink
             })
     }
     pub(super) fn begin_tree_rename(
@@ -43340,7 +43340,7 @@ impl FilesSurface {
             state.set_selected_range(
                 name_selection(
                     &entry.name,
-                    entry.kind == zeron_proto::WorkspaceEntryKind::Directory,
+                    entry.kind == zeren_proto::WorkspaceEntryKind::Directory,
                 ),
                 cx,
             )
@@ -43553,7 +43553,7 @@ impl FilesSurface {
             .filter(|path| {
                 self.tree
                     .node(path)
-                    .is_some_and(|n| n.entry.kind == zeron_proto::WorkspaceEntryKind::Directory)
+                    .is_some_and(|n| n.entry.kind == zeren_proto::WorkspaceEntryKind::Directory)
             })
             .count();
         let copy = format!(
@@ -43729,10 +43729,10 @@ mod tests {
             let input = files.tree_rename.as_ref().unwrap().input.clone();
             input.update(cx, |input, cx| input.set_value("renamed.txt", window, cx));
             let mut entry =
-                super::super::test_support::entry("a.txt", zeron_proto::WorkspaceEntryKind::File);
+                super::super::test_support::entry("a.txt", zeren_proto::WorkspaceEntryKind::File);
             entry.mutation_revision = Some("external-edit".into());
             files.tree.apply_page(
-                zeron_proto::WorkspaceDirectoryPage {
+                zeren_proto::WorkspaceDirectoryPage {
                     directory: "".into(),
                     checkout_id: Some("checkout".into()),
                     mutation_capabilities: files.mutation_capabilities,
@@ -43841,7 +43841,7 @@ use gpui::{
     AnyElement, Context, KeyDownEvent, ListSizingBehavior, MouseButton, Window, div, list,
     prelude::*, px,
 };
-use zeron_proto::WorkspaceEntryKind;
+use zeren_proto::WorkspaceEntryKind;
 
 use super::{
     FilesSurface, WorkspacePathDrag, model::DirectoryLoadState, model::VisibleRowKind,
@@ -44861,13 +44861,13 @@ between the tree and the real conversation drop zone.
 Commands from the repository root:
 
 ```sh
-cargo test --release --locked -p zeron-proto --lib
-cargo test --release --locked -p zeron-engine --lib workspace_files::
-cargo test --release --locked -p zeron-engine --lib rpc::
-cargo test --release --locked -p zeron-engine --test workspace_files
-cargo test --release --locked -p zeron-engine --test device_routing workspace_entry_mutations_are_forwarded
-cargo test --release --locked -p zeron-ui --lib -- --test-threads=1
-cargo check --release --locked -p zeron
+cargo test --release --locked -p zeren-proto --lib
+cargo test --release --locked -p zeren-engine --lib workspace_files::
+cargo test --release --locked -p zeren-engine --lib rpc::
+cargo test --release --locked -p zeren-engine --test workspace_files
+cargo test --release --locked -p zeren-engine --test device_routing workspace_entry_mutations_are_forwarded
+cargo test --release --locked -p zeren-ui --lib -- --test-threads=1
+cargo check --release --locked -p zeren
 ```
 
 This implementation was exercised on Linux with GPUI's test backend. Native
@@ -45019,7 +45019,7 @@ seeded chats in its sidebar and no streaming activity. For each binary, use a
 fresh output directory on the dedicated display:
 
 ```sh
-python3 scripts/profile-composer.py /path/to/zeron /tmp/composer-run-1 \
+python3 scripts/profile-composer.py /path/to/zeren /tmp/composer-run-1 \
   --settings /path/to/mock-ui/ui-settings.json \
   --ipc-port 27997 --display :117
 ```
@@ -45045,8 +45045,8 @@ Existing resize, row-reveal, overflow, editing, transcript, and picker tests rem
 in the full suite. Validation commands:
 
 ```sh
-cargo build --release --locked -p zeron
-cargo test --locked -p zeron-ui --lib -- --test-threads=1
+cargo build --release --locked -p zeren
+cargo test --locked -p zeren-ui --lib -- --test-threads=1
 ```
 ]],
 		["docs/performance-resource-usage.md"] = [[
@@ -45064,12 +45064,12 @@ existing animation clocks, scrolling behavior and visual effects.
 ## Repeated CPU comparison
 
 With four software-rendering workers, streaming CPU fell **40.3%
-from old Zeron**, and **33.3% from the previous optimized build**.
+from old Zeren**, and **33.3% from the previous optimized build**.
 The six runs were sequential: old, previous, final, final, previous, old. Each
 cell averages two runs. [Raw results](performance/resource-four-workers.json)
 include every executable hash, reply hash, phase and individual measurement.
 
-| Metric | Old Zeron | Previous optimized | Final |
+| Metric | Old Zeren | Previous optimized | Final |
 | --- | ---: | ---: | ---: |
 | Idle CPU | 27.41% | 15.75% | 7.49% |
 | Streaming CPU | 265.57% | 237.60% | 158.57% |
@@ -45081,7 +45081,7 @@ include every executable hash, reply hash, phase and individual measurement.
 The new pipelines add about 1.9 MiB of idle RSS and
 5.6 MiB of streaming RSS compared with the previous optimized build.
 This is a small memory tradeoff for the CPU reduction, with no new image or scene
-cache. Final idle RSS remains 37.7% below old Zeron.
+cache. Final idle RSS remains 37.7% below old Zeren.
 
 UI + engine totals, foreground 1280×800 window with a focused composer.
 The short workload is identical captured Haiku output: 51,769 bytes of Markdown,
@@ -45095,7 +45095,7 @@ The one-worker short comparison also averages two runs per build:
 [baseline](performance/resource-baseline.json),
 [final](performance/resource-candidate.json). It uses the same captured output.
 
-| Metric | Old Zeron | Final |
+| Metric | Old Zeren | Final |
 | --- | ---: | ---: |
 | Idle CPU | 25.45% | 6.93% |
 | Streaming CPU | 113.51% | 100.64% |
@@ -45108,7 +45108,7 @@ producing a 526,258-byte combined reply. Each build ran it once with one worker:
 [baseline](performance/resource-long-baseline.json),
 [final](performance/resource-long-candidate.json).
 
-| Metric | Old Zeron | Final |
+| Metric | Old Zeren | Final |
 | --- | ---: | ---: |
 | Streaming CPU | 112.30% | 103.13% |
 | Post-completion CPU, last 10 s | 92.77% | 8.30% |
@@ -45235,22 +45235,22 @@ integration target ran, or that native Metal performance was measured.
 Requires Node 22+, Rust, Python 3 and Xvfb/xdotool for Linux desktop profiling.
 The [sanitized fixture](../scripts/fixtures/README.md) reproduces the measured
 replay without an API call. Use a dedicated display and fresh output directories;
-the driver requires exactly one Zeron window.
+the driver requires exactly one Zeren window.
 
 ```sh
-cargo build --release -p zeron
+cargo build --release -p zeren
 Xvfb :98 -screen 0 1440x900x24 -nolisten tcp
 # In another terminal:
-DISPLAY=:98 WAYLAND_DISPLAY= LP_NUM_THREADS=4 ZERON_FRAME_STATS=0 \
-  ZERON_PROFILE_PSS=1 ZERON_PROFILE_IDLE_MS=45000 \
+DISPLAY=:98 WAYLAND_DISPLAY= LP_NUM_THREADS=4 ZEREN_FRAME_STATS=0 \
+  ZEREN_PROFILE_PSS=1 ZEREN_PROFILE_IDLE_MS=45000 \
   CLAUDE_CODE_EXECUTABLE="$PWD/scripts/replay-claude.py" \
-  ZERON_REPLAY_JOURNAL="$PWD/scripts/fixtures/resource-stream.jsonl" \
-  node scripts/resource-profile.mjs target/release/zeron /tmp/zeron-short claude-code
+  ZEREN_REPLAY_JOURNAL="$PWD/scripts/fixtures/resource-stream.jsonl" \
+  node scripts/resource-profile.mjs target/release/zeren /tmp/zeren-short claude-code
 
 # Use LP_NUM_THREADS=1 for the one-worker check.
-# Add ZERON_REPLAY_REPEAT=10 ZERON_REPLAY_DELAY_MS=8 for the long workload.
+# Add ZEREN_REPLAY_REPEAT=10 ZEREN_REPLAY_DELAY_MS=8 for the long workload.
 # For a live turn, omit replay variables and point CLAUDE_CODE_EXECUTABLE to
-# the authenticated CLI; ZERON_PROFILE_SUBMIT_UI=1 submits through the composer.
+# the authenticated CLI; ZEREN_PROFILE_SUBMIT_UI=1 submits through the composer.
 
 # In the zui checkout, on a host with Vulkan (software Vulkan works):
 LP_NUM_THREADS=4 cargo test --release -p gpui_wgpu --lib -- --include-ignored
@@ -45277,7 +45277,7 @@ creation time and socket descriptors to listening TCP sockets. On macOS it uses
 cwd belongs to a known local project are probed. The deepest matching project
 wins. Commands with explicit authentication arguments (`login`, `auth`,
 `authenticate`, `signin`, `sign-in`, `sso`, `oauth`, or `oauth2`, before `--`)
-are excluded before any connection, even when started by a Zeron terminal or
+are excluded before any connection, even when started by a Zeren terminal or
 agent. Their listeners may be one-shot browser callbacks: for example,
 `infisical login` fails with EOF if it receives a discovery HEAD without the
 browser's JSON body. This command check does not identify custom callback
@@ -45289,7 +45289,7 @@ authentication and application errors). Confirmed HTTP listeners are not
 probed again during that socket's lifetime; non-HTTP results use a capped
 exponential backoff.
 
-Zeron terminal/task/agent descendants are marked as Zeron-owned. Framework
+Zeren terminal/task/agent descendants are marked as Zeren-owned. Framework
 commands identify Vite, Next.js, Astro, Miniflare and Node servers; otherwise the
 list uses a generic HTTP label. Before a local backend connection, the daemon
 rechecks the listener's process identity and cwd to reject stale port reuse.
@@ -45361,7 +45361,7 @@ independently of edge availability. macOS and Linux currently provide discovery.
 
 ## Validation
 
-`cargo test --locked -p zeron-preview` covers real process/cwd isolation, non-HTTP
+`cargo test --locked -p zeren-preview` covers real process/cwd isolation, non-HTTP
 exclusion, live disappearance, persistent aliases, port changes, concurrent
 streams, slow readers, cancellation, large bodies, streaming HTTP headers and
 redirects, WebSocket traffic, and a real WebRTC pair in both directions.
@@ -45370,7 +45370,7 @@ redirects, WebSocket traffic, and a real WebRTC pair in both directions.
 organization authorization, stamped signaling, disconnect cleanup and binary
 traffic rejection. CI runs networking tests on Linux and macOS.
 
-Build `cargo build -p zeron-ui --example preview-fixture --features browser-fixture`.
+Build `cargo build -p zeren-ui --example preview-fixture --features browser-fixture`.
 Run the fixture with an output directory, an available display and `VITE_BINARY`
 pointing to an installed `vite/bin/vite.js`. It starts real Vite/API processes in
 an isolated project, discovers them through daemon RPC and waits for a native
@@ -45381,7 +45381,7 @@ attachments, not the repository.
 The opt-in `coordinator` integration test connects two authenticated clients to a
 local Worker, advertises a service, pairs over SDP/ICE, then transfers a 4 MiB
 HTTP response through the remote hostname. Run it with
-`ZERON_PREVIEW_TEST_EDGE=http://127.0.0.1:27641 cargo test -p zeron-preview --test coordinator -- --ignored`.
+`ZEREN_PREVIEW_TEST_EDGE=http://127.0.0.1:27641 cargo test -p zeren-preview --test coordinator -- --ignored`.
 ]],
 		["docs/session-publication.md"] = [[
 # Durable session publication
@@ -45430,11 +45430,11 @@ history deletion or prove that every possible checkpoint-pruning defect is fixed
 
 ## Validation
 
-`cargo test --locked -p zeron-sync --lib` covers the sync client and storage,
+`cargo test --locked -p zeren-sync --lib` covers the sync client and storage,
 including cursor preservation, restart/deduplication, and injected outbox-write
 failure followed by ordinary or cursor-bearing snapshot persistence.
 
-`cargo test --locked -p zeron-engine --lib --test session_publication --test restart_resume --test misc --test born_chat2_race --test message_queue --test transcript_salvage`
+`cargo test --locked -p zeren-engine --lib --test session_publication --test restart_resume --test misc --test born_chat2_race --test message_queue --test transcript_salvage`
 covers actual LRU eviction, disconnected cleanup before snapshot debounce,
 engine restart/resume, command queues, and profile lifecycle. The Codex adapter
 fixture reproduces a successful-but-invisible resumed turn, then validates full
@@ -45458,8 +45458,8 @@ accounts or private inputs.
 		["docs/theme-system.md"] = [[
 # Theme system
 
-Zeron themes are complete, source-neutral `ThemeVariant` values owned by the
-`zeron-theme` crate. Runtime components consume only Zeron semantic roles. VS
+Zeren themes are complete, source-neutral `ThemeVariant` values owned by the
+`zeren-theme` crate. Runtime components consume only Zeren semantic roles. VS
 Code workbench ids and TextMate selectors stop at the source compiler.
 
 ## Runtime model
@@ -45469,7 +45469,7 @@ Code workbench ids and TextMate selectors stop at the source compiler.
 - `ThemeSelection` stores independent light and dark variant ids.
 - `AccentSelection::ThemeDefault` preserves the variant's authored accent.
 - `AccentSelection::Preset` derives a contrast-checked interaction overlay.
-- Every variant records a recommended `SurfaceTreatment`: Zeron recommends
+- Every variant records a recommended `SurfaceTreatment`: Zeren recommends
   frost, while VS Code-derived themes recommend opaque surfaces because that is
   what their authors targeted.
 - `SurfacePreference` is a separate device-local choice: `Theme default`,
@@ -45486,7 +45486,7 @@ Surface preference affects only surface composition. Theme default preserves
 the variant's recommendation; either override remains active while users move
 between built-in, imported, and linked themes. Forced frost derives window,
 floating, input, card, and hover tints from the variant's mapped shell roles
-instead of fixed Zeron greys. Its window tint becomes denser when necessary to
+instead of fixed Zeren greys. Its window tint becomes denser when necessary to
 keep primary text at 4.5:1 and muted text at 3:1 against the adverse desktop
 luminance. Floating overlays, settings cards, and inputs run the same
 composited-background check independently; a delicate palette can therefore
@@ -45501,7 +45501,7 @@ The preference remains portable even where a particular surface cannot honor blu
 
 The built-in registry contains 30 variants across 19 families:
 
-- Zeron Light and Dark
+- Zeren Light and Dark
 - VS Code Light+ and Dark+
 - Catppuccin Latte and Mocha
 - Tokyo Night Light and Tokyo Night
@@ -45547,13 +45547,13 @@ the optional mapping review.
 
 The importer records `Opaque` as the variant's recommended surface treatment
 and reports that inference. This preserves the source palette by default while
-still allowing the independent Zeron surface preference to force frost.
+still allowing the independent Zeren surface preference to force frost.
 
-After source mapping, a deterministic hardening pass checks Zeron's shared
+After source mapping, a deterministic hardening pass checks Zeren's shared
 roles across every solid surface where they are painted. It keeps VS Code's
 semantic distinctions (`foreground`, `descriptionForeground`,
 `editor.foreground`, and component-specific foregrounds), promotes a stronger
-related source role when the preferred one cannot carry the Zeron role, and
+related source role when the preferred one cannot carry the Zeren role, and
 only then adjusts the original color toward a contrast-safe anchor. Primary,
 muted, button, terminal, focus/status, and interaction roles are covered.
 Foundational surfaces with alpha are flattened against the resolved theme
@@ -45577,15 +45577,15 @@ activated only after the updated library is persisted successfully. The library 
 `{data_dir}/theme-library.json` and is loaded before the first palette is
 installed.
 
-The `zeron-theme-import` development tool exposes the same single-file adapter
+The `zeren-theme-import` development tool exposes the same single-file adapter
 for built-in curation:
 
 Example:
 
 ```bash
-cargo run -p zeron-theme --bin zeron-theme-import -- \
+cargo run -p zeren-theme --bin zeren-theme-import -- \
   --input /path/to/theme.json \
-  --output /tmp/theme.zeron.json \
+  --output /tmp/theme.zeren.json \
   --report /tmp/theme.report.json \
   --id example-dark \
   --family-id example \
@@ -45602,7 +45602,7 @@ without truncating the advanced mapping review. Structural errors such as
 duplicate ids or incomplete provenance block installation. Contrast findings
 remain reviewable because compiled imports and runtime native-theme resolution
 apply deterministic safeguards rather than rejecting an otherwise valid
-source. Zeron does not fetch or execute VSIX packages at runtime; custom
+source. Zeren does not fetch or execute VSIX packages at runtime; custom
 sources are local files and folders compiled into resolved data.
 
 ## Acceptance and visual QA
@@ -45743,22 +45743,22 @@ regression, and the final implementation uses byte progress and fragmentation.
 ## Reproduce
 
 ```sh
-cargo test -p zeron-sync -p zeron-rpc --features zeron-sync/mock-server
-cargo test -p zeron-sync --lib socket:: -- --nocapture
-cargo clippy -p zeron-sync -p zeron-rpc --all-targets --features zeron-sync/mock-server
-cargo build -p zeron-sync --example transport_live
+cargo test -p zeren-sync -p zeren-rpc --features zeren-sync/mock-server
+cargo test -p zeren-sync --lib socket:: -- --nocapture
+cargo clippy -p zeren-sync -p zeren-rpc --all-targets --features zeren-sync/mock-server
+cargo build -p zeren-sync --example transport_live
 
 # Requires authenticated Wrangler and an account with Workers/R2 enabled.
 cd edge
 npm ci
-node_modules/.bin/wrangler r2 bucket create zeron-transport-385-20260915
+node_modules/.bin/wrangler r2 bucket create zeren-transport-385-20260915
 node_modules/.bin/wrangler deploy --config wrangler.transport-test.jsonc
 cd ..
 
 # Use the isolated workers.dev URL printed by deployment.
 python3 scripts/run-transport-matrix.py \
   --binary target/debug/examples/transport_live \
-  --origin https://zeron-transport-385-20260915.YOUR-SUBDOMAIN.workers.dev \
+  --origin https://zeren-transport-385-20260915.YOUR-SUBDOMAIN.workers.dev \
   --profile stream --output /tmp/transport-stream.json
 # Repeat with: very-slow, outage, http, catchup, upload.
 ```
@@ -45774,7 +45774,7 @@ After testing, delete only the isolated resources:
 ```sh
 cd edge
 node_modules/.bin/wrangler delete --config wrangler.transport-test.jsonc
-node_modules/.bin/wrangler r2 bucket delete zeron-transport-385-20260915
+node_modules/.bin/wrangler r2 bucket delete zeren-transport-385-20260915
 ```
 
 ## Scope and remaining limits
@@ -45830,30 +45830,30 @@ or that every feature works on every aircraft network.
 #   scripts/dev-demo.sh            # build, seed demo data, open the app
 #   scripts/dev-demo.sh --slow     # pace mock streams (~10s) to watch streaming
 #
-# Everything lives under /tmp/zeron-demo-*; re-runs reuse it. Ctrl-C cleans up.
+# Everything lives under /tmp/zeren-demo-*; re-runs reuse it. Ctrl-C cleans up.
 # A second demo beside a running one (another worktree's) picks its own
-# state and port: ZERON_DEMO_DIR=/tmp/zeron-demo-b ZERON_DEMO_PORT=27931.
+# state and port: ZEREN_DEMO_DIR=/tmp/zeren-demo-b ZEREN_DEMO_PORT=27931.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-DEMO_DIR="${ZERON_DEMO_DIR:-/tmp/zeron-demo}"
+DEMO_DIR="${ZEREN_DEMO_DIR:-/tmp/zeren-demo}"
 DAEMON_DIR="$DEMO_DIR-daemon"
 UI_DIR="$DEMO_DIR-ui"
-IPC="${ZERON_DEMO_PORT:-27921}"
+IPC="${ZEREN_DEMO_PORT:-27921}"
 # Demo projects live in ~/github when it exists, else in throwaway folders
 # (a space must point at a real folder).
 PROJECTS_DIR="$HOME/github"
-[[ -d "$PROJECTS_DIR" ]] || PROJECTS_DIR=/tmp/zeron-demo-projects
+[[ -d "$PROJECTS_DIR" ]] || PROJECTS_DIR=/tmp/zeren-demo-projects
 DELAY=""
 [[ "${1:-}" == "--slow" ]] && DELAY=350
 
 echo "▸ building (first run takes a few minutes)…"
-cargo build -p zeron -q
+cargo build -p zeren -q
 
 echo "▸ starting engine daemon on :$IPC"
-env ZERON_DATA_DIR="$DAEMON_DIR" ZERON_IPC_PORT=$IPC ZERON_HARNESS=mock \
-  ${DELAY:+ZERON_MOCK_DELAY_MS=$DELAY} RUST_LOG=warn \
-  ./target/debug/zeron headless &
+env ZEREN_DATA_DIR="$DAEMON_DIR" ZEREN_IPC_PORT=$IPC ZEREN_HARNESS=mock \
+  ${DELAY:+ZEREN_MOCK_DELAY_MS=$DELAY} RUST_LOG=warn \
+  ./target/debug/zeren headless &
 DAEMON_PID=$!
 trap 'kill $DAEMON_PID 2>/dev/null || true' EXIT
 for _ in $(seq 1 40); do
@@ -45861,7 +45861,7 @@ for _ in $(seq 1 40); do
   sleep 0.25
 done
 
-probe() { ZERON_DATA_DIR="$DAEMON_DIR" cargo run -q -p zeron-rpc --example rpc_probe -- "ws://127.0.0.1:$IPC" "$@"; }
+probe() { ZEREN_DATA_DIR="$DAEMON_DIR" cargo run -q -p zeren-rpc --example rpc_probe -- "ws://127.0.0.1:$IPC" "$@"; }
 
 if [[ ! -f "$DAEMON_DIR/.demo-seeded" ]]; then
   echo "▸ seeding demo chats"
@@ -45869,7 +45869,7 @@ if [[ ! -f "$DAEMON_DIR/.demo-seeded" ]]; then
   # One space per demo folder, created up-front (chats join by space id);
   # a folder already registered keeps its first space, so each is listed once.
   declare -A SPACES=()
-  for project in zeron marigold flint; do
+  for project in zeren marigold flint; do
     sid=$(uuidgen | tr 'A-Z' 'a-z')
     mkdir -p "$PROJECTS_DIR/$project"
     probe Mutate "{\"op\":\"createSpace\",\"spaceId\":\"$sid\",\"deviceId\":\"$DEV\",\"path\":\"$PROJECTS_DIR/$project\"}" >/dev/null
@@ -45887,10 +45887,10 @@ if [[ ! -f "$DAEMON_DIR/.demo-seeded" ]]; then
     fi
     probe Mutate "{\"op\":\"setChatActivity\",\"chatId\":\"$id\",\"lastMessageAt\":$(( ($(date +%s) - $4*3600) * 1000 ))}" >/dev/null
   }
-  seed "Native Zeron Rust Rewrite"    zeron zeron/main                 0  run
-  seed "Fix the Frost Date Lookup"    marigold     zeron/frost-date-lookup           2  run
-  seed "Print Seed Packet Labels"     marigold     zeron/seed-packet-labels          26 skip
-  seed "Initial Context Exploration"  zeron        zeron/initial-context-exploration 14 skip
+  seed "Native Zeren Rust Rewrite"    zeren zeren/main                 0  run
+  seed "Fix the Frost Date Lookup"    marigold     zeren/frost-date-lookup           2  run
+  seed "Print Seed Packet Labels"     marigold     zeren/seed-packet-labels          26 skip
+  seed "Initial Context Exploration"  zeren        zeren/initial-context-exploration 14 skip
   seed "Audit Ledger Rounding"        flint        flint/main                        48 skip
   touch "$DAEMON_DIR/.demo-seeded"
 fi
@@ -45916,17 +45916,17 @@ if [[ ! -f "$FANOUT_ID_FILE" ]]; then
 fi
 probe QueueCommand "{\"chatId\":\"$(cat "$FANOUT_ID_FILE")\",\"command\":{\"kind\":\"run\",\"messageId\":\"$(uuidgen)\",\"request\":{\"prompt\":\"/fanout 40\",\"model\":null,\"reasoning\":null,\"modelOptions\":{},\"cwd\":\"/tmp\",\"sandbox\":\"workspace-write\",\"autoApprove\":true,\"resume\":null}}}" >/dev/null
 
-echo "▸ opening zeron (composer is live — type into it; --slow shows streaming)"
+echo "▸ opening zeren (composer is live — type into it; --slow shows streaming)"
 echo "  'Fan Out Forty Scouts' settles a subagent every 2.5s; send '/fanout 40' to replay"
 # The UI attaches to the daemon, whose IPC bearer lives in the daemon's data dir.
-ZERON_DATA_DIR="$UI_DIR" ZERON_IPC_PORT=$IPC ZERON_IPC_TOKEN_FILE="$DAEMON_DIR/ipc-token" RUST_LOG=warn ./target/debug/zeron
+ZEREN_DATA_DIR="$UI_DIR" ZEREN_IPC_PORT=$IPC ZEREN_IPC_TOKEN_FILE="$DAEMON_DIR/ipc-token" RUST_LOG=warn ./target/debug/zeren
 ]=],
 		["scripts/package-macos.sh"] = [=[
 #!/usr/bin/env bash
 # macOS packaging: build the release binaries for the host arch and produce
-#   target/package/zeron-<version>-macos-<arch>.dmg          (user download)
-#   target/package/zeron-<version>-macos-<arch>-app.tar.gz   (auto-updater)
-# containing Zeron.app (unsigned unless CODESIGN_IDENTITY is set).
+#   target/package/zeren-<version>-macos-<arch>.dmg          (user download)
+#   target/package/zeren-<version>-macos-<arch>-app.tar.gz   (auto-updater)
+# containing Zeren.app (unsigned unless CODESIGN_IDENTITY is set).
 #
 # Usage: scripts/package-macos.sh
 # Env:   CODESIGN_IDENTITY="Developer ID Application: …" to sign the bundle.
@@ -45941,19 +45941,19 @@ command -v cargo >/dev/null 2>&1 || PATH="$HOME/.cargo/bin:$PATH"
 VERSION="$(grep -m1 '^version' "$ROOT/Cargo.toml" | sed 's/.*"\(.*\)".*/\1/')"
 ARCH="$(uname -m)" # arm64 on Apple silicon runners
 OUT_DIR="$ROOT/target/package"
-APP="$OUT_DIR/Zeron.app"
-DMG="$OUT_DIR/zeron-$VERSION-macos-$ARCH.dmg"
-APP_TARBALL="$OUT_DIR/zeron-$VERSION-macos-$ARCH-app.tar.gz"
+APP="$OUT_DIR/Zeren.app"
+DMG="$OUT_DIR/zeren-$VERSION-macos-$ARCH.dmg"
+APP_TARBALL="$OUT_DIR/zeren-$VERSION-macos-$ARCH-app.tar.gz"
 
 cd "$ROOT"
-cargo build --release -p zeron
+cargo build --release -p zeren
 
 rm -rf "$APP" "$DMG" "$APP_TARBALL"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-install -m 755 "$ROOT/target/release/zeron" "$APP/Contents/MacOS/zeron"
+install -m 755 "$ROOT/target/release/zeren" "$APP/Contents/MacOS/zeren"
 # The background engine the app starts (sessions keep running with the app
 # closed); its own process, named for Activity Monitor.
-install -m 755 "$ROOT/target/release/zeron-engine" "$APP/Contents/MacOS/Zeron Engine"
+install -m 755 "$ROOT/target/release/zeren-engine" "$APP/Contents/MacOS/Zeren Engine"
 sed "s/__VERSION__/$VERSION/" "$ROOT/dist/macos/Info.plist" >"$APP/Contents/Info.plist"
 mkdir -p "$APP/Contents/Resources/licenses/fonts"
 cp "$ROOT/crates/ui/assets/fonts/licenses/"* "$APP/Contents/Resources/licenses/fonts/"
@@ -45964,27 +45964,27 @@ cp "$ROOT/crates/voice/NOTICE.md" "$APP/Contents/Resources/licenses"/parakeet-v3
 
 # Icon: iconset from the pre-masked macOS icon (squircle + margins + shadow
 # baked into dist/macos/icon-1024.png — sips can't alpha-mask, so the mask is
-# applied ahead of time; dist/zeron.png stays the full-bleed shared artwork).
-ICONSET="$OUT_DIR/zeron.iconset"
+# applied ahead of time; dist/zeren.png stays the full-bleed shared artwork).
+ICONSET="$OUT_DIR/zeren.iconset"
 rm -rf "$ICONSET" && mkdir -p "$ICONSET"
 for size in 16 32 128 256 512; do
   sips -z "$size" "$size" "$ROOT/dist/macos/icon-1024.png" --out "$ICONSET/icon_${size}x${size}.png" >/dev/null
   retina=$((size * 2))
   sips -z "$retina" "$retina" "$ROOT/dist/macos/icon-1024.png" --out "$ICONSET/icon_${size}x${size}@2x.png" >/dev/null
 done
-iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/zeron.icns"
+iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/zeren.icns"
 rm -rf "$ICONSET"
 
 if [[ -n "${CODESIGN_IDENTITY:-}" ]]; then
   # Hardened runtime + secure timestamp are both notarization requirements.
   # (No --deep: Apple deprecated it. Nested code is signed first, inside out:
   # the engine, then the bundle that seals it.)
-  codesign --entitlements "$ROOT/dist/macos/Zeron.entitlements" --force --options runtime --timestamp --sign "$CODESIGN_IDENTITY" --identifier sh.zeron.app.engine "$APP/Contents/MacOS/Zeron Engine"
-  codesign --entitlements "$ROOT/dist/macos/Zeron.entitlements" --force --options runtime --timestamp --sign "$CODESIGN_IDENTITY" "$APP"
+  codesign --entitlements "$ROOT/dist/macos/Zeren.entitlements" --force --options runtime --timestamp --sign "$CODESIGN_IDENTITY" --identifier sh.zeron.app.engine "$APP/Contents/MacOS/Zeren Engine"
+  codesign --entitlements "$ROOT/dist/macos/Zeren.entitlements" --force --options runtime --timestamp --sign "$CODESIGN_IDENTITY" "$APP"
 else
   # Ad-hoc signature so the app launches on Apple silicon (Gatekeeper still
   # requires right-click → Open on first launch without notarization).
-  codesign --deep --force --entitlements "$ROOT/dist/macos/Zeron.entitlements" --sign - "$APP"
+  codesign --deep --force --entitlements "$ROOT/dist/macos/Zeren.entitlements" --sign - "$APP"
 fi
 
 # notarize <path>: submit to Apple and wait for the verdict. A rejection may
@@ -46002,7 +46002,7 @@ if $NOTARIZE; then
   # Staple the bundle BEFORE tarring it: the auto-updater swaps the .app with
   # no dmg involved, so the tarball copy must carry its own ticket to pass
   # Gatekeeper offline.
-  ZIP="$OUT_DIR/zeron-notarize.zip"
+  ZIP="$OUT_DIR/zeren-notarize.zip"
   ditto -c -k --keepParent "$APP" "$ZIP"
   notarize "$ZIP"
   rm -f "$ZIP"
@@ -46010,7 +46010,7 @@ if $NOTARIZE; then
 fi
 
 # The auto-updater artifact.
-tar -czf "$APP_TARBALL" -C "$OUT_DIR" Zeron.app
+tar -czf "$APP_TARBALL" -C "$OUT_DIR" Zeren.app
 echo "packaged: $APP_TARBALL"
 
 # The dmg presents the classic drag-into-Applications layout over the
@@ -46034,12 +46034,12 @@ import dmgbuild
 app = os.environ["APP"]
 dmgbuild.build_dmg(
     filename=os.environ["DMG"],
-    volume_name="Zeron",
+    volume_name="Zeren",
     settings={
         "format": "UDZO",
         "files": [app],
         "symlinks": {"Applications": "/Applications"},
-        "icon": os.path.join(app, "Contents/Resources/zeron.icns"),
+        "icon": os.path.join(app, "Contents/Resources/zeren.icns"),
         "background": os.environ["BG_TIFF"],
         "show_status_bar": False,
         "show_tab_view": False,
@@ -46051,7 +46051,7 @@ dmgbuild.build_dmg(
         "window_rect": ((200, 120), (660, 400)),
         "icon_size": 104,
         "text_size": 12,
-        "icon_locations": {"Zeron.app": (165, 195), "Applications": (495, 195)},
+        "icon_locations": {"Zeren.app": (165, 195), "Applications": (495, 195)},
     },
 )
 PY
@@ -46069,7 +46069,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BINARY="$1"
 shift
-BUNDLE="$(mktemp -d "${TMPDIR:-/tmp}/zeron-browser-fixture.XXXXXX")/Fixture.app"
+BUNDLE="$(mktemp -d "${TMPDIR:-/tmp}/zeren-browser-fixture.XXXXXX")/Fixture.app"
 trap 'rm -r "$(dirname "$BUNDLE")"' EXIT
 mkdir -p "$BUNDLE/Contents/MacOS"
 cp "$BINARY" "$BUNDLE/Contents/MacOS/fixture"

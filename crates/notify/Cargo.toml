@@ -1,5 +1,5 @@
 [package]
-name = "zeron-notify"
+name = "zeren-notify"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

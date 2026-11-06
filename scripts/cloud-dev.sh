@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # A Cloud to click through in the desktop app, with this checkout's code:
 #   - `wrangler dev`: edge + vault, dev auth;
-#   - a Zeron window (debug build) signed in as a fresh dev account.
-# Your running app and ~/.zeron are untouched: everything has its own data
+#   - a Zeren window (debug build) signed in as a fresh dev account.
+# Your running app and ~/.zeren are untouched: everything has its own data
 # dir and ports.
 #
 # MODE=local (default): fake sandboxes. A supervisor runs a real
-#   `zeron headless` on this computer for every sandbox that is up (own HOME
+#   `zeren headless` on this computer for every sandbox that is up (own HOME
 #   and data dir), so each chat run on Cloud gets its own session machine.
 #   Repositories check out under $STATE/projects (not /home/user) and
 #   sessions of one repository share that folder.
@@ -24,7 +24,7 @@
 #
 # In the window: Settings → Cloud → turn Cloud on and connect GitHub; sign in
 # to Codex / Claude in Settings → Providers with Cloud picked; then add a
-# project whose GitHub repository the Zeron GitHub App is installed on, pick
+# project whose GitHub repository the Zeren GitHub App is installed on, pick
 # Cloud in the device menu of a new chat there, and send.
 #
 # Credits: a new dev account starts with 600. Grant more with the run's admin
@@ -47,11 +47,11 @@ if [[ "$MODE" == boat ]]; then
   # One account and window across runs: GitHub, Claude/Codex and the
   # projects you added stay (the edge and vault keep their state in
   # edge/.wrangler); only session machines are deleted on exit.
-  STATE="${STATE:-/tmp/zeron-cloud-dev/boat}"
+  STATE="${STATE:-/tmp/zeren-cloud-dev/boat}"
   USER_ID="${USER_ID:-user_cdboat}"
 else
   # Fake sandboxes live in the edge's memory, so each run starts fresh.
-  STATE="${STATE:-/tmp/zeron-cloud-dev/$RUN}"
+  STATE="${STATE:-/tmp/zeren-cloud-dev/$RUN}"
   USER_ID="user_cd$RUN"
 fi
 BEARER="$USER_ID@$ORG_ID"
@@ -69,7 +69,7 @@ if [[ "$MODE" == boat ]]; then
     exit 1
   }
   VERSION="$(cat "$ROOT/target/package-dev/latest.txt" 2>/dev/null || true)"
-  TARBALL="$ROOT/target/package-dev/zeron-$VERSION-linux-x86_64.tar.gz"
+  TARBALL="$ROOT/target/package-dev/zeren-$VERSION-linux-x86_64.tar.gz"
   [[ -n "$VERSION" && -f "$TARBALL" ]] || {
     echo "MODE=boat needs a Linux build: run scripts/build-linux-dev.sh" >&2
     exit 1
@@ -120,8 +120,8 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 0' INT TERM
 
-log "building zeron"
-(cd "$ROOT" && cargo build -q -p zeron --bin zeron) > "$STATE/build.log" 2>&1 || {
+log "building zeren"
+(cd "$ROOT" && cargo build -q -p zeren --bin zeren) > "$STATE/build.log" 2>&1 || {
   tail -40 "$STATE/build.log"
   exit 1
 }
@@ -173,18 +173,18 @@ if [[ "$MODE" == boat ]]; then
   log "the tunnel serves release $VERSION"
 fi
 
-log "Zeron window as $USER_ID (data: $STATE/gui)"
-gui_env=(ZERON_DATA_DIR="$STATE/gui/data" ZERON_IPC_PORT="$GUI_PORT" ZERON_EDGE_URL="$EDGE"
-  ZERON_EDGE_TOKEN="$BEARER" ZERON_ORG_ID="$ORG_ID" ZERON_DEVICE_NAME="Cloud dev"
-  ZERON_OPEN_ROUTE="${OPEN_ROUTE:-settings/cloud}" ZERON_NO_LOGIN_SHELL=1 RUST_LOG="${GUI_RUST_LOG:-warn}"
+log "Zeren window as $USER_ID (data: $STATE/gui)"
+gui_env=(ZEREN_DATA_DIR="$STATE/gui/data" ZEREN_IPC_PORT="$GUI_PORT" ZEREN_EDGE_URL="$EDGE"
+  ZEREN_EDGE_TOKEN="$BEARER" ZEREN_ORG_ID="$ORG_ID" ZEREN_DEVICE_NAME="Cloud dev"
+  ZEREN_OPEN_ROUTE="${OPEN_ROUTE:-settings/cloud}" ZEREN_NO_LOGIN_SHELL=1 RUST_LOG="${GUI_RUST_LOG:-warn}"
   # The engine lives and dies with this window (cleanup kills GUI_PID).
-  ZERON_EMBED_ENGINE=1)
-(cd "$STATE/gui" && env "${gui_env[@]}" "$ROOT/target/debug/zeron" > "$STATE/gui/ui.log" 2>&1 &
+  ZEREN_EMBED_ENGINE=1)
+(cd "$STATE/gui" && env "${gui_env[@]}" "$ROOT/target/debug/zeren" > "$STATE/gui/ui.log" 2>&1 &
   echo $! > "$STATE/gui/pid")
 GUI_PID="$(cat "$STATE/gui/pid")"
 
 if [[ "$MODE" == boat ]]; then
-  log "ready — use the Zeron window; Ctrl-C to stop (deletes session machines)"
+  log "ready — use the Zeren window; Ctrl-C to stop (deletes session machines)"
   last=""
   while kill -0 "$GUI_PID" 2>/dev/null; do
     now="$(curl -s "$EDGE/cloud/$ORG_ID/sessions" -H "Authorization: Bearer $BEARER" | python3 -c '
@@ -199,7 +199,7 @@ except Exception:
     last="$now"
     sleep 5
   done
-  log "the Zeron window closed"
+  log "the Zeren window closed"
   exit 0
 fi
 
@@ -232,10 +232,10 @@ start_session() {
   # GIT_CONFIG_NOSYSTEM: like a clean Linux sandbox, no system git helper
   # (Apple git's osxkeychain) — this machine's keychain is never touched.
   (cd "$dir" && env -i PATH="$STATE/bin:$PATH" HOME="$dir/home" USER="$USER" GIT_CONFIG_NOSYSTEM=1 \
-    ZERON_NO_LOGIN_SHELL=1 ZERON_DATA_DIR="$dir/data" \
-    ZERON_IPC_PORT="$(cat "$dir/port")" RUST_LOG=info "${env_args[@]}" \
-    "$ROOT/target/debug/zeron" headless >> "$dir/engine.log" 2>&1 & echo $! > "$dir/pid")
-  log "session machine up: chat $(grep '^ZERON_CLOUD_CHAT=' "$dir/env" | cut -d= -f2) ($id, :$(cat "$dir/port"), log $dir/engine.log)"
+    ZEREN_NO_LOGIN_SHELL=1 ZEREN_DATA_DIR="$dir/data" \
+    ZEREN_IPC_PORT="$(cat "$dir/port")" RUST_LOG=info "${env_args[@]}" \
+    "$ROOT/target/debug/zeren" headless >> "$dir/engine.log" 2>&1 & echo $! > "$dir/pid")
+  log "session machine up: chat $(grep '^ZEREN_CLOUD_CHAT=' "$dir/env" | cut -d= -f2) ($id, :$(cat "$dir/port"), log $dir/engine.log)"
 }
 
 stop_session() {
@@ -245,7 +245,7 @@ stop_session() {
   log "session machine stopped: $id"
 }
 
-log "ready — use the Zeron window; Ctrl-C to stop"
+log "ready — use the Zeren window; Ctrl-C to stop"
 while kill -0 "$GUI_PID" 2>/dev/null; do
   # One line per session sandbox: "<id> <state>"; env written once.
   sandboxes="$(curl -sf "$EDGE/dev/cloud/fake-sandboxes" -H "Authorization: Bearer $BEARER" | python3 -c "
@@ -253,14 +253,14 @@ import json, os, sys
 root = sys.argv[1]
 for s in json.load(sys.stdin).get('sandboxes', []):
     env = s.get('env') or {}
-    if not env.get('ZERON_CLOUD_CHAT'):
+    if not env.get('ZEREN_CLOUD_CHAT'):
         continue
     d = os.path.join(root, s['id'])
     os.makedirs(d, exist_ok=True)
     path = os.path.join(d, 'env')
     if not os.path.exists(path):
         with open(path, 'w') as f:
-            f.write(''.join(f'{k}={v}\n' for k, v in env.items() if k.startswith('ZERON_')))
+            f.write(''.join(f'{k}={v}\n' for k, v in env.items() if k.startswith('ZEREN_')))
     print(s['id'], s['state'])
 " "$STATE/sessions" 2>/dev/null || true)"
   while read -r id state; do
@@ -278,4 +278,4 @@ for s in json.load(sys.stdin).get('sandboxes', []):
   done
   sleep 2
 done
-log "the Zeron window closed"
+log "the Zeren window closed"

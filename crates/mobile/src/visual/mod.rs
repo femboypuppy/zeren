@@ -22,8 +22,8 @@ use std::sync::mpsc::{self, Receiver, RecvTimeoutError, Sender};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use zeron_text::WidthCache;
-use zeron_visual::{DrawCmd, HandlerArg, HandlerId, Node, Visual};
+use zeren_text::WidthCache;
+use zeren_visual::{DrawCmd, HandlerArg, HandlerId, Node, Visual};
 
 use crate::layout::style::Typography;
 use crate::layout::{StyleDesc, TextSystem};
@@ -281,10 +281,10 @@ impl VisualHub {
     }
 
     /// Where scripts load from: the chat's host device.
-    pub fn set_source(&self, client: zeron_client::Client, device: String, pixel_scale: f32) {
+    pub fn set_source(&self, client: zeren_client::Client, device: String, pixel_scale: f32) {
         let fetch: Fetch = Arc::new(move |path: &str| {
             let (client, device, path) = (client.clone(), device.clone(), path.to_owned());
-            block_on(zeron_client::runtime::run(async move {
+            block_on(zeren_client::runtime::run(async move {
                 client.read_attachment(&device, &path).await
             }))
             .ok()
@@ -396,7 +396,7 @@ impl VisualSession {
         let title = slot.title.clone();
         let text = text.clone();
         std::thread::Builder::new()
-            .name("zeron-visual".into())
+            .name("zeren-visual".into())
             .spawn(move || Worker::new(&text, rx, slot, row_key, source, changed).run())
             .expect("spawn visual thread");
         Arc::new(Self {
@@ -497,12 +497,12 @@ struct SurfaceState {
     moved: bool,
     reads_pointer: bool,
     orbit: Option<Orbit>,
-    shader: Option<zeron_visual_gpu::ShaderState>,
+    shader: Option<zeren_visual_gpu::ShaderState>,
     /// A scene's GPU targets, kept while its size holds.
-    scene_gpu: Option<zeron_visual_gpu::SceneState>,
+    scene_gpu: Option<zeren_visual_gpu::SceneState>,
     shader_frame: u32,
     shader_time: f64,
-    scene: Option<(u64, zeron_visual::Scene)>,
+    scene: Option<(u64, zeren_visual::Scene)>,
     hints: Vec<([f32; 2], f32, String)>,
     hint: Option<String>,
     hover: chart::Hover,
@@ -747,8 +747,8 @@ impl Worker {
         {
             for name in names
                 .into_iter()
-                .filter(|name| zeron_visual::assets::valid_name(name))
-                .take(zeron_visual::assets::MAX_ASSETS)
+                .filter(|name| zeren_visual::assets::valid_name(name))
+                .take(zeren_visual::assets::MAX_ASSETS)
             {
                 if let Some(bytes) = self.fetch(format!("{stem}-asset-{name}")) {
                     files.insert(name, Arc::<[u8]>::from(bytes));
@@ -756,10 +756,10 @@ impl Worker {
             }
         }
         // Seeded like the engine's check, so the reader sees the same data.
-        let seed = zeron_visual::seed_for(&self.slot.id);
+        let seed = zeren_visual::seed_for(&self.slot.id);
         match Visual::load(&script, seed) {
             Ok(visual) => {
-                self.visual = Some(visual.with_assets(zeron_visual::Assets::new(files)));
+                self.visual = Some(visual.with_assets(zeren_visual::Assets::new(files)));
                 self.load = Load::Ready;
                 self.rerender();
             }
@@ -802,7 +802,7 @@ impl Worker {
         };
         let para = ctx.line(
             message,
-            Face::new(zeron_visual::TextSize::Sm, zeron_visual::Weight::Regular),
+            Face::new(zeren_visual::TextSize::Sm, zeren_visual::Weight::Regular),
             color,
         );
         laid.paint.para(
@@ -811,7 +811,7 @@ impl Worker {
             0.0,
             y,
             self.width,
-            zeron_visual::Align::Start,
+            zeren_visual::Align::Start,
             false,
         )
     }
@@ -1034,10 +1034,10 @@ impl Worker {
     fn canvas_frame(
         &mut self,
         state: &mut SurfaceState,
-        canvas: &zeron_visual::Canvas,
+        canvas: &zeren_visual::Canvas,
     ) -> Option<(Option<FrameImage>, Paint)> {
         let (w, h) = state.spec.size();
-        let pointer = state.pointer.map(|[x, y]| zeron_visual::Pointer {
+        let pointer = state.pointer.map(|[x, y]| zeren_visual::Pointer {
             x,
             y,
             down: state.down,
@@ -1106,7 +1106,7 @@ impl Worker {
     fn scene_frame(
         &mut self,
         state: &mut SurfaceState,
-        node: &zeron_visual::SceneNode,
+        node: &zeren_visual::SceneNode,
     ) -> Option<(Option<FrameImage>, Paint)> {
         let (w, h) = state.spec.size();
         let animate = node.animate && !self.reduce_motion;
@@ -1127,7 +1127,7 @@ impl Worker {
         let (_, scene) = state.scene.as_ref()?;
         let spin = if self.reduce_motion { 0.0 } else { node.spin };
         let orbit = state.orbit.as_ref()?;
-        let camera = zeron_visual::Camera {
+        let camera = zeren_visual::Camera {
             yaw: orbit.yaw(spin),
             pitch: orbit.pitch,
             zoom: node.zoom,
@@ -1139,7 +1139,7 @@ impl Worker {
         };
         let pixel_scale = self.source.pixel_scale.min(MAX_GPU_SCALE);
         let (image, hints, labels) =
-            match zeron_visual_gpu::render_scene(
+            match zeren_visual_gpu::render_scene(
                 scene,
                 camera,
                 w,
@@ -1159,9 +1159,9 @@ impl Worker {
                 None => {
                     // No GPU: the software renderer, rougher while it moves.
                     let quality = if self.moving(state) || orbit.drag.is_some() {
-                        zeron_visual::Quality::Draft
+                        zeren_visual::Quality::Draft
                     } else {
-                        zeron_visual::Quality::Final
+                        zeren_visual::Quality::Final
                     };
                     let raster = scene.render(camera, w, h, pixel_scale, quality, &rgba);
                     (
@@ -1178,27 +1178,27 @@ impl Worker {
         };
         let mut paint = Paint::default();
         for label in &labels {
-            let face = Face::new(label.size, zeron_visual::Weight::Regular);
+            let face = Face::new(label.size, zeren_visual::Weight::Regular);
             paint.label(
                 &mut ctx,
                 &label.text,
                 face,
                 palette.color(label.color),
                 label.at,
-                zeron_visual::Align::Center,
-                zeron_visual::Align::End,
+                zeren_visual::Align::Center,
+                zeren_visual::Align::End,
             );
         }
         if let Some(hint) = &state.hint {
-            let face = Face::new(zeron_visual::TextSize::Sm, zeron_visual::Weight::Medium);
+            let face = Face::new(zeren_visual::TextSize::Sm, zeren_visual::Weight::Medium);
             paint.label(
                 &mut ctx,
                 hint,
                 face,
                 palette.text,
                 [0.0, 0.0],
-                zeron_visual::Align::Start,
-                zeron_visual::Align::Start,
+                zeren_visual::Align::Start,
+                zeren_visual::Align::Start,
             );
         }
         Some((Some(image), paint))
@@ -1207,7 +1207,7 @@ impl Worker {
     fn shader_frame(
         &mut self,
         state: &mut SurfaceState,
-        node: &zeron_visual::ShaderNode,
+        node: &zeren_visual::ShaderNode,
     ) -> Option<(Option<FrameImage>, Paint)> {
         let (w, h) = state.spec.size();
         let scale = self.source.pixel_scale.min(MAX_GPU_SCALE);
@@ -1233,14 +1233,14 @@ impl Worker {
             }
             _ => [0.0, 0.0, -1.0, -1.0],
         };
-        let mut inputs = [[0.0f32; 4]; zeron_visual::shader::MAX_INPUTS / 4];
+        let mut inputs = [[0.0f32; 4]; zeren_visual::shader::MAX_INPUTS / 4];
         for (i, (_, value)) in node.inputs.iter().enumerate() {
             inputs[i / 4][i % 4] = *value;
         }
         let time = self.time();
         let shown_time = if animate { time } else { state.shader_time };
         let delta = (time - state.shader_time).max(0.0);
-        let uniforms = zeron_visual::shader::ShaderUniforms {
+        let uniforms = zeren_visual::shader::ShaderUniforms {
             resolution: [size.0 as f32, size.1 as f32, scale, 0.0],
             mouse,
             camera: [yaw, orbit.pitch, node.zoom, 0.0],
@@ -1255,18 +1255,18 @@ impl Worker {
         };
         let names: Vec<String> = node.inputs.iter().map(|(n, _)| n.clone()).collect();
         let assets = self.visual.as_ref()?.assets().clone();
-        let textures: Vec<zeron_visual::TextureData> = node
+        let textures: Vec<zeren_visual::TextureData> = node
             .textures
             .iter()
             // A missing one keeps its slot (and samples as clear).
             .map(|name| {
-                zeron_visual::TextureData::Encoded(
+                zeren_visual::TextureData::Encoded(
                     assets.get(name).unwrap_or_else(|| Arc::from([])),
                 )
             })
             .collect();
-        let rendered = zeron_visual_gpu::render_shader(
-            &zeron_visual_gpu::ShaderSpec {
+        let rendered = zeren_visual_gpu::render_shader(
+            &zeren_visual_gpu::ShaderSpec {
                 image: &node.code,
                 buffers: &node.buffers,
                 inputs: &names,

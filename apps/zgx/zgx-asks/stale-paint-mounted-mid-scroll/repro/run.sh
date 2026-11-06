@@ -6,14 +6,14 @@
 set -e
 HERE=${0:A:h}
 TMP=$(mktemp -d)
-# Zeron's ui with the lane as it was before the app's workaround.
+# Zeren's ui with the lane as it was before the app's workaround.
 cp -R ui $TMP/ui
 git show dd32e339:apps/zgx/ui/ds/transcript.luau > $TMP/ui/ds/transcript.luau
 swiftc -O -o $TMP/pxdiff $HERE/pxdiff.swift
 mkdir -p $TMP/eng $TMP/home
-ZGX_CHECK=0 ZERON_ZGX_UI=$TMP/ui ZERON_ZGX_ENGINE_SPAWN=0 ZERON_ZGX_ENGINE_PORT=27897 \
-	ZERON_ZGX_ENGINE_DATA=$TMP/eng HOME=$TMP/home \
-	./target/release/zeron-zgx fixture=chat_fixture.luau --inspect >$TMP/host.log 2>&1 &
+ZGX_CHECK=0 ZEREN_ZGX_UI=$TMP/ui ZEREN_ZGX_ENGINE_SPAWN=0 ZEREN_ZGX_ENGINE_PORT=27897 \
+	ZEREN_ZGX_ENGINE_DATA=$TMP/eng HOME=$TMP/home \
+	./target/release/zeren-zgx fixture=chat_fixture.luau --inspect >$TMP/host.log 2>&1 &
 P=$!
 trap "kill $P 2>/dev/null; rm -rf $TMP" EXIT
 sleep 3

@@ -1,11 +1,11 @@
 //! Native captures of where pull request links open (Settings → General →
 //! Links → *Open pull requests in*). Renders the production Shell offscreen,
 //! never activated, against a real engine, the local `gh` and WebKit, and
-//! presses links with native input events. A pull request that leaves Zeron
+//! presses links with native input events. A pull request that leaves Zeren
 //! opens in the default browser for real. Checks land in
 //! `<output-dir>/result.txt`, and the run fails when one does.
 //!
-//!   cargo run -p zeron-ui --example pull-request-destination-fixture \
+//!   cargo run -p zeren-ui --example pull-request-destination-fixture \
 //!     --features pull-request-fixture,browser-fixture -- <output-dir>
 //!
 //! macOS: captures read the window back with `render_to_image`, which leaves
@@ -20,14 +20,14 @@ use std::{
     sync::Arc,
     time::Duration,
 };
-use zeron_ui::settings::PullRequestDestination;
-use zeron_ui::*;
+use zeren_ui::settings::PullRequestDestination;
+use zeren_ui::*;
 
 const WIDTH: f32 = 1200.;
 const HEIGHT: f32 = 760.;
 
 fn pr(number: u32) -> String {
-    format!("https://github.com/zeronsh/zeron/pull/{number}")
+    format!("https://github.com/femboypuppy/zeren/pull/{number}")
 }
 
 async fn pause(cx: &mut AsyncApp, ms: u64) {
@@ -221,11 +221,11 @@ fn destination(label: &str) -> Option<PullRequestDestination> {
 }
 
 /// What the Settings menu and the link menu's toggle commit.
-fn configure(destination: PullRequestDestination, open_links_in_zeron: bool, cx: &mut AsyncApp) {
+fn configure(destination: PullRequestDestination, open_links_in_zeren: bool, cx: &mut AsyncApp) {
     cx.update(|cx| {
         settings::update(settings::SavePolicy::Immediate, cx, |settings| {
             settings.pull_request_destination = destination;
-            settings.open_web_links_in_zeron = open_links_in_zeron;
+            settings.open_web_links_in_zeren = open_links_in_zeren;
         });
         cx.refresh_windows();
     });
@@ -315,7 +315,7 @@ async fn scenario(
     key(window, "escape", cx).await?;
     toggle_settings(window, cx).await?;
 
-    // "Default browser": a pull request link leaves Zeron.
+    // "Default browser": a pull request link leaves Zeren.
     configure(default_browser, true, cx);
     settle(window, cx).await?;
     let before = frame(window, cx)?;
@@ -327,12 +327,12 @@ async fn scenario(
     let (shown, changed) = (browser(window, cx)?, changes(&before, &after).len());
     run.check(
         "default-browser",
-        "nothing opens in Zeron",
+        "nothing opens in Zeren",
         shown.is_none() && changed == 0,
         format!("Browser tab {shown:?}, {changed} changed areas"),
     );
 
-    // "Open links in Zeron" off: pull request links leave Zeron too (#956).
+    // "Open links in Zeren" off: pull request links leave Zeren too (#956).
     configure(view, false, cx);
     let before = frame(window, cx)?;
     press(window, link(1012)?, cx).await?;
@@ -343,12 +343,12 @@ async fn scenario(
     let (shown, changed) = (browser(window, cx)?, changes(&before, &after).len());
     run.check(
         "links-off",
-        "nothing opens in Zeron",
+        "nothing opens in Zeren",
         shown.is_none() && changed == 0,
         format!("Browser tab {shown:?}, {changed} changed areas"),
     );
 
-    // After a link left Zeron, the next link in the message opens on its
+    // After a link left Zeren, the next link in the message opens on its
     // first press.
     configure(default_browser, false, cx);
     press(window, link(997)?, cx).await?;
@@ -382,7 +382,7 @@ async fn scenario(
         );
     }
 
-    // "Pull request view": Zeron's own view, as before.
+    // "Pull request view": Zeren's own view, as before.
     configure(view, true, cx);
     let before = frame(window, cx)?;
     press(window, link(1013)?, cx).await?;
@@ -407,10 +407,10 @@ fn main() -> anyhow::Result<()> {
     let temp = tempfile::tempdir()?;
     let runtime = tokio::runtime::Runtime::new()?;
     let core = runtime.block_on(async {
-        zeron_engine::EngineCore::assemble(
+        zeren_engine::EngineCore::assemble(
             &temp.path().join("engine"),
-            Arc::new(zeron_engine::default_registry()),
-            zeron_proto::HarnessId::ClaudeCode,
+            Arc::new(zeren_engine::default_registry()),
+            zeren_proto::HarnessId::ClaudeCode,
             None,
         )
     })?;
@@ -418,7 +418,7 @@ fn main() -> anyhow::Result<()> {
     let data = temp.path().join("ui");
     std::fs::create_dir(&data)?;
     // The viewport reads the IPC bearer from its own data directory.
-    let _ipc = runtime.block_on(zeron_engine::serve_ipc(ipc_port, &data, core.rpc_service()))?;
+    let _ipc = runtime.block_on(zeren_engine::serve_ipc(ipc_port, &data, core.rpc_service()))?;
     let boot = EngineBootConfig {
         data_dir: data.clone(),
         ipc_port,
@@ -426,7 +426,7 @@ fn main() -> anyhow::Result<()> {
         edge_token: None,
         org_id: None,
         workos_client_id: None,
-        default_harness: zeron_proto::HarnessId::ClaudeCode,
+        default_harness: zeren_proto::HarnessId::ClaudeCode,
     };
     let handle = runtime.block_on(state::EngineHandle::bootstrap(boot.clone()))?;
     let device = core.device_id.clone();
@@ -438,7 +438,7 @@ fn main() -> anyhow::Result<()> {
             gpui_tokio::init(cx);
             gpui_base::init(cx);
             let mut settings = settings::UiSettings::default();
-            settings.surface = zeron_theme::SurfacePreference::Opaque;
+            settings.surface = zeren_theme::SurfacePreference::Opaque;
             settings::init(settings.clone(), data.clone(), cx);
             let fonts = typography::register_fonts(cx);
             typography::init(
@@ -472,8 +472,8 @@ fn main() -> anyhow::Result<()> {
             let state = cx.new(|_| {
                 let mut s = state::AppState::new();
                 s.fixture_attachment_engine(handle);
-                s.connection = zeron_proto::view::ConnectionStatus::Ready;
-                s.workspace_scope = Some(zeron_proto::WorkspaceScope::Local);
+                s.connection = zeren_proto::view::ConnectionStatus::Ready;
+                s.workspace_scope = Some(zeren_proto::WorkspaceScope::Local);
                 s.local_device_id = Some(device.clone());
                 s.devices = vec![
                     serde_json::from_value(serde_json::json!({
@@ -528,7 +528,7 @@ fn main() -> anyhow::Result<()> {
                 ]))
                 .unwrap();
                 s.receive_transcript_frame(
-                    zeron_doc::TranscriptFrame::Reset { reset: entries },
+                    zeren_doc::TranscriptFrame::Reset { reset: entries },
                     cx,
                 )
                 .unwrap();

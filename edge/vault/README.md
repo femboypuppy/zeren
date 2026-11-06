@@ -1,4 +1,4 @@
-# zeron-vault
+# zeren-vault
 
 The credential vault Worker (design: `docs/design/cloud-device.md`, "Credential vault"). It
 holds users' provider credentials (Codex, Claude, GitHub, API keys) encrypted, refreshes them,
@@ -11,7 +11,7 @@ and hands enrolled devices short-lived **grants**: access tokens only, never ref
   (`VAULT`, `entrypoint: "VaultApi"`), which passes an identity it has already verified
   (WorkOS user or runner JWT). The vault re-validates every field it receives.
 - **Grants need a device signature.** The device key (Ed25519, enrolled per device) signs
-  `zeron-vault-grant\n{userId}\n{deviceId}\n{provider}\n{ts}`. The `ts` must be within ±120 s and
+  `zeren-vault-grant\n{userId}\n{deviceId}\n{provider}\n{ts}`. The `ts` must be within ±120 s and
   strictly greater than the device's last one. The device must be enrolled, not revoked, and
   listed in the credential's `authorizedDevices`. Runner callers may only request grants for
   their own device.
@@ -44,8 +44,8 @@ cd edge/vault
 openssl rand -base64 32 | npx wrangler secret put VAULT_KEK   # the KEK, see below
 npx wrangler secret put GITHUB_APP_CLIENT_ID      # GitHub App (device flow + refresh; App JWT iss)
 npx wrangler secret put GITHUB_APP_CLIENT_SECRET
-npx wrangler secret put GITHUB_APP_PRIVATE_KEY < zeron.private-key.pem   # installation tokens
-npx wrangler secret put GITHUB_APP_SLUG           # e.g. zeron, for the install link
+npx wrangler secret put GITHUB_APP_PRIVATE_KEY < zeren.private-key.pem   # installation tokens
+npx wrangler secret put GITHUB_APP_SLUG           # e.g. zeren, for the install link
 npx wrangler secret put CANARY_USER_ID            # optional, see Canary
 ```
 

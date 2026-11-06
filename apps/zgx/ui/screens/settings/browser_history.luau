@@ -168,7 +168,7 @@ local VisitRow = ui.component(function(props: { visit: data.Visit, now: State<an
 				relative = true,
 				items = "end",
 				justify = "center",
-				h = "$zeron.icon_button.sm",
+				h = "$zeren.icon_button.sm",
 				ui.text {
 					function(): string
 						return locale.clock(it().at)

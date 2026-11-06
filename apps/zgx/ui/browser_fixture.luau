@@ -39,14 +39,14 @@ ui.command {
 		if tab then
 			local web = api.web(`panel-browser-{tab.id}`)
 			local sel = string.gsub(wanted:peek(), "'", "\\'")
-			web:run(`window.__zeronAnnotator && window.__zeronAnnotator.pick('{sel}');`)
+			web:run(`window.__zerenAnnotator && window.__zerenAnnotator.pick('{sel}');`)
 		end
 	end,
 }
 
 -- And a look into the page: `fixture.eval` runs `fixture_js` there, its
 -- answer (or error) in `fixture_result`.
-local js = ui.state("fixture_js", "typeof window.__zeronAnnotator")
+local js = ui.state("fixture_js", "typeof window.__zerenAnnotator")
 local result = ui.state("fixture_result", "" :: any)
 ui.command {
 	id = "fixture.eval",
@@ -174,7 +174,7 @@ return ui.column {
 	w_full = true,
 	h_full = true,
 	theme = function(): string
-		return if dark:get() then "zeron-dark" else "zeron-light"
+		return if dark:get() then "zeren-dark" else "zeren-light"
 	end,
 	bg = "$background",
 	on_focus = function()

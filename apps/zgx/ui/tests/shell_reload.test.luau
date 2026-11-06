@@ -1,4 +1,4 @@
--- Reload Zeron (the app relaunched whole, src/relaunch.rs) and Reload
+-- Reload Zeren (the app relaunched whole, src/relaunch.rs) and Reload
 -- interface (its scripts evaluated again in place): each a command of the
 -- shell's and a row of the palette, found by what someone would type, and
 -- each asking the host. On the shell in ui/shell_fixture.luau, the host's
@@ -29,22 +29,22 @@ local function search(app: any, text: string)
 	app:frames(30)
 end
 
-test("the palette finds Reload Zeron by reload, restart and relaunch", function()
+test("the palette finds Reload Zeren by reload, restart and relaunch", function()
 	local app = open()
 	search(app, "reload")
-	expect(app:has('#palette-list >> role:option "Reload Zeron"')).to_be(true)
+	expect(app:has('#palette-list >> role:option "Reload Zeren"')).to_be(true)
 	expect(app:has('#palette-list >> role:option "Reload interface"')).to_be(true)
 	for _, word in { "restart", "relaunch" } do
 		search(app, word)
-		expect(app:has('#palette-list >> role:option "Reload Zeron"')).to_be(true)
+		expect(app:has('#palette-list >> role:option "Reload Zeren"')).to_be(true)
 	end
 end)
 
-test("picking Reload Zeron asks the host to relaunch the app", function()
+test("picking Reload Zeren asks the host to relaunch the app", function()
 	local app = open()
-	search(app, "Reload Zeron")
+	search(app, "Reload Zeren")
 	expect(asked(app, "app.relaunch")).to_be(false)
-	app:click('#palette-list >> role:option "Reload Zeron"')
+	app:click('#palette-list >> role:option "Reload Zeren"')
 	app:frames(20)
 	expect(asked(app, "app.relaunch")).to_be(true)
 	expect(asked(app, "app.reload_interface")).to_be(false)

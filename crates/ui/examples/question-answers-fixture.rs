@@ -7,7 +7,7 @@
 //! harness, so no agent ever starts.
 //!
 //! ```bash
-//! cargo run -p zeron-ui --features appshots-fixture \
+//! cargo run -p zeren-ui --features appshots-fixture \
 //!   --example question-answers-fixture -- <output-dir>
 //! ```
 //!
@@ -25,12 +25,12 @@ use std::{
     sync::Arc,
     time::Duration,
 };
-use zeron_doc::{
+use zeren_doc::{
     MessagePart, MessageRole, MessageStatus, SessionCommandPayload, SessionCommandStatus,
     SessionMessageEntry,
 };
-use zeron_proto::{UserInputAnswer, UserInputQuestion};
-use zeron_ui::*;
+use zeren_proto::{UserInputAnswer, UserInputQuestion};
+use zeren_ui::*;
 
 const CHAT: &str = "questions";
 /// The question left open for the panel.
@@ -311,7 +311,7 @@ async fn drive(
 /// The command ledger and every question part, read straight from the chat's
 /// doc, and whether the close landed as a decline: an applied `RespondInput`
 /// with no answers, and the open question stamped closed (`Some([])`).
-fn engine_record(core: &zeron_engine::EngineCore) -> anyhow::Result<(String, bool)> {
+fn engine_record(core: &zeren_engine::EngineCore) -> anyhow::Result<(String, bool)> {
     let chat = core.doc_host.open(CHAT)?;
     let mut log = String::new();
     let mut declined = false;
@@ -353,14 +353,14 @@ fn main() -> anyhow::Result<()> {
     let temp = tempfile::tempdir()?;
     let runtime = tokio::runtime::Runtime::new()?;
     let core = runtime.block_on(async {
-        zeron_engine::EngineCore::assemble(
+        zeren_engine::EngineCore::assemble(
             &temp.path().join("engine"),
-            Arc::new(zeron_engine::default_registry()),
-            zeron_proto::HarnessId::ClaudeCode,
+            Arc::new(zeren_engine::default_registry()),
+            zeren_proto::HarnessId::ClaudeCode,
             None,
         )
     })?;
-    let config: zeron_proto::ChatConfig = serde_json::from_value(json!({
+    let config: zeren_proto::ChatConfig = serde_json::from_value(json!({
         "harness": "mock", "model": "fable-5", "reasoning": null, "sandbox": "workspace-write"
     }))?;
     core.workspace.create_chat(
@@ -382,7 +382,7 @@ fn main() -> anyhow::Result<()> {
     let data = temp.path().join("ui");
     std::fs::create_dir(&data)?;
     // Publish the IPC bearer where the attaching viewport looks for it.
-    let _ipc = runtime.block_on(zeron_engine::serve_ipc(ipc_port, &data, core.rpc_service()))?;
+    let _ipc = runtime.block_on(zeren_engine::serve_ipc(ipc_port, &data, core.rpc_service()))?;
     let boot = EngineBootConfig {
         data_dir: data.clone(),
         ipc_port,
@@ -390,7 +390,7 @@ fn main() -> anyhow::Result<()> {
         edge_token: None,
         org_id: None,
         workos_client_id: None,
-        default_harness: zeron_proto::HarnessId::ClaudeCode,
+        default_harness: zeren_proto::HarnessId::ClaudeCode,
     };
     let handle = runtime.block_on(state::EngineHandle::bootstrap(boot.clone()))?;
     let chats = core.workspace.read_chats()?;
@@ -439,8 +439,8 @@ fn main() -> anyhow::Result<()> {
             let state = cx.new(|_| {
                 let mut s = state::AppState::new();
                 s.fixture_attachment_engine(handle);
-                s.connection = zeron_proto::view::ConnectionStatus::Ready;
-                s.workspace_scope = Some(zeron_proto::WorkspaceScope::Development);
+                s.connection = zeren_proto::view::ConnectionStatus::Ready;
+                s.workspace_scope = Some(zeren_proto::WorkspaceScope::Development);
                 s.local_device_id = Some(device.clone());
                 s.devices = vec![
                     serde_json::from_value(json!({"id": device, "name": "This device",

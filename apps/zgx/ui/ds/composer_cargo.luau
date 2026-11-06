@@ -1,5 +1,5 @@
 -- What a message carries, as the composer shows it over the draft: a strip
--- of chips, one a thing attached, Zeron's tile strip (composer.rs, the
+-- of chips, one a thing attached, Zeren's tile strip (composer.rs, the
 -- attachment tiles) with each chip saying what it holds. A file is its
 -- icon beside its name and what it is ("Rust · 48 KB"); text pasted in
 -- whole is a chip too, saying how much ("412 lines · 18 KB"); an element
@@ -13,7 +13,7 @@
 -- a ring where its glyph was (over the thumbnail, on a scrim) and says how
 -- far; one that failed says so where its detail was, in the danger's ink,
 -- with Retry at its end. Under the pointer (or with the keys) an × hangs
--- at the chip's top-right corner, over its edge (Zeron's tiles'): laid
+-- at the chip's top-right corner, over its edge (Zeren's tiles'): laid
 -- over the chip, taking no room of its own, so no chip moves. The strip
 -- keeps room above its first row and the pill's inset keeps room at its
 -- end, so a corner's × is never clipped.
@@ -132,7 +132,7 @@ fn layer(input:LayerInput)->vec4<f32> {
 -- parameters, the cut opening as the × fades in (and closing as it goes).
 local function hollow(lit: () -> boolean): { [string]: any }
 	local box = ui.ref()
-	local width = n("zeron.composer.chip.hollow", 2)
+	local width = n("zeren.composer.chip.hollow", 2)
 	ui.effect(function()
 		local on = lit()
 		local el = box:peek()
@@ -183,11 +183,11 @@ local function cross(item: Item, lit: () -> boolean, on_remove: (id: string) -> 
 		justify = "center",
 		items = "center",
 		rounded = "$radius.full",
-		bg = "$zeron.composer.chip.cross",
+		bg = "$zeren.composer.chip.cross",
 		color = "$text.secondary",
 		cursor = "pointer",
-		hover = { bg = "$zeron.composer.chip.cross", color = "$text.primary" },
-		active = { bg = "$zeron.composer.chip.cross", color = "$text.primary" },
+		hover = { bg = "$zeren.composer.chip.cross", color = "$text.primary" },
+		active = { bg = "$zeren.composer.chip.cross", color = "$text.primary" },
 		focus = control.ring,
 		label = named,
 		tooltip = named(),
@@ -217,8 +217,8 @@ local function scrim(...: Node): Node
 		bottom = 0,
 		items = "center",
 		justify = "center",
-		bg = "$zeron.composer.chip.scrim",
-		color = "$zeron.composer.chip.scrim_ink",
+		bg = "$zeren.composer.chip.scrim",
+		color = "$zeren.composer.chip.scrim_ink",
 		pointer_events = "none",
 		...,
 	}
@@ -233,8 +233,8 @@ local function image_chip(item: Item, row: State<Item>, props: Props): Node
 	local function lit(): boolean
 		return hovered:get() or focused:get()
 	end
-	local h = n("zeron.composer.chip.h", 40)
-	local w = n("zeron.composer.chip.thumb", 56)
+	local h = n("zeren.composer.chip.h", 40)
+	local w = n("zeren.composer.chip.thumb", 56)
 	local function uploading(): boolean
 		local p = row:get().progress
 		return p ~= nil and p < 1 and row:get().failed == nil
@@ -250,7 +250,7 @@ local function image_chip(item: Item, row: State<Item>, props: Props): Node
 		h = h,
 		shrink = 0,
 		relative = true,
-		rounded = "$zeron.composer.chip.radius",
+		rounded = "$zeren.composer.chip.radius",
 		label = item.name,
 		-- (Opening: with the keys too, and the lightbox's thumbnail.)
 		focusable = props.on_open ~= nil,
@@ -276,10 +276,10 @@ local function image_chip(item: Item, row: State<Item>, props: Props): Node
 			layer_params = cut.layer_params,
 			w_full = true,
 			h_full = true,
-			rounded = "$zeron.composer.chip.radius",
+			rounded = "$zeren.composer.chip.radius",
 			overflow = "hidden",
 			border = 1,
-			border_color = "$zeron.composer.chip.edge",
+			border_color = "$zeren.composer.chip.edge",
 			border_over = true,
 			-- (Its file gone since, or not a picture: the gallery's glyph in
 			-- its place, `ui.image`'s `fallback`.)
@@ -292,8 +292,8 @@ local function image_chip(item: Item, row: State<Item>, props: Props): Node
 			},
 			ui.show(uploading, scrim(ring(function(): number
 				return row:get().progress or 0
-			end, "$zeron.composer.chip.scrim_ink", "#ffffff4d"))),
-			ui.show(failed, scrim(ui.div { color = "$zeron.tone.danger.ink", Icon { name = "danger-triangle", size = 16 } })),
+			end, "$zeren.composer.chip.scrim_ink", "#ffffff4d"))),
+			ui.show(failed, scrim(ui.div { color = "$zeren.tone.danger.ink", Icon { name = "danger-triangle", size = 16 } })),
 		},
 		if remove
 			then cross(item, lit, remove, function(on: boolean)
@@ -403,7 +403,7 @@ local function comment_card(c: any): Node?
 			w_full = true,
 			px = "$space.3",
 			py = "$space.2",
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			if type(c.plugin) == "string"
 				then ui.text { locale.t("ds.composer_cargo.comment_from", { plugin = c.plugin }), text_size = "$font.size.xs", color = "$text.tertiary" }
 				else nil,
@@ -445,8 +445,8 @@ local function row_chip(item: Item, row: State<Item>, props: Props): Node
 	local function lit(): boolean
 		return hovered:get() or focused:get()
 	end
-	local h = n("zeron.composer.chip.h", 40)
-	local glyph_size = n("zeron.composer.chip.glyph", 18)
+	local h = n("zeren.composer.chip.h", 40)
+	local glyph_size = n("zeren.composer.chip.glyph", 18)
 	local function uploading(): boolean
 		local p = row:get().progress
 		return p ~= nil and p < 1 and row:get().failed == nil
@@ -471,10 +471,10 @@ local function row_chip(item: Item, row: State<Item>, props: Props): Node
 			ui.overlay {
 				w_full = true,
 				h_full = true,
-				rounded = ui.raw(control.nest("$zeron.composer.chip.radius", (n("zeron.composer.chip.h", 40) - APPSHOT_H) / 2), "concentric with the chip: its corner less the picture's inset"),
+				rounded = ui.raw(control.nest("$zeren.composer.chip.radius", (n("zeren.composer.chip.h", 40) - APPSHOT_H) / 2), "concentric with the chip: its corner less the picture's inset"),
 				overflow = "hidden",
 				border = 1,
-				border_color = "$zeron.composer.chip.edge",
+				border_color = "$zeren.composer.chip.edge",
 				border_over = true,
 				bg = "$hover",
 				ui.image { src = item.src, fit = "cover", w_full = true, h_full = true },
@@ -504,7 +504,7 @@ local function row_chip(item: Item, row: State<Item>, props: Props): Node
 		color = "$text.secondary",
 		ui.show(uploading, ring(function(): number
 			return row:get().progress or 0
-		end, "$text.primary", "$border.strong"), ui.show(failed, ui.div { color = "$zeron.tone.danger.ink", Icon { name = "danger-triangle", size = 16 } }, glyph)),
+		end, "$text.primary", "$border.strong"), ui.show(failed, ui.div { color = "$zeren.tone.danger.ink", Icon { name = "danger-triangle", size = 16 } }, glyph)),
 	}
 	local function meta(): string
 		local now = row:get()
@@ -534,7 +534,7 @@ local function row_chip(item: Item, row: State<Item>, props: Props): Node
 	-- holds both and knows the pointer over either.
 	return ui.row {
 		-- (In points: `max_w` doesn't take a token.)
-		max_w = n("zeron.composer.chip.max", 214),
+		max_w = n("zeren.composer.chip.max", 214),
 		shrink = 0,
 		relative = true,
 		label = function(): string
@@ -555,13 +555,13 @@ local function row_chip(item: Item, row: State<Item>, props: Props): Node
 			min_w = 0,
 			-- (Held to the chip's widest too: a pick's two lines, each wider,
 			-- fade at its edge rather than push it wider.)
-			max_w = n("zeron.composer.chip.max", 214),
-			pl = "$zeron.space.snug",
+			max_w = n("zeren.composer.chip.max", 214),
+			pl = "$zeren.space.snug",
 			pr = "$space.2",
 			gap = "$space.2",
 			items = "center",
-			rounded = "$zeron.composer.chip.radius",
-			bg = "$zeron.composer.chip.bg",
+			rounded = "$zeren.composer.chip.radius",
+			bg = "$zeren.composer.chip.bg",
 			tooltip = card,
 			tooltip_placement = if card then { side = "top", align = "start", offset = 8 } else nil,
 			cursor = if opens then "pointer" else nil,
@@ -594,7 +594,7 @@ local function row_chip(item: Item, row: State<Item>, props: Props): Node
 							text_size = "$font.size.md",
 							line_height = "$font.line.md",
 							weight = "$font.weight.semibold",
-							color = "$zeron.tone.accent.ink",
+							color = "$zeren.tone.accent.ink",
 						}
 						else nil,
 					FadeText {
@@ -621,7 +621,7 @@ local function row_chip(item: Item, row: State<Item>, props: Props): Node
 						text_size = "$font.size.xs",
 						line_height = "$font.line.xs",
 						color = function()
-							return if failed() then "$zeron.tone.danger.ink" else "$text.tertiary"
+							return if failed() then "$zeren.tone.danger.ink" else "$text.tertiary"
 						end,
 					}
 				),
@@ -634,7 +634,7 @@ local function row_chip(item: Item, row: State<Item>, props: Props): Node
 					h = 24,
 					px = "$space.2",
 					shrink = 0,
-					rounded = ui.raw(control.nest("$zeron.composer.chip.radius", "$space.2"), "concentric with the chip: its corner less the button's inset"),
+					rounded = ui.raw(control.nest("$zeren.composer.chip.radius", "$space.2"), "concentric with the chip: its corner less the button's inset"),
 					bg = "#00000000",
 					color = "$text.primary",
 					text_size = "$font.size.sm",
@@ -705,7 +705,7 @@ M.Strip = ui.component(function(props: Props): Node
 			opened:set(false)
 		end
 	end)
-	local h = n("zeron.composer.chip.h", 40)
+	local h = n("zeren.composer.chip.h", 40)
 	-- A chip follows its item (its progress climbing, its failure): zgx's
 	-- animated rows get no state of their own, so each finds its item in
 	-- the list by its id.
@@ -723,9 +723,9 @@ M.Strip = ui.component(function(props: Props): Node
 		w_full = true,
 		flex_wrap = true,
 		items = "center",
-		gap = "$zeron.composer.chip.gap",
-		px = "$zeron.composer.chip.inset",
-		pt = "$zeron.composer.chip.top",
+		gap = "$zeren.composer.chip.gap",
+		px = "$zeren.composer.chip.inset",
+		pt = "$zeren.composer.chip.top",
 		ui.each(shown, function(item: Item): Node
 			if item.id == FOLD then
 				return ui.button {
@@ -738,7 +738,7 @@ M.Strip = ui.component(function(props: Props): Node
 					h = h,
 					px = "$space.2",
 					shrink = 0,
-					rounded = "$zeron.composer.chip.radius",
+					rounded = "$zeren.composer.chip.radius",
 					bg = "#00000000",
 					color = "$text.tertiary",
 					text_size = "$font.size.sm",
@@ -766,7 +766,7 @@ M.Strip = ui.component(function(props: Props): Node
 			direction = "row",
 			flex_wrap = true,
 			items = "center",
-			gap = "$zeron.composer.chip.gap",
+			gap = "$zeren.composer.chip.gap",
 			animate = { duration = 220, ease = "outCubic" },
 			enter = { opacity = { 0, 1 }, scale = { 0.9, 1 }, duration = 220, ease = "outCubic" },
 			exit = { opacity = 0, scale = 0.9, duration = 140, ease = "outCubic" },

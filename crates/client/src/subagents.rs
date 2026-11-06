@@ -14,10 +14,10 @@ use std::time::Duration;
 
 use serde_json::json;
 use tokio_util::sync::CancellationToken;
-use zeron_doc::parts::SubagentStatus;
-use zeron_doc::{MessagePart, SessionMessageEntry, TranscriptUpdate, apply_transcript_frame};
-use zeron_proto::ToolCall;
-use zeron_rpc::methods;
+use zeren_doc::parts::SubagentStatus;
+use zeren_doc::{MessagePart, SessionMessageEntry, TranscriptUpdate, apply_transcript_frame};
+use zeren_proto::ToolCall;
+use zeren_rpc::methods;
 
 use crate::client::{Client, ClientInner};
 use crate::error::Result;
@@ -83,7 +83,7 @@ pub fn subagents(entries: &[Arc<SessionMessageEntry>]) -> Vec<SubagentInfo> {
                 _ if !*resolved => SubagentState::Running,
                 _ => SubagentState::Done,
             };
-            let (_, detail) = zeron_proto::view::tool_chip_content(call);
+            let (_, detail) = zeren_proto::view::tool_chip_content(call);
             out.push(SubagentInfo {
                 id: id.clone(),
                 doc_id: subagent_ref.clone(),
@@ -265,7 +265,7 @@ async fn follow(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zeron_doc::{MessageRole, MessageStatus};
+    use zeren_doc::{MessageRole, MessageStatus};
 
     fn spawn(id: &str, name: &str, status: Option<SubagentStatus>, resolved: bool) -> MessagePart {
         MessagePart::Tool {

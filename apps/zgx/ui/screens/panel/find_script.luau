@@ -3,21 +3,21 @@
 -- Highlight API (Safari 17.2+, so WebKit's), the current one in the accent,
 -- scrolled into view; nothing of the page's markup is touched.
 --
---   window.__zeronFind.find(query, { wash, accent, ink })   { count, current }
---   window.__zeronFind.step(by)                              the next (1) or previous (-1)
---   window.__zeronFind.clear()                               every light out
+--   window.__zerenFind.find(query, { wash, accent, ink })   { count, current }
+--   window.__zerenFind.step(by)                              the next (1) or previous (-1)
+--   window.__zerenFind.clear()                               every light out
 --
 -- A page is untrusted: the script answers with two numbers and nothing else
 -- comes back.
 
 return [==[
 (() => {
-  if (window.__zeronFind) return;
+  if (window.__zerenFind) return;
   const MOST = 2000;
   let ranges = [], current = -1, style = null;
   const supports = typeof Highlight !== 'undefined' && !!(window.CSS && CSS.highlights);
   const clear = () => {
-    if (supports) { CSS.highlights.delete('zeron-find'); CSS.highlights.delete('zeron-find-current'); }
+    if (supports) { CSS.highlights.delete('zeren-find'); CSS.highlights.delete('zeren-find-current'); }
     ranges = []; current = -1;
   };
   const skip = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE', 'TEXTAREA']);
@@ -50,13 +50,13 @@ return [==[
     if (!supports) return;
     const all = new Highlight(...ranges);
     all.priority = 0;
-    CSS.highlights.set('zeron-find', all);
+    CSS.highlights.set('zeren-find', all);
     if (current >= 0) {
       const one = new Highlight(ranges[current]);
       one.priority = 1;
-      CSS.highlights.set('zeron-find-current', one);
+      CSS.highlights.set('zeren-find-current', one);
     } else {
-      CSS.highlights.delete('zeron-find-current');
+      CSS.highlights.delete('zeren-find-current');
     }
   };
   const reveal = () => {
@@ -75,8 +75,8 @@ return [==[
         style = document.createElement('style');
         // Every match a light wash of the accent; the current one the accent
         // itself with its ink, underlined too, so it stands out on any page.
-        style.textContent = `::highlight(zeron-find){background:${t.wash || 'rgba(146,119,176,.28)'};color:inherit}` +
-          `::highlight(zeron-find-current){background:${t.accent || '#9277b0'};color:${t.ink || '#fff'};text-decoration:underline}`;
+        style.textContent = `::highlight(zeren-find){background:${t.wash || 'rgba(146,119,176,.28)'};color:inherit}` +
+          `::highlight(zeren-find-current){background:${t.accent || '#9277b0'};color:${t.ink || '#fff'};text-decoration:underline}`;
         document.documentElement.appendChild(style);
       }
       clear();
@@ -97,6 +97,6 @@ return [==[
     },
     clear() { clear(); return answer(); },
   };
-  Object.defineProperty(window, '__zeronFind', { value: Object.freeze(api), configurable: false, writable: false });
+  Object.defineProperty(window, '__zerenFind', { value: Object.freeze(api), configurable: false, writable: false });
 })();
 ]==]

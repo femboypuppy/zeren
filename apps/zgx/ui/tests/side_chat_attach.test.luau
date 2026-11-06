@@ -106,7 +106,7 @@ test("a sidebar session dropped on a side chat is mentioned there, not on the ch
 	app:type(".side-chat-tab >> role:textbox", "see that one")
 	app:key("Enter")
 	app:frames(10)
-	expect(calls(app)).to_contain("zeron-chat:chat-1")
+	expect(calls(app)).to_contain("zeren-chat:chat-1")
 end)
 
 test("the files pane's files dropped on a side chat attach, by their path on its computer", function()

@@ -133,7 +133,7 @@ local function bar(now: State<any>, peak: () -> number, width: () -> number): No
 			end,
 			rounded = "$radius.sm",
 			bg = function(): string
-				return if credits() > 0 then "$accent" else "$zeron.secondary.bg"
+				return if credits() > 0 then "$accent" else "$zeren.secondary.bg"
 			end,
 		},
 	}
@@ -181,7 +181,7 @@ local function usage(): Node
 	-- Each day's share of the chart's width, as it's measured: the days
 	-- spread edge to edge, the gaps between them the token's.
 	local chart_w = ui.use_state(0)
-	local GAP = (ui.theme.get("zeron.space.hair") :: number?) or 2
+	local GAP = (ui.theme.get("zeren.space.hair") :: number?) or 2
 	local function width(): number
 		local n = #days:get()
 		if n == 0 then
@@ -253,7 +253,7 @@ local function usage(): Node
 								grow = 1,
 								direction = "row",
 								items = "end",
-								gap = "$zeron.space.hair",
+								gap = "$zeren.space.hair",
 							}),
 						},
 						ui.row {

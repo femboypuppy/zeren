@@ -8,19 +8,19 @@
 -- again as its source grows. With the plugin off, the block is the code
 -- block it was.
 
-local zeron = require("./zeron")("md-hello")
+local zeren = require("./zeren")("md-hello")
 
-zeron.place {
+zeren.place {
 	at = ".md-code.lang-hello",
 	replace = function(): Node
-		local code = zeron.need("code")
+		local code = zeren.need("code")
 		return ui.column {
 			class = "md-hello",
 			w_full = true,
 			gap = "$space.1",
 			p = "$space.4",
 			rounded = "$radius.xl",
-			bg = "$zeron.secondary.bg",
+			bg = "$zeren.secondary.bg",
 			border = 1,
 			border_color = "$accent",
 			ui.text { "Hello", text_size = "$font.size.xs", color = "$accent" },

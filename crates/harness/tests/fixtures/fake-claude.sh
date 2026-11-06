@@ -1,5 +1,5 @@
 #!/bin/sh
-# Fake Claude Code CLI for zeron-harness tests.
+# Fake Claude Code CLI for zeren-harness tests.
 #
 # Reads the first stream-json user line from stdin, picks a scenario from the
 # prompt text, and plays a scripted stream-json transcript on stdout —
@@ -14,9 +14,9 @@ read -r first || exit 1
 initialized=false
 while :; do
   case "$first" in
-    *'"request_id":"zeron_initialize"'*)
+    *'"request_id":"zeren_initialize"'*)
       case "$first" in *'"perTaskStopAffordance":true'*) initialized=true ;; esac
-      printf '%s\n' '{"type":"control_response","response":{"subtype":"success","request_id":"zeron_initialize","response":{}}}'
+      printf '%s\n' '{"type":"control_response","response":{"subtype":"success","request_id":"zeren_initialize","response":{}}}'
       read -r first || exit 1
       ;;
     *) break ;;
@@ -58,12 +58,12 @@ case "$first" in
 *scenario:native-subagents*)
   # A bare `--disallowedTools` rule takes the tools out of the init frame's
   # list, as 2.1.310 does (it lists the `Agent` tool as `Task`). The reply
-  # says whether the inline Zeron server is side-chats-only.
+  # says whether the inline Zeren server is side-chats-only.
   tools='"Bash","Task","Workflow"'
   server='native subagents'
   for arg in "$@"; do
     [ "$arg" = "--disallowedTools=Agent,Task,Workflow" ] && tools='"Bash"'
-    case "$arg" in *'"ZERON_SIDE_CHATS_ONLY":"1"'*) server='side chats only' ;; esac
+    case "$arg" in *'"ZEREN_SIDE_CHATS_ONLY":"1"'*) server='side chats only' ;; esac
   done
   emit "{\"type\":\"system\",\"subtype\":\"init\",\"model\":\"claude-fable-5\",\"tools\":[$tools],\"cwd\":\"/tmp\",\"session_id\":\"sess-native\"}"
   emit "{\"type\":\"stream_event\",\"event\":{\"type\":\"content_block_delta\",\"delta\":{\"type\":\"text_delta\",\"text\":\"$server\"}}}"
@@ -719,7 +719,7 @@ case "$first" in
 *scenario:grandchild*)
   # An MCP server or tool the CLI started, still running when it exits.
   sleep 300 </dev/null >/dev/null 2>&1 &
-  printf '%s' "$!" > "$ZERON_TEST_PIDFILE"
+  printf '%s' "$!" > "$ZEREN_TEST_PIDFILE"
   emit '{"type":"system","subtype":"init","model":"claude-fable-5","tools":[],"cwd":"/tmp","session_id":"sess-gc"}'
   emit '{"type":"result","subtype":"success","result":"done","usage":{"input_tokens":1,"output_tokens":1},"session_id":"sess-gc"}'
   ;;

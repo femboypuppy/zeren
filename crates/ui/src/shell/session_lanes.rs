@@ -1,12 +1,12 @@
 //! The lanes card, stacked under the session card and shown with it: what
 //! runs alongside the open chat — its **side chats** (forks, and chats an
-//! agent spawned through the Zeron MCP server) and its **subagents** (the
+//! agent spawned through the Zeren MCP server) and its **subagents** (the
 //! spawn chips of its transcript, with their live status). Each lane is a
 //! section of session-card rows; clicking a row opens it in the right pane.
 //! Settled subagents fold into one "finished" row, closed until opened.
 
-use zeron_doc::{MessagePart, SubagentStatus};
-use zeron_proto::{Chat, ChatIndicator};
+use zeren_doc::{MessagePart, SubagentStatus};
+use zeren_proto::{Chat, ChatIndicator};
 
 use super::session_info::SESSION_CARD_WIDTH;
 use super::*;
@@ -170,9 +170,9 @@ pub(super) struct ChildChatRow {
     pub status: ChatIndicator,
     pub time_ago: SharedString,
     /// The chat's linked pull request, drawn as the sidebar's badge.
-    pub change_request: Option<zeron_proto::ChangeRequestSummary>,
+    pub change_request: Option<zeren_proto::ChangeRequestSummary>,
     /// The harness it runs on, drawn as the sidebar's brand mark.
-    pub harness: Option<zeron_proto::HarnessId>,
+    pub harness: Option<zeren_proto::HarnessId>,
     activity: DateTime<Utc>,
 }
 
@@ -194,7 +194,7 @@ pub(super) fn child_chat_rows(
                 device_id: chat.device_id.clone(),
                 title: child_chat_title(chat).into(),
                 status: state.display_status_for(chat, now),
-                time_ago: zeron_proto::view::format_time_ago(activity, now).into(),
+                time_ago: zeren_proto::view::format_time_ago(activity, now).into(),
                 change_request: state.change_request_for_chat(chat).cloned(),
                 harness: chat.config.as_ref().map(|config| config.harness),
                 activity,
@@ -249,7 +249,7 @@ fn glyph(path: &'static str, theme: &Theme) -> AnyElement {
 }
 
 /// The harness a row runs on, as the sidebar's brand mark.
-fn harness_mark(harness: zeron_proto::HarnessId, theme: &Theme) -> gpui::Svg {
+fn harness_mark(harness: zeren_proto::HarnessId, theme: &Theme) -> gpui::Svg {
     let (path, tint) = crate::pickers::harness_brand_icon(harness);
     icon(path)
         .size(px(13.0))
@@ -606,14 +606,14 @@ impl Shell {
     fn render_subagent_row(
         &mut self,
         row: SubagentRow,
-        harness: Option<zeron_proto::HarnessId>,
+        harness: Option<zeren_proto::HarnessId>,
         view: gpui::EntityId,
         theme: &Theme,
         cx: &mut Context<Self>,
     ) -> gpui::Stateful<gpui::Div> {
         let key = format!("session-lanes-subagent-{}", row.doc_id);
         let mark = status_mark(key.clone(), row.indicator(), view, theme, cx);
-        let time = zeron_proto::view::format_time_ago(row.spawned_at, Utc::now());
+        let time = zeren_proto::view::format_time_ago(row.spawned_at, Utc::now());
         let title = row_title(format!("{key}-title"), row.title.clone());
         popover::picker_row(theme, false, false, key.clone())
             .id(SharedString::from(key))
@@ -704,8 +704,8 @@ impl Shell {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zeron_doc::{MessageRole, MessageStatus, SessionMessageEntry};
-    use zeron_proto::ToolCall;
+    use zeren_doc::{MessageRole, MessageStatus, SessionMessageEntry};
+    use zeren_proto::ToolCall;
 
     fn chat(id: &str, parent: Option<&str>, minutes_ago: i64) -> Chat {
         serde_json::from_value(serde_json::json!({

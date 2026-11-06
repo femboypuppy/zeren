@@ -2,12 +2,12 @@
 -- A session's pull request beside its title in the sidebar: the design
 -- system's pull request badge (ds/badge, the sidebar's own badge
 -- generalised: its state's glyph and number in its state's colour,
--- `$zeron.pr.*`, on a wash of it), lit under the pointer as Zeron's sidebar
+-- `$zeren.pr.*`, on a wash of it), lit under the pointer as Zeren's sidebar
 -- badge brightens (crates/ui/src/change_requests.rs `render_badge_model`).
 -- A click opens its session and the pull request in that chat's panel.
 --
 -- No tooltip, on purpose: the session's hover card says its state and title
--- (card_row.luau), as Zeron's sidebar has it, rather than a second card
+-- (card_row.luau), as Zeren's sidebar has it, rather than a second card
 -- over the first.
 
 local Badge = require("@ds/badge")

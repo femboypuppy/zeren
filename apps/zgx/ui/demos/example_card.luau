@@ -95,7 +95,7 @@ local function failure(align: TextAlign?, lines: number?): Node
 		h = line * (lines or 1),
 		text_size = "$font.size.md",
 		line_height = "$font.line.md",
-		color = "$zeron.tone.danger.ink",
+		color = "$zeren.tone.danger.ink",
 		wrap = true,
 	}
 end
@@ -141,7 +141,7 @@ local function glow(box: { left: number, right: number, top: number, bottom: num
 			w_full = true,
 			h_full = true,
 			blur = GLOW_BLUR,
-			opacity = "$zeron.card.glow",
+			opacity = "$zeren.card.glow",
 			ui.image { src = SKY, w_full = true, h_full = true, fit = "cover" },
 		},
 	}

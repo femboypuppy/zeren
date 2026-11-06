@@ -1,12 +1,12 @@
 -- A window's title bar over its sidebar: the window's buttons, the
--- sidebar's toggle, back and forward, at Zeron's exact places (crates/ui/
+-- sidebar's toggle, back and forward, at Zeren's exact places (crates/ui/
 -- src/shell.rs: `titlebar_cluster_start`, `TITLEBAR_*`; lib.rs: the
 -- window's `traffic_light_position`), so a sidebar under it in a real window
 -- lines up with the system's buttons.
 --
 -- Open, they sit flat on the sidebar's top. Collapsed, the sidebar no
 -- longer runs under them: they stand over the page (its wallpaper, its
--- art), so an island of glass gathers behind them, as Zeron's does
+-- art), so an island of glass gathers behind them, as Zeren's does
 -- (`titlebar_island_vertical_geometry`: growing from 28 to 32 points about
 -- the controls' middle). They never move; only the island comes and goes.
 --
@@ -35,7 +35,7 @@ export type Props = {
 	read on_back: (() -> ())?,
 	read on_forward: (() -> ())?,
 	read lights: boolean?,
-	-- When the island shows: Zeron's shows only while the controls stand
+	-- When the island shows: Zeren's shows only while the controls stand
 	-- over artwork (the sidebar collapsed, on a new session's canvas, a
 	-- wallpaper set). By default, whenever the sidebar is collapsed.
 	read island: (() -> boolean)?,
@@ -54,26 +54,26 @@ export type Props = {
 	read actions_width: State<number>?,
 }
 
--- Zeron's metrics. The bar: 38 tall, its row padded 4 at the top, so its
+-- Zeren's metrics. The bar: 38 tall, its row padded 4 at the top, so its
 -- controls centre 21 down.
 local H, TOP_PAD = 38, 4
 local MIDDLE = (H + TOP_PAD) / 2
--- macOS's buttons, as macOS 26 draws them (measured off Zeron's window): 14
+-- macOS's buttons, as macOS 26 draws them (measured off Zeren's window): 14
 -- across, 23 apart, the first centred 21 in, so 21, 44 and 67.
 local LIGHT, LIGHT_FIRST, LIGHT_PITCH = 14, 21, 23
--- The toggle: 88 in beside the traffic lights (Zeron's
+-- The toggle: 88 in beside the traffic lights (Zeren's
 -- `titlebar_cluster_start`), 10 in with nothing at the left (the shipping
 -- app's elsewhere). The controls, their gaps and the island round them are
--- the theme's island (`zeron.island`), read as the bar is built; its row
--- runs 10 past its last control (Zeron's `TITLEBAR_CLUSTER_PAD`).
+-- the theme's island (`zeren.island`), read as the bar is built; its row
+-- runs 10 past its last control (Zeren's `TITLEBAR_CLUSTER_PAD`).
 local TOGGLE_IN, ROW_PAD = 88, 10
 -- On macOS the toggle stands this far past the traffic lights' right edge
 -- (`ui.window.controls`: 12 in and 60 across in zgx's inset title bar, so
 -- 88 in, as ever). In full screen macOS hides them, and the controls take
--- the window's edge inset (Zeron's `titlebar_cluster_start(true)`). Off
+-- the window's edge inset (Zeren's `titlebar_cluster_start(true)`). Off
 -- macOS the bar keeps its 88.
 local LIGHTS_GAP, FULL_SCREEN_IN = 16, 12
--- How they slide over: as Zeron's do (`titlebar_tween`, 200 ms, ease out),
+-- How they slide over: as Zeren's do (`titlebar_tween`, 200 ms, ease out),
 -- once the system's animation is over. The window draws no frames while
 -- macOS animates it in or out (it shows a picture of the window meanwhile:
 -- zgx's frames say "the window stopped presenting" for its 0.35 s going in,
@@ -172,7 +172,7 @@ end
 -- `target`'s props kept where each says (`at[prop](full)`, read tracked: the
 -- window in full screen or not, the lights, whatever else it reads), by the
 -- engine: still while the window goes in or out of full screen, then
--- sliding over as Zeron's controls do (`FULL_SCREEN_SLIDE`); otherwise eased
+-- sliding over as Zeren's controls do (`FULL_SCREEN_SLIDE`); otherwise eased
 -- by `settle` (a tween's options) or set at once. Nothing runs per frame
 -- and nothing at rest: the node's own style gives them a plain number to
 -- start from (`at` as it stands then), never a function (an animated style
@@ -277,7 +277,7 @@ end
 -- The title line's middle, from the window's top: where everything on the
 -- bar centres. 21, as beside the traffic lights; where the window's buttons
 -- stand at the right in a strip shorter than the bar (Windows' 32-point
--- caption buttons), on their middle, so Zeron's controls and theirs share
+-- caption buttons), on their middle, so Zeren's controls and theirs share
 -- one line; never nearer the window's top than an island's middle, its
 -- controls held their padding in from the edge (zgx reports the buttons
 -- shorter in a zoomed window than it draws them: zgx-asks/
@@ -321,7 +321,7 @@ local TitleBar = ui.component(function(props: Props): Node
 	local CONTROL, GROUP_GAP, CONTROL_GAP = m.control, m.group, m.gap
 	-- The island: from the window's inset to the control row's end; as tall
 	-- as an island (a control and its padding), a padding's worth less as it
-	-- comes (Zeron's 28 to 32). Its end follows the row (full screen).
+	-- comes (Zeren's 28 to 32). Its end follows the row (full screen).
 	local ISLAND_LEFT = m.inset
 	local function island_w(full: boolean, tracked: boolean?): number
 		local start = toggle_in(full, tracked)
@@ -476,7 +476,7 @@ local TitleBar = ui.component(function(props: Props): Node
 		end)
 		local side = ROW_PAD - m.inset
 		local function hung(): any
-			return if caption() ~= nil then 0 else "$zeron.island.radius"
+			return if caption() ~= nil then 0 else "$zeren.island.radius"
 		end
 		local actions_island: ContainerProps = {
 			id = "titlebar-actions-island",
@@ -510,7 +510,7 @@ local TitleBar = ui.component(function(props: Props): Node
 		actions_island.rounded_tl = hung
 		actions_island.rounded_tr = hung
 		actions_island.rounded_br = hung
-		actions_island.rounded_bl = "$zeron.island.radius"
+		actions_island.rounded_bl = "$zeren.island.radius"
 		table.insert(bar, ui.div(actions_island))
 		-- The page's controls, as far in from the right as the row runs past
 		-- its last control at the left, and clear of the window's own

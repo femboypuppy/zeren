@@ -3,7 +3,7 @@
 -- sign in, and to switch accounts when one hits its limit, so that is the
 -- whole page: each installed agent a card, its accounts under it with how
 -- much of each plan is used, the way to add one at the card's foot; and
--- under those the agents still to install, Zeron's own a click each and
+-- under those the agents still to install, Zeren's own a click each and
 -- every other agent a page away. Each agent's settings open from its card.
 -- The pieces are in providers_parts.luau.
 

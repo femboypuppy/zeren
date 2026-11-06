@@ -1,13 +1,13 @@
 -- The git journey's pieces, shared by its pages: one pull request from
 -- its commit to its merge (#1142, "Add the design system's primitives",
--- zeron/primitives into main), the people around it, its commits and
+-- zeren/primitives into main), the people around it, its commits and
 -- files, a diff of one file (with a comment on any line of it), its checks
 -- (as a block that folds to one line), what happened to it in order (the
 -- activity), and the header every page of it opens with. The vocabulary
--- is Zeron's (pull_requests.rs row_status: Draft, Open, Approved, Changes
+-- is Zeren's (pull_requests.rs row_status: Draft, Open, Approved, Changes
 -- requested, Merge conflicts; Checks · n).
 --
--- Every page has two widths: the window's, and a side pane's. Zeron's
+-- Every page has two widths: the window's, and a side pane's. Zeren's
 -- right pane is 520 by default and 360 at its narrowest (settings.rs
 -- RIGHT_PANE_MIN); its pull request page tightens its gutters to 16 below
 -- 480 (pull_request_detail.rs NARROW_PAGE, NARROW_PAD_X). The narrow
@@ -64,7 +64,7 @@ M.ME, M.THEO, M.PRIYA, M.JONAS = ME, THEO, PRIYA, JONAS
 M.PR = {
 	number = 1142,
 	title = "Add the design system's primitives",
-	branch = "zeron/primitives",
+	branch = "zeren/primitives",
 	base = "main",
 	added = 2480,
 	removed = 61,
@@ -80,7 +80,7 @@ M.COMMITS = {
 	{ sha = "3f2c9a1", subject = "Settings pieces, and the token lint" },
 }
 
--- The commit's files: Zeron's statuses, with the lines each adds and takes.
+-- The commit's files: Zeren's statuses, with the lines each adds and takes.
 M.FILES = {
 	{ path = "ui/ds/badge.luau", status = "added", add = 312, del = 0 },
 	{ path = "ui/ds/tokens.luau", status = "modified", add = 64, del = 2 },
@@ -190,7 +190,7 @@ local HUNK: { Line } = {
 	{ kind = "hunk", text = "@@ -40,7 +40,9 @@ function M.Badge(props: Props): Node" },
 	{ kind = " ", old = 40, new = 40, text = '	local size = SIZE[props.size or "sm"]' },
 	{ kind = " ", old = 41, new = 41, text = '	local look: Look = props.look or "soft"' },
-	{ kind = "-", old = 42, text = '	local ink = `$zeron.tone.{props.tone or "neutral"}.ink`' },
+	{ kind = "-", old = 42, text = '	local ink = `$zeren.tone.{props.tone or "neutral"}.ink`' },
 	{ kind = "+", new = 42, text = "	local ink = ink_of(props)" },
 	{ kind = "+", new = 43, text = "	-- A colour given outright (a pull request's state) wins over a tone." },
 	{ kind = " ", old = 43, new = 44, text = '	local radius = if props.shape == "pill" then "$radius.full" else size.radius' },
@@ -210,7 +210,7 @@ function M.diff(path: string, status: string, add: number, del: number, opts: Di
 	return Git.diff({ path = path, status = status, add = add, del = del }, HUNK, opts)
 end
 
--- A review thread on a line of the change, as Zeron shows one inline: the
+-- A review thread on a line of the change, as Zeren shows one inline: the
 -- design system's band under the line, its words on the code's text edge
 -- (`inset`), joined to a block above it if there is one.
 function M.thread(opts: { inset: number?, joined: boolean?, draft: State<string>, resolved: State<boolean>, changes: boolean? }): Node

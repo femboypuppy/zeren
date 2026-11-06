@@ -19,7 +19,7 @@ local TURNS = 300
 -- a model's usual pace, and a fast one's.
 local SPEEDS: { [string]: number } = { slow = 45, steady = 220, fast = 900 }
 -- How often the reply's text is committed: often enough that it reads as a
--- flow, not lumps (Zeron's 120 ms read as lumps), rarely enough that each
+-- flow, not lumps (Zeren's 120 ms read as lumps), rarely enough that each
 -- commit carries a few words.
 local TICK = 33
 
@@ -74,8 +74,8 @@ local function with_tools(list: { Message }): { Message }
 					},
 				},
 			},
-			{ id = "tools-t3", kind = "exec", verb = "Ran", target = "cargo test -p zeron-ui transcript", output = table.concat(LOG, "\n"), output_ref = "gallery/tools-t3", output_bytes = 18432 },
-			{ id = "tools-t4", kind = "exec", verb = "Ran", target = "cargo clippy -p zeron-ui", failed = true, output = "error: could not compile `zeron-ui` (lib) due to 1 previous error\nerror[E0425]: cannot find value `row_ix` in this scope\n  --> crates/ui/src/transcript.rs:7001:31" },
+			{ id = "tools-t3", kind = "exec", verb = "Ran", target = "cargo test -p zeren-ui transcript", output = table.concat(LOG, "\n"), output_ref = "gallery/tools-t3", output_bytes = 18432 },
+			{ id = "tools-t4", kind = "exec", verb = "Ran", target = "cargo clippy -p zeren-ui", failed = true, output = "error: could not compile `zeren-ui` (lib) due to 1 previous error\nerror[E0425]: cannot find value `row_ix` in this scope\n  --> crates/ui/src/transcript.rs:7001:31" },
 		},
 	})
 	return list
@@ -361,7 +361,7 @@ return {
 				shrink = 0,
 				ui.column {
 					w_full = true,
-					max_w = ui.theme.get("zeron.prose.measure") :: number,
+					max_w = ui.theme.get("zeren.prose.measure") :: number,
 					min_w = 0,
 					ds.Composer {
 						value = typed,

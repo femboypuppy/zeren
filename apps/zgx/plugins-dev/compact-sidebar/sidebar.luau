@@ -1,5 +1,5 @@
 -- The sidebar, as one short list: every session, newest first, its title
--- and where it stands. It keeps Zeron's own module's interface (pin,
+-- and where it stands. It keeps Zeren's own module's interface (pin,
 -- archive, rename, the rail) by wrapping it, and draws only the full
 -- sidebar itself. Rows are keyed by session, so a session's state or title
 -- moving changes its row in place.
@@ -78,7 +78,7 @@ function M.Sidebar(props: any): Node
 		h_full = true,
 		pt = ui.raw(props.top or 0, "the title bar's height, the shell's"),
 		px = "$space.2",
-		gap = "$zeron.list.gap",
+		gap = "$zeren.list.gap",
 		ui.show(function(): boolean
 			return not props.collapsed:get()
 		end, ui.scroll {
@@ -89,7 +89,7 @@ function M.Sidebar(props: any): Node
 					return chat.id
 				end,
 				w_full = true,
-				gap = "$zeron.list.gap",
+				gap = "$zeren.list.gap",
 			}),
 		}),
 	}

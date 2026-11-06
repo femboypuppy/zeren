@@ -1,5 +1,5 @@
 -- The pictures a reply shows: those it names in Markdown (`![alt](path)`)
--- and those an agent shows (`show_image`, a generated image). Zeron's
+-- and those an agent shows (`show_image`, a generated image). Zeren's
 -- reply image row (crates/ui/src/reply_images.rs) is the behaviour; the
 -- look is the design system's.
 --
@@ -26,8 +26,8 @@
 -- written) shows at once: nothing replays.
 --
 -- One that can't be read is a quiet line of its own: what it was and why,
--- a link to its path where the reply's links open (Zeron keeps the link).
--- It is read again on Zeron's backoff (screens/chat/reply_images).
+-- a link to its path where the reply's links open (Zeren keeps the link).
+-- It is read again on Zeren's backoff (screens/chat/reply_images).
 --
 -- Under the pointer (or with focus), Copy and, for a file on this Mac, Show
 -- in Finder sit at its top right, each a small glass square 6 in from the
@@ -100,22 +100,22 @@ local function n(token: string, fallback: number): number
 	return if type(v) == "number" then v else fallback
 end
 
--- The measures, the theme's (zeron.prose.picture): the widest and tallest,
+-- The measures, the theme's (zeren.prose.picture): the widest and tallest,
 -- a placeholder's shape, the corner, a small one's tile, how long or wide
 -- before it's cut, the tray's inset and corner, a run's tallest row, and
 -- the controls' inset from the corner.
 local function measures(): { [string]: number }
 	return {
-		W = n("zeron.prose.picture.w", 660),
-		H = n("zeron.prose.picture.h", 420),
-		PLACE = n("zeron.prose.picture.place", 1.6),
-		R = n("zeron.prose.picture.radius", 12),
-		MIN = n("zeron.prose.picture.min", 64),
-		TALL = n("zeron.prose.picture.tall", 0.5),
-		WIDE = n("zeron.prose.picture.wide", 5),
-		INSET = n("zeron.prose.picture.tray.inset", 4),
-		ROW = n("zeron.prose.picture.tray.row", 300),
-		CONTROL = n("zeron.prose.picture.control.inset", 6),
+		W = n("zeren.prose.picture.w", 660),
+		H = n("zeren.prose.picture.h", 420),
+		PLACE = n("zeren.prose.picture.place", 1.6),
+		R = n("zeren.prose.picture.radius", 12),
+		MIN = n("zeren.prose.picture.min", 64),
+		TALL = n("zeren.prose.picture.tall", 0.5),
+		WIDE = n("zeren.prose.picture.wide", 5),
+		INSET = n("zeren.prose.picture.tray.inset", 4),
+		ROW = n("zeren.prose.picture.tray.row", 300),
+		CONTROL = n("zeren.prose.picture.control.inset", 6),
 	}
 end
 
@@ -479,7 +479,7 @@ local Frame = ui.component(function(props: FrameProps): Node
 
 	local frame: { [any]: any } = {
 		relative = true,
-		rounded = "$zeron.prose.picture.radius",
+		rounded = "$zeren.prose.picture.radius",
 		overflow = "hidden",
 		border = 1,
 		border_over = true,
@@ -578,7 +578,7 @@ local Frame = ui.component(function(props: FrameProps): Node
 	local open_menu = ui.use_state(false)
 	return ContextMenu {
 		open = open_menu,
-		ring = "$zeron.prose.picture.radius",
+		ring = "$zeren.prose.picture.radius",
 		label = locale.t("ds.reply_picture.actions"),
 		-- Alone: its own shape, as wide as it is (no wider than the
 		-- column, its height following), easing to a new size.
@@ -655,7 +655,7 @@ export type LineProps = {
 	-- Why, in plain words (`M.plain`): its tooltip.
 	reason: string?,
 	-- Where it's a link (a reply's picture that can't be shown opens its
-	-- path, as Zeron keeps it a link): what a click does, and its menu.
+	-- path, as Zeren keeps it a link): what a click does, and its menu.
 	on_click: (() -> ())?,
 	context_menu: ((e: PointerEvent) -> { Node }?)?,
 }
@@ -670,7 +670,7 @@ function M.Line(props: LineProps): Node
 		class = "md-image-error",
 		self = "start",
 		max_w = "100%",
-		min_h = "$zeron.prose.small.line",
+		min_h = "$zeren.prose.small.line",
 		gap = "$space.2",
 		items = "center",
 		color = "$text.tertiary",
@@ -688,8 +688,8 @@ function M.Line(props: LineProps): Node
 			words,
 			literal = true,
 			truncate = true,
-			text_size = "$zeron.prose.small.size",
-			line_height = "$zeron.prose.small.line",
+			text_size = "$zeren.prose.small.size",
+			line_height = "$zeren.prose.small.line",
 			underline = if click then true else nil,
 			underline_offset = if click then 4 else nil,
 		},
@@ -820,7 +820,7 @@ function M.Run(props: RunProps): Node
 				ui.div {
 					relative = true,
 					rounded = ui.raw(m.R + m.INSET, "concentric: the pictures' corner plus the tray's inset"),
-					bg = "$zeron.prose.code.bg",
+					bg = "$zeren.prose.code.bg",
 					w = function(): number
 						return laid:get().w + m.INSET * 2
 					end,

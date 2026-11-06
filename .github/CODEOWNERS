@@ -17,5 +17,5 @@
 /scripts/package-windows.ps1 @SinaKhalili @wingleeio
 /scripts/ios/ @SinaKhalili @wingleeio
 
-# Reads the Android release keystore (ZERON_ANDROID_KEYSTORE*).
+# Reads the Android release keystore (ZEREN_ANDROID_KEYSTORE*).
 /apps/android/app/build.gradle.kts @SinaKhalili @wingleeio

@@ -1,8 +1,8 @@
 # zgx ask: let an app rebind its commands' shortcuts while it runs
 
 ## What we're building
-Settings → Shortcuts in the Zeron app on zgx (apps/zgx), at parity with
-the shipping Zeron app. That page lists every shortcut, and rebinding one
+Settings → Shortcuts in the Zeren app on zgx (apps/zgx), at parity with
+the shipping Zeren app. That page lists every shortcut, and rebinding one
 records a key combination: click a combo, press keys, Esc cancels, and a
 conflict with another command shows while you record. The new binding
 applies at once, everywhere.

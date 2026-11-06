@@ -24,6 +24,6 @@ export const makeDevice = async (deviceId: string): Promise<TestDevice> => {
     deviceId,
     publicKey: toBase64Url(raw),
     sign,
-    grantSig: (userId, provider, ts) => sign(`zeron-vault-grant\n${userId}\n${deviceId}\n${provider}\n${ts}`)
+    grantSig: (userId, provider, ts) => sign(`zeren-vault-grant\n${userId}\n${deviceId}\n${provider}\n${ts}`)
   };
 };

@@ -83,19 +83,19 @@ test("a command picked lands as its token and is sent as its reference; one type
 	-- (It goes to the host as it joins the transcript.)
 	expect(app:wait('~"the branch"', { timeout_ms = 2000 })).to_be(true)
 	local calls = app:state("calls")
-	expect(calls).to_contain("send:s2:[/review](zeron-invoke:7b226b696e64223a22636f6d6d616e64222c226e616d65223a22726576696577227d) the branch, then /compact by hand")
+	expect(calls).to_contain("send:s2:[/review](zeren-invoke:7b226b696e64223a22636f6d6d616e64222c226e616d65223a22726576696577227d) the branch, then /compact by hand")
 end)
 
-test("Zeron's own commands end the `/` list, named clear of the agent's, and only a chat's in a chat", function()
+test("Zeren's own commands end the `/` list, named clear of the agent's, and only a chat's in a chat", function()
 	local app = chat()
 	app:type("role:textbox", "/")
 	settle(app)
 	expect(app:has('role:option "/model"')).to_be(true)
 	expect(app:has('role:option "/stop"')).to_be(true)
-	expect(app:has('~"Zeron: open settings"')).to_be(true)
-	-- The agent has a `/new`: it keeps it, and Zeron's is `/zeron:new`.
+	expect(app:has('~"Zeren: open settings"')).to_be(true)
+	-- The agent has a `/new`: it keeps it, and Zeren's is `/zeren:new`.
 	expect(app:has('role:option "/new"')).to_be(true)
-	expect(app:has('role:option "/zeron:new"')).to_be(true)
+	expect(app:has('role:option "/zeren:new"')).to_be(true)
 	-- A new chat (no session): none of a chat's own.
 	app:key("Escape")
 	app:fill("role:textbox", "")
@@ -108,7 +108,7 @@ test("Zeron's own commands end the `/` list, named clear of the agent's, and onl
 	expect(app:has('role:option "/rename"')).to_be(false)
 end)
 
-test("one of Zeron's own picked runs at once, its token gone and the rest kept; a draft of only it runs as it's sent", function()
+test("one of Zeren's own picked runs at once, its token gone and the rest kept; a draft of only it runs as it's sent", function()
 	local app = chat()
 	app:type("role:textbox", "Keep this /sto")
 	settle(app)
@@ -130,10 +130,10 @@ end)
 
 -- (`/rename` opens the sidebar's rename, which reads the host's places:
 -- the fixture has none, so it's left to the app.)
-test("every one of Zeron's own runs from the chat page without an error", function()
-	-- (The fixture's agent has a `/new` of its own, so Zeron's is
-	-- `/zeron:new`: `/new` goes to the agent, as it should.)
-	for _, name in { "model", "resume", "settings", "files", "terminal", "zeron:new" } do
+test("every one of Zeren's own runs from the chat page without an error", function()
+	-- (The fixture's agent has a `/new` of its own, so Zeren's is
+	-- `/zeren:new`: `/new` goes to the agent, as it should.)
+	for _, name in { "model", "resume", "settings", "files", "terminal", "zeren:new" } do
 		local app = chat()
 		app:type("role:textbox", `/{name}`)
 		settle(app)

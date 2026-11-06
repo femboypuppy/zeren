@@ -1,4 +1,4 @@
--- The pictures a reply names (`![alt](path)`), as Zeron's transcript draws
+-- The pictures a reply names (`![alt](path)`), as Zeren's transcript draws
 -- them (crates/ui/src/reply_images.rs): only a path on the chat's own device,
 -- absolute or in the chat's folder, of a PNG, JPEG or WebP by its name. No
 -- URL is ever fetched (`http:`, `file:`, `data:`…), and `~`, network and
@@ -10,8 +10,8 @@
 -- What each picture is (coming, shown, couldn't be read) is kept by chat
 -- and path in state that outlives the view: a reload, a chat opened again,
 -- the same picture in another reply, none reads it twice. At most four are
--- read at once, as Zeron's. One that couldn't be read is read again, as
--- Zeron's shared backoff does (a picture an agent names a moment before it
+-- read at once, as Zeren's. One that couldn't be read is read again, as
+-- Zeren's shared backoff does (a picture an agent names a moment before it
 -- writes the file): 3, 10, 30 and 90 seconds on, while it shows
 -- (`retry`, the time it's due, which ds/reply_picture waits for).
 --
@@ -222,7 +222,7 @@ end
 -- The pictures sent with messages (each a path on the chat's device): in a
 -- chat on this device, the path itself; on another (`session()`'s `device`
 -- not its `here`), read from there through the engine (`files.attachment`,
--- Zeron's transcript thumbnails), kept as reply pictures are.
+-- Zeren's transcript thumbnails), kept as reply pictures are.
 function M.for_attachments(session: () -> Session?, read: Read?): Pictures
 	-- (Any path here shows as it is; one read from another device must be
 	-- a path of its own there.)

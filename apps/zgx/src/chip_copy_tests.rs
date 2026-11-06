@@ -2,8 +2,8 @@
 //! pill each, its room the span's own padding (zgx d6582b32), not thin
 //! spaces in its text. So a selection across the message copies the names
 //! as written, with no U+2009 around them. Mounted headless on the chat
-//! fixture, whose `link_turn` sends "Look at [chat.rs](zeron-file:…) please,
-//! as in [Long chat](zeron-chat:s1), and [the site](https://…)".
+//! fixture, whose `link_turn` sends "Look at [chat.rs](zeren-file:…) please,
+//! as in [Long chat](zeren-chat:s1), and [the site](https://…)".
 
 use zgx_script::{ScriptHost, testing::TestApp};
 

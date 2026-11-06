@@ -381,7 +381,7 @@ const ORPHAN_SWEEP_MS = 10 * 60_000;
 const ORPHAN_GRACE_MS = 15 * 60_000;
 /** The writer the edge's own registry ops are attributed to (and clocked by). */
 const REGISTRY_WRITER = "cloud-edge";
-/** Mirrors `zeron_proto::CLOUD_SESSION_CAPABILITY` (a session machine's device). */
+/** Mirrors `zeren_proto::CLOUD_SESSION_CAPABILITY` (a session machine's device). */
 const CLOUD_SESSION_CAPABILITY = "cloud-session";
 const SWEEP_RETRY_MS = 5 * 60_000;
 const FULL_NAME_RE = /^[A-Za-z0-9_.-]{1,100}\/[A-Za-z0-9_.-]{1,100}$/;

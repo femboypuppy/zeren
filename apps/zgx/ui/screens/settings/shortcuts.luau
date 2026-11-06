@@ -1,4 +1,4 @@
--- Settings → Shortcuts: every shortcut Zeron has, grouped as the shipping
+-- Settings → Shortcuts: every shortcut Zeren has, grouped as the shipping
 -- app's page groups them, each with its keys. The list is the shell's own
 -- table (screens/shell/keys `LIST`: `{ id, title, key, group, menu }` in
 -- display order), which its `ui.command`s are declared from, so the page can't
@@ -218,7 +218,7 @@ local function binding(k: Key): Node
 	}
 end
 
--- Restore defaults: every shortcut back as Zeron has it, shown while any
+-- Restore defaults: every shortcut back as Zeren has it, shown while any
 -- is rebound.
 local function restore(): Node?
 	local s = shell_keys()

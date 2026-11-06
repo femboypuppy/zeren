@@ -6,12 +6,12 @@
 //! Its self-updater (`claude update`, `pi update --self`, …) reinstalls with
 //! whatever npm it finds, which may be another Node's, writing a second copy
 //! the launcher never runs. So an install is updated by the package manager
-//! that owns it, into the place it lives; one zeron can't prove is left to
+//! that owns it, into the place it lives; one zeren can't prove is left to
 //! the user, with the reason.
 
 use std::path::{Path, PathBuf};
 
-use zeron_proto::HarnessId;
+use zeren_proto::HarnessId;
 
 /// A version-manager wrapper script is a few lines; anything larger is a
 /// real launcher.
@@ -47,7 +47,7 @@ pub(super) enum PackageOwner {
     Project,
 }
 
-/// How an install must be updated, when zeron can't do it itself.
+/// How an install must be updated, when zeren can't do it itself.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) enum Manual {
     /// A mise-managed tool: its version is pinned in mise's config.
@@ -70,7 +70,7 @@ impl Manual {
     }
 }
 
-/// An update zeron can run for a package-managed install.
+/// An update zeren can run for a package-managed install.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct PackageUpdate {
     pub program: PathBuf,
@@ -315,7 +315,7 @@ fn find_program(name: &str, near: &[PathBuf]) -> Option<PathBuf> {
     let mut dirs: Vec<PathBuf> = near.to_vec();
     for path in [
         std::env::var_os("PATH"),
-        zeron_harness::shell_env::login_shell_path().map(|p| p.to_os_string()),
+        zeren_harness::shell_env::login_shell_path().map(|p| p.to_os_string()),
     ]
     .into_iter()
     .flatten()

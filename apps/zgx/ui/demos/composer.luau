@@ -33,7 +33,7 @@ local effort = ui.state("cx_effort", "high" :: string?)
 local fast = ui.state("cx_fast", false)
 local checkout = ui.state("cx_checkout", "worktree" :: string?)
 local device = ui.state("cx_device", "mac" :: string?)
-local branch = ui.state("cx_branch", "zeron/zgx-onboarding-design-system" :: string?)
+local branch = ui.state("cx_branch", "zeren/zgx-onboarding-design-system" :: string?)
 local cargo = ui.state("cx_cargo", {} :: { Cargo.Item })
 local queue = ui.state("cx_queue", {} :: { Dock.Queued })
 local todos = ui.state("cx_todos", {} :: { Dock.Todo })
@@ -89,8 +89,8 @@ local DEVICES: { ds.ComposerDevice } = {
 }
 local BRANCHES: { Dropdown.Item } = {
 	{ value = "main", label = "main" },
-	{ value = "zeron/zgx-onboarding-design-system", label = "zeron/zgx-onboarding-design-system" },
-	{ value = "zeron/composer", label = "zeron/composer" },
+	{ value = "zeren/zgx-onboarding-design-system", label = "zeren/zgx-onboarding-design-system" },
+	{ value = "zeren/composer", label = "zeren/composer" },
 }
 
 -- Timers a state runs (an upload climbing, words arriving while
@@ -125,7 +125,7 @@ local function drop_cargo(id: string)
 	cargo:set(list)
 end
 
--- An upload climbing to 99% (the last step is the commit's: Zeron caps it
+-- An upload climbing to 99% (the last step is the commit's: Zeren caps it
 -- there), one item finishing on the way.
 local function climb(id: string, from: number, done_at: number?)
 	local p = from
@@ -650,7 +650,7 @@ local function chip(s: Spec): Node
 		border = 1,
 		border_over = true,
 		border_color = function()
-			return if on() then "$zeron.composer.option.ring" else "#00000000"
+			return if on() then "$zeren.composer.option.ring" else "#00000000"
 		end,
 		color = function()
 			return if on() then "$text.primary" else "$text.secondary"
@@ -707,9 +707,9 @@ local function behind(): Node
 		pointer_events = "none",
 		ui.column {
 			w_full = true,
-			max_w = "$zeron.prose.measure",
+			max_w = "$zeren.prose.measure",
 			gap = "$space.4",
-			UserMessage { text = "Port the composer dock to zgx: the queue tray first, then the plan. Keep Zeron's tuck." },
+			UserMessage { text = "Port the composer dock to zgx: the queue tray first, then the plan. Keep Zeren's tuck." },
 			Markdown {
 				text = "Read `composer_dock.rs` and `queue.rs`. The dock is one element that travels between the new chat and a session; the trays tuck 18 points under the pill with their top corners at 16. I'll port the queue's rows first, then the plan's folding, and leave the handoff fade for last.",
 			},

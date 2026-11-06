@@ -5,7 +5,7 @@
 -- and it reads on glass and opaque, light and dark.
 --
 --   Badge { "Beta", tone = "accent" }            a label on a tone
---   Badge { "Merged", color = "$zeron.pr.merged", icon = "git-merge" }
+--   Badge { "Merged", color = "$zeren.pr.merged", icon = "git-merge" }
 --   Badge { "3", tone = "danger", look = "solid", shape = "pill" }
 --   Tag { "frontend", on_remove = … }            a chip that can go
 --   Count { n = 12 }                              a number in a pill
@@ -58,13 +58,13 @@ export type Props = {
 -- How strong a badge's ink is on any colour (the sidebar's pull request
 -- badge's): for what draws a state's colour as a badge would, outside one
 -- (a hover card's pull request row).
-M.INK = "$zeron.badge.ink"
+M.INK = "$zeren.badge.ink"
 
 -- Each size: its height, padding, gap, type and glyph.
 local SIZE = {
 	-- (Small: the sidebar's pull request badge, its 3-point gap kept.)
 	sm = { h = 16, px = "$space.1", gap = ui.raw(3, "the sidebar badge's glyph gap"), text = "$font.size.xs", icon = 11, radius = "$radius.sm" },
-	md = { h = 20, px = "$zeron.space.tight", gap = "$space.1", text = "$font.size.sm", icon = 12, radius = "$radius.md" },
+	md = { h = 20, px = "$zeren.space.tight", gap = "$space.1", text = "$font.size.sm", icon = 12, radius = "$radius.md" },
 }
 
 -- A solid badge's fill, by tone.
@@ -82,7 +82,7 @@ local function ink_of(props: Props): string
 	if props.color then
 		return props.color
 	end
-	return `$zeron.tone.{props.tone or "neutral"}.ink`
+	return `$zeren.tone.{props.tone or "neutral"}.ink`
 end
 
 function M.Badge(props: Props): Node
@@ -106,9 +106,9 @@ function M.Badge(props: Props): Node
 				bg = if props.color then props.color else "$text.primary",
 				opacity = if props.color and props.lit
 					then function(): string
-						return if (props.lit :: () -> boolean)() then "$zeron.badge.lit.wash" else "$zeron.badge.wash"
+						return if (props.lit :: () -> boolean)() then "$zeren.badge.lit.wash" else "$zeren.badge.wash"
 					end
-					elseif props.color then "$zeron.badge.wash"
+					elseif props.color then "$zeren.badge.wash"
 					else 0.07,
 				pointer_events = "none",
 			})
@@ -120,12 +120,12 @@ function M.Badge(props: Props): Node
 				top = 0,
 				bottom = 0,
 				rounded = radius,
-				bg = `$zeron.tone.{props.tone}.wash`,
+				bg = `$zeren.tone.{props.tone}.wash`,
 				pointer_events = "none",
 			})
 		end
 	end
-	local fg = if look == "solid" then "$zeron.check.mark" else ink
+	local fg = if look == "solid" then "$zeren.check.mark" else ink
 	if props.dot then
 		table.insert(children, ui.div { w = 6, h = 6, shrink = 0, rounded = "$radius.full", bg = fg })
 	end
@@ -168,9 +168,9 @@ function M.Badge(props: Props): Node
 		color = fg,
 		opacity = if look == "soft" and props.color and props.lit
 			then function(): string
-				return if (props.lit :: () -> boolean)() then "$zeron.badge.lit.ink" else "$zeron.badge.ink"
+				return if (props.lit :: () -> boolean)() then "$zeren.badge.lit.ink" else "$zeren.badge.ink"
 			end
-			elseif look == "soft" and props.color then "$zeron.badge.ink"
+			elseif look == "soft" and props.color then "$zeren.badge.ink"
 			else nil,
 		-- Solid fills with the tone's own colour, not its ink (the pale
 		-- inks of dark would wash out the white on them).
@@ -221,7 +221,7 @@ function M.Tag(props: TagProps): Node
 			mr = ui.raw(if sm then -4 else -6, "the × in the chip's corner"),
 			justify = "center",
 			-- (Concentric with the tag: a token tokens.luau derives.)
-			rounded = "$zeron.tag.remove_radius",
+			rounded = "$zeren.tag.remove_radius",
 			bg = "#00000000",
 			color = "$text.tertiary",
 			cursor = "pointer",
@@ -235,7 +235,7 @@ function M.Tag(props: TagProps): Node
 	return ui.row {
 		shrink = 0,
 		h = h,
-		px = if sm then "$zeron.space.tight" else "$space.2",
+		px = if sm then "$zeren.space.tight" else "$space.2",
 		gap = "$space.1",
 		items = "center",
 		rounded = "$radius.md",
@@ -247,20 +247,20 @@ function M.Tag(props: TagProps): Node
 		focus = if props.on_click then control.ring else nil,
 		bg = function()
 			if props.invalid then
-				return "$zeron.tone.danger.wash"
+				return "$zeren.tone.danger.wash"
 			end
-			return if on() then "$zeron.selected.flat.bg" else "$zeron.secondary.bg"
+			return if on() then "$zeren.selected.flat.bg" else "$zeren.secondary.bg"
 		end,
 		border_color = function()
 			if props.invalid then
-				return "$zeron.tone.danger.edge"
+				return "$zeren.tone.danger.edge"
 			end
-			return if on() then "$zeron.selected.ring" else "#00000000"
+			return if on() then "$zeren.selected.ring" else "#00000000"
 		end,
-		hover = if props.on_click then { bg = "$zeron.secondary.hover" } else nil,
+		hover = if props.on_click then { bg = "$zeren.secondary.hover" } else nil,
 		color = function()
 			if props.invalid then
-				return "$zeron.tone.danger.ink"
+				return "$zeren.tone.danger.ink"
 			end
 			return if on() then "$text.primary" else "$text.secondary"
 		end,
@@ -296,7 +296,7 @@ export type DotProps = { tone: Tone?, color: string?, size: number?, pulse: bool
 
 function M.Dot(props: DotProps): Node
 	local size = props.size or 8
-	local ink = if props.color then props.color else `$zeron.tone.{props.tone or "neutral"}.ink`
+	local ink = if props.color then props.color else `$zeren.tone.{props.tone or "neutral"}.ink`
 	return ui.div {
 		w = size,
 		h = size,
@@ -337,7 +337,7 @@ function M.PullRequest(props: { state: PrState, number: number?, size: Size?, ti
 	local state = if PR[props.state] then props.state else "open"
 	return M.Badge {
 		if props.number then tostring(props.number) else locale.t(s.label),
-		color = `$zeron.pr.{props.state}`,
+		color = `$zeren.pr.{props.state}`,
 		icon = s.icon,
 		size = props.size,
 		tabular = props.number ~= nil,
@@ -360,7 +360,7 @@ local REVIEW: { [ReviewState]: { icon: Icon.Name, label: string } } = {
 
 function M.Review(props: { state: ReviewState, size: Size? }): Node
 	local s = REVIEW[props.state] or REVIEW.pending
-	return M.Badge { locale.t(s.label), color = `$zeron.review.{props.state}`, icon = s.icon, size = props.size or "md" }
+	return M.Badge { locale.t(s.label), color = `$zeren.review.{props.state}`, icon = s.icon, size = props.size or "md" }
 end
 
 -- A commit's checks: passing, failing or running, with how many passed.
@@ -376,7 +376,7 @@ function M.Checks(props: { state: ChecksState, passed: number?, total: number?, 
 	local text: string | Message = if props.total then `{props.passed or 0}/{props.total}` else locale.t(s.label)
 	return M.Badge {
 		text,
-		color = `$zeron.checks.{props.state}`,
+		color = `$zeren.checks.{props.state}`,
 		icon = s.icon,
 		size = props.size or "md",
 		tabular = props.total ~= nil,
@@ -400,7 +400,7 @@ local FILE: { [FileState]: { letter: string, label: string } } = {
 function M.FileStatus(props: { status: FileState, look: ("letter" | "badge")? }): Node
 	local s = FILE[props.status] or FILE.modified
 	if props.look == "badge" then
-		return M.Badge { locale.t(s.label), color = `$zeron.git.{props.status}` }
+		return M.Badge { locale.t(s.label), color = `$zeren.git.{props.status}` }
 	end
 	return ui.text {
 		s.letter,
@@ -410,7 +410,7 @@ function M.FileStatus(props: { status: FileState, look: ("letter" | "badge")? })
 		font = "$font.mono",
 		text_size = "$font.size.sm",
 		weight = "$font.weight.medium",
-		color = `$zeron.git.{props.status}`,
+		color = `$zeren.git.{props.status}`,
 		-- (zgx reads no `label` on a text: the tooltip names it.)
 		tooltip = locale.s(s.label),
 	}
@@ -442,18 +442,18 @@ function M.DiffStat(props: { added: number, removed: number, bar: boolean?, size
 				w = 6,
 				h = 6,
 				rounded = ui.raw(1.5, "a 6-point block's corner"),
-				bg = if i <= adds then "$zeron.diff.added" elseif i <= adds + dels then "$zeron.diff.removed" else "$border.strong",
+				bg = if i <= adds then "$zeren.diff.added" elseif i <= adds + dels then "$zeren.diff.removed" else "$border.strong",
 			})
 		end
 		bar = ui.row { gap = ui.raw(1.5, "between a diff bar's blocks"), items = "center", aria_hidden = true, table.unpack(blocks) }
 	end
 	return ui.row {
 		shrink = 0,
-		gap = "$zeron.space.tight",
+		gap = "$zeren.space.tight",
 		items = "center",
 		label = locale.t("ds.badge.diff", { added = tostring(props.added), removed = tostring(props.removed) }),
-		ui.text { `+{short(props.added)}`, font = "$font.mono", text_size = text, tabular = true, color = "$zeron.diff.added" },
-		ui.text { `−{short(props.removed)}`, font = "$font.mono", text_size = text, tabular = true, color = "$zeron.diff.removed" },
+		ui.text { `+{short(props.added)}`, font = "$font.mono", text_size = text, tabular = true, color = "$zeren.diff.added" },
+		ui.text { `−{short(props.removed)}`, font = "$font.mono", text_size = text, tabular = true, color = "$zeren.diff.removed" },
 		bar,
 	}
 end

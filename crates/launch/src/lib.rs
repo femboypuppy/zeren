@@ -1,8 +1,8 @@
-//! How a Zeron app starts its engine: the engine executable beside the app's
-//! ("Zeron Engine" in a macOS bundle, `zeron-engine` elsewhere), else the app
+//! How a Zeren app starts its engine: the engine executable beside the app's
+//! ("Zeren Engine" in a macOS bundle, `zeren-engine` elsewhere), else the app
 //! binary's [`ENGINE_SUBCOMMAND`]; the environment it's given; detached, so
 //! it outlives the app. The engine's `managed` module, the command line
-//! (`zeron headless` and the other engine subcommands, run in the helper) and
+//! (`zeren headless` and the other engine subcommands, run in the helper) and
 //! the zgx app all start it through here, without linking the engine.
 
 use std::ffi::OsString;
@@ -16,17 +16,17 @@ pub const ENGINE_SUBCOMMAND: &str = "engine";
 
 /// The separate engine executable's name next to the app's.
 #[cfg(target_os = "macos")]
-pub const ENGINE_EXECUTABLES: &[&str] = &["Zeron Engine", "zeron-engine"];
+pub const ENGINE_EXECUTABLES: &[&str] = &["Zeren Engine", "zeren-engine"];
 #[cfg(windows)]
-pub const ENGINE_EXECUTABLES: &[&str] = &["zeron-engine.exe"];
+pub const ENGINE_EXECUTABLES: &[&str] = &["zeren-engine.exe"];
 #[cfg(not(any(target_os = "macos", windows)))]
-pub const ENGINE_EXECUTABLES: &[&str] = &["zeron-engine"];
+pub const ENGINE_EXECUTABLES: &[&str] = &["zeren-engine"];
 
 /// Set on the background engine's environment by the app that started it.
-pub const MANAGED_ENV: &str = "ZERON_MANAGED_ENGINE";
+pub const MANAGED_ENV: &str = "ZEREN_MANAGED_ENGINE";
 /// The app to open for a clicked banner: its bundle on macOS, its
 /// executable elsewhere.
-pub const APP_ENV: &str = "ZERON_APP";
+pub const APP_ENV: &str = "ZEREN_APP";
 
 /// The engine executable beside the app at `app_exe`, if there is one.
 pub fn engine_executable(app_exe: &Path) -> Option<PathBuf> {
@@ -81,20 +81,20 @@ pub fn launch(config: &LaunchConfig, app_exe: &Path) -> std::io::Result<Child> {
     command
         .env(MANAGED_ENV, "1")
         .env(APP_ENV, app_path(app_exe))
-        .env("ZERON_DATA_DIR", &config.data_dir)
-        .env("ZERON_IPC_PORT", config.ipc_port.to_string())
-        .env("ZERON_EDGE_URL", &config.edge_url)
+        .env("ZEREN_DATA_DIR", &config.data_dir)
+        .env("ZEREN_IPC_PORT", config.ipc_port.to_string())
+        .env("ZEREN_EDGE_URL", &config.edge_url)
         // Empty selects development auth, exactly as `None` does in-process.
         .env(
-            "ZERON_WORKOS_CLIENT_ID",
+            "ZEREN_WORKOS_CLIENT_ID",
             config.workos_client_id.as_deref().unwrap_or(""),
         );
     match &config.edge_token {
-        Some(token) => command.env("ZERON_EDGE_TOKEN", token),
-        None => command.env_remove("ZERON_EDGE_TOKEN"),
+        Some(token) => command.env("ZEREN_EDGE_TOKEN", token),
+        None => command.env_remove("ZEREN_EDGE_TOKEN"),
     };
     if let Some(org) = &config.org_id {
-        command.env("ZERON_ORG_ID", org);
+        command.env("ZEREN_ORG_ID", org);
     }
     spawn_detached(&mut command)
 }
@@ -152,11 +152,11 @@ pub fn reap(mut child: Child) {
 }
 
 /// Become the engine helper beside the app at `app_exe`, given `args` (this
-/// process's own, `zeron headless`'s `headless` and on): the standard helper
+/// process's own, `zeren headless`'s `headless` and on): the standard helper
 /// pattern for an app whose interface binary doesn't link the engine. On
 /// Unix the helper replaces this process (`exec`), so the pid, signals,
 /// standard streams and exit status are the helper's own — a service
-/// manager watching `zeron headless` watches the engine. Elsewhere it runs
+/// manager watching `zeren headless` watches the engine. Elsewhere it runs
 /// as a child with the same streams, and its exit status is passed on.
 /// Returns only when it couldn't start.
 pub fn exec_helper(app_exe: &Path, args: impl IntoIterator<Item = OsString>) -> std::io::Error {
@@ -193,7 +193,7 @@ mod tests {
     #[test]
     fn engine_command_prefers_the_engine_beside_the_app() {
         let dir = tempfile::tempdir().unwrap();
-        let app = dir.path().join("zeron");
+        let app = dir.path().join("zeren");
         std::fs::write(&app, "").unwrap();
         // Only the app: it runs the engine as a subcommand.
         let command = engine_command(&app);
@@ -215,19 +215,19 @@ mod tests {
     #[test]
     fn app_path_is_the_bundle_on_macos_layouts() {
         assert_eq!(
-            app_path(Path::new("/Applications/Zeron.app/Contents/MacOS/zeron")),
-            PathBuf::from("/Applications/Zeron.app")
+            app_path(Path::new("/Applications/Zeren.app/Contents/MacOS/zeren")),
+            PathBuf::from("/Applications/Zeren.app")
         );
         assert_eq!(
-            app_path(Path::new("/home/me/.zeron/app/current/zeron")),
-            PathBuf::from("/home/me/.zeron/app/current/zeron")
+            app_path(Path::new("/home/me/.zeren/app/current/zeren")),
+            PathBuf::from("/home/me/.zeren/app/current/zeren")
         );
     }
 
     #[test]
     fn a_missing_helper_is_an_error_not_a_hang() {
         let dir = tempfile::tempdir().unwrap();
-        let app = dir.path().join("zeron");
+        let app = dir.path().join("zeren");
         let error = exec_helper(&app, [OsString::from("headless")]);
         assert_eq!(error.kind(), std::io::ErrorKind::NotFound);
     }

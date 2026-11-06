@@ -122,7 +122,7 @@ return {
 					title = "Invite your teammates",
 					body = function()
 						return if sent:get()
-							then "2 invites sent. They'll get an email from Zeron."
+							then "2 invites sent. They'll get an email from Zeren."
 							else "Chats and agents you share stay in step for everyone."
 					end,
 					ui.show(function()

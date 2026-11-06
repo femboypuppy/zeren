@@ -37,7 +37,7 @@
 //! count to check against; byte lengths), `WatchSessions` and `WatchChats`
 //! (whole lists), `WatchQueue`; runs, interrupts and answers through
 //! `QueueCommand`; config through `Mutate setChatConfig`; uploads through
-//! `UploadChunk` / `UploadCommit`. `ZERON_ZGX_MOCK=1` offers the engine's
+//! `UploadChunk` / `UploadCommit`. `ZEREN_ZGX_MOCK=1` offers the engine's
 //! mock agent, for trying a turn without a paid one.
 
 use std::{
@@ -327,7 +327,7 @@ const FOLDED_AT_ONCE: usize = 64;
 fn folding(entries: Vec<(usize, String, Json)>, context: &RowContext) -> Folding {
     let (sender, results) = std::sync::mpsc::channel();
     let (doc, device, model) = (context.doc.clone(), context.device.clone(), context.model.clone());
-    let spawned = std::thread::Builder::new().name("zeron-fold".into()).spawn(move || {
+    let spawned = std::thread::Builder::new().name("zeren-fold".into()).spawn(move || {
         let mut batch = Vec::with_capacity(FOLDED_AT_ONCE);
         for (at, id, entry) in entries {
             batch.push(fold_off(at, id, &entry, &doc, device.as_deref(), model.as_deref()));
@@ -342,7 +342,7 @@ fn folding(entries: Vec<(usize, String, Json)>, context: &RowContext) -> Folding
         let _ = sender.send(batch);
     });
     if let Err(error) = spawned {
-        eprintln!("zeron-zgx: a chat's rows: no worker ({error})");
+        eprintln!("zeren-zgx: a chat's rows: no worker ({error})");
     }
     Folding { results }
 }
@@ -915,11 +915,11 @@ impl Chats {
             return;
         }
         self.catalog_state.set(CatalogState::Loading);
-        let mock = std::env::var("ZERON_ZGX_MOCK").is_ok_and(|v| v == "1");
+        let mock = std::env::var("ZEREN_ZGX_MOCK").is_ok_and(|v| v == "1");
         let list = match engine::get().call("ListHarnesses", json!({ "includeRegistry": true })).await {
             Ok(list) => list,
             Err(error) => {
-                eprintln!("zeron-zgx: chat: the agents didn't list: {error}");
+                eprintln!("zeren-zgx: chat: the agents didn't list: {error}");
                 self.catalog_state.set(CatalogState::Looking);
                 return;
             }
@@ -965,7 +965,7 @@ impl Chats {
                             .borrow_mut()
                             .insert(id, list.as_array().cloned().unwrap_or_default());
                     }
-                    Err(error) => eprintln!("zeron-zgx: chat: {id}'s models didn't list: {error}"),
+                    Err(error) => eprintln!("zeren-zgx: chat: {id}'s models didn't list: {error}"),
                 }
                 left.set(left.get() - 1);
                 if left.get() == 0 {
@@ -1032,7 +1032,7 @@ impl Chats {
                 .collect(),
             Err(error) => {
                 // (Unreachable: this device's catalog stands in, as before.)
-                eprintln!("zeron-zgx: chat: {device}'s agents didn't list: {error}");
+                eprintln!("zeren-zgx: chat: {device}'s agents didn't list: {error}");
                 if !self.known_remotes.borrow().contains_key(&device) {
                     self.remote.borrow_mut().take();
                     self.publish_catalog();
@@ -1064,7 +1064,7 @@ impl Chats {
                         Ok(list) => {
                             r.models.insert(id, list.as_array().cloned().unwrap_or_default());
                         }
-                        Err(error) => eprintln!("zeron-zgx: chat: {id}'s models on {device} didn't list: {error}"),
+                        Err(error) => eprintln!("zeren-zgx: chat: {id}'s models on {device} didn't list: {error}"),
                     }
                     r.ready = left.get() == 0;
                     if r.ready {
@@ -1954,7 +1954,7 @@ impl View {
         // the chat keeps the config it was made with: a side chat's, its
         // parent's.)
         if fresh && config["harness"].is_null() {
-            eprintln!("zeron-zgx: chat: {id}: no agent to send with (the chat isn't known here yet)");
+            eprintln!("zeren-zgx: chat: {id}: no agent to send with (the chat isn't known here yet)");
             self.mark_failed(&id, &message_id, None);
             return Err("missing");
         }
@@ -1963,7 +1963,7 @@ impl View {
                 .call("Mutate", json!({ "op": "setChatConfig", "chatId": id, "config": config }))
                 .await
                 .map_err(|e| {
-                    eprintln!("zeron-zgx: chat: a new chat's config wasn't set: {e}");
+                    eprintln!("zeren-zgx: chat: a new chat's config wasn't set: {e}");
                     self.mark_failed(&id, &message_id, None);
                     engine::outcome(&e)
                 })?;
@@ -2018,7 +2018,7 @@ impl View {
                 .call("Mutate", json!({ "op": "setChatConfig", "chatId": id, "config": config }))
                 .await
             {
-                eprintln!("zeron-zgx: chat: a sent pick didn't reach the chat's config: {e}");
+                eprintln!("zeren-zgx: chat: a sent pick didn't reach the chat's config: {e}");
             }
         }
         self.publish_messages();
@@ -2358,7 +2358,7 @@ async fn command(chat: &str, command: Json) -> Result<(), Outcome> {
         .await
         .map(|_| ())
         .map_err(|e| {
-            eprintln!("zeron-zgx: chat: {} for {chat} wasn't taken: {e}", command["kind"]);
+            eprintln!("zeren-zgx: chat: {} for {chat} wasn't taken: {e}", command["kind"]);
             engine::outcome(&e)
         })
 }
@@ -2710,9 +2710,9 @@ fn quote_chip(place: &str, body: &str) -> Value {
 }
 
 /// The shipping app's browser annotation token (crates/proto annotation.rs):
-/// `[Annotation N](zeron-annotation:<hex JSON>)`, as ds/annotation.luau
+/// `[Annotation N](zeren-annotation:<hex JSON>)`, as ds/annotation.luau
 /// writes it after a prompt's words.
-const ANNOTATION_SCHEME: &str = "](zeron-annotation:";
+const ANNOTATION_SCHEME: &str = "](zeren-annotation:";
 
 /// An element picked on a page, as a sent message shows it (the composer's
 /// chip, ds/composer_cargo): its page, then its number and what it says.
@@ -3280,7 +3280,7 @@ pub(crate) fn message(entry: &Json, model: Option<&str>) -> Option<Value> {
                 .join("\n\n");
             // A message from another chat: its routing header is the agent's to
             // read; the transcript shows who sent it, over its words.
-            let sender = zeron_proto::agent_messages::agent_message_sender(&text);
+            let sender = zeren_proto::agent_messages::agent_message_sender(&text);
             let body = sender.as_ref().map_or(text.as_str(), |(_, body)| *body);
             let sender = sender.as_ref().map_or(Value::Nil, |(from, _)| {
                 Value::record([("chat", Value::from(from.chat_id.as_str())), ("title", Value::from(from.title.as_str()))])
@@ -3642,7 +3642,7 @@ fn compact_blocks(entry: &Json) -> Option<Value> {
 const DISPLAY_TOOLS: &[&str] = &["show_image", "show_visual"];
 
 /// Whether `part` is a display tool's call: an MCP tool by its name, bare or
-/// as a harness names it (`mcp__zeron__show_visual`).
+/// as a harness names it (`mcp__zeren__show_visual`).
 fn display_tool(part: &Json) -> bool {
     if part["kind"].as_str() != Some("tool") {
         return false;
@@ -5179,7 +5179,7 @@ mod tests {
     fn a_message_from_another_chat_says_who_over_its_words() {
         let id = "cd27c5c2-0000-4000-8000-000000000000";
         let said = |text: String| json!({ "id": "u", "role": "user", "parts": [{ "kind": "text", "id": "t", "text": text }] });
-        let m = message(&said(zeron_proto::agent_messages::agent_message("Layout pass (cd27c5c2)", id, "All done.")), None).unwrap();
+        let m = message(&said(zeren_proto::agent_messages::agent_message("Layout pass (cd27c5c2)", id, "All done.")), None).unwrap();
         let sender = m.field("sender").unwrap();
         let is = |v: Option<&Value>, want: &str| matches!(v, Some(Value::Str(s)) if s.as_ref() == want);
         assert!(is(sender.field("chat"), id));
@@ -5188,7 +5188,7 @@ mod tests {
         assert!(is(m.field("text"), "All done."));
         assert!(is(m.field("copy"), "All done."));
         // A person's that merely starts alike is theirs, as written.
-        let typed = "[Message from Zeron chat x]\n\nhi";
+        let typed = "[Message from Zeren chat x]\n\nhi";
         let m = message(&said(typed.to_owned()), None).unwrap();
         assert!(m.field("sender").is_none_or(|s| matches!(s, Value::Nil)));
         assert!(is(m.field("text"), typed));
@@ -5472,7 +5472,7 @@ mod tests {
     fn display_tools_are_their_output_alone() {
         let mcp = |id: &str, tool: &str, resolved: bool, error: bool| {
             json!({ "kind": "tool", "id": id, "resolved": resolved, "isError": error, "output": "no such file: chart.png",
-                    "call": { "kind": "mcp", "server": "zeron", "tool": tool, "input": {} } })
+                    "call": { "kind": "mcp", "server": "zeren", "tool": tool, "input": {} } })
         };
         let exec = |id: &str| json!({ "kind": "tool", "id": id, "resolved": true, "isError": false, "call": { "kind": "exec", "command": "ls" } });
         let reply = |parts: Vec<Json>| json!({ "id": "a1", "role": "assistant", "status": "complete", "parts": parts });
@@ -5482,7 +5482,7 @@ mod tests {
         assert_eq!(shown.list().len(), 1, "one group round it");
         assert_eq!(shown.list()[0].field("summary"), Some(&Value::from("Ran 2 commands")));
         assert_eq!(shown.list()[0].field("tools").unwrap().list().len(), 2);
-        let running = reply(vec![mcp("s1", "mcp__zeron__show_image", false, false)]);
+        let running = reply(vec![mcp("s1", "mcp__zeren__show_image", false, false)]);
         assert!(blocks(&running).list().is_empty());
         let message = message(&entry, None).unwrap();
         assert_eq!(message.field("tools").unwrap().list().len(), 2, "the message's tools leave it out");
@@ -5505,7 +5505,7 @@ mod tests {
     fn pictures_an_agent_shows_sit_in_the_reply_in_place() {
         let mcp = |id: &str, error: bool| {
             json!({ "kind": "tool", "id": id, "resolved": true, "isError": error, "output": "visual:2: attempt to index nil",
-                    "call": { "kind": "mcp", "server": "zeron", "tool": "mcp__zeron__show_image", "input": {} } })
+                    "call": { "kind": "mcp", "server": "zeren", "tool": "mcp__zeren__show_image", "input": {} } })
         };
         let image = |id: &str, name: &str| json!({ "kind": "image", "id": id, "path": format!("/u/{name}"), "name": name, "mimeType": "image/png" });
         let exec = |id: &str| json!({ "kind": "tool", "id": id, "resolved": true, "isError": false, "call": { "kind": "exec", "command": "ls" } });

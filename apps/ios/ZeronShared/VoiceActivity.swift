@@ -3,7 +3,7 @@ import AppIntents
 import Foundation
 
 /// The voice call as a Live Activity: the Dynamic Island and the Lock Screen
-/// keep showing the orchestrator call once Zeron leaves the screen. Shared by
+/// keep showing the orchestrator call once Zeren leaves the screen. Shared by
 /// the app, which starts and updates it, and the widget extension, which
 /// draws it.
 struct VoiceActivityAttributes: ActivityAttributes {
@@ -19,7 +19,7 @@ struct VoiceActivityAttributes: ActivityAttributes {
 }
 
 /// The orb's call states. Each has the desktop orb's own drawing (exported
-/// from `zeron-orb`) in the extension's asset catalog.
+/// from `zeren-orb`) in the extension's asset catalog.
 enum VoiceActivityOrb: String, Codable, Hashable {
     case connecting, listening, speaking, working, awaiting, muted
 

@@ -1,4 +1,4 @@
-//! UniFFI facade over `zeron-client`: the account-scoped [`CoreClient`], the
+//! UniFFI facade over `zeren-client`: the account-scoped [`CoreClient`], the
 //! per-chat [`SessionHandle`], the foreign [`ClientListener`], and the static
 //! helpers the platform needs before a client exists (sign-in, catalogs,
 //! formatting).
@@ -8,7 +8,7 @@
 //! awaited from Swift concurrency / Kotlin coroutines directly.
 //!
 //! Rust consumers inside this crate (the layout engine) reach the transcript
-//! through [`CoreClient::session_handle`] → [`zeron_client::SessionHandle`]
+//! through [`CoreClient::session_handle`] → [`zeren_client::SessionHandle`]
 //! (`snapshot()` / `subscribe()`), never over FFI.
 
 mod cloud;
@@ -22,7 +22,7 @@ mod types;
 
 use std::sync::Arc;
 
-use zeron_client as zc;
+use zeren_client as zc;
 
 pub use cloud::*;
 pub use session::*;
@@ -570,7 +570,7 @@ pub fn auth_production_edge_url() -> String {
     zc::auth::PRODUCTION_EDGE_URL.to_owned()
 }
 
-/// OAuth callback scheme (`zeron`).
+/// OAuth callback scheme (`zeren`).
 #[uniffi::export]
 pub fn auth_callback_scheme() -> String {
     zc::auth::CALLBACK_SCHEME.to_owned()
@@ -582,7 +582,7 @@ pub fn workos_authorize_url(state: String) -> String {
     zc::auth::workos_authorize_url(&state)
 }
 
-/// `code`/`state` (or the provider error) of a `zeron://callback?…` URL.
+/// `code`/`state` (or the provider error) of a `zeren://callback?…` URL.
 #[uniffi::export]
 pub fn parse_auth_callback(url: String) -> Option<AuthCallback> {
     zc::auth::parse_auth_callback(&url).map(Into::into)

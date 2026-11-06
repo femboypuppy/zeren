@@ -14,7 +14,7 @@
 --                          crates/visual `NumberFormat`: 1,234.5 ms
 --
 -- The chart colours: the accent first, then five fixed hues of the six
--- (`zeron.visual.series.*`), the one nearest the accent's hue left out, so
+-- (`zeren.visual.series.*`), the one nearest the accent's hue left out, so
 -- no two series read alike whatever the accent (the shipping app's rule).
 
 local M = {}
@@ -93,7 +93,7 @@ local function series_tokens(): { string }
 	local out = { "$accent" }
 	for i, hue in HUES do
 		if i ~= skip and #out < 6 then
-			table.insert(out, `$zeron.visual.series.{hue.name}`)
+			table.insert(out, `$zeren.visual.series.{hue.name}`)
 		end
 	end
 	return out
@@ -256,11 +256,11 @@ function M.format(value: number, fmt: any?): string
 	return `{sign}{f.prefix or ""}{grouped}{frac or ""}{space}{unit}`
 end
 
--- The transcript's type scale for a visual's sizes (`zeron.visual.text.*`):
+-- The transcript's type scale for a visual's sizes (`zeren.visual.text.*`):
 -- size and line, in points.
 function M.size(name: string?): (string, string)
 	local n = if name == "2xl" then "xxl" else (name or "body")
-	return `$zeron.visual.text.{n}.size`, `$zeron.visual.text.{n}.line`
+	return `$zeren.visual.text.{n}.size`, `$zeren.visual.text.{n}.line`
 end
 
 M.WEIGHTS = {

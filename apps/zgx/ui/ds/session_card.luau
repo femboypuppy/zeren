@@ -1,4 +1,4 @@
--- A session's card, as Zeron's hover card (crates/ui shell/session_hover_card.rs):
+-- A session's card, as Zeren's hover card (crates/ui shell/session_hover_card.rs):
 -- its title (three lines at most), how long ago it moved, where it runs
 -- (this device's glyph, or a remote one), its project and its branch. One
 -- surface, the menus' glass (ds/glass): what floats over the page. It takes
@@ -8,8 +8,8 @@
 --                 project = fn, branch = fn, session = id }
 --
 -- Plugins add rows under its details (the GitHub plugin's pull request, as
--- Zeron's card has it): `zeron.place { at = ".session-card-end", after = … }`,
--- reading `zeron.need("session")`, the card's session (`session`).
+-- Zeren's card has it): `zeren.place { at = ".session-card-end", after = … }`,
+-- reading `zeren.need("session")`, the card's session (`session`).
 --
 -- Each prop a value or a function of state: `time` a time (`os.time()`
 -- seconds) or text; `device`, `project`, `branch` nil when there's none

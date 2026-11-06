@@ -175,7 +175,7 @@ class FingerprintTests(unittest.TestCase):
 
 
 class RealWorkspaceTests(unittest.TestCase):
-    """The zeron workspace itself (skipped where the sources are not checked out)."""
+    """The zeren workspace itself (skipped where the sources are not checked out)."""
 
     def setUp(self):
         if not (ROOT / "crates" / "ui" / "src").is_dir():

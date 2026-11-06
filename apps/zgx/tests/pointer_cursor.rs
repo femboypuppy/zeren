@@ -33,7 +33,7 @@ fn the_sidebar_edge_shows_the_resize_cursor_and_a_row_the_hand() {
     assert_eq!(scene.cursor_at(100., 290.), Some(Cursor::Pointer));
 }
 
-/// Every resize handle Zeron v3 has shows its cursor under the pointer, a
+/// Every resize handle Zeren v3 has shows its cursor under the pointer, a
 /// chat alone and in a split (whose panes, page card and drop layers stand
 /// over the page): the sidebar's edge and the right panel's edge. (Its
 /// split panes and the panel's tab groups share their room equally: no

@@ -1,4 +1,4 @@
--- The model picker's accounts, as Zeron's composer has them: an Account row and
+-- The model picker's accounts, as Zeren's composer has them: an Account row and
 -- a usage ring on the chip, for the composer's device (this one or another),
 -- reading the fuller window (Cursor's, the pool of the model chosen); no usage
 -- reported, no ring; one that can't be switched to, not offered.

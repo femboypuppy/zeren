@@ -3,7 +3,7 @@
 -- any source naming a diagram type as a picture from assets, and fails the
 -- rest as the renderer would. `test_mermaid_calls` counts what it was
 -- asked to draw; `test.append` adds the next piece of the reply.
--- (`zeron-zgx fixture=mermaid_fixture.luau --inspect` shows the same reply
+-- (`zeren-zgx fixture=mermaid_fixture.luau --inspect` shows the same reply
 -- drawn by the real host: the stand-in is only put in where there's none.)
 
 ui.theme.strict("warn")
@@ -63,7 +63,7 @@ ui.state("test_mermaid_writing", ""):set(table.concat(told, " "))
 local PIECES = {
 	"Here's the flow:\n\n```mermaid\nflowchart TD\n  A[Start] --> B{Ready?}\n",
 	"  B -->|yes| C[Ship it]\n  B -->|no| D[Fix]\n",
-	"```\n\nAnd who talks to whom:\n\n```mermaid\nsequenceDiagram\n  participant U as User\n  participant Z as Zeron\n  U->>Z: Ask\n  Z-->>U: Answer\n```\n",
+	"```\n\nAnd who talks to whom:\n\n```mermaid\nsequenceDiagram\n  participant U as User\n  participant Z as Zeren\n  U->>Z: Ask\n  Z-->>U: Answer\n```\n",
 	"\nThis one isn't a diagram:\n\n```mermaid\nnot a diagram at all\n```\n",
 }
 local reply = ui.state("test_mermaid_reply", "")
@@ -89,11 +89,11 @@ ui.command {
 }
 ui.command { id = "theme_light", title = "Light theme", run = function()
 	ui.theme.follow_system(false)
-	ui.theme.current:set("zeron-light")
+	ui.theme.current:set("zeren-light")
 end }
 ui.command { id = "theme_dark", title = "Dark theme", run = function()
 	ui.theme.follow_system(false)
-	ui.theme.current:set("zeron-dark")
+	ui.theme.current:set("zeren-dark")
 end }
 
 return ui.overlay {

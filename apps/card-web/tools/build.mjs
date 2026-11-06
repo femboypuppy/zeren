@@ -45,7 +45,7 @@ export async function build({ site = "" } = {}) {
     const urls = urlsFor(card, site);
     const dir = join(dist, `@${m.username}`);
     await mkdir(join(dir, "player"), { recursive: true });
-    await writeFile(join(dir, "index.html"), renderShare(card, urls, { site: "@zeron" }));
+    await writeFile(join(dir, "index.html"), renderShare(card, urls, { site: "@zeren" }));
     await writeFile(join(dir, "player", "index.html"), renderPlayer(card, urls));
     await writeFile(join(dist, "cards", `${m.username}.json`), JSON.stringify(card));
   }

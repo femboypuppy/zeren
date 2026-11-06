@@ -49,23 +49,23 @@ return {
 			dialog.Dialog {
 				open = discard,
 				title = "Discard 3 changes?",
-				body = "The edits to badge.luau, tokens.luau and zeron-dark.json go for good. Stashed and committed work stays.",
+				body = "The edits to badge.luau, tokens.luau and zeren-dark.json go for good. Stashed and committed work stays.",
 				tone = "danger",
 				confirm = { label = "Discard" },
 			},
 			dialog.Dialog {
 				open = delete,
-				title = "Delete zeron/primitives?",
+				title = "Delete zeren/primitives?",
 				body = "The branch goes from this Mac and from origin. Its pull request closes.",
 				tone = "danger",
 				size = "md",
-				confirm_text = "zeron/primitives",
+				confirm_text = "zeren/primitives",
 				confirm = { label = "Delete branch" },
 			},
 			dialog.Sheet {
 				open = sheet,
 				title = "New pull request",
-				description = "From zeron/primitives into the base you choose.",
+				description = "From zeren/primitives into the base you choose.",
 				foot = ui.row {
 					gap = "$space.2",
 					Button { "Cancel", tone = "secondary", on_click = ui.set(sheet, false) },

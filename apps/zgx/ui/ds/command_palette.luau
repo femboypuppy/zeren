@@ -33,7 +33,7 @@
 -- a search reorders them, and a search narrowing the last one looks only
 -- at what that one found, so thousands of sessions cost what dozens do.
 --
--- `CommandPalette { open = state, root = { id = "root", title = "Zeron", items = { … } } }`
+-- `CommandPalette { open = state, root = { id = "root", title = "Zeren", items = { … } } }`
 
 local motion = require("@self/motion")
 local control = require("@self/control")
@@ -126,7 +126,7 @@ export type Page = {
 	-- recent files). The root with one has a Files scope.
 	search: ((query: string) -> any)?,
 	-- Where it is, as a path to type from (a folder's): ⌘L puts it in the
-	-- search, to edit into another (Zeron's address bar).
+	-- search, to edit into another (Zeren's address bar).
 	path: (() -> string?)?,
 	-- What's typed that goes somewhere at once (a folder's `name/`, a path
 	-- ending in its separator): the page it opens, the search cleared
@@ -159,7 +159,7 @@ local ROW, SESSION, HEAD, HEAD_FIRST, INSET, SLOT = 36, 52, 32, 26, 6, 18
 -- The list's height at most, and an empty one's.
 local VIEW_MAX, NOTE_H = 440, 196
 -- How far the card's top sits from the window's (clear of its title bar,
--- a little above centre in a window of Zeron's size).
+-- a little above centre in a window of Zeren's size).
 local TOP = 88
 -- Kept clear under the card in a short window, and the least the list
 -- shrinks to there (about four rows) before the window clips the card.
@@ -193,7 +193,7 @@ local SLIDE_MS, SLIDE_EASE = 140, "outQuint"
 -- Between rows: the theme's list gap (read as the list lays out: the
 -- themes load after this module).
 local function gap(): number
-	return (ui.theme.get("zeron.list.gap") :: number?) or 2
+	return (ui.theme.get("zeren.list.gap") :: number?) or 2
 end
 
 -- The scopes, in Tab's order (each name its message's key).
@@ -203,7 +203,7 @@ local SCOPES = {
 	{ id = "commands", label = "ds.command_palette.scope.commands" },
 	{ id = "settings", label = "ds.command_palette.scope.settings" },
 }
--- With a search (Zeron's palette: All, Threads, Commands, Files, ⌘1–4),
+-- With a search (Zeren's palette: All, Threads, Commands, Files, ⌘1–4),
 -- Files in its place, settings after.
 local SCOPES_SEARCHED = {
 	{ id = "all", label = "ds.command_palette.scope.all" },
@@ -567,11 +567,11 @@ local function marked(text: string, at: { number }?, style: TextStyle): Node
 			table.insert(rich, ui.span {
 				piece,
 				literal = true,
-				color = "$zeron.match.ink",
+				color = "$zeren.match.ink",
 				-- (A theme token, which a span takes: zgx's definitions allow
 				-- a span's weight numbers only.)
 				weight = "$font.weight.semibold" :: any,
-				bg = "$zeron.match.wash",
+				bg = "$zeren.match.wash",
 				radius = 3,
 				padding = { 0, 1 },
 			})
@@ -615,10 +615,10 @@ local scope_chip = ui.variants {
 	variants = {
 		chosen = {
 			[true] = {
-				bg = "$zeron.menu.selected",
+				bg = "$zeren.menu.selected",
 				color = "$text.primary",
-				hover = { bg = "$zeron.menu.selected" },
-				active = { bg = "$zeron.menu.selected" },
+				hover = { bg = "$zeren.menu.selected" },
+				active = { bg = "$zeren.menu.selected" },
 			},
 			[false] = {
 				bg = "#00000000",
@@ -638,13 +638,13 @@ local rule = Menu.Rule
 -- state's colour, on a wash of it.
 local function pr_badge(pr: { number: number, state: ("open" | "merged" | "closed" | "draft")? }): Node
 	local state = pr.state or "open"
-	local hue = `$zeron.pr.{state}`
+	local hue = `$zeren.pr.{state}`
 	return ui.row {
 		shrink = 0,
 		relative = true,
 		h = 16,
 		px = "$space.1",
-		gap = "$zeron.space.hair",
+		gap = "$zeren.space.hair",
 		items = "center",
 		rounded = "$radius.sm",
 		label = locale.t("ds.command_palette.pr", { n = tostring(pr.number), state = state }),
@@ -863,7 +863,7 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 				n_kind[kind] = (n_kind[kind] or 0) + 1
 				if sc == "all" or kind == sc then
 					local fs = 150 - i * 0.01
-					-- (Nothing typed, its list heads the page, as Zeron's recent
+					-- (Nothing typed, its list heads the page, as Zeren's recent
 					-- files do; searched, it follows the rest.)
 					local order = if #terms == 0 then -1e6 + i else 1e6 + i
 					table.insert(found, { item = item, score = fs, order = order, rank = math.floor(fs * 100) * 1e10 })
@@ -1465,7 +1465,7 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 					return props.root.title or ""
 				end,
 				literal = true,
-				pl = "$zeron.space.tight",
+				pl = "$zeren.space.tight",
 				pr = "$space.1",
 				text_size = "$font.size.sm",
 				weight = "$font.weight.medium",
@@ -1487,15 +1487,15 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 				tooltip = locale.s("ds.command_palette.back_tip"),
 				tooltip_delay = 500,
 				h = 24,
-				pl = "$zeron.space.tight",
+				pl = "$zeren.space.tight",
 				pr = "$space.2",
 				gap = "$space.1",
 				items = "center",
 				rounded = "$radius.lg",
-				bg = "$zeron.secondary.bg",
+				bg = "$zeren.secondary.bg",
 				color = "$text.primary",
-				hover = { bg = "$zeron.secondary.hover" },
-				active = { bg = "$zeron.secondary.active" },
+				hover = { bg = "$zeren.secondary.hover" },
+				active = { bg = "$zeren.secondary.active" },
 				text_size = "$font.size.sm",
 				weight = "$font.weight.medium",
 				on_click = back,
@@ -1567,7 +1567,7 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 				tooltip_delay = 500,
 				h = 26,
 				px = "$space.2",
-				gap = "$zeron.space.tight",
+				gap = "$zeren.space.tight",
 				items = "center",
 				rounded = "$radius.lg",
 				text_size = "$font.size.sm",
@@ -1592,7 +1592,7 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 		h = SCOPES_H,
 		w_full = true,
 		px = "$space.1",
-		gap = "$zeron.space.hair",
+		gap = "$zeren.space.hair",
 		items = "center",
 	}
 	for _, node in scopes do
@@ -1603,7 +1603,7 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 		scope_items,
 		ui.row {
 			pr = "$space.2",
-			gap = "$zeron.space.tight",
+			gap = "$zeren.space.tight",
 			items = "center",
 			Kbd { keys = "tab", tone = "quiet" },
 			ui.text { locale.t("ds.command_palette.next_scope"), text_size = "$font.size.xs", color = "$text.tertiary" },
@@ -1653,7 +1653,7 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 				h = 16,
 				items = "center",
 				justify = "center",
-				color = `$zeron.status.{s.status}`,
+				color = `$zeren.status.{s.status}`,
 				tooltip = k.long,
 				label = k.long,
 				if k.glyph then status.StatusIcon { kind = s.status, size = 14 } else status.StatusDot { kind = s.status, size = 6 },
@@ -1673,7 +1673,7 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 			px = "$space.1",
 			items = "center",
 			rounded = "$radius.sm",
-			bg = "$zeron.secondary.bg",
+			bg = "$zeren.secondary.bg",
 			ui.text { text, text_size = "$font.size.xs", color = "$text.tertiary" },
 		}
 	end
@@ -1709,7 +1709,7 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 				w_full = true,
 				h_full = true,
 				px = "$space.3",
-				pb = "$zeron.space.tight",
+				pb = "$zeren.space.tight",
 				gap = "$space.2",
 				items = "end",
 				Text {
@@ -1751,8 +1751,8 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 					gap = "$space.2",
 					items = "center",
 					opacity = breath,
-					ui.div { w = SLOT, h = SLOT, shrink = 0, rounded = "$radius.sm", bg = "$zeron.secondary.bg" },
-					ui.div { w = widths[r.count or 1], h = 10, rounded = "$radius.sm", bg = "$zeron.secondary.bg" },
+					ui.div { w = SLOT, h = SLOT, shrink = 0, rounded = "$radius.sm", bg = "$zeren.secondary.bg" },
+					ui.div { w = widths[r.count or 1], h = 10, rounded = "$radius.sm", bg = "$zeren.secondary.bg" },
 				},
 			}
 		end
@@ -1821,7 +1821,7 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 				for _, node in line do
 					table.insert(line_row, node)
 				end
-				table.insert(content, ui.column { grow = 1, min_w = 0, gap = "$zeron.space.hair", ui.row(line_row), ui.row(detail_row) })
+				table.insert(content, ui.column { grow = 1, min_w = 0, gap = "$zeren.space.hair", ui.row(line_row), ui.row(detail_row) })
 			else
 				table.insert(content, glyph(item))
 				table.insert(content, live(item.id, "label", item.label, { text_size = "$font.size.md", color = "$text.primary", grow = 1 }))
@@ -1884,7 +1884,7 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 					w_full = true,
 					h_full = true,
 					rounded = row_corner,
-					bg = "$zeron.menu.selected",
+					bg = "$zeren.menu.selected",
 					border = 1,
 					border_color = "$border.subtle",
 				}
@@ -2032,7 +2032,7 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 	end
 	local function legend(keys: Node, what: string | () -> string, strong: boolean?): Node
 		return ui.row {
-			gap = "$zeron.space.tight",
+			gap = "$zeren.space.tight",
 			items = "center",
 			shrink = 0,
 			keys,
@@ -2057,7 +2057,7 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 		ui.div { grow = 1 },
 		ui.show(function(): boolean
 			return shown_rows:get() > 1
-		end, legend(ui.row { gap = "$zeron.space.hair", Kbd { keys = "up" }, Kbd { keys = "down" } }, function(): string
+		end, legend(ui.row { gap = "$zeren.space.hair", Kbd { keys = "up" }, Kbd { keys = "down" } }, function(): string
 			return locale.s("ds.command_palette.navigate")
 		end)),
 		legend(Kbd { text = "esc" }, way_out),
@@ -2072,15 +2072,15 @@ local Body = ui.component(function(props: Props & { recent_state: State<{ string
 		-- Frosted: the palette's glass over a blur of the page under it.
 		-- Opaque: a solid card.
 		bg = function()
-			return if material.see_through() then "$zeron.palette.tint" else "$zeron.palette.solid"
+			return if material.see_through() then "$zeren.palette.tint" else "$zeren.palette.solid"
 		end,
 		backdrop_blur = function()
-			return if material.see_through() then "$zeron.menu.blur" else 0
+			return if material.see_through() then "$zeren.menu.blur" else 0
 		end,
 		border = 1,
 		border_color = "$border",
-		inset_shadow = "$zeron.highlight",
-		shadow = "$zeron.menu.shadow",
+		inset_shadow = "$zeren.highlight",
+		shadow = "$zeren.menu.shadow",
 		-- Opening: a short scale up and fade in (each time: the card is
 		-- built as the palette opens).
 		on_mount = function(el)

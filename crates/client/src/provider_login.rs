@@ -27,7 +27,7 @@ use sha2::{Digest as _, Sha256};
 use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::oneshot;
-use zeron_proto::{VaultAccountProfile, VaultProvider};
+use zeren_proto::{VaultAccountProfile, VaultProvider};
 
 use crate::Client;
 use crate::error::{ClientError, Result};
@@ -86,7 +86,7 @@ fn flows() -> &'static Mutex<HashMap<String, Flow>> {
 
 impl Client {
     /// Start a sign-in. `done_url` is where the browser goes once the
-    /// provider hands back its code (`zeron://signed-in` on iOS).
+    /// provider hands back its code (`zeren://signed-in` on iOS).
     pub async fn provider_login_start(
         &self,
         provider: LoginProvider,
@@ -629,7 +629,7 @@ mod tests {
         assert_eq!(code.unwrap(), "c0de");
         socket
             .write_all(
-                http_response("302 Found", &[("Location", "zeron://signed-in")], "").as_bytes(),
+                http_response("302 Found", &[("Location", "zeren://signed-in")], "").as_bytes(),
             )
             .await
             .unwrap();
@@ -637,6 +637,6 @@ mod tests {
         let mut browser = browser.await.unwrap();
         let mut reply = String::new();
         browser.read_to_string(&mut reply).await.unwrap();
-        assert!(reply.starts_with("HTTP/1.1 302") && reply.contains("Location: zeron://signed-in"));
+        assert!(reply.starts_with("HTTP/1.1 302") && reply.contains("Location: zeren://signed-in"));
     }
 }

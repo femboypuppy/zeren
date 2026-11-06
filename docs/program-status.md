@@ -1,6 +1,6 @@
 # Agent and terminal status
 
-Zeron's native harnesses report structured lifecycle events. `InputRequested`
+Zeren's native harnesses report structured lifecycle events. `InputRequested`
 and `InputResolved` drive needs-input/working; `Done` records completed,
 interrupted, or errored independently of whether a persistent harness process
 remains alive. Interrupted turns do not produce successful completion receipts.
@@ -13,7 +13,7 @@ can discover support without an environment override.
 
 ## One display projection
 
-`zeron_proto::view::display_status` is shared by desktop, client/mobile views, and
+`zeren_proto::view::display_status` is shared by desktop, client/mobile views, and
 MCP. Native execution state and terminal-reported activity are independent:
 
 | Evidence | Display |
@@ -76,7 +76,7 @@ terminal control strings. Only one bounded summary per chat is replicated.
 
 ## Verification
 
-`cargo test -p zeron-engine --test misc` exercises a real Unix PTY through the
+`cargo test -p zeren-engine --test misc` exercises a real Unix PTY through the
 engine, registry, shared sidebar derivation, and MCP. It also runs a capability
 probe without a terminal emulator. Parser unit tests cover fragmentation,
 malformed/oversized reports, hierarchical records, replacement, and lifecycle
@@ -87,8 +87,8 @@ report a cancelled turn as successful completion.
 For native visual evidence, run the isolated production Shell fixture:
 
 ```sh
-cargo run -p zeron-ui --example program-status-fixture \
-  --features appshots-fixture,resource-profile -- /tmp/zeron-program-status-captures
+cargo run -p zeren-ui --example program-status-fixture \
+  --features appshots-fixture,resource-profile -- /tmp/zeren-program-status-captures
 ```
 
 It sends real OSC reports through three PTYs and captures working, needs input,

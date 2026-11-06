@@ -1,7 +1,7 @@
 //! Cloud device + credential vault wire types (docs/design/cloud-device.md).
 //!
 //! Cloud is a place a session can run: the checkout picker offers it for any
-//! project whose GitHub repository the Zeron GitHub App reaches. Each session
+//! project whose GitHub repository the Zeren GitHub App reaches. Each session
 //! run there gets its own sandbox, which clones the repository, hosts an
 //! ordinary engine as a hidden *session device*, sleeps when idle and wakes
 //! when the chat is sent to. The account has one logical Cloud device id —
@@ -422,7 +422,7 @@ pub struct VaultStatus {
     /// profile, vault not deployed).
     #[serde(default)]
     pub available: bool,
-    /// Where the user installs the Zeron GitHub App on accounts and
+    /// Where the user installs the Zeren GitHub App on accounts and
     /// repositories — Cloud sessions reach only those.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub github_install_url: Option<String>,

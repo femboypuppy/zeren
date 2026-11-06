@@ -1,7 +1,7 @@
-//! The built-in themes Zeron once installed as templates, retired.
+//! The built-in themes Zeren once installed as templates, retired.
 //!
 //! Until themes were chosen apart from templates (src/themes.rs), each of
-//! Zeron's built-in themes was written as a colour-only template under
+//! Zeren's built-in themes was written as a colour-only template under
 //! `<data>/templates/theme-<key>/`: its manifest, marked with the theme's key
 //! (`builtin_theme`), and a `theme.luau` palette, nothing else. Only one
 //! template runs at a time, so a template of yours and a theme couldn't both
@@ -9,8 +9,8 @@
 //!
 //! - moves anyone running one to the default template, with that theme
 //!   chosen for light and dark (unless they've chosen themes already);
-//! - deletes each such folder, but only one shaped exactly as Zeron wrote it
-//!   (`written_by_zeron`): a folder that isn't marked, holds anything more
+//! - deletes each such folder, but only one shaped exactly as Zeren wrote it
+//!   (`written_by_zeren`): a folder that isn't marked, holds anything more
 //!   (screens, an imported package's record), is under another id or says
 //!   another author is never touched, whatever it says.
 
@@ -29,12 +29,12 @@ fn read_json(path: &Path) -> Json {
     std::fs::read(path).ok().and_then(|b| serde_json::from_slice(&b).ok()).unwrap_or_default()
 }
 
-/// The built-in theme key folder `id` in `templates` held, if Zeron wrote
+/// The built-in theme key folder `id` in `templates` held, if Zeren wrote
 /// it: a real folder at `theme-<key>` (or `theme-<key>-N`, where yours had
 /// that id) holding exactly its manifest and `theme.luau`, both regular
-/// files; the manifest marked with the key and by Zeron; the palette data,
+/// files; the manifest marked with the key and by Zeren; the palette data,
 /// not code.
-pub fn written_by_zeron(templates: &Path, id: &str) -> Option<String> {
+pub fn written_by_zeren(templates: &Path, id: &str) -> Option<String> {
     let dir = templates.join(id);
     if !std::fs::symlink_metadata(&dir).is_ok_and(|m| m.is_dir()) {
         return None;
@@ -52,15 +52,15 @@ pub fn written_by_zeron(templates: &Path, id: &str) -> Option<String> {
         names.push(name);
     }
     names.sort();
-    if names != [FILE, "zeron-template.json"] {
+    if names != [FILE, "zeren-template.json"] {
         return None;
     }
-    let manifest = read_json(&dir.join("zeron-template.json"));
+    let manifest = read_json(&dir.join("zeren-template.json"));
     let key = manifest[MARK].as_str().filter(|k| !k.is_empty())?;
     let base = format!("theme-{key}");
     let at_its_id = id == base || id.strip_prefix(&format!("{base}-")).is_some_and(|n| !n.is_empty() && n.chars().all(|c| c.is_ascii_digit()));
-    let palette = std::fs::read_to_string(dir.join(FILE)).ok().and_then(|t| zeron_theme::luau_data::parse(&t));
-    (at_its_id && manifest["author"] == "Zeron" && palette.is_some()).then(|| key.to_string())
+    let palette = std::fs::read_to_string(dir.join(FILE)).ok().and_then(|t| zeren_theme::luau_data::parse(&t));
+    (at_its_id && manifest["author"] == "Zeren" && palette.is_some()).then(|| key.to_string())
 }
 
 /// What `retire` did: the theme the window was moved off (its key), and the
@@ -77,18 +77,18 @@ pub struct Retired {
 pub fn retire(templates: &Path, data_dir: &Path) -> Retired {
     let mut out = Retired::default();
     let active = live::chosen(templates);
-    if let Some(key) = written_by_zeron(templates, &active) {
+    if let Some(key) = written_by_zeren(templates, &active) {
         if crate::themes::chosen(data_dir).is_empty()
             && let Some(theme) = crate::themes::find_builtin(&key)
             && let Err(error) = crate::themes::save_choice(data_dir, &crate::themes::choice_of(&theme))
         {
-            eprintln!("zeron-zgx: the theme {key} wasn't kept: {error}");
+            eprintln!("zeren-zgx: the theme {key} wasn't kept: {error}");
         }
         match live::set_active(templates, live::BUILTIN) {
             Ok(_) => out.moved_from = Some(key),
             // (Still in use: it stays, to try again next launch.)
             Err(error) => {
-                eprintln!("zeron-zgx: the theme template {active} is still in use: {error}");
+                eprintln!("zeren-zgx: the theme template {active} is still in use: {error}");
                 return out;
             }
         }
@@ -97,10 +97,10 @@ pub fn retire(templates: &Path, data_dir: &Path) -> Retired {
     let mut ids: Vec<String> = entries.flatten().map(|e| e.file_name().to_string_lossy().into_owned()).filter(|id| id.starts_with("theme-")).collect();
     ids.sort();
     for id in ids {
-        if written_by_zeron(templates, &id).is_some() {
+        if written_by_zeren(templates, &id).is_some() {
             match std::fs::remove_dir_all(templates.join(&id)) {
                 Ok(()) => out.removed.push(id),
-                Err(error) => eprintln!("zeron-zgx: the theme template {id} wasn't removed: {error}"),
+                Err(error) => eprintln!("zeren-zgx: the theme template {id} wasn't removed: {error}"),
             }
         }
     }
@@ -126,12 +126,12 @@ mod tests {
         std::fs::write(path, text).unwrap();
     }
 
-    /// A theme template as an earlier Zeron wrote it.
-    fn zeron_s(templates: &Path, id: &str, key: &str) {
+    /// A theme template as an earlier Zeren wrote it.
+    fn zeren_s(templates: &Path, id: &str, key: &str) {
         write(
             templates,
-            &format!("{id}/zeron-template.json"),
-            &format!(r#"{{ "id": "{id}", "name": "{key}", "description": "Its colours on Zeron's interface.", "author": "Zeron", "version": "0.2.131", "zeron_version": "0.2.131", "builtin_theme": "{key}" }}"#),
+            &format!("{id}/zeren-template.json"),
+            &format!(r#"{{ "id": "{id}", "name": "{key}", "description": "Its colours on Zeren's interface.", "author": "Zeren", "version": "0.2.131", "zeren_version": "0.2.131", "builtin_theme": "{key}" }}"#),
         );
         write(templates, &format!("{id}/theme.luau"), "-- Its colours.\nreturn {\n\tname = \"Theme\",\n\tdark = { background = \"#282828\" },\n}\n");
     }
@@ -140,7 +140,7 @@ mod tests {
     fn running_one_moves_you_to_the_default_with_its_theme_chosen() {
         let d = dir("moved");
         let t = d.join("templates");
-        zeron_s(&t, "theme-gruvbox", "gruvbox");
+        zeren_s(&t, "theme-gruvbox", "gruvbox");
         live::set_active(&t, "theme-gruvbox").unwrap();
         let retired = retire(&t, &d);
         assert_eq!(retired, Retired { moved_from: Some("gruvbox".into()), removed: vec!["theme-gruvbox".into()] });
@@ -155,7 +155,7 @@ mod tests {
     fn a_choice_of_yours_is_kept_and_a_single_variant_theme_fills_its_slot() {
         let d = dir("kept");
         let t = d.join("templates");
-        zeron_s(&t, "theme-tokyo-night", "tokyo-night");
+        zeren_s(&t, "theme-tokyo-night", "tokyo-night");
         live::set_active(&t, "theme-tokyo-night").unwrap();
         let mine = Choice { light: Some("github-light".into()), dark: None };
         save_choice(&d, &mine).unwrap();
@@ -165,37 +165,37 @@ mod tests {
         // An earlier build's single-variant theme, under its second id.
         let d = dir("single");
         let t = d.join("templates");
-        zeron_s(&t, "theme-dracula-2", "dracula");
+        zeren_s(&t, "theme-dracula-2", "dracula");
         live::set_active(&t, "theme-dracula-2").unwrap();
         retire(&t, &d);
         assert_eq!(chosen(&d), Choice { light: None, dark: Some("dracula".into()) });
     }
 
     #[test]
-    fn only_a_folder_shaped_as_zeron_wrote_it_is_removed() {
+    fn only_a_folder_shaped_as_zeren_wrote_it_is_removed() {
         let d = dir("only");
         let t = d.join("templates");
-        zeron_s(&t, "theme-ayu", "ayu");
-        zeron_s(&t, "theme-ayu-2", "ayu");
+        zeren_s(&t, "theme-ayu", "ayu");
+        zeren_s(&t, "theme-ayu-2", "ayu");
         // Unmarked, at a theme's id: yours.
-        write(&t, "theme-nord/zeron-template.json", r#"{"name":"Nord","author":"you"}"#);
+        write(&t, "theme-nord/zeren-template.json", r#"{"name":"Nord","author":"you"}"#);
         write(&t, "theme-nord/theme.luau", "return nil");
         // Marked, with screens of its own.
-        zeron_s(&t, "theme-catppuccin", "catppuccin");
+        zeren_s(&t, "theme-catppuccin", "catppuccin");
         write(&t, "theme-catppuccin/screens/shell/sidebar.luau", "-- takes over");
         // Marked, an imported package's.
-        zeron_s(&t, "theme-github", "github");
+        zeren_s(&t, "theme-github", "github");
         write(&t, "theme-github/.imported.json", r#"{"key":"k","author":{"kind":"unknown"}}"#);
         // Marked, but another author's, another id, or a palette that's code.
-        zeron_s(&t, "theme-rose-pine", "rose-pine");
-        write(&t, "theme-rose-pine/zeron-template.json", r#"{"name":"Rosé","author":"someone","builtin_theme":"rose-pine"}"#);
-        zeron_s(&t, "my-dracula", "dracula");
-        zeron_s(&t, "theme-night-owl", "night-owl");
+        zeren_s(&t, "theme-rose-pine", "rose-pine");
+        write(&t, "theme-rose-pine/zeren-template.json", r#"{"name":"Rosé","author":"someone","builtin_theme":"rose-pine"}"#);
+        zeren_s(&t, "my-dracula", "dracula");
+        zeren_s(&t, "theme-night-owl", "night-owl");
         write(&t, "theme-night-owl/theme.luau", "ui.call('terminal.start', {}) return nil");
         // Marked with another theme's key than its id says.
-        zeron_s(&t, "theme-nord-dark", "gruvbox");
+        zeren_s(&t, "theme-nord-dark", "gruvbox");
         // Yours in use: it stays in use.
-        write(&t, "airy/zeron-template.json", r#"{"name":"Airy"}"#);
+        write(&t, "airy/zeren-template.json", r#"{"name":"Airy"}"#);
         live::set_active(&t, "airy").unwrap();
         let retired = retire(&t, &d);
         assert_eq!(retired.removed, vec!["theme-ayu".to_string(), "theme-ayu-2".to_string()]);
@@ -212,7 +212,7 @@ mod tests {
     fn one_of_yours_running_under_a_theme_s_id_isn_t_moved() {
         let d = dir("yours");
         let t = d.join("templates");
-        write(&t, "theme-gruvbox/zeron-template.json", r#"{"name":"Gruvbox","author":"you"}"#);
+        write(&t, "theme-gruvbox/zeren-template.json", r#"{"name":"Gruvbox","author":"you"}"#);
         write(&t, "theme-gruvbox/screens/x.luau", "-- mine");
         live::set_active(&t, "theme-gruvbox").unwrap();
         assert_eq!(retire(&t, &d), Retired::default());

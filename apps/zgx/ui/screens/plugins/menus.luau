@@ -1,5 +1,5 @@
 --!strict
--- What plugins add to Zeron's menus. A menu built when it opens asks for
+-- What plugins add to Zeren's menus. A menu built when it opens asks for
 -- its kind's items and puts them at its end, after a separator:
 --
 --   local menus = require("@app/screens/plugins/menus")
@@ -8,7 +8,7 @@
 --
 -- Kinds: "session" (a session's row; context { id }) and "file" (a file
 -- or folder's row in the tree, or the open file; context { path, session? }).
--- A plugin adds an item with its SDK's `zeron.menu { kind, id, label, run }`
+-- A plugin adds an item with its SDK's `zeren.menu { kind, id, label, run }`
 -- (it needs "ui.add"); choosing it runs `run(context)` in the plugin.
 -- Items show under their plugin's name, so you can tell whose they are.
 

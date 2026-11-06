@@ -1,8 +1,8 @@
-//! zeron-rpc — the typed control plane (UiRpc / ControlRpc) over WebSocket + in-memory
+//! zeren-rpc — the typed control plane (UiRpc / ControlRpc) over WebSocket + in-memory
 //! transports, plus the device-room relay transport ({s,k,to,from} frames — [`device_room`]).
 //!
 //! Framing: ndjson envelopes, one JSON object per WebSocket text message (or per line on
-//! byte transports), matching the shape of zeron's Effect RPC without the Effect runtime:
+//! byte transports), matching the shape of zeren's Effect RPC without the Effect runtime:
 //!
 //! - client → server: `{id, method, params}` to invoke, `{id, cancel: true}` to stop a stream;
 //! - server → client: `{id, ok}` / `{id, err}` for unary calls,
@@ -77,7 +77,7 @@ pub mod methods {
     /// replies with the device's fresh `ListHarnesses` catalog.
     pub const GET_TITLE_SETTINGS: &str = "GetTitleSettings";
     pub const SET_TITLE_SETTINGS: &str = "SetTitleSettings";
-    /// Whether agents' commits on this device credit Zeron
+    /// Whether agents' commits on this device credit Zeren
     /// (`{enabled, cloud}`; set with `{enabled}`).
     pub const GET_COMMIT_CREDIT: &str = "GetCommitCredit";
     pub const SET_COMMIT_CREDIT: &str = "SetCommitCredit";
@@ -137,16 +137,16 @@ pub mod methods {
     /// app foregrounded). No params; IPC-only. Each room ignores the hint
     /// unless it has been broadcast-quiet ≥30s, so this is cheap to spam.
     pub const PROBE_SYNC: &str = "ProbeSync";
-    /// Live sync introspection (`zeron sync` / debug surfaces): per-room
+    /// Live sync introspection (`zeren sync` / debug surfaces): per-room
     /// connection state, last pushed-frame/ack ages, rejoin/probe/resync
     /// counters for the workspace room and every open chat doc. No params;
     /// IPC-only.
     pub const SYNC_STATUS: &str = "SyncStatus";
-    /// Pushed edge-connectivity posture (`zeron_proto::Connectivity`):
+    /// Pushed edge-connectivity posture (`zeren_proto::Connectivity`):
     /// current value first, then every change — the connection pill /
     /// composer-honesty / queued-badge feed. No params; IPC-only.
     pub const WATCH_CONNECTIVITY: &str = "WatchConnectivity";
-    /// In-flight queued-attachment transfers (`zeron_proto::TransferProgress`
+    /// In-flight queued-attachment transfers (`zeren_proto::TransferProgress`
     /// list): current set first, then a fresh snapshot per landed chunk —
     /// the sending thumbnail's percent-ring feed. No params; IPC-only.
     pub const WATCH_TRANSFERS: &str = "WatchTransfers";
@@ -173,7 +173,7 @@ pub mod methods {
     /// engine behind its windows would leave that process unusable.
     pub const STOP_ENGINE: &str = "StopEngine";
     /// Headless IPC only: stop starting work ahead of a Cloud sleep (the
-    /// edge runs `zeron quiesce` before stopping the machine). Replies
+    /// edge runs `zeren quiesce` before stopping the machine). Replies
     /// `{"quiesced":true}` or `{"quiesced":false,"busy":"<why>"}`.
     pub const QUIESCE_FOR_SLEEP: &str = "QuiesceForSleep";
     pub const AUTH_STATUS: &str = "AuthStatus";
@@ -437,7 +437,7 @@ pub mod methods {
     /// each change.
     pub const WATCH_PLUGINS: &str = "WatchPlugins";
     /// `{id, allow, hash, review?}` → `PluginItem`. Allowing needs `review`,
-    /// minted by [`REVIEW_PLUGIN`] for the same `id` and `hash`: only Zeron's
+    /// minted by [`REVIEW_PLUGIN`] for the same `id` and `hash`: only Zeren's
     /// consent window holds one. Declining (`allow: false`) needs none.
     /// Allowing is this device's alone: never over the relay.
     pub const DECIDE_PLUGIN: &str = "DecidePlugin";
@@ -494,16 +494,16 @@ pub mod methods {
     /// looks up its own key at once (nothing in the call is trusted; it only
     /// hastens the regular check). Answered to peers; not to agents.
     pub const CHECK_PLUGIN_KEY: &str = "CheckPluginKey";
-    /// Templates (whole replacements of Zeron's interface): `{}` → `{dir,
+    /// Templates (whole replacements of Zeren's interface): `{}` → `{dir,
     /// active, templates: [{id, name, description, author, version,
-    /// zeron_version, builtin, active, status: "ok" | "errors" | "out_of_date"
+    /// zeren_version, builtin, active, status: "ok" | "errors" | "out_of_date"
     /// | "broken", error?, dir, preview?, imported?: {key, author}}], pending:
-    /// [{pending, id, name, key, author, hash, ignored, …}]}`, Zeron's own
+    /// [{pending, id, name, key, author, hash, ignored, …}]}`, Zeren's own
     /// first. "out_of_date":
-    /// its `zeron_version` isn't this Zeron's (a real update since it was made).
+    /// its `zeren_version` isn't this Zeren's (a real update since it was made).
     pub const LIST_TEMPLATES: &str = "ListTemplates";
     /// `{id, name?, from?}` → `{id, dir, files: [rel], map}`: a full copy of
-    /// Zeron's app (overlaid with `from`'s files) to edit.
+    /// Zeren's app (overlaid with `from`'s files) to edit.
     pub const CREATE_TEMPLATE: &str = "CreateTemplate";
     /// `{id}` → `{active}`: the template the window runs (the app switches
     /// live).
@@ -515,17 +515,17 @@ pub mod methods {
     /// `.removed`.
     pub const DELETE_TEMPLATE: &str = "DeleteTemplate";
     /// `{id, path}` → `{id, path, files, key}`: the template as a signed
-    /// package (`path`, a `.zeron-template` file), signed with this device's
+    /// package (`path`, a `.zeren-template` file), signed with this device's
     /// plugin key in the template domain. Never-templated files are left out.
     pub const EXPORT_TEMPLATE: &str = "ExportTemplate";
     /// `{path}` → yours (signed by this device's key): installed,
     /// `{installed, name, author, ignored}`; anyone else's: kept for you to
-    /// allow in Zeron, `{pending, id, name, …, key, author, hash, ignored,
+    /// allow in Zeren, `{pending, id, name, …, key, author, hash, ignored,
     /// needs_consent: true}`. Unsigned or tampered packages are refused.
     pub const IMPORT_TEMPLATE: &str = "ImportTemplate";
     /// `{pending, allow, hash}` → `{installed, name, author}` or
     /// `{declined}`: the consent window's answer for a waiting package
-    /// (checked again; `hash` is the package as shown). Only Zeron's consent
+    /// (checked again; `hash` is the package as shown). Only Zeren's consent
     /// window calls it.
     pub const DECIDE_TEMPLATE: &str = "DecideTemplate";
     /// `{pending, hash}` → `{review}`: as [`REVIEW_PLUGIN`], for
@@ -541,7 +541,7 @@ pub mod methods {
     /// `DescribeElements` is the live window's.
     pub const DESCRIBE_APP: &str = "DescribeApp";
     /// Themes (the window's colours, apart from its template; all data,
-    /// this device's, in the data dir: `zeron_theme::catalog`): `{}` →
+    /// this device's, in the data dir: `zeren_theme::catalog`): `{}` →
     /// `{themes: [{id, name, source, editable, variants: {light?, dark?},
     /// in_use, template?, problem?}], wearing: {light, dark}, chosen, guide}`.
     pub const LIST_THEMES: &str = "ListThemes";
@@ -574,11 +574,11 @@ pub mod methods {
     /// landed in the window, for an agent to check its work (and, with
     /// `snapshot`, a picture of the window cut to them).
     pub const PLUGIN_STATUS: &str = "PluginStatus";
-    /// `{dir}` → the list: the app's folder of Zeron's own plugins, scanned
+    /// `{dir}` → the list: the app's folder of Zeren's own plugins, scanned
     /// with yours (allowed what they ask, on unless turned off, never
     /// removed).
     pub const SET_BUILTIN_PLUGINS: &str = "SetBuiltinPlugins";
-    /// `{path}` (a `.zeron-plugin` file) or `{url, ref?, folder?}` (a
+    /// `{path}` (a `.zeren-plugin` file) or `{url, ref?, folder?}` (a
     /// package link, a GitHub release, a git repository) → `{plugin,
     /// update, from?, added, removed, waiting}`: someone else's plugin
     /// installed, verified first; it waits for you in the app (`waiting`)
@@ -593,7 +593,7 @@ pub mod methods {
     /// (checked first when none was found yet). Refused when someone else
     /// signed it or it was changed; new permissions wait for you again.
     pub const UPDATE_PLUGIN: &str = "UpdatePlugin";
-    /// `{id, to?}` → `{path}`: a plugin as a `.zeron-plugin` package (an
+    /// `{id, to?}` → `{path}`: a plugin as a `.zeren-plugin` package (an
     /// own plugin is re-signed first), into the folder or file `to`.
     pub const EXPORT_PLUGIN: &str = "ExportPlugin";
     /// `{source, title, body, session?}` → `{outcome: "posted" | "off" |
@@ -674,7 +674,7 @@ pub fn peer_refused(method: &str, params: &serde_json::Value) -> bool {
     }
 }
 
-/// The methods an agent's `zeron mcp` server may call with the
+/// The methods an agent's `zeren mcp` server may call with the
 /// agent-scoped IPC token: what its tools need and nothing that grants
 /// power. An allow-list, so a method added later stays the app's until
 /// it's listed here. Never here: deciding or reviewing (`Decide*`,
@@ -1292,7 +1292,7 @@ mod tests {
         }
     }
 
-    /// R6/R16: the agent-scoped token (what `zeron mcp` holds) reaches its
+    /// R6/R16: the agent-scoped token (what `zeren mcp` holds) reaches its
     /// tools' methods as an agent, and nothing that decides, signs, updates
     /// or hands out credentials; the full token still reaches everything.
     #[tokio::test]

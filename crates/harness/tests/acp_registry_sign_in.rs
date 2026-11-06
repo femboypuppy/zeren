@@ -30,9 +30,9 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use zeron_harness::acp::{NEEDS_TERMINAL, SignInOptions, SignInProgress};
-use zeron_harness::{AcpHarness, acp_registry as reg};
-use zeron_proto::RegistryAgent;
+use zeren_harness::acp::{NEEDS_TERMINAL, SignInOptions, SignInProgress};
+use zeren_harness::{AcpHarness, acp_registry as reg};
+use zeren_proto::RegistryAgent;
 
 fn fixture() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/fake-registry-signin.py")
@@ -56,7 +56,7 @@ fn agents() -> &'static Path {
             std::fs::write(dir.join("agent.json"), record.to_string()).unwrap();
         }
         // SAFETY: set once, before any test reads it.
-        unsafe { std::env::set_var("ZERON_AGENTS_DIR", root.path()) };
+        unsafe { std::env::set_var("ZEREN_AGENTS_DIR", root.path()) };
         root
     })
     .path()
@@ -87,7 +87,7 @@ async fn sign_in(mode: &str, on_page: impl FnOnce(String, PathBuf) + Send + 'sta
         browser: Some(browser),
         method: None,
         env: vec![
-            ("ZERON_LOGIN_URL_FILE".into(), url_file.clone().into()),
+            ("ZEREN_LOGIN_URL_FILE".into(), url_file.clone().into()),
             ("HOME".into(), scratch.clone().into()),
         ],
         url_filter: None,

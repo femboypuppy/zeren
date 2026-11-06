@@ -1,4 +1,4 @@
--- A scrollbar as Zeron draws one: a thin thumb floating over a scroll
+-- A scrollbar as Zeren draws one: a thin thumb floating over a scroll
 -- view's trailing edge, there while the view scrolls and for a moment
 -- after, or while the pointer is on it, and gone otherwise, so a list
 -- shows its rows and nothing else. It takes the pointer as a scrollbar

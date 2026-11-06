@@ -1,30 +1,30 @@
 --!strict
--- Settings → Templates: the whole interfaces Zeron can run in, laid out as
+-- Settings → Templates: the whole interfaces Zeren can run in, laid out as
 -- Settings → Plugins is (screens/plugins/page), both through
 -- ds.Settings.Catalog: the same search, tabs, card of rows and empty states.
--- Its tabs are what's installed (Zeron's own, built in, first; yours; and
+-- Its tabs are what's installed (Zeren's own, built in, first; yours; and
 -- others', imported, each by who signed it) and what's yours. Every row's
 -- preview is drawn from its template's colours (src/plugins/looks.rs): a
 -- swatch of each appearance it changes, or the default's.
 --
--- Templates are shared as signed .zeron-template files: Export… (a row's
+-- Templates are shared as signed .zeren-template files: Export… (a row's
 -- ⋯) signs one as yours; Install brings one in, as Plugins' does: from a
--- link (a .zeron-template's, or a GitHub repository or release with one)
+-- link (a .zeren-template's, or a GitHub repository or release with one)
 -- or a file, the dialog open and its Install spinning until it's done.
 -- Someone else's waits, named above the rows, until you allow it in
--- Zeron's consent window (its own window: nothing here can allow it). One
+-- Zeren's consent window (its own window: nothing here can allow it). One
 -- from a package is checked where it came from for a newer version as the
 -- page opens (the engine checks every few hours too); a row with one says
--- so and has Update. One whose maker Zeron can't vouch for says
+-- so and has Update. One whose maker Zeren can't vouch for says
 -- Unverified beside its version, and where it came from under its name.
 --
 -- Each row is its template's as the list changes: its colours' preview, its
 -- name and version, who made it and how it stands (in use, broken with why,
--- made for an earlier Zeron), Use (or "In use") and a ⋯ menu of its folder,
--- Duplicate and Delete. Zeron's own can't be deleted. What's at a row's end
+-- made for an earlier Zeren), Use (or "In use") and a ⋯ menu of its folder,
+-- Duplicate and Delete. Zeren's own can't be deleted. What's at a row's end
 -- swaps only when the template's use does.
 --
--- Agents make and change templates (Zeron's MCP tools), so the page says to
+-- Agents make and change templates (Zeren's MCP tools), so the page says to
 -- ask one. A template's colours are only its suggestion: the theme you
 -- choose on the Themes page (screens/themes) is worn over any template.
 
@@ -53,7 +53,7 @@ local install_busy = ui.state("templates_install_busy", false)
 local updating = ui.state("templates_updating", nil :: string?)
 local checked_at = ui.state("templates_checked_at", 0)
 
--- Its maker can't be vouched for: someone else's, signed by a key Zeron
+-- Its maker can't be vouched for: someone else's, signed by a key Zeren
 -- doesn't know (as a plugin's: words.unverified).
 local function unverified(t: any): boolean
 	return not t.builtin and t.imported ~= nil and words.unverified(t.imported)
@@ -61,7 +61,7 @@ end
 
 local function author(t: state.Template): string
 	if t.builtin then
-		return ui.t("templates.page.author.zeron"):get()
+		return ui.t("templates.page.author.zeren"):get()
 	elseif state.yours(t) then
 		return ui.t("templates.page.author.you"):get()
 	end
@@ -81,7 +81,7 @@ local function about(t: state.Template): string
 	elseif t.status == "errors" then
 		return ui.t("templates.page.about.errors", { error = t.error or "" }):get()
 	elseif t.status == "out_of_date" then
-		local made_for = t.zeron_version
+		local made_for = t.zeren_version
 		return if made_for and made_for ~= ""
 			then ui.t("templates.page.about.out_of_date", { version = made_for }):get()
 			else ui.t("templates.page.about.out_of_date_unversioned"):get()
@@ -153,13 +153,13 @@ end
 
 -- (Its name read as the dialog opens, in the locale then.)
 local function package_filter(): { any }
-	return { { ui.t("templates.page.package_filter"):get(), { "zeron-template" } } }
+	return { { ui.t("templates.page.package_filter"):get(), { "zeren-template" } } }
 end
 
 -- Export…: where to save it, then it, signed as yours.
 local function export_file(id: string, name: string)
 	ui.task(function()
-		local file = ui.save_file({ title = ui.t("templates.page.export_title"):get(), name = `{id}.zeron-template`, filters = package_filter() }):await()
+		local file = ui.save_file({ title = ui.t("templates.page.export_title"):get(), name = `{id}.zeren-template`, filters = package_filter() }):await()
 		if not file then
 			return
 		end
@@ -173,8 +173,8 @@ local function export_file(id: string, name: string)
 	end)
 end
 
--- Install: a link or a .zeron-template file. Yours installs; someone
--- else's opens Zeron's consent window (the host's), and waits above the
+-- Install: a link or a .zeren-template file. Yours installs; someone
+-- else's opens Zeren's consent window (the host's), and waits above the
 -- rows. The dialog closes once it's done; failing, it stays, to try again.
 local function install(from: { path: string?, url: string? })
 	local p: any = state.import(from)
@@ -367,7 +367,7 @@ local function controls(t: state.Template, now: State<any>): Node
 					end)
 				end),
 			},
-			-- (Not Zeron's own: it's everyone's already.)
+			-- (Not Zeren's own: it's everyone's already.)
 			if t.builtin
 				then nil
 				else Menu.Row {
@@ -410,7 +410,7 @@ local function controls(t: state.Template, now: State<any>): Node
 	return ui.row {
 		gap = "$space.2",
 		items = "center",
-		-- Unverified, before its version, for one whose maker Zeron can't
+		-- Unverified, before its version, for one whose maker Zeren can't
 		-- vouch for.
 		ui.show(function(): boolean
 			return unverified(now:get())
@@ -479,7 +479,7 @@ local function row(t: state.Template, _i: number, now: State<any>): Node
 	}
 end
 
--- What Yours says with nothing in it (Installed always holds Zeron's own).
+-- What Yours says with nothing in it (Installed always holds Zeren's own).
 local function none(_tab: string): Node
 	return ds.EmptyState {
 		icon = "gallery",
@@ -597,7 +597,7 @@ function M.View(): Node
 			},
 		},
 		-- (No New for now: templates of yours arrive by an agent or as a
-		-- copy of Zeron's. Install brings in someone else's, as Plugins'.)
+		-- copy of Zeren's. Install brings in someone else's, as Plugins'.)
 		import = {
 			label = ui.t("templates.page.install_more"),
 			on_click = function()

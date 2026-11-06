@@ -1,4 +1,4 @@
-//! Zeron-owned styling and highlighting adapters for `gpui-base`.
+//! Zeren-owned styling and highlighting adapters for `gpui-base`.
 
 use std::{ops::Range, rc::Rc, sync::Arc};
 
@@ -6,17 +6,17 @@ use gpui::{Context, HighlightStyle, SharedString, Window};
 use gpui_base::input::{
     FoldRange, HighlightStyleResolver, InputEdit, InputEditorStyle, InputHighlighter, Rope,
 };
-use zeron_syntax::{HighlightKind, HighlightedDocument};
+use zeren_syntax::{HighlightKind, HighlightedDocument};
 
 use super::editor::FileEditorState;
 use crate::theme::{SyntaxPalette, Theme};
 
 #[derive(Clone)]
-struct ZeronHighlightStyleResolver {
+struct ZerenHighlightStyleResolver {
     palette: SyntaxPalette,
 }
 
-impl HighlightStyleResolver for ZeronHighlightStyleResolver {
+impl HighlightStyleResolver for ZerenHighlightStyleResolver {
     fn style(&self, name: &str) -> Option<HighlightStyle> {
         kind_for_name(name).map(|kind| HighlightStyle {
             color: Some(self.palette.color(kind)),
@@ -26,7 +26,7 @@ impl HighlightStyleResolver for ZeronHighlightStyleResolver {
 }
 
 #[derive(Clone)]
-pub(super) struct ZeronInputHighlighter {
+pub(super) struct ZerenInputHighlighter {
     language: SharedString,
     spans: Vec<(Range<usize>, HighlightKind)>,
     /// The text `spans` were computed for, until the first edit proves the
@@ -36,7 +36,7 @@ pub(super) struct ZeronInputHighlighter {
     unverified_source: Option<Arc<str>>,
 }
 
-impl ZeronInputHighlighter {
+impl ZerenInputHighlighter {
     fn new(source: &str, document: &HighlightedDocument) -> Self {
         Self {
             language: format!("{:?}", document.language).into(),
@@ -46,7 +46,7 @@ impl ZeronInputHighlighter {
     }
 }
 
-impl InputHighlighter for ZeronInputHighlighter {
+impl InputHighlighter for ZerenInputHighlighter {
     fn language(&self) -> SharedString {
         self.language.clone()
     }
@@ -156,7 +156,7 @@ pub(super) fn editor_style(theme: &Theme) -> InputEditorStyle {
         border: theme.border,
         selection: theme.accent.opacity(0.22),
         caret: theme.caret,
-        highlight_styles: Arc::new(ZeronHighlightStyleResolver {
+        highlight_styles: Arc::new(ZerenHighlightStyleResolver {
             palette: theme.syntax.clone(),
         }),
         editor_active_line: Some(crate::theme::wash(0.025)),
@@ -182,7 +182,7 @@ pub(super) fn install_highlighter(
                 probe::record(probe::Event::FactoryBuilt {
                     source: source.clone(),
                 });
-                Some(Box::new(ZeronInputHighlighter::new(&source, &document)) as Box<_>)
+                Some(Box::new(ZerenInputHighlighter::new(&source, &document)) as Box<_>)
             }),
             cx,
         );
@@ -357,7 +357,7 @@ fn kind_for_name(name: &str) -> Option<HighlightKind> {
 mod tests {
     use super::*;
     use gpui_base::input::Point;
-    use zeron_syntax::{HighlightSpan, LanguageId};
+    use zeren_syntax::{HighlightSpan, LanguageId};
 
     fn highlighted(source: &str, spans: Vec<HighlightSpan>) -> HighlightedDocument {
         HighlightedDocument::from_absolute_spans(LanguageId::Rust, source, spans).unwrap()
@@ -394,8 +394,8 @@ mod tests {
                 },
             ],
         );
-        let highlighter = ZeronInputHighlighter::new(source, &document);
-        let resolver = ZeronHighlightStyleResolver {
+        let highlighter = ZerenInputHighlighter::new(source, &document);
+        let resolver = ZerenHighlightStyleResolver {
             palette: Theme::dark().syntax,
         };
         let runs = highlighter.styles(&(0..source.len()), &resolver);
@@ -414,8 +414,8 @@ mod tests {
                 kind: HighlightKind::Variable,
             }],
         );
-        let highlighter = ZeronInputHighlighter::new(stale_source, &stale_document);
-        let resolver = ZeronHighlightStyleResolver {
+        let highlighter = ZerenInputHighlighter::new(stale_source, &stale_document);
+        let resolver = ZerenHighlightStyleResolver {
             palette: Theme::dark().syntax,
         };
         let updated_text = "é";

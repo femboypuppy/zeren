@@ -15,7 +15,7 @@ use gpui::{
 };
 use std::time::{Duration, Instant};
 
-use zeron_doc::{MessagePart, MessageRole, SessionMessageEntry};
+use zeren_doc::{MessagePart, MessageRole, SessionMessageEntry};
 
 use crate::markdown::{Block, InlineRun, InlineStyle};
 use crate::motion;
@@ -42,7 +42,7 @@ pub struct RailTick {
     /// Message id — equals the user row's id in the transcript row model.
     pub message_id: String,
     pub prompt: String,
-    /// The chat that sent the prompt through Zeron's `send_message`; its
+    /// The chat that sent the prompt through Zeren's `send_message`; its
     /// routing header is off `prompt`, as in the transcript.
     pub sender: Option<AgentSender>,
     pub reply: Option<String>,
@@ -62,7 +62,7 @@ fn user_text(entry: &SessionMessageEntry) -> (String, Option<AgentSender>) {
     // prompt, or "Attached image(s)" for image-only sends
     // (message-attachments.ts `userMessageRailText`).
     let text = crate::attachments::user_message_rail_text(
-        &zeron_proto::annotation::annotation_display(&raw),
+        &zeren_proto::annotation::annotation_display(&raw),
     );
     match crate::transcript::agent_message_sender(&text) {
         Some((sender, body)) => (body.to_owned(), Some(sender)),
@@ -445,12 +445,12 @@ impl GlideTimeline {
     }
 }
 
-/// `ZERON_SCROLL_TRACE=1` logs per-frame glide positions at `warn` level —
-/// the smoothness measurement knob (same family as `ZERON_FRAME_STATS`).
+/// `ZEREN_SCROLL_TRACE=1` logs per-frame glide positions at `warn` level —
+/// the smoothness measurement knob (same family as `ZEREN_FRAME_STATS`).
 fn scroll_trace_enabled() -> bool {
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ENABLED.get_or_init(|| {
-        std::env::var("ZERON_SCROLL_TRACE").is_ok_and(|v| !v.is_empty() && v != "0")
+        std::env::var("ZEREN_SCROLL_TRACE").is_ok_and(|v| !v.is_empty() && v != "0")
     })
 }
 
@@ -1027,7 +1027,7 @@ impl Transcript {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zeron_doc::MessageStatus;
+    use zeren_doc::MessageStatus;
 
     fn entry(id: &str, role: MessageRole, text: &str) -> SessionMessageEntry {
         SessionMessageEntry {
@@ -1314,7 +1314,7 @@ mod tests {
     fn agent_sent_prompts_carry_their_sender() {
         let id = "c563133c-2825-4056-8d1e-4b2a18c210ae";
         let routed = format!(
-            "[Message from Zeron chat Harden Orbit (c563133c). Reply to it with the Zeron `send_message` tool, chat {id}.]\n\nYou own the **soak**."
+            "[Message from Zeren chat Harden Orbit (c563133c). Reply to it with the Zeren `send_message` tool, chat {id}.]\n\nYou own the **soak**."
         );
         let entries = vec![
             entry("u1", MessageRole::User, &routed),

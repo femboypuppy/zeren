@@ -1,11 +1,11 @@
-//! Which agents Zeron signs in to and how: the rules every app's provider
+//! Which agents Zeren signs in to and how: the rules every app's provider
 //! settings follow (desktop Settings → Providers, the phone's Providers), so
 //! the platforms offer the same sign-ins, labels and switching. Pure.
 
 use crate::HarnessId;
 
-/// The providers zeron can sign into, in display order: (harness, name, CLI
-/// command — named in the empty-state copy, zeron settings.agents.tsx
+/// The providers zeren can sign into, in display order: (harness, name, CLI
+/// command — named in the empty-state copy, zeren settings.agents.tsx
 /// `PROVIDERS`). Every agent with a login of its own is here; what each one
 /// supports is documented engine-side (`agent_accounts` module docs).
 pub const PROVIDERS: [(HarnessId, &str, &str); 10] = [
@@ -50,14 +50,14 @@ pub fn keeps_one_login(harness: HarnessId) -> bool {
     harness == HarnessId::Antigravity
 }
 
-/// Whether zeron switches this agent's logins. Hermes rotates through its
+/// Whether zeren switches this agent's logins. Hermes rotates through its
 /// own credential pool (listed, never reordered); Antigravity keeps one.
 pub fn switches_accounts(harness: HarnessId) -> bool {
     !matches!(harness, HarnessId::Hermes | HarnessId::Antigravity | HarnessId::Fx)
 }
 
 /// A standing note under a provider's Accounts label, for an agent whose
-/// accounts work differently. Hermes owns its credential pool: zeron lists
+/// accounts work differently. Hermes owns its credential pool: zeren lists
 /// it and adds to it through Hermes' own CLI, but never switches or removes
 /// its entries. Pure.
 pub fn provider_note(harness: HarnessId) -> Option<&'static str> {
@@ -80,7 +80,7 @@ pub struct LoginOption {
     pub label: &'static str,
 }
 
-/// The sign-ins zeron offers for `harness`, in button order. Pure.
+/// The sign-ins zeren offers for `harness`, in button order. Pure.
 pub fn login_options(harness: HarnessId) -> Vec<LoginOption> {
     let option = |provider, label| LoginOption {
         provider: Some(provider),

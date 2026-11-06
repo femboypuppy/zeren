@@ -75,7 +75,7 @@ test("a plugin arriving, a new version and a status change keep every row", func
 	-- One that can't load says why, and offers its folder.
 	app:command("break")
 	app:frames(20)
-	expect(app:tree()).to_contain("permission Zeron doesn")
+	expect(app:tree()).to_contain("permission Zeren doesn")
 	expect(app:has('role:button "Show folder"')).to_be(true)
 end)
 
@@ -210,22 +210,22 @@ test("with none installed, a search says nothing matches, and clearing it says h
 	expect(app:tree()).to_contain("No plugins yet")
 end)
 
-test("Zeron's own says so, shows what it can do, and can be turned off, not removed", function()
+test("Zeren's own says so, shows what it can do, and can be turned off, not removed", function()
 	local app = open()
 	app:command("builtin")
 	app:frames(20)
 	local tree = app:tree()
-	expect(tree).to_contain("by Zeron")
+	expect(tree).to_contain("by Zeren")
 	-- (What it can do on a line of its own under the description, whole.)
 	expect(tree).to_contain("Your sessions' pull requests.")
-	expect(tree).to_contain('"by Zeron"')
+	expect(tree).to_contain('"by Zeren"')
 	expect(tree).to_contain('text "It can see your pull')
 	expect(app:has('role:switch "GitHub"')).to_be(true)
 	expect(app:has('role:button "Remove GitHub"')).to_be(false)
 	expect(app:has('role:button "Remove Focus"')).to_be(true)
 end)
 
-test("narrow, one of Zeron's own still shows all it's allowed, wrapped under its description", function()
+test("narrow, one of Zeren's own still shows all it's allowed, wrapped under its description", function()
 	local app = open()
 	app:command("builtin")
 	app:frames(20)
@@ -297,17 +297,17 @@ test("an install that fails keeps the dialog, to try again", function()
 	expect(app:has('role:dialog >> role:button "Install"')).to_be(true)
 end)
 
-test("one Zeron can't vouch for says Unverified by its version, and where it came from", function()
+test("one Zeren can't vouch for says Unverified by its version, and where it came from", function()
 	local app = open()
 	local function badges(): number
 		local _, n = string.gsub(app:tree(), '"Unverified"', "")
 		return n
 	end
-	-- Zeron's own, yours and a verified author's: never.
+	-- Zeren's own, yours and a verified author's: never.
 	app:command("builtin")
 	app:frames(20)
 	expect(badges()).to_be(0)
-	-- Someone Zeron can't vouch for: one badge, theirs.
+	-- Someone Zeren can't vouch for: one badge, theirs.
 	app:command("arrive")
 	app:frames(20)
 	expect(badges()).to_be(1)

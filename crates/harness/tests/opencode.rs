@@ -13,10 +13,10 @@ use futures::StreamExt;
 use serde_json::{Value, json};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::sync::{broadcast, mpsc, oneshot};
-use zeron_harness::{
+use zeren_harness::{
     CancellationToken, Harness, HarnessError, OpencodeHarness, RunControls, SteerMessage,
 };
-use zeron_proto::{
+use zeren_proto::{
     AccessMode, AgentEvent, DoneStatus, ReasoningLevel, RunRequest, SandboxLevel, ToolCall,
     UserInputAnswer,
 };
@@ -650,10 +650,10 @@ async fn stoppable_turn(
 ) -> (
     futures::stream::BoxStream<'static, Result<AgentEvent, HarnessError>>,
     mpsc::Sender<SteerMessage>,
-    zeron_harness::TurnControl,
+    zeren_harness::TurnControl,
 ) {
     let (mut controls, steer, _token) = controls();
-    let turn = zeron_harness::TurnControl::default();
+    let turn = zeren_harness::TurnControl::default();
     controls.turn = turn.clone();
     assert!(driver.stops_turn_in_place());
     let mut stream = driver
@@ -1419,7 +1419,7 @@ async fn slash_command_rejects_attachments_instead_of_dropping_them() {
 
 #[tokio::test]
 async fn dollar_selected_skill_uses_opencode_native_command_with_arguments() {
-    use zeron_proto::{
+    use zeren_proto::{
         HarnessId,
         invocation::{Invocation, harness_prompt},
     };
@@ -1488,16 +1488,16 @@ async fn live_turn(
 /// data, config and logins (opencode's anonymous tier needs no account):
 /// an attachment whose name carries URL-reserved characters, a follow-up
 /// prompt, and a stop that keeps the session. Run with
-/// `ZERON_OPENCODE_LIVE_EXE=/path/to/opencode [ZERON_OPENCODE_LIVE_MODEL=provider/model]
-/// cargo test -p zeron-harness --test opencode live_ -- --ignored --nocapture`.
+/// `ZEREN_OPENCODE_LIVE_EXE=/path/to/opencode [ZEREN_OPENCODE_LIVE_MODEL=provider/model]
+/// cargo test -p zeren-harness --test opencode live_ -- --ignored --nocapture`.
 #[tokio::test]
-#[ignore = "drives a real opencode; set ZERON_OPENCODE_LIVE_EXE"]
+#[ignore = "drives a real opencode; set ZEREN_OPENCODE_LIVE_EXE"]
 async fn live_turns_against_a_real_opencode() {
-    let Some(exe) = std::env::var_os("ZERON_OPENCODE_LIVE_EXE") else {
-        eprintln!("ZERON_OPENCODE_LIVE_EXE unset; skipping");
+    let Some(exe) = std::env::var_os("ZEREN_OPENCODE_LIVE_EXE") else {
+        eprintln!("ZEREN_OPENCODE_LIVE_EXE unset; skipping");
         return;
     };
-    let model = std::env::var("ZERON_OPENCODE_LIVE_MODEL")
+    let model = std::env::var("ZEREN_OPENCODE_LIVE_MODEL")
         .unwrap_or_else(|_| "opencode/big-pickle".to_owned());
     let root = tempfile::tempdir().unwrap();
     let project = root.path().join("project dir");
@@ -1537,7 +1537,7 @@ async fn live_turns_against_a_real_opencode() {
     first.attachments = vec![shot.to_string_lossy().into_owned()];
     first.env = env;
     let (mut controls, steer, _token) = controls();
-    let turn = zeron_harness::TurnControl::default();
+    let turn = zeren_harness::TurnControl::default();
     controls.turn = turn.clone();
     let driver = OpencodeHarness::new().with_executable(std::path::PathBuf::from(exe));
     let mut stream = driver.run(first, controls).await.expect("run starts");
@@ -1598,16 +1598,16 @@ async fn live_turns_against_a_real_opencode() {
 /// [`live_turns_against_a_real_opencode`]): supervised asks before the
 /// command and the file and, refused, leaves no file; auto-accept edits
 /// writes the file unasked and still asks before the command. Run with
-/// `ZERON_OPENCODE_LIVE_EXE=/path/to/opencode cargo test -p zeron-harness
+/// `ZEREN_OPENCODE_LIVE_EXE=/path/to/opencode cargo test -p zeren-harness
 /// --test opencode live_access -- --ignored --nocapture`.
 #[tokio::test]
-#[ignore = "drives a real opencode; set ZERON_OPENCODE_LIVE_EXE"]
+#[ignore = "drives a real opencode; set ZEREN_OPENCODE_LIVE_EXE"]
 async fn live_access_modes_against_a_real_opencode() {
-    let Some(exe) = std::env::var_os("ZERON_OPENCODE_LIVE_EXE") else {
-        eprintln!("ZERON_OPENCODE_LIVE_EXE unset; skipping");
+    let Some(exe) = std::env::var_os("ZEREN_OPENCODE_LIVE_EXE") else {
+        eprintln!("ZEREN_OPENCODE_LIVE_EXE unset; skipping");
         return;
     };
-    let model = std::env::var("ZERON_OPENCODE_LIVE_MODEL")
+    let model = std::env::var("ZEREN_OPENCODE_LIVE_MODEL")
         .unwrap_or_else(|_| "opencode/big-pickle".to_owned());
     for access in [AccessMode::Supervised, AccessMode::AutoAcceptEdits] {
         let root = tempfile::tempdir().unwrap();

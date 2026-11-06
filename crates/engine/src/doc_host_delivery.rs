@@ -166,8 +166,8 @@ async fn deliver(weak: std::sync::Weak<DocHostInner>, chat: &str) {
             }
         }
         drop(host);
-        let mut wake = zeron_sync::wake::subscribe();
-        let mut online = zeron_sync::wake::subscribe_online();
+        let mut wake = zeren_sync::wake::subscribe();
+        let mut online = zeren_sync::wake::subscribe_online();
         tokio::select! {
             _ = tokio::time::sleep(backoff) => {},
             _ = wake.recv() => {},
@@ -188,7 +188,7 @@ mod tests {
 
     #[tokio::test]
     async fn remote_chat_transports_carry_the_host_on_both_paths() {
-        use zeron_sync::chat_client::ChatTransport;
+        use zeren_sync::chat_client::ChatTransport;
 
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
         let edge = EdgeConfig::with_static_token(

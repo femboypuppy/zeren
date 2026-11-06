@@ -2,15 +2,15 @@
 //! subagents, compact transcript, work fold open — the production Shell over
 //! an isolated in-process engine. No agent runs.
 //!
-//! `cargo run -p zeron-ui --features appshots-fixture,resource-profile --example subagent-fold-fixture -- [hold-secs] [app-id]`
+//! `cargo run -p zeren-ui --features appshots-fixture,resource-profile --example subagent-fold-fixture -- [hold-secs] [app-id]`
 //! prints `READY` once the fold is open, keeps the window up for `hold-secs`
 //! (default 20) so the compositor can capture it, then quits.
 use gpui::{AppContext, Bounds, WindowBounds, WindowOptions, px, size};
 use serde_json::json;
 use std::{io::Write, sync::Arc, time::Duration};
-use zeron_doc::{MessagePart, MessageRole, MessageStatus, SessionMessageEntry, SubagentStatus};
-use zeron_proto::ToolCall;
-use zeron_ui::*;
+use zeren_doc::{MessagePart, MessageRole, MessageStatus, SessionMessageEntry, SubagentStatus};
+use zeren_proto::ToolCall;
+use zeren_ui::*;
 
 fn port() -> u16 {
     std::net::TcpListener::bind("127.0.0.1:0")
@@ -100,7 +100,7 @@ fn main() -> anyhow::Result<()> {
         .unwrap_or(20);
     let app_id = std::env::args()
         .nth(2)
-        .unwrap_or_else(|| "zeron-fixture-subagent-fold".into());
+        .unwrap_or_else(|| "zeren-fixture-subagent-fold".into());
     tracing_subscriber::fmt()
         .with_env_filter(std::env::var("RUST_LOG").unwrap_or_else(|_| "warn".into()))
         .init();
@@ -109,10 +109,10 @@ fn main() -> anyhow::Result<()> {
     std::fs::create_dir_all(&workspace)?;
     let runtime = tokio::runtime::Runtime::new()?;
     let core = runtime.block_on(async {
-        zeron_engine::EngineCore::assemble(
+        zeren_engine::EngineCore::assemble(
             &temp.path().join("engine"),
-            Arc::new(zeron_engine::default_registry()),
-            zeron_proto::HarnessId::ClaudeCode,
+            Arc::new(zeren_engine::default_registry()),
+            zeren_proto::HarnessId::ClaudeCode,
             None,
         )
     })?;
@@ -128,7 +128,7 @@ fn main() -> anyhow::Result<()> {
     std::fs::create_dir(&data)?;
     // The viewport reads the IPC bearer from its own data dir.
     let ipc_port = port();
-    let _ipc = runtime.block_on(zeron_engine::serve_ipc(ipc_port, &data, core.rpc_service()))?;
+    let _ipc = runtime.block_on(zeren_engine::serve_ipc(ipc_port, &data, core.rpc_service()))?;
     let boot = EngineBootConfig {
         data_dir: data.clone(),
         ipc_port,
@@ -136,7 +136,7 @@ fn main() -> anyhow::Result<()> {
         edge_token: None,
         org_id: None,
         workos_client_id: None,
-        default_harness: zeron_proto::HarnessId::ClaudeCode,
+        default_harness: zeren_proto::HarnessId::ClaudeCode,
     };
     let handle = runtime.block_on(state::EngineHandle::bootstrap(boot.clone()))?;
     let chats = core.workspace.read_chats()?;
@@ -187,8 +187,8 @@ fn main() -> anyhow::Result<()> {
             let state = cx.new(|_| {
                 let mut s = state::AppState::new();
                 s.fixture_attachment_engine(handle);
-                s.connection = zeron_proto::view::ConnectionStatus::Ready;
-                s.workspace_scope = Some(zeron_proto::WorkspaceScope::Development);
+                s.connection = zeren_proto::view::ConnectionStatus::Ready;
+                s.workspace_scope = Some(zeren_proto::WorkspaceScope::Development);
                 s.local_device_id = Some(device.clone());
                 s.devices = vec![
                     serde_json::from_value(json!({"id": device, "name": "This device",
@@ -224,7 +224,7 @@ fn main() -> anyhow::Result<()> {
                 pause(cx, 800).await;
                 state.update(cx, |s, cx| {
                     s.receive_transcript_frame(
-                        zeron_doc::TranscriptFrame::Reset { reset: entries },
+                        zeren_doc::TranscriptFrame::Reset { reset: entries },
                         cx,
                     )
                     .unwrap();

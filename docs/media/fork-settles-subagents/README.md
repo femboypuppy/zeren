@@ -2,7 +2,7 @@
 
 Live captures for "Fork: settle the running subagent chips a fork copies" (#1001).
 
-- The same scenario ran on two headless engines on one Mac, on Claude Code 2.1.310 with Haiku: Zeron v0.2.121 (before) and this branch (after). A chat starts one background `Agent` that runs `sleep 70`. Right after its turn ends, the chat is forked (`ForkSideChat`).
+- The same scenario ran on two headless engines on one Mac, on Claude Code 2.1.310 with Haiku: Zeren v0.2.121 (before) and this branch (after). A chat starts one background `Agent` that runs `sleep 70`. Right after its turn ends, the chat is forked (`ForkSideChat`).
 - Before: the fork, captured about an hour later, still lists "Sleep for 70 seconds" as running, and its chip still spins.
 - After: the fork's copy reads `failed` as soon as `ForkSideChat` returns, and stays settled. The source keeps its own chip, which went from running to done once the subagent finished.
 - The frames are the production `Shell` rendered offscreen by gpui (`Window::render_to_image`), attached to each engine over IPC. They are not an OS screen recording.

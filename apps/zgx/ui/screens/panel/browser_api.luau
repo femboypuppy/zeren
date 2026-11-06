@@ -116,7 +116,7 @@ end
 
 -- What typed text should go to: an address (as `normalize` makes it), or a
 -- search when it doesn't read as one (words with spaces, a single word with
--- no dot, port or scheme: "react hooks", "zeron"), on `engine` (its address
+-- no dot, port or scheme: "react hooks", "zeren"), on `engine` (its address
 -- with `%s` where the words go). An address `normalize` refuses for being
 -- a file, credentials or another scheme stays refused, as there's no
 -- search a path or a `javascript:` should become.

@@ -1,5 +1,5 @@
 //! A plugin's programs ("commands"): the ones its manifest names
-//! (`"commands": ["gh"]`), run as you when it asks (`zeron.run(program,
+//! (`"commands": ["gh"]`), run as you when it asks (`zeren.run(program,
 //! args, { cwd, stdin, timeout, env })`). One runner for the engine's
 //! services and the app's windows, so both hold a plugin to the same rules.
 //!
@@ -17,7 +17,7 @@
 //! - no shell: each argument reaches the program as it is;
 //! - the program is found by its name on your login shell's PATH, never a
 //!   path, and the plugin can't change PATH;
-//! - `env`: only harmless variables ([`ENV_ALLOWED`], and `ZERON_PLUGIN_…`
+//! - `env`: only harmless variables ([`ENV_ALLOWED`], and `ZEREN_PLUGIN_…`
 //!   names of the plugin's own), never one that changes what runs or what
 //!   loads (`GIT_*` but a few, `BASH_ENV`, `NODE_OPTIONS`, `PERL5OPT`,
 //!   `PYTHON*`, `GH_CONFIG_DIR`, `*_PRELOAD`, `DYLD_*`, `LD_*`, `PATH`, …);
@@ -193,10 +193,10 @@ pub const ENV_ALLOWED: &[&str] = &[
 ];
 
 /// The plugin's own variables: nothing else reads these.
-pub const ENV_OWN_PREFIX: &str = "ZERON_PLUGIN_";
+pub const ENV_OWN_PREFIX: &str = "ZEREN_PLUGIN_";
 
 /// A run's own environment variables (`env = { LC_ALL = "C" }`), set over
-/// yours: allowed names ([`ENV_ALLOWED`] or `ZERON_PLUGIN_…`), and text.
+/// yours: allowed names ([`ENV_ALLOWED`] or `ZEREN_PLUGIN_…`), and text.
 pub fn env_of(asked: &Json) -> Result<Vec<(String, String)>, String> {
     let Some(env) = asked.get("env").filter(|e| !e.is_null()) else {
         return Ok(Vec::new());
@@ -416,16 +416,16 @@ impl GitRun {
 /// what the run does, or why it may not. See the module's notes.
 pub fn git_args(args: &[String], cwd: Option<&Path>) -> Result<GitRun, String> {
     let mut run = GitRun { dir: cwd.map(Path::to_path_buf), ..GitRun::default() };
-    let refuse = |why: String| Err(format!("Zeron doesn't run git that way: {why}"));
+    let refuse = |why: String| Err(format!("Zeren doesn't run git that way: {why}"));
     // A folder git is pointed at: inside the run's folder, when it has one.
     let check_dir = |flag: &str, dir: &str| -> Result<(), String> {
         match cwd {
             Some(cwd) if !inside(cwd, dir) => Err(format!(
-                "Zeron doesn't run git that way: {flag} {dir} is outside the run's folder ({})",
+                "Zeren doesn't run git that way: {flag} {dir} is outside the run's folder ({})",
                 cwd.display()
             )),
             None if !Path::new(dir).is_absolute() => {
-                Err(format!("Zeron doesn't run git that way: {flag} {dir} needs a whole path, or the run a cwd"))
+                Err(format!("Zeren doesn't run git that way: {flag} {dir} needs a whole path, or the run a cwd"))
             }
             _ => Ok(()),
         }
@@ -531,8 +531,8 @@ pub fn git_args(args: &[String], cwd: Option<&Path>) -> Result<GitRun, String> {
         words.push(arg);
     }
     match command {
-        "bisect" if words.first() == Some(&"run") => Err("Zeron doesn't run git that way: git bisect run runs a program".into()),
-        "submodule" if words.contains(&"foreach") => Err("Zeron doesn't run git that way: git submodule foreach runs a program".into()),
+        "bisect" if words.first() == Some(&"run") => Err("Zeren doesn't run git that way: git bisect run runs a program".into()),
+        "submodule" if words.contains(&"foreach") => Err("Zeren doesn't run git that way: git submodule foreach runs a program".into()),
         "config" => {
             let all: Vec<&str> = rest.iter().map(String::as_str).collect();
             let reads = all.iter().any(|a| {
@@ -559,7 +559,7 @@ const GH_COMMANDS: &[&str] = &[
 
 /// gh's arguments, if a plugin may run them.
 pub fn gh_args(args: &[String]) -> Result<(), String> {
-    let refuse = |why: &str| Err(format!("Zeron doesn't run gh that way: {why}"));
+    let refuse = |why: &str| Err(format!("Zeren doesn't run gh that way: {why}"));
     let words: Vec<&str> = args.iter().map(String::as_str).filter(|a| !a.starts_with('-')).collect();
     let Some(&command) = words.first() else {
         return Ok(()); // (`gh --version`.)

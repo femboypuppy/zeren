@@ -49,11 +49,11 @@ export type ToneValue = Tone | () -> Tone
 local function ink(tone: ToneValue?): string
 	local t: Tone? = if type(tone) == "function" then (tone :: any)() else tone :: any
 	if t == nil or t == "accent" then
-		return "$zeron.switch.on"
+		return "$zeren.switch.on"
 	elseif t == "neutral" then
 		return "$text.secondary"
 	end
-	return `$zeron.tone.{t}.ink`
+	return `$zeren.tone.{t}.ink`
 end
 
 export type BarProps = {
@@ -139,7 +139,7 @@ M.ProgressBar = ui.component(function(props: BarProps): Node
 		w_full = props.w_full,
 		grow = props.grow,
 		rounded = "$radius.full",
-		bg = "$zeron.switch.track",
+		bg = "$zeren.switch.track",
 		fill,
 	}
 end)

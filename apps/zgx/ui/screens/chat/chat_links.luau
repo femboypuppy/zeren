@@ -1,5 +1,5 @@
--- Another Zeron chat mentioned in a message (crates/proto chat_mentions.rs):
--- `[title](zeron-chat:<id>)`, its title on one line with its brackets,
+-- Another Zeren chat mentioned in a message (crates/proto chat_mentions.rs):
+-- `[title](zeren-chat:<id>)`, its title on one line with its brackets,
 -- backslashes and backticks escaped, and only a plain chat id. The engine
 -- reads it out to the agent as that chat and how to read it.
 --
@@ -24,7 +24,7 @@ function M.link(title: string?, id: string): string?
 	local label = string.gsub(M.title(title), "[\\%[%]`]", function(c: string): string
 		return "\\" .. c
 	end)
-	return `[{label}](zeron-chat:{id})`
+	return `[{label}](zeren-chat:{id})`
 end
 
 return M

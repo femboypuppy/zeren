@@ -5,30 +5,30 @@
 #   scripts/dev-demo.sh            # build, seed demo data, open the app
 #   scripts/dev-demo.sh --slow     # pace mock streams (~10s) to watch streaming
 #
-# Everything lives under /tmp/zeron-demo-*; re-runs reuse it. Ctrl-C cleans up.
+# Everything lives under /tmp/zeren-demo-*; re-runs reuse it. Ctrl-C cleans up.
 # A second demo beside a running one (another worktree's) picks its own
-# state and port: ZERON_DEMO_DIR=/tmp/zeron-demo-b ZERON_DEMO_PORT=27931.
+# state and port: ZEREN_DEMO_DIR=/tmp/zeren-demo-b ZEREN_DEMO_PORT=27931.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-DEMO_DIR="${ZERON_DEMO_DIR:-/tmp/zeron-demo}"
+DEMO_DIR="${ZEREN_DEMO_DIR:-/tmp/zeren-demo}"
 DAEMON_DIR="$DEMO_DIR-daemon"
 UI_DIR="$DEMO_DIR-ui"
-IPC="${ZERON_DEMO_PORT:-27921}"
+IPC="${ZEREN_DEMO_PORT:-27921}"
 # Demo projects live in ~/github when it exists, else in throwaway folders
 # (a space must point at a real folder).
 PROJECTS_DIR="$HOME/github"
-[[ -d "$PROJECTS_DIR" ]] || PROJECTS_DIR=/tmp/zeron-demo-projects
+[[ -d "$PROJECTS_DIR" ]] || PROJECTS_DIR=/tmp/zeren-demo-projects
 DELAY=""
 [[ "${1:-}" == "--slow" ]] && DELAY=350
 
 echo "▸ building (first run takes a few minutes)…"
-cargo build -p zeron -q
+cargo build -p zeren -q
 
 echo "▸ starting engine daemon on :$IPC"
-env ZERON_DATA_DIR="$DAEMON_DIR" ZERON_IPC_PORT=$IPC ZERON_HARNESS=mock \
-  ${DELAY:+ZERON_MOCK_DELAY_MS=$DELAY} RUST_LOG=warn \
-  ./target/debug/zeron headless &
+env ZEREN_DATA_DIR="$DAEMON_DIR" ZEREN_IPC_PORT=$IPC ZEREN_HARNESS=mock \
+  ${DELAY:+ZEREN_MOCK_DELAY_MS=$DELAY} RUST_LOG=warn \
+  ./target/debug/zeren headless &
 DAEMON_PID=$!
 trap 'kill $DAEMON_PID 2>/dev/null || true' EXIT
 for _ in $(seq 1 40); do
@@ -36,7 +36,7 @@ for _ in $(seq 1 40); do
   sleep 0.25
 done
 
-probe() { ZERON_DATA_DIR="$DAEMON_DIR" cargo run -q -p zeron-rpc --example rpc_probe -- "ws://127.0.0.1:$IPC" "$@"; }
+probe() { ZEREN_DATA_DIR="$DAEMON_DIR" cargo run -q -p zeren-rpc --example rpc_probe -- "ws://127.0.0.1:$IPC" "$@"; }
 
 if [[ ! -f "$DAEMON_DIR/.demo-seeded" ]]; then
   echo "▸ seeding demo chats"
@@ -44,7 +44,7 @@ if [[ ! -f "$DAEMON_DIR/.demo-seeded" ]]; then
   # One space per demo folder, created up-front (chats join by space id);
   # a folder already registered keeps its first space, so each is listed once.
   declare -A SPACES=()
-  for project in zeron marigold flint; do
+  for project in zeren marigold flint; do
     sid=$(uuidgen | tr 'A-Z' 'a-z')
     mkdir -p "$PROJECTS_DIR/$project"
     probe Mutate "{\"op\":\"createSpace\",\"spaceId\":\"$sid\",\"deviceId\":\"$DEV\",\"path\":\"$PROJECTS_DIR/$project\"}" >/dev/null
@@ -62,10 +62,10 @@ if [[ ! -f "$DAEMON_DIR/.demo-seeded" ]]; then
     fi
     probe Mutate "{\"op\":\"setChatActivity\",\"chatId\":\"$id\",\"lastMessageAt\":$(( ($(date +%s) - $4*3600) * 1000 ))}" >/dev/null
   }
-  seed "Native Zeron Rust Rewrite"    zeron zeron/main                 0  run
-  seed "Fix the Frost Date Lookup"    marigold     zeron/frost-date-lookup           2  run
-  seed "Print Seed Packet Labels"     marigold     zeron/seed-packet-labels          26 skip
-  seed "Initial Context Exploration"  zeron        zeron/initial-context-exploration 14 skip
+  seed "Native Zeren Rust Rewrite"    zeren zeren/main                 0  run
+  seed "Fix the Frost Date Lookup"    marigold     zeren/frost-date-lookup           2  run
+  seed "Print Seed Packet Labels"     marigold     zeren/seed-packet-labels          26 skip
+  seed "Initial Context Exploration"  zeren        zeren/initial-context-exploration 14 skip
   seed "Audit Ledger Rounding"        flint        flint/main                        48 skip
   touch "$DAEMON_DIR/.demo-seeded"
 fi
@@ -91,7 +91,7 @@ if [[ ! -f "$FANOUT_ID_FILE" ]]; then
 fi
 probe QueueCommand "{\"chatId\":\"$(cat "$FANOUT_ID_FILE")\",\"command\":{\"kind\":\"run\",\"messageId\":\"$(uuidgen)\",\"request\":{\"prompt\":\"/fanout 40\",\"model\":null,\"reasoning\":null,\"modelOptions\":{},\"cwd\":\"/tmp\",\"sandbox\":\"workspace-write\",\"autoApprove\":true,\"resume\":null}}}" >/dev/null
 
-echo "▸ opening zeron (composer is live — type into it; --slow shows streaming)"
+echo "▸ opening zeren (composer is live — type into it; --slow shows streaming)"
 echo "  'Fan Out Forty Scouts' settles a subagent every 2.5s; send '/fanout 40' to replay"
 # The UI attaches to the daemon, whose IPC bearer lives in the daemon's data dir.
-ZERON_DATA_DIR="$UI_DIR" ZERON_IPC_PORT=$IPC ZERON_IPC_TOKEN_FILE="$DAEMON_DIR/ipc-token" RUST_LOG=warn ./target/debug/zeron
+ZEREN_DATA_DIR="$UI_DIR" ZEREN_IPC_PORT=$IPC ZEREN_IPC_TOKEN_FILE="$DAEMON_DIR/ipc-token" RUST_LOG=warn ./target/debug/zeren

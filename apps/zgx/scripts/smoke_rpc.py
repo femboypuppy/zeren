@@ -1,4 +1,4 @@
-"""A minimal IPC call to an isolated zeron engine: rpc.py <port> <data_dir> <method> <json params>."""
+"""A minimal IPC call to an isolated zeren engine: rpc.py <port> <data_dir> <method> <json params>."""
 import base64, json, os, socket, struct, sys
 
 port, data_dir, method, params = int(sys.argv[1]), sys.argv[2], sys.argv[3], json.loads(sys.argv[4])

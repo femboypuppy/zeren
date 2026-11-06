@@ -52,7 +52,7 @@ return {
 					kind = "island",
 					p = "$space.1",
 					ui.row {
-						gap = "$zeron.space.hair",
+						gap = "$zeren.space.hair",
 						ds.IconButton { icon = "arrow-up", label = "Previous", size = "sm" },
 						ds.IconButton { icon = "arrow-down", label = "Next", size = "sm" },
 						ds.IconButton { icon = "close", label = "Close", size = "sm" },

@@ -120,13 +120,13 @@ end)
 test("a running command's output grows in place", function()
 	local app = work()
 	open_row(app, "Ran cargo build")
-	expect(app:has('.tool-output-text >> ~"Compiling zeron"')).to_be(true)
-	local before = node(app, "Compiling zeron")
+	expect(app:has('.tool-output-text >> ~"Compiling zeren"')).to_be(true)
+	local before = node(app, "Compiling zeren")
 	expect(before).never.to_be_nil()
-	app:set_state("test_tool_stream", "Compiling zeron\nFinished dev\n")
+	app:set_state("test_tool_stream", "Compiling zeren\nFinished dev\n")
 	app:frames(10)
 	expect(app:has('.tool-output-text >> ~"Finished dev"')).to_be(true)
-	expect(node(app, "Compiling zeron")).to_be(before)
+	expect(node(app, "Compiling zeren")).to_be(before)
 end)
 
 test("a read opens to its result; an older doc's edit to its diff at once", function()
@@ -201,7 +201,7 @@ test("a whole output that can't come says why, keeps the ten lines, and is asked
 	for _, case in {
 		{ word = "offline", says = "The device that ran this command is offline. Try again when it's back." },
 		{ word = "unavailable", says = "The rest of this output wasn't kept." },
-		{ word = "update", says = "Update Zeron on the device that ran this command to see all of its output." },
+		{ word = "update", says = "Update Zeren on the device that ran this command to see all of its output." },
 	} do
 		app:set_state("test_tool_whole", case.word)
 		app:click('role:button "Show all 300 lines"')

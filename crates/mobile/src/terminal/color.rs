@@ -1,9 +1,9 @@
-//! Cell colors for the phone: the Zeron palettes, xterm's cube and ramp, and
+//! Cell colors for the phone: the Zeren palettes, xterm's cube and ramp, and
 //! the desktop's contrast floor (`crates/ui/src/terminal/view.rs`
 //! `resolve_color` / `ensure_contrast`) so a program's own colors stay
 //! readable on the terminal's background.
 
-use zeron_term::emulator::CellColor;
+use zeren_term::emulator::CellColor;
 
 /// Text a program colored itself is lifted to at least this contrast
 /// (WCAG ratio) against what's behind it.
@@ -12,7 +12,7 @@ pub const MIN_CONTRAST: f32 = 3.0;
 /// xterm 6×6×6 cube levels.
 const CUBE: [u8; 6] = [0, 95, 135, 175, 215, 255];
 
-/// Zeron Dark / Light ANSI 16 (crates/theme builtins).
+/// Zeren Dark / Light ANSI 16 (crates/theme builtins).
 const ANSI_DARK: [u32; 16] = [
     0x242424, 0xf87171, 0x4ade80, 0xfacc15, 0x60a5fa, 0xc084fc, 0x22d3ee, 0xd4d4d8, 0x52525b,
     0xfca5a5, 0x86efac, 0xfde047, 0x93c5fd, 0xd8b4fe, 0x67e8f9, 0xfafafa,

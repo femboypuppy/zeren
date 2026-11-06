@@ -7,7 +7,7 @@
 //!
 //! ```sh
 //! AUDIT_OUT=/path/to/dir AUDIT_SHOTS=shell,gallery:sidebar \
-//!   cargo test --bin zeron-zgx audit_shots -- --ignored --nocapture
+//!   cargo test --bin zeren-zgx audit_shots -- --ignored --nocapture
 //! ```
 //!
 //! A shot is `<fixture>` (ui/<fixture>_fixture.luau, or a name ending
@@ -20,8 +20,8 @@
 //! (`#e9e9ee` light, `#1d1d22` dark), the same under both. `AUDIT_WAIT_MS`
 //! lets real time pass before the picture, for what comes over the network.
 //!
-//! Plugins too: `ZERON_ZGX_DEV_PLUGINS` loads plugin folders into each shot
-//! (lent the design system, as the app lends it), and `ZERON_ZGX_DEV_GITHUB`
+//! Plugins too: `ZEREN_ZGX_DEV_PLUGINS` loads plugin folders into each shot
+//! (lent the design system, as the app lends it), and `ZEREN_ZGX_DEV_GITHUB`
 //! plays GitHub from a JSON file (src/plugins `dev_plugins`): GitHub's
 //! viewer and board in ui/github_viewer_fixture.luau, github_board_fixture.luau.
 

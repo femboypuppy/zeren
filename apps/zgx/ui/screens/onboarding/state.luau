@@ -1,5 +1,5 @@
 -- Onboarding's state. `step` is plain state, kept across hot reloads, so a
--- save shows the step being worked on; `ZERON_ZGX_STEP` (through the host's
+-- save shows the step being worked on; `ZEREN_ZGX_STEP` (through the host's
 -- `onboarding.start`) picks where a launch starts.
 
 local api = require("@account/api")
@@ -23,13 +23,13 @@ M.PATHS = {
 	skipped = { "signin", "appearance", "providers", "done" },
 } :: { [Path]: { Step } }
 
--- Someone who already had Zeron, first in this interface: the intro, then only
+-- Someone who already had Zeren, first in this interface: the intro, then only
 -- their username and card (those not finished before), once.
 M.WELCOME = { "signin", "username", "card", "done" } :: { Step }
 M.welcome = ui.shared("onboarding.welcome", false):peek() == true
 
 -- Which steps are pages that are finished once and remembered, and where:
--- an account's on the account (Zeron's `/onboarding`, so another Mac
+-- an account's on the account (Zeren's `/onboarding`, so another Mac
 -- passes over them), a device's on this Mac. Sign-in and done are not
 -- pages. A page added later (a "what's new") gets an id of its own, and
 -- anyone who finished the others sees only it; a page redesigned to be
@@ -51,12 +51,12 @@ M.NEWS = {} :: { string }
 
 -- The device's pages finished on this Mac.
 M.device_done = ui.persist("onboarding_done", {} :: { [string]: boolean })
--- The pages finished before this run (the account's, as Zeron answered at
+-- The pages finished before this run (the account's, as Zeren answered at
 -- sign-in, and this Mac's): the run opens on the first one left. They stay
 -- in the path, so Back and Continue go through every step in order from
 -- there, and the dots don't move. Taken once, as the run starts.
 M.passed = ui.state("passed", {} :: { [string]: boolean })
--- `ZERON_ZGX_REPLAY`: every page, as if none were finished.
+-- `ZEREN_ZGX_REPLAY`: every page, as if none were finished.
 M.replay = ui.shared("onboarding.replay", false):peek() == true
 
 local start = ui.shared("onboarding.start", "signin"):peek() :: Step
@@ -70,7 +70,7 @@ M.name_done = ui.state("name_done", false)
 -- A username was claimed in this run.
 M.claimed = ui.state("claimed", false)
 -- The account's card, once claimed or asked for (kept as state, so a hot
--- reload on Your card neither asks Zeron again nor deals it again), and
+-- reload on Your card neither asks Zeren again nor deals it again), and
 -- whether it has been dealt (its arrival plays once).
 M.card = ui.state("card", nil :: api.Card?)
 M.card_dealt = ui.state("card_dealt", false)
@@ -78,7 +78,7 @@ M.card_dealt = ui.state("card_dealt", false)
 M.wall_again = ui.state("wall_again", false)
 
 -- Each time a step opens, a visit (screens/visits, as Settings' pages have
--- them): what a step asks Zeron as it opens (the account's GitHub, its
+-- them): what a step asks Zeren as it opens (the account's GitHub, its
 -- agents, its username) is asked once a visit, not again as a hot reload
 -- builds the step again. An answer a step waits for (its username, its
 -- organization) is asked until answered in this visit.

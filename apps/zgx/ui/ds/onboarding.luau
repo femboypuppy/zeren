@@ -2,7 +2,7 @@
 -- a step header (where in the flow this is, and what it asks), and option
 -- cards (a choice made by picking a card: one of them, or several).
 --
---   Hero { title = "Welcome to Zeron", body = "…", art = Mark { … }, …actions }
+--   Hero { title = "Welcome to Zeren", body = "…", art = Mark { … }, …actions }
 --   StepHeader { step = 2, count = 4, title = "Which agents do you use?", body = "…" }
 --   OptionCards { value = state, options = { { value = "claude", title = "Claude", mark = "claude" }, … } }
 --   OptionCards { value = list_state, multiple = true, options = … }
@@ -47,7 +47,7 @@ function M.Hero(props: HeroProps): Node
 		ui.column {
 			items = "center",
 			gap = "$space.5",
-			max_w = ui.theme.get("zeron.hero.measure") :: number?,
+			max_w = ui.theme.get("zeren.hero.measure") :: number?,
 			props.art,
 			ui.column {
 				items = "center",
@@ -134,7 +134,7 @@ local Card = ui.component(function(props: { option: Option, on: () -> boolean, r
 			items = "center",
 			justify = "center",
 			rounded = "$radius.lg",
-			bg = "$zeron.secondary.bg",
+			bg = "$zeren.secondary.bg",
 			color = function()
 				return if on() then "$text.primary" else "$text.secondary"
 			end,
@@ -151,21 +151,21 @@ local Card = ui.component(function(props: { option: Option, on: () -> boolean, r
 		rounded = if props.round then "$radius.full" else "$radius.sm",
 		border = 1,
 		bg = function()
-			return if on() then "$zeron.check.on" else "$zeron.check.bg"
+			return if on() then "$zeren.check.on" else "$zeren.check.bg"
 		end,
 		border_color = function()
 			if on() then
-				return "$zeron.check.on"
+				return "$zeren.check.on"
 			end
-			return if hovered:get() then "$text.tertiary" else "$zeron.check.edge"
+			return if hovered:get() then "$text.tertiary" else "$zeren.check.edge"
 		end,
-		color = "$zeron.check.mark",
+		color = "$zeren.check.mark",
 		if props.round
 			then ui.div {
 				w = 6,
 				h = 6,
 				rounded = "$radius.full",
-				bg = "$zeron.check.mark",
+				bg = "$zeren.check.mark",
 				scale = ui.spring(ui.computed(function(): number
 					return if on() then 1 else 0
 				end), { stiffness = 520, damping = 26 }),
@@ -180,7 +180,7 @@ local Card = ui.component(function(props: { option: Option, on: () -> boolean, r
 	local text = ui.column {
 		grow = 1,
 		min_w = 0,
-		gap = "$zeron.space.hair",
+		gap = "$zeren.space.hair",
 		ui.row {
 			gap = "$space.2",
 			items = "center",
@@ -197,7 +197,7 @@ local Card = ui.component(function(props: { option: Option, on: () -> boolean, r
 		label = o.title,
 		focusable = not o.disabled,
 		disabled = o.disabled,
-		opacity = if o.disabled then "$zeron.disabled" else nil,
+		opacity = if o.disabled then "$zeren.disabled" else nil,
 		cursor = if o.disabled then nil else "pointer",
 		relative = true,
 		w_full = true,
@@ -208,9 +208,9 @@ local Card = ui.component(function(props: { option: Option, on: () -> boolean, r
 		rounded = "$radius.xl",
 		border = 1,
 		bg = function()
-			return if hovered:get() and not on() then "$hover" else "$zeron.option.bg"
+			return if hovered:get() and not on() then "$hover" else "$zeren.option.bg"
 		end,
-		border_color = "$zeron.option.edge",
+		border_color = "$zeren.option.edge",
 		focus = control.ring,
 		on_hover = function(inside: boolean)
 			hovered:set(inside)
@@ -232,7 +232,7 @@ local Card = ui.component(function(props: { option: Option, on: () -> boolean, r
 			bottom = -1,
 			rounded = "$radius.xl",
 			border = 2,
-			border_color = "$zeron.option.ring",
+			border_color = "$zeren.option.ring",
 			pointer_events = "none",
 			opacity = ui.tween(ui.computed(function(): number
 				return if on() then 1 else 0

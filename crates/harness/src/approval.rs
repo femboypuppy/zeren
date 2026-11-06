@@ -2,7 +2,7 @@
 //! before what its [`AccessMode`] does not cover; every driver asks the same
 //! way — a yes/no question through [`crate::RunControls::request_input`] —
 //! so an approval reads alike whichever agent raised it.
-use zeron_proto::{AccessMode, UserInputAnswer, UserInputQuestion};
+use zeren_proto::{AccessMode, UserInputAnswer, UserInputQuestion};
 
 pub const ALLOW: &str = "Yes";
 pub const DENY: &str = "No";

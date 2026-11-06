@@ -145,7 +145,7 @@ local function go(name: string, params: { [string]: string }?, replace: boolean?
 end
 
 -- The window's router, made as the shell is built (the app's script runs
--- it on every load): history behind and ahead, ⌘[ and ⌘], `zeron://` links.
+-- it on every load): history behind and ahead, ⌘[ and ⌘], `zeren://` links.
 function M.make()
 	-- (The history it had, made again: from its first place, through each
 	-- after it, then back to where it stood, so what was ahead is too.)
@@ -158,7 +158,7 @@ function M.make()
 	router = ui.router {
 		routes = ROUTES,
 		initial = entries[1],
-		scheme = "zeron",
+		scheme = "zeren",
 	}
 	replaying = true
 	ui.batch(function()
@@ -367,7 +367,7 @@ M.device = steady(function(): string?
 	return sessions.now:get().here
 end)
 
--- A new chat with nowhere to work yet (Zeron's first launch): no project,
+-- A new chat with nowhere to work yet (Zeren's first launch): no project,
 -- and none not chosen ("No project"). Its page asks for one in the
 -- composer's place.
 M.needs_project = ui.computed(function(): boolean
@@ -403,10 +403,10 @@ end
 -- `kept`), and once the chats have come, settles: a session left open
 -- that's still there stays open; one archived or gone since, and a first
 -- launch with nothing saved, give way to the session most recently active,
--- as Zeron opens on it (shell/tabs.rs); none, a new chat. A session not
+-- as Zeren opens on it (shell/tabs.rs); none, a new chat. A session not
 -- among the chats yet is given a moment (`GRACE_MS`) to arrive, as an
 -- engine just started may list them late. Gone somewhere meanwhile (a
--- `zeron://` link, a click), it stays there. (Kept in a named state, so a
+-- `zeren://` link, a click), it stays there. (Kept in a named state, so a
 -- reload, which keeps it, never moves the window; a fixture that wants its
 -- start as it is sets it first.)
 M.launched = ui.state("shell_launch_opened", false)
@@ -584,7 +584,7 @@ function M.settings(page: string?)
 	go("settings", { page = to })
 end
 
--- A `zeron://` link the system handed the app (a clicked banner, a chat's
+-- A `zeren://` link the system handed the app (a clicked banner, a chat's
 -- link), read by the host (src/links.rs): `{ seq, chat?, settings? }`, `seq`
 -- moving with each. Followed once each, never on a reload.
 local link = ui.shared("app.link", { seq = 0 } :: { seq: number, chat: string?, settings: string? })

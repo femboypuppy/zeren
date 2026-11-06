@@ -1,6 +1,6 @@
 //! Signed packages: one JSON file carrying a signed manifest and the files
 //! it covers, `{format, manifest, files: {rel: base64}}`. Plugins
-//! (`.zeron-plugin`, the plugin domain) and templates (`.zeron-template`,
+//! (`.zeren-plugin`, the plugin domain) and templates (`.zeren-template`,
 //! the template domain) share it. Each kind brings its format, its signing
 //! prefix, which paths it keeps, and its words for a refusal.
 //!
@@ -122,7 +122,7 @@ pub fn hashes(files: &BTreeMap<String, Vec<u8>>) -> FileHashes {
 /// and one that stays in its folder on every system (no `C:`, device
 /// names or trailing dots: crates/plugin-guard's `path`).
 pub fn plain_path(rel: &str) -> bool {
-    zeron_plugin_guard::path::is_safe(rel) && rel.split('/').all(|part| !part.starts_with('.'))
+    zeren_plugin_guard::path::is_safe(rel) && rel.split('/').all(|part| !part.starts_with('.'))
 }
 
 #[cfg(test)]
@@ -144,25 +144,25 @@ mod tests {
         let mut files = BTreeMap::new();
         files.insert("init.luau".to_string(), b"return 1".to_vec());
         let manifest = key.sign_manifest(&json!({ "id": "p", "name": "P" }), &hashes(&files));
-        (pack("zeron-plugin:v1", &manifest, &files).unwrap(), key.public())
+        (pack("zeren-plugin:v1", &manifest, &files).unwrap(), key.public())
     }
 
     #[test]
     fn a_package_verifies_over_every_file_before_anything_is_kept() {
         let (raw, key) = signed();
-        let v = parse(raw.clone(), "zeron-plugin:v1", PAYLOAD_PREFIX, plain_path, &WORDS).unwrap();
+        let v = parse(raw.clone(), "zeren-plugin:v1", PAYLOAD_PREFIX, plain_path, &WORDS).unwrap();
         assert_eq!((v.key, v.files.len(), v.hash), (key, 1, signing::sha256_hex(&raw)));
         // Another kind's format, a file changed, a path outside, unsigned.
-        assert_eq!(parse(raw.clone(), "zeron-template:v1", PAYLOAD_PREFIX, plain_path, &WORDS).unwrap_err(), "not a package");
+        assert_eq!(parse(raw.clone(), "zeren-template:v1", PAYLOAD_PREFIX, plain_path, &WORDS).unwrap_err(), "not a package");
         let mut value: Value = serde_json::from_slice(&raw).unwrap();
         value["files"]["init.luau"] = json!(B64.encode(b"return 2"));
-        assert_eq!(parse(serde_json::to_vec(&value).unwrap(), "zeron-plugin:v1", PAYLOAD_PREFIX, plain_path, &WORDS).unwrap_err(), "tampered");
+        assert_eq!(parse(serde_json::to_vec(&value).unwrap(), "zeren-plugin:v1", PAYLOAD_PREFIX, plain_path, &WORDS).unwrap_err(), "tampered");
         let mut value: Value = serde_json::from_slice(&raw).unwrap();
         value["files"]["../evil"] = json!(B64.encode(b"x"));
-        assert!(parse(serde_json::to_vec(&value).unwrap(), "zeron-plugin:v1", PAYLOAD_PREFIX, plain_path, &WORDS).unwrap_err().starts_with("won't write"));
+        assert!(parse(serde_json::to_vec(&value).unwrap(), "zeren-plugin:v1", PAYLOAD_PREFIX, plain_path, &WORDS).unwrap_err().starts_with("won't write"));
         let mut value: Value = serde_json::from_slice(&raw).unwrap();
         value["manifest"].as_object_mut().unwrap().remove("signature");
-        assert_eq!(parse(serde_json::to_vec(&value).unwrap(), "zeron-plugin:v1", PAYLOAD_PREFIX, plain_path, &WORDS).unwrap_err(), "unsigned");
+        assert_eq!(parse(serde_json::to_vec(&value).unwrap(), "zeren-plugin:v1", PAYLOAD_PREFIX, plain_path, &WORDS).unwrap_err(), "unsigned");
     }
 
     /// R9: a signed package naming a drive-relative path (`D:x.cmd`, or
@@ -177,8 +177,8 @@ mod tests {
             files.insert("init.luau".to_string(), b"return 1".to_vec());
             files.insert(bad.to_string(), b"evil".to_vec());
             let manifest = key.sign_manifest(&json!({ "id": "p", "name": "P" }), &hashes(&files));
-            let raw = pack("zeron-plugin:v1", &manifest, &files).unwrap();
-            let refused = parse(raw, "zeron-plugin:v1", PAYLOAD_PREFIX, plain_path, &WORDS);
+            let raw = pack("zeren-plugin:v1", &manifest, &files).unwrap();
+            let refused = parse(raw, "zeren-plugin:v1", PAYLOAD_PREFIX, plain_path, &WORDS);
             assert!(refused.is_err_and(|e| e.starts_with("won't write")), "{bad}");
         }
     }

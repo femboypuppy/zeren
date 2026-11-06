@@ -1,4 +1,4 @@
-//! The example plugins (plugins-dev/) in Zeron's real shell, headless: the
+//! The example plugins (plugins-dev/) in Zeren's real shell, headless: the
 //! shell fixture (ui/shell_fixture.luau, sessions made up, no engine) with
 //! each example loaded from its folder as the bridge loads a snapshot,
 //! granted what its manifest asks, and its records made from the shell's
@@ -15,13 +15,13 @@ fn example(id: &str) -> Item {
     from(Path::new(env!("CARGO_MANIFEST_DIR")).join("plugins-dev").join(id), id)
 }
 
-/// A plugin of Zeron's own (plugins-builtin/).
+/// A plugin of Zeren's own (plugins-builtin/).
 pub(super) fn builtin(id: &str) -> Item {
     from(Path::new(env!("CARGO_MANIFEST_DIR")).join("plugins-builtin").join(id), id)
 }
 
 fn from(dir: PathBuf, id: &str) -> Item {
-    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(dir.join("zeron-plugin.json")).unwrap()).unwrap();
+    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(dir.join("zeren-plugin.json")).unwrap()).unwrap();
     Item {
         json: json!({
             "id": id, "name": manifest["name"], "status": "on", "entry": manifest["entry"],
@@ -294,7 +294,7 @@ pub(super) fn shell_with(items: Vec<Item>, github: World) -> (TestApp, Heard) {
         offline(&host);
         {
             let heard = heard.clone();
-            host.action("zeron.open", move |v: zgx_script::Value| heard.borrow_mut().push(("zeron.open".into(), v.to_json())));
+            host.action("zeren.open", move |v: zgx_script::Value| heard.borrow_mut().push(("zeren.open".into(), v.to_json())));
         }
         host.action("close", |_| {});
         expose_surface(&host);
@@ -441,7 +441,7 @@ fn github_shows_each_session_s_pull_request_beside_its_title() {
     app.frames(5);
     {
         let heard = heard.borrow();
-        assert!(heard.iter().any(|(k, v)| k == "zeron.open" && v.contains("\"a1\"")), "{heard:?}");
+        assert!(heard.iter().any(|(k, v)| k == "zeren.open" && v.contains("\"a1\"")), "{heard:?}");
         let (_, tab) = heard.iter().find(|(k, _)| k == "plugin.github.open_tab").expect("a tab asked for");
         let tab: serde_json::Value = serde_json::from_str(tab).unwrap();
         assert_eq!((tab["session"].as_str(), tab["kind"].as_str(), tab["data"]["number"].as_f64()), (Some("a1"), Some("github-pr"), Some(1264.)));
@@ -764,7 +764,7 @@ fn counting_watch() -> Item {
         }
     }
     let dir = At(dir);
-    for f in ["pulls.luau", "gh.luau", "zeron-plugin.json"] {
+    for f in ["pulls.luau", "gh.luau", "zeren-plugin.json"] {
         std::fs::copy(src.join(f), dir.path().join(f)).unwrap();
     }
     std::fs::create_dir_all(dir.path().join("locales")).unwrap();
@@ -774,21 +774,21 @@ fn counting_watch() -> Item {
     let before = std::env::var("GITHUB_ISOLATION_FROM").ok();
     let watch = before.as_ref().map(PathBuf::from).unwrap_or_else(|| src.join("watch.luau"));
     std::fs::copy(watch, dir.path().join("watch.luau")).unwrap();
-    let mut sdk = std::fs::read_to_string(src.join("zeron.luau")).unwrap();
+    let mut sdk = std::fs::read_to_string(src.join("zeren.luau")).unwrap();
     if before.is_some() {
         sdk = sdk.replace("\t\tlocal mine = ui.computed(function(): any\n\t\t\tlocal pr = (github_heard:get() or {})[session]\n\t\t\treturn if pr == false then nil else pr\n\t\tend)\n\t\treturn function(): any\n\t\t\treturn mine:get()\n\t\tend", "\t\treturn function(): any\n\t\t\tlocal pr = (github_heard:get() or {})[session]\n\t\t\treturn if pr == false then nil else pr\n\t\tend");
     }
-    std::fs::write(dir.path().join("zeron.luau"), sdk).unwrap();
+    std::fs::write(dir.path().join("zeren.luau"), sdk).unwrap();
     std::fs::write(
         dir.path().join("init.luau"),
-        r#"local zeron = require("./zeron")("github")
-local pulls = require("./pulls")(zeron)
-local watch = require("./watch")(zeron, pulls)
+        r#"local zeren = require("./zeren")("github")
+local pulls = require("./pulls")(zeren)
+local watch = require("./watch")(zeren, pulls)
 local reads: { [string]: number } = {}
-zeron.place {
+zeren.place {
 	at = ".session-title",
 	after = function(): Node
-		local id = zeron.need("session").id
+		local id = zeren.need("session").id
 		local pr = watch.pr(id)
 		return ui.text {
 			class = "pr-reads",
@@ -1023,7 +1023,7 @@ fn viewer_with(github: serde_json::Value) -> (TestApp, Heard) {
     let calls: Heard = Heard::default();
     let asked = calls.clone();
     let app = TestApp::new(move |runtime| {
-        // (Zeron's design system lent as the app lends it, from ui/.)
+        // (Zeren's design system lent as the app lends it, from ui/.)
         let host = super::lend_design_system(ScriptHost::new(runtime, &entry), &entry);
         host.shared("zgx.window.size", zgx_script::window_size_value(600., 1200.));
         {
@@ -1125,7 +1125,7 @@ fn github_s_viewer_shows_the_pull_request_s_header_and_description() {
     assert!(at("1 of 3 passed · Tests failed") < at("Selectors by class."), "{tree}");
     // One line, its outcome the glyph's: no words of their own to open it.
     assert!(!tree.contains("\"See what failed\""), "{tree}");
-    // Folded to a line; a click shows each, as Zeron's viewer says them.
+    // Folded to a line; a click shows each, as Zeren's viewer says them.
     assert!(!tree.contains("\"Tests\""));
     app.click("#github-pr-checks >> role:button \"Checks: 1 of 3 passed, Tests failed\"");
     app.frames(5);
@@ -1354,7 +1354,7 @@ fn github_s_viewer_merges_closes_and_reviews_a_pull_request() {
     let head = "f".repeat(40);
     let detail = json!({
         "title": "Add the primitives", "body": "", "url": "https://github.com/zeronsh/zgx/pull/1264", "number": 1264, "state": "OPEN",
-        "headRefName": "zeron/primitives", "baseRefName": "main", "headRefOid": head,
+        "headRefName": "zeren/primitives", "baseRefName": "main", "headRefOid": head,
         "mergeable": "MERGEABLE", "mergeStateStatus": "CLEAN", "viewerDidAuthor": false, "isCrossRepository": false,
         "allCommits": { "totalCount": 3 },
         "ci": { "state": "passed" }, "statusCheckRollup": [ { "name": "Build", "status": "COMPLETED", "conclusion": "SUCCESS" } ],
@@ -1367,7 +1367,7 @@ fn github_s_viewer_merges_closes_and_reviews_a_pull_request() {
     let tree = app.tree();
     // Where it stands, how it goes in, what becomes of its branch.
     // (The tree prints long words cut: their start.)
-    for text in ["\"Ready to merge\"", "\"Approved by theo, every check passed, no conflicts with", "\"How it goes in\"", "\"The 3 commits become one on main", "\"Merge commit\"", "\"Rebase and merge\"", "\"Delete the branch after\"", "\"zeron/primitives goes from GitHub."] {
+    for text in ["\"Ready to merge\"", "\"Approved by theo, every check passed, no conflicts with", "\"How it goes in\"", "\"The 3 commits become one on main", "\"Merge commit\"", "\"Rebase and merge\"", "\"Delete the branch after\"", "\"zeren/primitives goes from GitHub."] {
         assert!(tree.contains(text), "{text}: {tree}");
     }
     // A verdict: someone else's, still open.
@@ -1380,7 +1380,7 @@ fn github_s_viewer_merges_closes_and_reviews_a_pull_request() {
     app.frames(10);
     let all = runs(&asked);
     let merged = all.iter().position(|r| ran(r, &["mergePullRequest", "\"how\":\"SQUASH\"", &head])).unwrap_or_else(|| panic!("{all:?}"));
-    assert!(all[merged..].iter().any(|r| ran(r, &["DELETE", "repos/zeronsh/zgx/git/refs/heads/zeron/primitives"])), "{all:?}");
+    assert!(all[merged..].iter().any(|r| ran(r, &["DELETE", "repos/zeronsh/zgx/git/refs/heads/zeren/primitives"])), "{all:?}");
     assert!(all[merged..].iter().any(|r| ran(r, &["pullRequest(number"])), "{all:?}");
     // Closing, from the header's menu.
     app.click("role:button \"More\"");
@@ -1393,7 +1393,7 @@ fn github_s_viewer_merges_closes_and_reviews_a_pull_request() {
 
 #[test]
 fn github_s_viewer_says_what_stands_in_a_merge_s_way_and_what_became_of_one() {
-    let base = json!({ "title": "T", "body": "", "url": "https://github.com/zeronsh/zgx/pull/1264", "number": 1264, "baseRefName": "main", "headRefName": "zeron/x" });
+    let base = json!({ "title": "T", "body": "", "url": "https://github.com/zeronsh/zgx/pull/1264", "number": 1264, "baseRefName": "main", "headRefName": "zeren/x" });
     let with = |extra: serde_json::Value| {
         let mut d = base.clone();
         for (k, v) in extra.as_object().unwrap() {
@@ -1456,7 +1456,7 @@ fn a_picture_in_a_pull_request_tab_opens_in_the_lightbox_over_the_window() {
 }
 
 #[test]
-fn github_s_viewer_opens_its_links_where_zeron_opens_links() {
+fn github_s_viewer_opens_its_links_where_zeren_opens_links() {
     let head = "e".repeat(40);
     let detail = json!({
         "title": "T", "body": "", "url": "https://github.com/zeronsh/zgx/pull/1264", "number": 1264, "state": "OPEN", "headRefOid": head,
@@ -1828,7 +1828,7 @@ fn github_s_board_lists_a_project_s_pull_requests_by_filter_and_opens_one() {
     app.frames(10);
     assert!(app.tree().contains("\"Review me\""), "{}", app.tree());
     assert!(runs(&asked).iter().any(|r| ran(r, &["search(", "review-requested:@me"])), "{:?}", runs(&asked));
-    // A row: the pull request in the page's own panel (Zeron's right pane),
+    // A row: the pull request in the page's own panel (Zeren's right pane),
     // as a tab.
     app.click("#github-board-filters >> role:tab \"Authored\"");
     app.frames(10);
@@ -1920,7 +1920,7 @@ fn a_plugin_s_page_survives_a_reload_and_takes_its_place_in_the_history() {
 /// drawn offscreen by zgx's own renderer (no window), Parallax scenes
 /// loaded, and the renderer's memory report read after each (its layers,
 /// each by node, and its image textures). Run on purpose, as audit_shots:
-/// `cargo test --bin zeron-zgx wallpaper_gpu_memory -- --ignored --nocapture`.
+/// `cargo test --bin zeren-zgx wallpaper_gpu_memory -- --ignored --nocapture`.
 #[test]
 #[ignore]
 fn wallpaper_gpu_memory() {
@@ -1928,7 +1928,7 @@ fn wallpaper_gpu_memory() {
     let items = vec![builtin("parallax-scenes")];
     let mut app = shell(items.clone());
     assert_eq!(app.error(), None);
-    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(Path::new(items[0].json["snapshot"].as_str().unwrap()).join("zeron-plugin.json")).unwrap()).unwrap();
+    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(Path::new(items[0].json["snapshot"].as_str().unwrap()).join("zeren-plugin.json")).unwrap()).unwrap();
     app.host.shared("plugins", zgx_script::Value::Nil).set(json_value(&json!({
         "state": "ready",
         "list": [{ "id": "parallax-scenes", "name": manifest["name"], "status": "on", "ui": manifest["ui"], "permissions": manifest["permissions"], "allowed": manifest["permissions"], "ask": [] }],
@@ -2050,7 +2050,7 @@ fn wallpaper_gpu_memory() {
 }
 
 /// Parallax scenes (plugins-builtin/parallax-scenes): used as the wallpaper
-/// (its page's Zeron row), its scene stands in a new chat's background
+/// (its page's Zeren row), its scene stands in a new chat's background
 /// place, under the effect, as its settings say; let go, it's gone.
 #[test]
 fn parallax_scenes_draws_a_new_chat_s_background_as_its_settings_say() {
@@ -2058,8 +2058,8 @@ fn parallax_scenes_draws_a_new_chat_s_background_as_its_settings_say() {
     let mut app = shell(items.clone());
     assert_eq!(app.error(), None, "the shell with Parallax scenes failed");
     // On, and replacing the place (as the host lists it).
-    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(Path::new(items[0].json["snapshot"].as_str().unwrap()).join("zeron-plugin.json")).unwrap()).unwrap();
-    // Its settings page: a scene and how far it moves, as Zeron checks them.
+    let manifest: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(Path::new(items[0].json["snapshot"].as_str().unwrap()).join("zeren-plugin.json")).unwrap()).unwrap();
+    // Its settings page: a scene and how far it moves, as Zeren checks them.
     let declared = super::settings::declared("parallax-scenes", &manifest, true);
     assert_eq!(declared.iter().map(|s| s.id.clone()).collect::<Vec<_>>(), ["wallpaper", "scene", "parallax"]);
     app.host.shared("plugins", zgx_script::Value::Nil).set(json_value(&json!({
@@ -2097,7 +2097,7 @@ fn greeter_reads_its_settings_and_hears_each_change() {
     let mut book = settings::Book::new(Some(dir.clone()));
     let snapshot = PathBuf::from(items[0].json["snapshot"].as_str().unwrap());
     book.sync(&[settings::On { id: "settings-demo".into(), name: "Greeter".into(), hash: "h1".into(), builtin: false }], |_| settings::manifest_in(&snapshot));
-    // Not one of Zeron's own: its permission row is left out.
+    // Not one of Zeren's own: its permission row is left out.
     assert!(!book.list().to_string().contains("screen-recording"), "{}", book.list());
     let own = app.host.shared("plugin.settings-demo.settings", zgx_script::Value::Nil);
     let publish = |book: &settings::Book| own.set(json_value(&serde_json::Value::Object(book.values("settings-demo"))));
@@ -2149,7 +2149,7 @@ fn a_plugin_s_icon_is_the_svg_in_its_folder_and_nothing_outside_it() {
     std::fs::create_dir_all(&dir).unwrap();
     std::fs::write(dir.join("icon.png"), "png").unwrap();
     for icon in ["../secret.svg", "/etc/x.svg", "icon.png", ""] {
-        std::fs::write(dir.join("zeron-plugin.json"), json!({ "id": "p", "icon": icon }).to_string()).unwrap();
+        std::fs::write(dir.join("zeren-plugin.json"), json!({ "id": "p", "icon": icon }).to_string()).unwrap();
         assert!(super::icon_svg(&json!({ "snapshot": dir })).is_none(), "{icon} isn't an icon");
     }
     let _ = std::fs::remove_dir_all(&dir);
@@ -2179,7 +2179,7 @@ fn the_design_system_s_icons_are_its_assets_inlined() {
 
 /// How long the viewer takes with a long description (`PERF_BODY`: a JSON
 /// file with `body`): building, scrolling, and a version bump. A look, not
-/// a test: `PERF_BODY=… cargo test --bin zeron-zgx perf_long_description -- --ignored --nocapture`.
+/// a test: `PERF_BODY=… cargo test --bin zeren-zgx perf_long_description -- --ignored --nocapture`.
 #[test]
 #[ignore]
 fn perf_long_description() {
@@ -2221,7 +2221,7 @@ fn perf_long_description() {
 
 /// The cost of each frame while the panel toggles with a pull request open
 /// in it (`PERF_BODY`: a JSON file with `body`). A look, not a test:
-/// `PERF_BODY=… cargo test --bin zeron-zgx perf_panel_toggle -- --ignored --nocapture`.
+/// `PERF_BODY=… cargo test --bin zeren-zgx perf_panel_toggle -- --ignored --nocapture`.
 #[test]
 #[ignore]
 fn perf_panel_toggle() {
@@ -2312,7 +2312,7 @@ fn perf_panel_toggle() {
 /// The cost of each frame while a pull request scrolls in the panel
 /// (`PERF_BODY`: a JSON file with `body`; `PERF_STATES`: states to set
 /// first, `name=json;name=json`, a wallpaper and a material). A look, not a
-/// test: `PERF_BODY=… cargo test --bin zeron-zgx perf_scroll_pane -- --ignored --nocapture`.
+/// test: `PERF_BODY=… cargo test --bin zeren-zgx perf_scroll_pane -- --ignored --nocapture`.
 #[test]
 #[ignore]
 fn perf_scroll_pane() {
@@ -2421,7 +2421,7 @@ fn a_plugin_s_own_words_follow_the_language_chosen_and_fall_back_to_its_english(
     // Chinese, chosen: its own words in Chinese, at once.
     choose_language(&mut app, "zh-Hans");
     assert_eq!(app.text("session-words"), "正在处理");
-    // A language it lacks (Zeron has it too: English's parent rules): its
+    // A language it lacks (Zeren has it too: English's parent rules): its
     // English.
     choose_language(&mut app, "en");
     assert_eq!(app.text("session-words"), "Working");
@@ -2440,15 +2440,15 @@ fn a_plugin_without_locales_says_what_it_did_in_any_language() {
 }
 
 #[test]
-fn the_design_system_lent_to_a_plugin_has_zeron_s_words_from_the_first_load() {
+fn the_design_system_lent_to_a_plugin_has_zeren_s_words_from_the_first_load() {
     // A plugin loads before the app's script: the lent design system finds
-    // Zeron's catalog loaded (lend_design_system's script), and follows
+    // Zeren's catalog loaded (lend_design_system's script), and follows
     // the language chosen.
     let dir = std::env::temp_dir().join(format!("zgx-lent-ds-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).unwrap();
     std::fs::write(
-        dir.join("zeron-plugin.json"),
+        dir.join("zeren-plugin.json"),
         r#"{ "id": "lent-words", "name": "Lent words", "entry": "init.luau", "permissions": ["ui.add"] }"#,
     )
     .unwrap();
@@ -2471,13 +2471,13 @@ ui.contribute { target = "#page-title", after = ui.text { id = "lent-words", loc
     app.frames(30);
     assert_eq!(app.text("lent-words"), "Working", "{}", app.tree());
     choose_language(&mut app, "zh-Hans");
-    assert_ne!(app.text("lent-words"), "Working", "Zeron's words follow the language in a plugin too");
+    assert_ne!(app.text("lent-words"), "Working", "Zeren's words follow the language in a plugin too");
     let _ = std::fs::remove_dir_all(&dir);
 }
 
 /// The cost of each frame as a pull request with a big diff opens in the
 /// panel (72 files, ~21k lines). A look, not a test:
-/// `cargo test --bin zeron-zgx perf_open_pane -- --ignored --nocapture`.
+/// `cargo test --bin zeren-zgx perf_open_pane -- --ignored --nocapture`.
 #[test]
 #[ignore]
 fn perf_open_pane() {
@@ -2556,7 +2556,7 @@ fn perf_open_pane() {
 /// Each frame's cost while the panel's edge is dragged with a pull request
 /// in it (`PERF_BODY`: a JSON file with `body`), against the same drag with
 /// the panel empty, real fonts and the GPU drawing. A look, not a test:
-/// `PERF_BODY=… cargo test --release --bin zeron-zgx perf_resize_pane -- --ignored --nocapture`.
+/// `PERF_BODY=… cargo test --release --bin zeren-zgx perf_resize_pane -- --ignored --nocapture`.
 #[test]
 #[ignore]
 fn perf_resize_pane() {
@@ -2640,7 +2640,7 @@ fn perf_resize_pane() {
     }
 }
 
-// -- Zeron's Git plugin (plugins-builtin/git) ---------------------------------
+// -- Zeren's Git plugin (plugins-builtin/git) ---------------------------------
 
 /// A checkout as the device's Git service answers for it: its status, what
 /// changed in each scope, a file's diff, its history and branches. `fail`
@@ -2654,7 +2654,7 @@ fn git_world() -> serde_json::Value {
             "branch": "feature/graph", "oid": "a".repeat(40), "upstream": "origin/feature/graph",
             "ahead": 2, "behind": 0, "pushed": false, "base": "origin/main", "base_ahead": 3, "base_behind": 0,
             "conflicts": 0, "changes": 4, "tree": "t1", "index": "i1", "device": "devbox", "remote": "origin",
-            "remote_url": "git@github.com:zeronsh/zeron.git", "who": "Ada Lovelace",
+            "remote_url": "git@github.com:zeronsh/zeren.git", "who": "Ada Lovelace",
         },
         "changes": {
             "working": { "scope": "working", "a": "a".repeat(40), "b": "t1", "files": [
@@ -2812,7 +2812,7 @@ fn git_in(fixture: &str, records: serde_json::Value, service: serde_json::Value,
     (app, heard, service)
 }
 
-/// The Git service on "box" says `data` (`zeron.emit("changed", data)`), as
+/// The Git service on "box" says `data` (`zeren.emit("changed", data)`), as
 /// the host's inbox brings another device's events.
 fn tell_git(app: &mut TestApp, data: serde_json::Value) {
     tell_git_n(app, data, 1);
@@ -3044,7 +3044,7 @@ fn git_s_history_draws_the_graph_and_opens_a_commit() {
     assert!(missing.is_empty(), "{missing:?}: {tree}");
     // Git alone: no pull request, no picture.
     assert!(!app.tree().contains("Open pull request") && !app.tree().contains("on GitHub"), "{}", app.tree());
-    // A commit clicked: a tab of its own (Zeron's commit tab), titled by
+    // A commit clicked: a tab of its own (Zeren's commit tab), titled by
     // its subject, known by its id; the list stays as it was.
     app.click("role:button \"Merge main into feature/graph\"");
     app.frames(5);
@@ -3140,19 +3140,19 @@ fn git_s_empty_page_rows_open_its_tab() {
 fn github_puts_create_pull_request_and_its_pull_request_in_git_s_slot() {
     // A pushed branch ahead of main, no pull request yet: Create pull
     // request, opening GitHub's own page for it.
-    let github = json!({ "viewer": "ada", "repository": "zeronsh/zeron", "branches": {} });
+    let github = json!({ "viewer": "ada", "repository": "zeronsh/zeren", "branches": {} });
     let (mut app, heard, _) = git_tab(git_world(), Some(github.clone()));
     assert_eq!(app.error(), None);
     assert!(app.wait_until(|app| app.find(".git-branch-actions >> #github-git-create-pr").is_some()), "{}", app.tree());
     app.click("#github-git-create-pr");
     app.frames(5);
     let opened: Vec<String> = heard.borrow().iter().filter(|(k, _)| k == "plugin.github.open_url").map(|(_, v)| v.clone()).collect();
-    assert!(opened.iter().any(|u| u.contains("https://github.com/zeronsh/zeron/compare/main...feature/graph?expand=1")), "{opened:?}");
+    assert!(opened.iter().any(|u| u.contains("https://github.com/femboypuppy/zeren/compare/main...feature/graph?expand=1")), "{opened:?}");
     // GitHub has one now: its badge in Create's place, a click opening it in
     // the chat's panel.
     let (mut app, heard, _) = git_tab(
         git_world(),
-        Some(json!({ "viewer": "ada", "repository": "zeronsh/zeron", "branches": { "feature/graph": branch_pr(77, "OPEN", json!({ "headRefName": "feature/graph", "title": "Graph lanes" })) } })),
+        Some(json!({ "viewer": "ada", "repository": "zeronsh/zeren", "branches": { "feature/graph": branch_pr(77, "OPEN", json!({ "headRefName": "feature/graph", "title": "Graph lanes" })) } })),
     );
     assert!(refresh_until(&mut app, |app| app.find(".git-branch-actions >> .github-pr-badge").is_some()), "{}", app.tree());
     assert!(app.find("#github-git-create-pr").is_none());
@@ -3176,9 +3176,9 @@ fn git_s_tab_opens_to_the_scope_it_was_asked_for() {
 #[test]
 fn git_puts_the_branch_s_totals_in_the_panel_home_and_opens_its_changes() {
     // The real panel home (ui/panel_home_fixture.luau), chat-1 on device
-    // "d" in /proj on zeron/panel-home; Git's service says what it adds.
+    // "d" in /proj on zeren/panel-home; Git's service says what it adds.
     let records = json!({ "sessions": { "chat-1": {
-        "title": "Parent", "status": "idle", "device": "d", "cwd": "/proj", "branch": "zeron/panel-home", "project": "p1",
+        "title": "Parent", "status": "idle", "device": "d", "cwd": "/proj", "branch": "zeren/panel-home", "project": "p1",
     } }, "files_read": true });
     let mut service = git_world();
     service["branch_totals"] = json!({ "base": "main", "adds": 2034, "dels": 51 });
@@ -3203,7 +3203,7 @@ fn git_puts_the_branch_s_totals_in_the_panel_home_and_opens_its_changes() {
     assert!(app.wait_until(|_| asked_service(&heard, "changes").iter().any(|c| c["args"]["scope"] == "branch")), "{:?}", service_calls(&heard));
 }
 
-/// What Git asked the composer to carry (`zeron.compose_comment`), in order.
+/// What Git asked the composer to carry (`zeren.compose_comment`), in order.
 fn composed_comments(heard: &Heard) -> Vec<serde_json::Value> {
     heard.borrow().iter().filter(|(k, _)| k == "plugin.git.compose_comment").map(|(_, v)| serde_json::from_str(v).unwrap()).collect()
 }
@@ -3285,18 +3285,18 @@ fn git_s_diff_comments_go_to_the_chat_s_draft_and_mark_their_lines() {
 
 #[test]
 fn github_puts_the_branch_s_pull_request_under_it_in_the_panel_home() {
-    // The real panel home, chat-1 on zeron/panel-home in /proj; GitHub
+    // The real panel home, chat-1 on zeren/panel-home in /proj; GitHub
     // knows that branch's pull request, open, its checks passed.
     let records = json!({ "sessions": { "chat-1": {
-        "title": "Parent", "status": "idle", "device": "d", "cwd": "/proj", "branch": "zeron/panel-home", "project": "p1",
+        "title": "Parent", "status": "idle", "device": "d", "cwd": "/proj", "branch": "zeren/panel-home", "project": "p1",
     } }, "files_read": true });
     let pr = json!({
-        "number": 1200, "title": "Panel home details", "url": "https://github.com/zeronsh/zeron/pull/1200",
-        "state": "OPEN", "isDraft": false, "isCrossRepository": false, "headRefName": "zeron/panel-home", "baseRefName": "main",
+        "number": 1200, "title": "Panel home details", "url": "https://github.com/femboypuppy/zeren/pull/1200",
+        "state": "OPEN", "isDraft": false, "isCrossRepository": false, "headRefName": "zeren/panel-home", "baseRefName": "main",
         "reviewRequests": { "nodes": [] },
         "commits": { "nodes": [{ "commit": { "statusCheckRollup": { "state": "SUCCESS" } } }] },
     });
-    let github = json!({ "viewer": "ada", "repository": "zeronsh/zeron", "branches": { "zeron/panel-home": pr } });
+    let github = json!({ "viewer": "ada", "repository": "zeronsh/zeren", "branches": { "zeren/panel-home": pr } });
     let (mut app, heard, _) = git_in("panel_home_fixture.luau", records.clone(), git_world(), Some(github));
     assert_eq!(app.error(), None);
     assert!(app.wait_until(|app| app.find("#github-panel-pr").is_some()), "{}", app.tree());
@@ -3319,7 +3319,7 @@ fn github_puts_the_branch_s_pull_request_under_it_in_the_panel_home() {
     assert_eq!((tab["kind"].as_str(), tab["data"]["number"].as_i64()), (Some("github-pr"), Some(1200)), "{tab}");
 
     // No pull request for the branch: nothing, and no room taken.
-    let github = json!({ "viewer": "ada", "repository": "zeronsh/zeron", "branches": {} });
+    let github = json!({ "viewer": "ada", "repository": "zeronsh/zeren", "branches": {} });
     let (mut app, heard, _) = git_in("panel_home_fixture.luau", records, git_world(), Some(github));
     assert!(app.wait_until(|_| runs(&heard).iter().any(|r| ran(r, &["graphql", "pullRequests"]))), "{:?}", runs(&heard));
     app.frames(20);
@@ -3336,15 +3336,15 @@ fn history_of(app: &mut TestApp) {
 
 #[test]
 fn history_s_refs_keep_to_their_room_and_fold_the_rest() {
-    // The merge carries five refs (Zeron's rule: 45% of the commit's room,
+    // The merge carries five refs (Zeren's rule: 45% of the commit's room,
     // the subject never under 80, each badge at most 112, the rest "+N").
-    let refs = ["HEAD -> zeron/create-readme-update-pr", "origin/zeron/create-readme-update-pr", "tag: v1.0.0-release-candidate", "origin/main", "release/9"];
+    let refs = ["HEAD -> zeren/create-readme-update-pr", "origin/zeren/create-readme-update-pr", "tag: v1.0.0-release-candidate", "origin/main", "release/9"];
     // (The branch and its own remote are one badge; release/9 is a local
     // branch with a slash, told from a remote's by the service's list.)
-    let names = ["zeron/create-readme-update-pr", "v1.0.0-release-candidate", "origin/main", "release/9"];
+    let names = ["zeren/create-readme-update-pr", "v1.0.0-release-candidate", "origin/main", "release/9"];
     let mut w = git_world();
     w["history"]["commits"][0]["refs"] = json!(refs);
-    w["history"]["commits"][0]["remotes"] = json!(["origin/zeron/create-readme-update-pr", "origin/main"]);
+    w["history"]["commits"][0]["remotes"] = json!(["origin/zeren/create-readme-update-pr", "origin/main"]);
     let (mut app, _heard, _) = git_tab(w, None);
     history_of(&mut app);
     let row = "role:button \"Merge main into feature/graph\"";
@@ -3382,7 +3382,7 @@ fn history_s_refs_keep_to_their_room_and_fold_the_rest() {
 #[test]
 fn history_s_graph_goes_compact_when_narrow_and_back_with_room() {
     // Two lanes (the merge's): 30 wide at their 12; compact, one rail, 18
-    // (Zeron's rule: compact once the subject would get under 160 beside
+    // (Zeren's rule: compact once the subject would get under 160 beside
     // the columns, back only once it has 184).
     let (mut app, _heard, _) = git_tab(git_world(), None);
     history_of(&mut app);
@@ -3417,7 +3417,7 @@ fn history_s_graph_goes_compact_when_narrow_and_back_with_room() {
 fn history_lights_the_path_under_the_pointer_and_quiets_the_rest() {
     // The merge (1) and "Draw the lanes" (2) are one path, the branch's
     // first parents; "Fix the build" (4) came in by the merge, a path of its
-    // own (Zeron's graph focus).
+    // own (Zeren's graph focus).
     let (mut app, _heard, _) = git_tab(git_world(), None);
     history_of(&mut app);
     app.frames(10);
@@ -3448,11 +3448,11 @@ fn history_lights_the_path_under_the_pointer_and_quiets_the_rest() {
 #[test]
 fn github_puts_faces_pull_requests_and_its_menu_items_in_git_s_history() {
     let github = json!({
-        "viewer": "ada", "repository": "zeronsh/zeron", "branches": {},
+        "viewer": "ada", "repository": "zeronsh/zeren", "branches": {},
         "commits": {
             "1111111111111111111111111111111111111111": {
                 "author": { "user": { "login": "ada", "avatarUrl": "https://avatars.githubusercontent.com/u/1" } },
-                "associatedPullRequests": { "nodes": [{ "number": 1142, "title": "Graph lanes", "url": "https://github.com/zeronsh/zeron/pull/1142", "state": "MERGED", "merged": true }] },
+                "associatedPullRequests": { "nodes": [{ "number": 1142, "title": "Graph lanes", "url": "https://github.com/femboypuppy/zeren/pull/1142", "state": "MERGED", "merged": true }] },
             },
             "2222222222222222222222222222222222222222": { "author": { "user": { "login": "ada", "avatarUrl": "https://avatars.githubusercontent.com/u/1" } }, "associatedPullRequests": { "nodes": [] } },
         },
@@ -3476,12 +3476,12 @@ fn github_puts_faces_pull_requests_and_its_menu_items_in_git_s_history() {
     app.host
         .set_state(
             "git_fixture.menu_ask",
-            json_value(&json!({ "plugin": "github", "id": "github-view-commit", "kind": "git.commit", "context": { "sha": "1".repeat(40), "remote_url": "git@github.com:zeronsh/zeron.git" } })),
+            json_value(&json!({ "plugin": "github", "id": "github-view-commit", "kind": "git.commit", "context": { "sha": "1".repeat(40), "remote_url": "git@github.com:zeronsh/zeren.git" } })),
         )
         .unwrap();
     assert!(app.host.run_command("fixture.menu_run"));
     assert!(
-        app.wait_until(|_| heard.borrow().iter().any(|(k, v)| k == "plugin.github.open_url" && v.contains("https://github.com/zeronsh/zeron/commit/1111111111"))),
+        app.wait_until(|_| heard.borrow().iter().any(|(k, v)| k == "plugin.github.open_url" && v.contains("https://github.com/femboypuppy/zeren/commit/1111111111"))),
         "{:?}",
         heard.borrow().iter().filter(|(k, _)| k.contains("open_url")).collect::<Vec<_>>()
     );
@@ -3674,7 +3674,7 @@ fn git_s_tabs_are_changes_or_history_and_a_commit_opens_its_own() {
 /// one frame, its time and its phases (zgx's trace), and the rows built
 /// (`count`, a tree line pattern) at rest and as it goes. Run on purpose:
 /// `GIT_PERF_JSON=… GIT_PERF=history,files,diff,split,wrap cargo test
-/// --release --bin zeron-zgx git_scroll_cost -- --ignored --nocapture`.
+/// --release --bin zeren-zgx git_scroll_cost -- --ignored --nocapture`.
 #[test]
 #[ignore]
 fn git_scroll_cost() {
@@ -3846,7 +3846,7 @@ fn every_list_row_hovers_by_the_design_system_s_one_recipe() {
     let read = |p: &str| std::fs::read_to_string(dir.join(p)).unwrap_or_else(|e| panic!("{p}: {e}"));
     // The recipe: a flat Surface, edge to edge, no edge or shadow of its own.
     let recipe = read("ui/ds/list_row.luau");
-    for must in ["require(\"@self/surface\")", "depth = \"flat\"", "rounded = 0", "border = 0", "M.HOVER, M.PRESSED, M.SELECTED = \"$hover\", \"$pressed\", \"$zeron.selected.flat.bg\""] {
+    for must in ["require(\"@self/surface\")", "depth = \"flat\"", "rounded = 0", "border = 0", "M.HOVER, M.PRESSED, M.SELECTED = \"$hover\", \"$pressed\", \"$zeren.selected.flat.bg\""] {
         assert!(recipe.contains(must), "ds/list_row lacks {must}");
     }
     for never in ["shadow", "inset_shadow", "border_color"] {
@@ -3857,7 +3857,7 @@ fn every_list_row_hovers_by_the_design_system_s_one_recipe() {
     let surface = read("ui/ds/surface.luau");
     assert!(surface.contains("hover = { bg = \"$hover\" }, active = { bg = \"$pressed\" }"), "Surface's hover isn't the theme's wash");
     let flat = surface.split("depth = \"flat\",").nth(1).unwrap_or_default().split("},").next().unwrap_or_default();
-    assert!(flat.contains("$zeron.selected.flat.bg") && !flat.contains("shadow") && !flat.contains("ring"), "flat selection: {flat}");
+    assert!(flat.contains("$zeren.selected.flat.bg") && !flat.contains("shadow") && !flat.contains("ring"), "flat selection: {flat}");
     // Every list on it, none washing itself.
     for (file, uses) in [
         ("ui/ds/git.luau", "require(\"@self/list_row\")"),

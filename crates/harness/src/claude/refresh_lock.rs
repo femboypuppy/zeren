@@ -1,4 +1,4 @@
-//! Claude Code's OAuth refresh lock — honoured by everything zeron does to a
+//! Claude Code's OAuth refresh lock — honoured by everything zeren does to a
 //! Claude login or a Claude process.
 //!
 //! A Claude.ai refresh token is single-use: every refresh rotates the pair,
@@ -6,7 +6,7 @@
 //! store only while it still holds the refresh token that was posted
 //! (2.1.x). The CLI answers an `invalid_grant` by wiping the stored login
 //! ("Not logged in · Please run /login"). So a rotated pair that never
-//! reaches the store logs the user out on the next refresh, and zeron used to
+//! reaches the store logs the user out on the next refresh, and zeren used to
 //! lose one in two ways:
 //!
 //! - **Killing a child mid-refresh.** SIGKILL saves nothing; on SIGTERM the
@@ -109,7 +109,7 @@ pub async fn settle(config_dir: &Path, max: Duration) -> bool {
     while refresh_in_flight(config_dir) {
         if tokio::time::Instant::now() >= deadline {
             tracing::warn!(
-                target: "zeron_harness::claude",
+                target: "zeren_harness::claude",
                 dir = %config_dir.display(),
                 "Claude login refresh still in flight; proceeding"
             );
@@ -118,7 +118,7 @@ pub async fn settle(config_dir: &Path, max: Duration) -> bool {
         if !waited {
             waited = true;
             tracing::info!(
-                target: "zeron_harness::claude",
+                target: "zeren_harness::claude",
                 dir = %config_dir.display(),
                 "waiting for an in-flight Claude login refresh to be saved"
             );

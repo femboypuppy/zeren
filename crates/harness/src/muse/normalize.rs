@@ -4,12 +4,12 @@
 //! `item/updated` and `item/completed` with a rising `revision`, plus
 //! `item/delta` appends to one field (`text`, `summary.<n>`, `output`).
 //! Text is emitted as the suffix past what was already sent, so a full
-//! re-send after deltas never duplicates. Items Zeron does not show:
+//! re-send after deltas never duplicates. Items Zeren does not show:
 //! `userMessage` (the prompt itself), `reminderChild` (Muse's per-step
 //! housekeeping agents) and `compaction`.
 use serde_json::{Value, json};
 use std::collections::{HashMap, HashSet};
-use zeron_proto::{AgentEvent, DoneStatus, TodoItem, TodoStatus, ToolCall, ToolDiff};
+use zeren_proto::{AgentEvent, DoneStatus, TodoItem, TodoStatus, ToolCall, ToolDiff};
 
 /// Tools whose own item carries the work (subagents, the todo list, a
 /// question): their tool row would only duplicate it.
@@ -338,8 +338,8 @@ fn tool_call(tool: &str, args: &Value) -> ToolCall {
                 })
                 .collect(),
         },
-        name if name.starts_with("zeron_") => ToolCall::Mcp {
-            server: "zeron".into(),
+        name if name.starts_with("zeren_") => ToolCall::Mcp {
+            server: "zeren".into(),
             tool: name[6..].into(),
             input: Some(args.clone()),
         },

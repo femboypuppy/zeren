@@ -1,5 +1,5 @@
 -- The gallery's Themes page: the palettes a window can wear (src/themes.rs;
--- here a few of Zeron's built in, a template's and an imported one, as
+-- here a few of Zeren's built in, a template's and an imported one, as
 -- ui/themes_fixture_data.luau has them), each as a swatch of its surfaces,
 -- inks, accent, tones and code colours. Settings → Themes lists every one.
 
@@ -38,7 +38,7 @@ local function swatch(p: any): Node
 			ui.div { grow = 1 },
 			table.unpack(chips),
 		},
-		ui.row { gap = "$zeron.space.hair", p = "$space.1", rounded = "$radius.md", bg = own(p.raised), table.unpack(code) },
+		ui.row { gap = "$zeren.space.hair", p = "$space.1", rounded = "$radius.md", bg = own(p.raised), table.unpack(code) },
 	}
 end
 
@@ -62,7 +62,7 @@ end
 return {
 	id = "theme-library",
 	title = "Themes",
-	about = "The palettes a window can wear: Zeron's built in, a template's own, and VS Code themes you import (a theme's .json, comments allowed, or an extension's folder), mapped by the shipping app's importer.",
+	about = "The palettes a window can wear: Zeren's built in, a template's own, and VS Code themes you import (a theme's .json, comments allowed, or an extension's folder), mapped by the shipping app's importer.",
 	demo = function(): Node
 		return ui.column {
 			w_full = true,

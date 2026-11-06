@@ -18,7 +18,7 @@ use tokio::io::AsyncReadExt;
 use tokio::sync::Mutex;
 use tokio::time::Instant;
 
-use zeron_proto::{Model, ModelOption, ModelOptionChoice, ReasoningLevel};
+use zeren_proto::{Model, ModelOption, ModelOptionChoice, ReasoningLevel};
 
 use crate::HarnessError;
 use crate::jsonrpc::{Incoming, RpcClient};
@@ -34,7 +34,7 @@ pub(super) async fn wait_for_model(
     response: &mut serde_json::Value,
     model: &str,
     members: &[String],
-    access: zeron_proto::AccessMode,
+    access: zeren_proto::AccessMode,
 ) -> Result<String, HarnessError> {
     let wait = async {
         loop {
@@ -266,7 +266,7 @@ fn parse_variant(family: &str, label: &str) -> (String, Option<ReasoningLevel>, 
 
 fn effort_word(word: &str, next: Option<&&str>) -> Option<(ReasoningLevel, bool)> {
     Some(match word {
-        // "No Thinking" is Devin's `none`; Zeron's lowest level stands in.
+        // "No Thinking" is Devin's `none`; Zeren's lowest level stands in.
         "No" if next == Some(&"Thinking") => (ReasoningLevel::Minimal, true),
         "None" | "Minimal" => (ReasoningLevel::Minimal, false),
         "Low" => (ReasoningLevel::Low, false),

@@ -5,7 +5,7 @@
 -- in the space under a reply: zgx's partial repaint, fixed in zgx c43b4e5;
 -- zgx-asks/stale-paint-mounted-mid-scroll has the pixel repro.)
 
-local TEXT = "Yes. I called Zeron’s `show_image` tool three times to display `components.png`, `workbench.png`, and `zgx-effects.png` from the project.\n\n"
+local TEXT = "Yes. I called Zeren’s `show_image` tool three times to display `components.png`, `workbench.png`, and `zgx-effects.png` from the project.\n\n"
 
 local function settle(app: any)
 	app:frames(30)

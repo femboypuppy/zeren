@@ -1,5 +1,5 @@
 //! Desktop banner notifications, posted by whichever process owns the engine
-//! — the app's background engine (`zeron-engine`) or, when the app embeds its
+//! — the app's background engine (`zeren-engine`) or, when the app embeds its
 //! engine, the app itself. Platform facilities, failures swallowed:
 //!
 //! - macOS: `NSUserNotification` through the ObjC runtime, so the banner is
@@ -20,7 +20,7 @@
 //!   desktop).
 //! - Windows: no-op for now — toasts require a registered AppUserModelID
 //!   (an installer concern); the app's chime still covers it.
-//! - `ZERON_DISABLE_NOTIFICATIONS` env kill-switch (callers also check the
+//! - `ZEREN_DISABLE_NOTIFICATIONS` env kill-switch (callers also check the
 //!   `notificationsEnabled` setting);
 //! - failures are logged and swallowed — a missing notifier must never
 //!   bother the session flow.
@@ -33,18 +33,18 @@ pub mod links;
 
 use std::sync::Mutex;
 
-const DISABLE_ENV: &str = "ZERON_DISABLE_NOTIFICATIONS";
+const DISABLE_ENV: &str = "ZEREN_DISABLE_NOTIFICATIONS";
 
 /// Reserved notification target routed to Settings → Agents rather than a
 /// conversation. Session ids are generated UUIDs, so this cannot collide
 /// with a real chat.
-pub const AGENT_UPDATES_TARGET: &str = "__zeron_agent_updates__";
+pub const AGENT_UPDATES_TARGET: &str = "__zeren_agent_updates__";
 
 /// The app-side link a clicked banner opens when the engine posted it from
-/// its own process: `zeron://notification/<target>`.
-pub const LINK_PREFIX: &str = "zeron://notification/";
+/// its own process: `zeren://notification/<target>`.
+pub const LINK_PREFIX: &str = "zeren://notification/";
 
-/// `zeron://notification/<target>` for a banner's target.
+/// `zeren://notification/<target>` for a banner's target.
 pub fn link(target: &str) -> String {
     format!("{LINK_PREFIX}{target}")
 }
@@ -340,8 +340,8 @@ mod macos {
     pub(super) fn delegate() -> *mut Object {
         static DELEGATE: OnceLock<usize> = OnceLock::new();
         *DELEGATE.get_or_init(|| unsafe {
-            let mut decl = ClassDecl::new("ZeronNotifyDelegate", class!(NSObject))
-                .expect("ZeronNotifyDelegate registered twice");
+            let mut decl = ClassDecl::new("ZerenNotifyDelegate", class!(NSObject))
+                .expect("ZerenNotifyDelegate registered twice");
             decl.add_method(
                 sel!(userNotificationCenter:shouldPresentNotification:),
                 should_present as extern "C" fn(&Object, Sel, *mut Object, *mut Object) -> BOOL,
@@ -447,7 +447,7 @@ fn post_impl(title: &str, body: &str, _target: Option<&str>) {
         // `--` ends option parsing: session titles are model-generated, so a
         // `-`-leading one must land as the summary, not as a flag.
         let result = std::process::Command::new("notify-send")
-            .args(["--app-name=Zeron", "--", &title, &body])
+            .args(["--app-name=Zeren", "--", &title, &body])
             .stdout(std::process::Stdio::null())
             .stderr(std::process::Stdio::null())
             .status();
@@ -479,25 +479,25 @@ mod tests {
 
     #[test]
     fn links_round_trip_their_target() {
-        assert_eq!(link("chat-1"), "zeron://notification/chat-1");
+        assert_eq!(link("chat-1"), "zeren://notification/chat-1");
         assert_eq!(link_target(&link("chat-1")), Some("chat-1"));
         assert_eq!(link_target(LINK_PREFIX), None);
-        assert_eq!(link_target("zeron://chat/x"), None);
+        assert_eq!(link_target("zeren://chat/x"), None);
     }
 
     #[test]
     fn reads_the_bundle_id_from_an_app_plist() {
-        let dir = std::env::temp_dir().join(format!("zeron-notify-{}", std::process::id()));
-        let contents = dir.join("Zeron Dev.app").join("Contents");
+        let dir = std::env::temp_dir().join(format!("zeren-notify-{}", std::process::id()));
+        let contents = dir.join("Zeren Dev.app").join("Contents");
         std::fs::create_dir_all(&contents).unwrap();
         std::fs::write(
             contents.join("Info.plist"),
-            "<dict>\n<key>CFBundleName</key>\n<string>Zeron Dev</string>\n\
+            "<dict>\n<key>CFBundleName</key>\n<string>Zeren Dev</string>\n\
              <key>CFBundleIdentifier</key>\n    <string>sh.zeron.app.dev</string>\n</dict>",
         )
         .unwrap();
         assert_eq!(
-            bundle_id_of(&dir.join("Zeron Dev.app")).as_deref(),
+            bundle_id_of(&dir.join("Zeren Dev.app")).as_deref(),
             Some("sh.zeron.app.dev")
         );
         assert_eq!(bundle_id_of(&dir.join("Missing.app")), None);

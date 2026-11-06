@@ -12,7 +12,7 @@ use std::{collections::BTreeSet, path::PathBuf};
 use zgx_script::{ScriptHost, Value, testing::TestApp};
 
 fn ui_dir() -> PathBuf {
-    std::env::var_os("ZERON_ZGX_TEST_UI")
+    std::env::var_os("ZEREN_ZGX_TEST_UI")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui"))
 }
@@ -163,9 +163,9 @@ fn nothing_hard_codes_a_style() {
         gallery.click(&format!("role:button \"{page}\"[1]"));
         gallery.frames(20);
         assert!(gallery.error().is_none(), "the gallery's {page} page failed: {:?}", gallery.error());
-        // (`ZERON_ZGX_TEST_DUMP=1`: each page's laid-out tree, to compare
+        // (`ZEREN_ZGX_TEST_DUMP=1`: each page's laid-out tree, to compare
         // two copies of the scripts.)
-        if std::env::var_os("ZERON_ZGX_TEST_DUMP").is_some() {
+        if std::env::var_os("ZEREN_ZGX_TEST_DUMP").is_some() {
             eprintln!("PAGE {page}\n{}", gallery.tree());
         }
         // An example's states (its "State" switch), each shown in turn.

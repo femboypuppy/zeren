@@ -8,10 +8,10 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use tokio::sync::{mpsc, oneshot};
-use zeron_harness::{
+use zeren_harness::{
     CancellationToken, Harness, MuseHarness, RunControls, SteerMessage, TurnControl,
 };
-use zeron_proto::{
+use zeren_proto::{
     AccessMode, AgentEvent, DoneStatus, HarnessId, RunRequest, SandboxLevel, ToolCall,
     UserInputAnswer, UserInputQuestion,
 };
@@ -116,7 +116,7 @@ fn controls(answers: Vec<UserInputAnswer>) -> (RunControls, Controls) {
     )
 }
 
-type Events = futures::stream::BoxStream<'static, Result<AgentEvent, zeron_harness::HarnessError>>;
+type Events = futures::stream::BoxStream<'static, Result<AgentEvent, zeren_harness::HarnessError>>;
 
 /// Events up to and including the next `Done`.
 async fn turn(stream: &mut Events) -> Vec<AgentEvent> {
@@ -703,6 +703,6 @@ async fn a_title_runs_on_a_read_only_host_and_ends_with_its_turn() {
         .as_str()
         .unwrap()
         .to_owned();
-    assert!(prompt.starts_with(zeron_harness::TITLE_INSTRUCTIONS));
+    assert!(prompt.starts_with(zeren_harness::TITLE_INSTRUCTIONS));
     assert!(prompt.contains("fix the login bug"));
 }

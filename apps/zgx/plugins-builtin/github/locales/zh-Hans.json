@@ -233,7 +233,7 @@
     "sign_in": "在此 Mac 上使用 `gh auth login` 登录 GitHub。",
     "not_found": "GitHub 找不到此内容，或你的账户无权查看。",
     "rate_limit": "已达到 GitHub 请求频率限制。请几分钟后重试。",
-    "rate_limit_until": "已达到 GitHub 请求频率限制。Zeron 将在 {at} 再次尝试。",
+    "rate_limit_until": "已达到 GitHub 请求频率限制。Zeren 将在 {at} 再次尝试。",
     "no_answer": "GitHub 未响应。",
     "unreadable": "无法读取 GitHub 的响应。",
     "said_no": "GitHub 拒绝了请求。"

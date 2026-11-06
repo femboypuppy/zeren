@@ -15,7 +15,7 @@
 --
 --   Dock { queue = queued, todos = plan, tasks = running, open = tray, … }
 --
--- The queue's rows are Zeron's (crates/ui/src/queue.rs): a grip, its
+-- The queue's rows are Zeren's (crates/ui/src/queue.rs): a grip, its
 -- thumbnails, its first line, and at its end Edit, Remove and one primary
 -- action: "Send now" for a message with cargo (it interrupts), "Steer" where
 -- the agent takes a word mid-turn, else "Send next". Rows drag into a new
@@ -270,7 +270,7 @@ local function head(opts: Head, open: State<Tray?>, height: number): Node
 		shrink = 0,
 		-- Concentric with the tray's top corners, through its edge and inset.
 		-- Concentric with the tray: its corner less its edge and padding.
-		rounded = "$zeron.composer.tray.row_radius",
+		rounded = "$zeren.composer.tray.row_radius",
 		cursor = "pointer",
 		role = "button",
 		label = function()
@@ -304,12 +304,12 @@ local function tray(level: () -> number, head_node: Node, body: Node, open: () -
 		rounded_tr = ui.raw(radius, "the tray's corner, worked out from the pill's (geometry)"),
 		border = 1,
 		border_sides = { 1, 1, 0, 1 },
-		border_color = "$zeron.composer.tray.edge",
+		border_color = "$zeren.composer.tray.edge",
 		bg = function()
-			return if material.see_through() then "$zeron.composer.tray.tint" else "$zeron.composer.tray.solid"
+			return if material.see_through() then "$zeren.composer.tray.tint" else "$zeren.composer.tray.solid"
 		end,
 		backdrop_blur = function()
-			return if material.see_through() then "$zeron.composer.tray.blur" else 0
+			return if material.see_through() then "$zeren.composer.tray.blur" else 0
 		end,
 		px = "$space.1",
 		pt = "$space.1",
@@ -338,10 +338,10 @@ local function thumbs(items: { cargo.Item }, narrow: () -> boolean): Node?
 				h = 28,
 				shrink = 0,
 				-- Concentric with its row, a step in from the row's edge.
-				rounded = "$zeron.composer.tray.thumb_radius",
+				rounded = "$zeren.composer.tray.thumb_radius",
 				overflow = "hidden",
 				border = 1,
-				border_color = "$zeron.composer.chip.edge",
+				border_color = "$zeren.composer.chip.edge",
 				border_over = true,
 				bg = "$hover",
 				items = "center",
@@ -424,7 +424,7 @@ local function queue_row(q: Queued, i: () -> number, last: () -> boolean, row: S
 	end
 	-- Being edited: Save to queue, and Cancel, in the actions' place.
 	local editing_side = ui.row {
-		gap = "$zeron.space.hair",
+		gap = "$zeren.space.hair",
 		shrink = 0,
 		items = "center",
 		IconButton {
@@ -475,11 +475,11 @@ local function queue_row(q: Queued, i: () -> number, last: () -> boolean, row: S
 			ui.text { words, text_size = "$font.size.xs" },
 		})
 		return ui.row {
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			shrink = 0,
 			items = "center",
 			ui.row {
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				items = "center",
 				opacity = ui.tween(ui.computed(quiet_when), { duration = 120 }),
 				IconButton {
@@ -519,7 +519,7 @@ local function queue_row(q: Queued, i: () -> number, last: () -> boolean, row: S
 		gap = "$space.2",
 		items = "center",
 		-- Concentric with the tray, as its head is.
-		rounded = "$zeron.composer.tray.row_radius",
+		rounded = "$zeren.composer.tray.row_radius",
 		role = "listitem",
 		label = function()
 			return `{i()}. {now().text}`
@@ -528,7 +528,7 @@ local function queue_row(q: Queued, i: () -> number, last: () -> boolean, row: S
 			return if locked() then 0.55 else 1
 		end,
 		bg = function()
-			return if editing() then "$zeron.selected.flat.bg" else "#00000000"
+			return if editing() then "$zeren.selected.flat.bg" else "#00000000"
 		end,
 		hover = { bg = "$hover" },
 		on_hover = function(inside: boolean)
@@ -635,7 +635,7 @@ local function fold_row(count: () -> number, later: boolean, on_click: () -> ())
 		gap = "$space.2",
 		items = "center",
 		cursor = "pointer",
-		rounded = "$zeron.composer.tray.row_radius",
+		rounded = "$zeren.composer.tray.row_radius",
 		hover = { bg = "$hover" },
 		role = "button",
 		label = function()
@@ -667,7 +667,7 @@ local function task_row(t: Task, row: State<Task>, now: State<number>, props: Pr
 		gap = "$space.2",
 		items = "center",
 		-- Concentric with the tray, as its head is.
-		rounded = "$zeron.composer.tray.row_radius",
+		rounded = "$zeren.composer.tray.row_radius",
 		role = "listitem",
 		hover = { bg = "$hover" },
 		ui.div {
@@ -736,12 +736,12 @@ end
 
 M.Dock = ui.component(function(props: Props): Node
 	local geometry = {
-		radius = n("zeron.composer.tray.radius", 16),
-		step = n("zeron.composer.tray.step", 16),
-		tuck = n("zeron.composer.tray.tuck", 10),
-		header = n("zeron.composer.tray.header", 32),
-		row = n("zeron.composer.tray.row", 32),
-		body = n("zeron.composer.tray.body", 216),
+		radius = n("zeren.composer.tray.radius", 16),
+		step = n("zeren.composer.tray.step", 16),
+		tuck = n("zeren.composer.tray.tuck", 10),
+		header = n("zeren.composer.tray.header", 32),
+		row = n("zeren.composer.tray.row", 32),
+		body = n("zeren.composer.tray.body", 216),
 	}
 	local open: State<Tray?> = props.open or ui.use_state(nil :: Tray?)
 	local narrow = props.narrow or function()
@@ -1094,7 +1094,7 @@ M.Dock = ui.component(function(props: Props): Node
 				key = function(q: Queued): string
 					return q.id
 				end,
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				animate = { duration = 220, ease = "outCubic" },
 				enter = { opacity = { 0, 1 }, y = { 6, 0 }, duration = 220, ease = "outCubic" },
 				exit = { opacity = 0, duration = 140 },

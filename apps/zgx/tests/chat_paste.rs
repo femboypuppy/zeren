@@ -1,4 +1,4 @@
-//! A paste into the composer, as Zeron's takes one (crates/ui composer.rs
+//! A paste into the composer, as Zeren's takes one (crates/ui composer.rs
 //! `paste`): text goes in; a picture on the clipboard (a screenshot) becomes
 //! an image the message carries, the host writing it out (src/pasted.rs,
 //! stubbed by the chat fixture as `store.paste_image`). The page is the
@@ -11,7 +11,7 @@ use std::path::PathBuf;
 use zgx_script::{ScriptHost, Value, testing::TestApp};
 
 fn ui_dir() -> PathBuf {
-    std::env::var_os("ZERON_ZGX_TEST_UI")
+    std::env::var_os("ZEREN_ZGX_TEST_UI")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui"))
 }

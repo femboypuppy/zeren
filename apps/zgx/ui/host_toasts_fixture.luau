@@ -1,7 +1,7 @@
 -- The shell's fixture with the app's own toasts on command, for the host's
 -- toasts beside them (src/plugins/host_bar.rs): "fixture.toast" shows one
 -- of ds/toast's (another each time), "fixture.toasts_clear" puts them away.
--- With `ZERON_ZGX_HOST_TOASTS=1` (debug builds), the host's toasts show
+-- With `ZEREN_ZGX_HOST_TOASTS=1` (debug builds), the host's toasts show
 -- over it too.
 
 local node = require("./shell_fixture")

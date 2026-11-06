@@ -47,7 +47,7 @@ end
 -- How tall the toggle's frame is drawn: its 16pt glyph's 17.75 of 24 units
 -- (ds/sidebar_icon), stroke included.
 local FRAME_INK = 16 * 17.75 / 24
--- The heaviest glyph stroke, in points (light's, ds/themes/zeron-light.json).
+-- The heaviest glyph stroke, in points (light's, ds/themes/zeren-light.json).
 local HEAVIEST_STROKE = 1.45
 
 -- The glyph drawn in the button `button` (the node after it in `scope`'s tree).

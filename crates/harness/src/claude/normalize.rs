@@ -2,7 +2,7 @@
 //! decoding, error-code mapping).
 
 use serde_json::Value;
-use zeron_proto::{AgentEvent, DoneStatus, HarnessId, TodoItem, TodoStatus, ToolCall};
+use zeren_proto::{AgentEvent, DoneStatus, HarnessId, TodoItem, TodoStatus, ToolCall};
 
 use super::wire::{ContentBlock, Frame, MessageFrame, ResultFrame};
 
@@ -328,7 +328,7 @@ fn note_commands(f: &MessageFrame, commands: &mut std::collections::HashMap<Stri
 }
 
 /// A `tool_result` block as its event. A Bash call's carries its output (the
-/// end of it, [`zeron_proto::command_output_cap`]) and exit code: Claude Code
+/// end of it, [`zeren_proto::command_output_cap`]) and exit code: Claude Code
 /// leads a failed command's text with `Exit code N`; one that succeeded says
 /// nothing, so it exited 0 — unless it went to the background, which says
 /// only that it started. Every other tool's output stays off the event.
@@ -351,7 +351,7 @@ fn tool_result(
                 None => (None, text.as_str()),
             };
             let exit = code.or((!is_error && !background).then_some(0));
-            (zeron_proto::command_output_cap(rest), exit)
+            (zeren_proto::command_output_cap(rest), exit)
         }
         None => (None, None),
     };
@@ -694,7 +694,7 @@ impl Normalizer {
         // forks wait for their replay.
         if !fork.seen.is_empty() && fork.replayed == Some(false) {
             tracing::warn!(
-                target: "zeron_harness::claude",
+                target: "zeren_harness::claude",
                 chip = %fork.chip,
                 "the typed fork's replay repeated no record read off disk; no longer reading forks' transcripts"
             );
@@ -932,7 +932,7 @@ impl Normalizer {
                 if f.subtype == "api_retry" {
                     let attempt = f.attempt.unwrap_or(1);
                     tracing::info!(
-                        target: "zeron_harness::claude",
+                        target: "zeren_harness::claude",
                         attempt,
                         max = ?f.max_retries,
                         status = ?f.error_status,
@@ -1244,7 +1244,7 @@ impl Normalizer {
                 // A result line that would not parse (see `parse_frame`):
                 // its turn still ends, with what little the line told us.
                 if f.unreadable {
-                    tracing::warn!(target: "zeron_harness::claude", "unreadable result frame");
+                    tracing::warn!(target: "zeren_harness::claude", "unreadable result frame");
                     let failed = f.is_error && !interrupted;
                     let status = if interrupted {
                         DoneStatus::Interrupted
@@ -1325,7 +1325,7 @@ impl Normalizer {
                         .partition(|m| is_internal_diagnostic(m));
                     for diagnostic in &diagnostics {
                         tracing::debug!(
-                            target: "zeron_harness::claude",
+                            target: "zeren_harness::claude",
                             "internal CLI diagnostic (not surfaced): {diagnostic}"
                         );
                     }
@@ -1463,7 +1463,7 @@ mod tests {
         input: Value,
         content: Value,
         is_error: bool,
-    ) -> zeron_doc::MessagePart {
+    ) -> zeren_doc::MessagePart {
         let mut n = Normalizer::new();
         let mut parts = Vec::new();
         for raw in [
@@ -1476,7 +1476,7 @@ mod tests {
         ] {
             let frame = crate::claude::wire::parse_frame(&raw.to_string()).expect("frame parses");
             for event in n.normalize(frame, false) {
-                zeron_doc::fold_event_into_parts(&mut parts, &event);
+                zeren_doc::fold_event_into_parts(&mut parts, &event);
             }
         }
         parts
@@ -1495,7 +1495,7 @@ mod tests {
             + "curl -H 'Authorization: Bearer sk-ant-api03-abcdefghijklmnop' failed";
         let text = format!("Exit code 2\n{body}");
         let part = folded_tool("Bash", json!({"command": "cargo test"}), json!(text), true);
-        let zeron_doc::MessagePart::Tool {
+        let zeren_doc::MessagePart::Tool {
             is_error,
             output: Some(tail),
             output_bytes,
@@ -1531,7 +1531,7 @@ mod tests {
         );
         assert!(matches!(
             &ok,
-            zeron_doc::MessagePart::Tool { output: Some(o), exit_code: Some(0), output_truncated: false, .. }
+            zeren_doc::MessagePart::Tool { output: Some(o), exit_code: Some(0), output_truncated: false, .. }
                 if o == "a.rs\nb.rs"
         ));
         let bg = folded_tool(
@@ -1542,7 +1542,7 @@ mod tests {
         );
         assert!(matches!(
             &bg,
-            zeron_doc::MessagePart::Tool {
+            zeren_doc::MessagePart::Tool {
                 exit_code: None,
                 output: Some(_),
                 ..
@@ -1556,7 +1556,7 @@ mod tests {
         );
         assert!(matches!(
             &killed,
-            zeron_doc::MessagePart::Tool {
+            zeren_doc::MessagePart::Tool {
                 exit_code: Some(137),
                 output: None,
                 ..
@@ -1591,7 +1591,7 @@ mod tests {
         );
         assert!(matches!(
             &part,
-            zeron_doc::MessagePart::Tool {
+            zeren_doc::MessagePart::Tool {
                 output: None,
                 exit_code: None,
                 ..

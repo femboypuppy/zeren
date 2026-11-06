@@ -6,7 +6,7 @@
 //! (state) survived; what its button ran (a function in the old VM) didn't,
 //! so it stood there with no button.
 //!
-//! `ZERON_ZGX_TEST_UI` points these at a scratch copy of ui/, to show them
+//! `ZEREN_ZGX_TEST_UI` points these at a scratch copy of ui/, to show them
 //! failing on old code (as tests/reload.rs).
 
 use std::path::{Path, PathBuf};
@@ -14,7 +14,7 @@ use std::path::{Path, PathBuf};
 use zgx_script::{ScriptHost, testing::TestApp};
 
 fn ui() -> PathBuf {
-    std::env::var_os("ZERON_ZGX_TEST_UI").map_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui"), PathBuf::from)
+    std::env::var_os("ZEREN_ZGX_TEST_UI").map_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui"), PathBuf::from)
 }
 
 /// The fixture, its `ui.persist` keeping to `storage`.

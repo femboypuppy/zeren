@@ -15,7 +15,7 @@ use zgx_script::{ScriptHost, testing::TestApp};
 
 const W: f32 = 1200.;
 const H: f32 = 800.;
-/// The middle of the title bar's strip (Zeron's: 38 tall, its controls
+/// The middle of the title bar's strip (Zeren's: 38 tall, its controls
 /// centred 21 down).
 const STRIP_Y: f32 = 21.;
 
@@ -276,7 +276,7 @@ fn a_plugins_title_bar_controls_stand_on_glass_over_art() {
 fn the_panels_edge_follows_the_pointer_at_once_and_opening_eases() {
     let mut app = mount();
     // (Wide enough that the panel opens short of its widest: the window's
-    // fit caps it, as Zeron's does, and an edge dragged past that holds.)
+    // fit caps it, as Zeren's does, and an edge dragged past that holds.)
     app.ui.scene.borrow_mut().resize(1600., 800.);
     app.frames(30);
     app.click("#shell-sidebar >> role:button \"Fix the build\"");
@@ -328,7 +328,7 @@ fn the_places_plugins_target_are_there() {
     }
 }
 
-/// A session's card (Zeron's hover card): the pointer resting on its row,
+/// A session's card (Zeren's hover card): the pointer resting on its row,
 /// it shows after a beat, beside the row, 284 wide, with how long ago it
 /// moved, where it runs, its project and its branch: one surface over the
 /// window (no tooltip's frame around it); a press puts it away.
@@ -358,7 +358,7 @@ fn a_rested_on_session_shows_its_card() {
     assert!(!shown(&mut app, "1h ago"), "a press puts it away");
 }
 
-/// A session renamed in its row (Zeron's inline rename): a double click on
+/// A session renamed in its row (Zeren's inline rename): a double click on
 /// it puts a field over its title, the title selected; ↩ keeps the name
 /// typed, Esc the old one; its menu's Rename does the same, in the row, not
 /// a dialog.
@@ -419,7 +419,7 @@ fn x_of(app: &mut TestApp, selector: &str) -> Option<(f32, f32)> {
     Some((b.x, b.width))
 }
 
-/// A session's menu's Copy, as Zeron's: its folder, its harness's link and
+/// A session's menu's Copy, as Zeren's: its folder, its harness's link and
 /// id where it has them (a Codex thread's link, `codex://threads/…`), its
 /// own id; each copied, and said so.
 #[test]
@@ -454,18 +454,18 @@ fn a_sessions_copy_menu_copies_and_says_so() {
     app.click("role:menuitem \"Copy\"");
     assert!(app.wait_until(|app| app.find("role:menuitem \"Session ID\"").is_some()));
     assert!(app.find("role:menuitem \"Harness session ID\"").is_none(), "no harness id, none offered");
-    // Its Zeron link (every session's), as the host makes it.
+    // Its Zeren link (every session's), as the host makes it.
     app.frames(20);
-    app.click("role:menuitem \"Zeron conversation link\"");
+    app.click("role:menuitem \"Zeren conversation link\"");
     assert!(
-        app.wait_until(|app| app.desktop.as_ref().unwrap().clipboard().starts_with("zeron://open/chat/a3?workspace=")),
-        "the Zeron link: {:?}",
+        app.wait_until(|app| app.desktop.as_ref().unwrap().clipboard().starts_with("zeren://open/chat/a3?workspace=")),
+        "the Zeren link: {:?}",
         app.desktop.as_ref().unwrap().clipboard()
     );
-    assert!(app.wait_until(|app| app.find("\"Zeron conversation link copied\"").is_some()), "said so");
+    assert!(app.wait_until(|app| app.find("\"Zeren conversation link copied\"").is_some()), "said so");
 }
 
-/// Deleting a session is asked once more (Zeron's "Delete session?"): its
+/// Deleting a session is asked once more (Zeren's "Delete session?"): its
 /// title in the question; Cancel keeps it, Delete deletes it.
 #[test]
 fn deleting_a_session_asks_first() {
@@ -533,7 +533,7 @@ fn the_panels_edge_resizes_from_the_keys() {
 }
 
 /// A session carried from the sidebar over the chat says "Drop to mention"
-/// (Zeron's overlay), and dropped there it's a chat chip on the composer.
+/// (Zeren's overlay), and dropped there it's a chat chip on the composer.
 #[test]
 fn a_session_dropped_on_the_chat_is_mentioned() {
     use zgx::input::{InputEvent, PointerButton};
@@ -570,7 +570,7 @@ fn said(app: &TestApp) -> String {
     })
 }
 
-/// A project's header's right click, as Zeron's: `item` from its menu.
+/// A project's header's right click, as Zeren's: `item` from its menu.
 fn project_menu(app: &mut TestApp, project: &str, item: &str) {
     let head = app.bounds(&format!("#sidebar >> \"{project}\""));
     zgx_script::driver::right_click_at(&mut app.ui, (head.x + head.width / 2., head.y + head.height / 2.));
@@ -601,7 +601,7 @@ fn a_projects_header_renames_it() {
 }
 
 /// Remove… on a project's header asks once more, saying what goes with it
-/// (Zeron's "Remove project?": its sessions on its device); Cancel keeps it,
+/// (Zeren's "Remove project?": its sessions on its device); Cancel keeps it,
 /// Remove removes it.
 #[test]
 fn removing_a_project_asks_first() {

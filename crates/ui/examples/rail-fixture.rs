@@ -1,11 +1,11 @@
-//! Prompt-rail review fixture: a long conversation (ZERON_RAIL_PROMPTS, 60 by
+//! Prompt-rail review fixture: a long conversation (ZEREN_RAIL_PROMPTS, 60 by
 //! default) in an isolated, offline shell. With `--capture <dir>` it films the
 //! rail pinned to the bottom, hovered, wheel-scrolled and after a jump, then
-//! quits; ZERON_PALETTE_LIGHT=1 renders the light theme.
+//! quits; ZEREN_PALETTE_LIGHT=1 renders the light theme.
 use gpui::{AppContext, Bounds, WindowBounds, WindowOptions, px, size};
 use serde_json::json;
 use std::path::{Path, PathBuf};
-use zeron_ui::*;
+use zeren_ui::*;
 
 const PROMPTS: [&str; 12] = [
     "Why does the order sheet double-count croissants on Saturdays?",
@@ -198,7 +198,7 @@ fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt().with_env_filter("warn").init();
     let temp = tempfile::tempdir()?;
     let data = temp.path().to_path_buf();
-    let prompts: usize = std::env::var("ZERON_RAIL_PROMPTS")
+    let prompts: usize = std::env::var("ZEREN_RAIL_PROMPTS")
         .ok()
         .and_then(|n| n.parse().ok())
         .unwrap_or(60);
@@ -227,7 +227,7 @@ fn main() -> anyhow::Result<()> {
         let fonts = typography::register_fonts(cx);
         typography::init(settings.ui_font_family.clone(), settings.ui_font_size, settings.terminal_font_family.clone(), settings.terminal_font_size, settings.code_font_family.clone(), settings.code_font_size, fonts, cx);
         theme_library::init(data.clone(), cx);
-        let mode = if std::env::var_os("ZERON_PALETTE_LIGHT").is_some() { appearance::AppearanceMode::Light } else { appearance::AppearanceMode::Dark };
+        let mode = if std::env::var_os("ZEREN_PALETTE_LIGHT").is_some() { appearance::AppearanceMode::Light } else { appearance::AppearanceMode::Dark };
         appearance::init(mode, settings.theme_selection, settings.accent, settings.surface, cx);
         history::init(settings.git_history_columns, settings.git_history_column_widths, settings.git_history_column_order, settings.git_history_author_display, cx);
         composer::init(cx, settings.composer_send_behavior);
@@ -235,8 +235,8 @@ fn main() -> anyhow::Result<()> {
         app_menus::init(cx);
         let state = cx.new(|_| {
             let mut s = state::AppState::new();
-            s.connection = zeron_proto::view::ConnectionStatus::Ready;
-            s.workspace_scope = Some(zeron_proto::WorkspaceScope::Local);
+            s.connection = zeren_proto::view::ConnectionStatus::Ready;
+            s.workspace_scope = Some(zeren_proto::WorkspaceScope::Local);
             s.local_device_id = Some("local".into());
             s.devices = vec![serde_json::from_value(json!({"id":"local","name":"This device","platform":std::env::consts::OS,"lastSeenAt":null})).unwrap()];
             s.chats = vec![serde_json::from_value(json!({"id":"rail","deviceId":"local","title":"Bakery ordering app","archived":false,"createdAt":"2026-10-25T00:00:00Z","config":{"harness":"claude-code","model":"claude-sonnet-4-6","reasoning":null,"sandbox":"workspace-write"}})).unwrap()];
@@ -263,7 +263,7 @@ fn main() -> anyhow::Result<()> {
         cx.spawn(async move |cx| {
             pause(cx, 600).await;
             state.update(cx, |s, cx| {
-                s.receive_transcript_frame(zeron_doc::TranscriptFrame::Reset { reset: serde_json::from_value(serde_json::Value::Array(entries)).unwrap() }, cx).unwrap();
+                s.receive_transcript_frame(zeren_doc::TranscriptFrame::Reset { reset: serde_json::from_value(serde_json::Value::Array(entries)).unwrap() }, cx).unwrap();
                 cx.notify();
             });
             let Some(dir) = capture_dir else { return };

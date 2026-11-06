@@ -2,11 +2,11 @@
 //! shapes where turn-end detection and runtime survival break, each checked
 //! against hard invariants rather than happy-path output.
 //!
-//! ZERON_TEST_HARNESS=claude ZERON_TEST_MODEL=claude-sonnet-5-5 \
-//! ZERON_TEST_OTHER_MODEL=claude-haiku-4-5 ZERON_CHAOS_ROUNDS=3 \
-//!   cargo test -p zeron-engine --test adapter_chaos_live -- --ignored --nocapture
+//! ZEREN_TEST_HARNESS=claude ZEREN_TEST_MODEL=claude-sonnet-5-5 \
+//! ZEREN_TEST_OTHER_MODEL=claude-haiku-4-5 ZEREN_CHAOS_ROUNDS=3 \
+//!   cargo test -p zeren-engine --test adapter_chaos_live -- --ignored --nocapture
 //!
-//! `ZERON_CHAOS_ONLY=<scenario>` runs one scenario. Invariants, per chat:
+//! `ZEREN_CHAOS_ONLY=<scenario>` runs one scenario. Invariants, per chat:
 //! - Never "done" early: no agent output after a Done unless a new user turn
 //!   began first (a steer boundary or a fresh process); no Idle→Working flip
 //!   the user did not cause; every requested sentinel present at the end.
@@ -15,18 +15,18 @@
 //! - One process for the chat's life, except after the user's Stop.
 //! - Nothing the agent started outlives a Stop.
 //!
-//! `ZERON_TEST_HARNESS`: claude | codex | cursor | opencode | grok | devin |
+//! `ZEREN_TEST_HARNESS`: claude | codex | cursor | opencode | grok | devin |
 //! pi | hermes | antigravity. `restart_durability` covers quitting and
 //! force-killing the app mid-turn (same environment variables).
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use zeron_doc::SessionCommandPayload;
-use zeron_engine::{EngineCore, HarnessRegistry};
-use zeron_harness::{
+use zeren_doc::SessionCommandPayload;
+use zeren_engine::{EngineCore, HarnessRegistry};
+use zeren_harness::{
     AcpHarness, ClaudeHarness, CodexHarness, CursorHarness, Harness, OpencodeHarness, PiHarness,
 };
-use zeron_proto::{
+use zeren_proto::{
     AgentEvent, ChatConfig, HarnessId, ReasoningLevel, RunRequest, SandboxLevel, SessionStatus,
 };
 
@@ -91,7 +91,7 @@ fn engine(dir: &std::path::Path, name: &str) -> EngineCore {
 
 impl Suite {
     fn new() -> Self {
-        let name = std::env::var("ZERON_TEST_HARNESS").unwrap_or_else(|_| "claude".into());
+        let name = std::env::var("ZEREN_TEST_HARNESS").unwrap_or_else(|_| "claude".into());
         let (id, _, sleep_base) = harness(&name);
         let dir = tempfile::tempdir().unwrap();
         let cwd = dir.path().to_str().unwrap().to_owned();
@@ -103,8 +103,8 @@ impl Suite {
             core,
             id,
             name,
-            model: std::env::var("ZERON_TEST_MODEL").ok(),
-            other_model: std::env::var("ZERON_TEST_OTHER_MODEL").ok(),
+            model: std::env::var("ZEREN_TEST_MODEL").ok(),
+            other_model: std::env::var("ZEREN_TEST_OTHER_MODEL").ok(),
             cwd,
             dir,
             sleep_base,
@@ -454,7 +454,7 @@ impl Chat<'_> {
                 matches!(
                     e,
                     AgentEvent::Done {
-                        status: zeron_proto::DoneStatus::Errored,
+                        status: zeren_proto::DoneStatus::Errored,
                         ..
                     }
                 )
@@ -519,7 +519,7 @@ fn descendants(root: u32) -> Vec<u32> {
 
 /// The answer to every question an approval or ask raises: an allowing
 /// option where one is offered, else the first.
-fn answer_all(questions: &[zeron_proto::UserInputQuestion]) -> Vec<zeron_proto::UserInputAnswer> {
+fn answer_all(questions: &[zeren_proto::UserInputQuestion]) -> Vec<zeren_proto::UserInputAnswer> {
     questions
         .iter()
         .map(|q| {
@@ -533,7 +533,7 @@ fn answer_all(questions: &[zeron_proto::UserInputQuestion]) -> Vec<zeron_proto::
                     && !o.contains("deny")
                     && !o.contains("reject")
             });
-            zeron_proto::UserInputAnswer {
+            zeren_proto::UserInputAnswer {
                 question_id: q.id.clone(),
                 labels: allow.or(q.options.first()).cloned().into_iter().collect(),
             }
@@ -1048,11 +1048,11 @@ async fn adapter_chaos() {
     }
     let suite = Suite::new();
     suite.kill_probes();
-    let rounds: usize = std::env::var("ZERON_CHAOS_ROUNDS")
+    let rounds: usize = std::env::var("ZEREN_CHAOS_ROUNDS")
         .ok()
         .and_then(|r| r.parse().ok())
         .unwrap_or(1);
-    let only = std::env::var("ZERON_CHAOS_ONLY").ok();
+    let only = std::env::var("ZEREN_CHAOS_ONLY").ok();
     let mut failures = Vec::new();
     let mut runs = 0;
     for round in 0..rounds {
@@ -1118,7 +1118,7 @@ fn completed_of(core: &EngineCore) -> usize {
                     matches!(
                         e.event,
                         AgentEvent::Done {
-                            status: zeron_proto::DoneStatus::Completed,
+                            status: zeren_proto::DoneStatus::Completed,
                             ..
                         }
                     )
@@ -1160,7 +1160,7 @@ fn resumed_to_end(core: &EngineCore) -> bool {
                         matches!(
                             e.event,
                             AgentEvent::Done {
-                                status: zeron_proto::DoneStatus::Completed,
+                                status: zeren_proto::DoneStatus::Completed,
                                 ..
                             }
                         )
@@ -1187,7 +1187,7 @@ fn restart_request(name: &str, cwd: &str, prompt: &str) -> RunRequest {
         mcp: None,
         prompt: prompt.into(),
         harness: Some(harness(name).0),
-        model: std::env::var("ZERON_TEST_MODEL").ok(),
+        model: std::env::var("ZEREN_TEST_MODEL").ok(),
         reasoning: None,
         model_options: Default::default(),
         cwd: cwd.into(),
@@ -1265,7 +1265,7 @@ async fn restart_durability() {
             .with_test_writer()
             .try_init();
     }
-    let name = std::env::var("ZERON_TEST_HARNESS").unwrap_or_else(|_| "claude".into());
+    let name = std::env::var("ZEREN_TEST_HARNESS").unwrap_or_else(|_| "claude".into());
     let (id, _, base) = harness(&name);
     let dir = tempfile::tempdir().unwrap();
     let cwd = dir.path().to_str().unwrap().to_owned();
@@ -1284,7 +1284,7 @@ async fn restart_durability() {
             RESTART_CHAT,
             &ChatConfig {
                 harness: id,
-                model: std::env::var("ZERON_TEST_MODEL").ok(),
+                model: std::env::var("ZEREN_TEST_MODEL").ok(),
                 reasoning: None,
                 model_options: Default::default(),
                 sandbox: SandboxLevel::DangerFullAccess,
@@ -1303,7 +1303,7 @@ async fn restart_durability() {
     .await;
     println!("{name}: opening turn done");
 
-    if std::env::var_os("ZERON_RESTART_ONLY_FORCE_KILL").is_none() {
+    if std::env::var_os("ZEREN_RESTART_ONLY_FORCE_KILL").is_none() {
         // 2. Quit the app mid-command.
         let marker = format!("zr{}=1", base + 7);
         send_to(
@@ -1356,11 +1356,11 @@ async fn restart_durability() {
     let crash_marker = format!("zr{}=1", base + 8);
     let mut child = tokio::process::Command::new(std::env::current_exe().unwrap())
         .args(["crash_phase", "--exact", "--ignored", "--nocapture"])
-        .env("ZERON_CRASH_DIR", dir.path())
-        .env("ZERON_CRASH_PROMPT", format!(
+        .env("ZEREN_CRASH_DIR", dir.path())
+        .env("ZEREN_CRASH_PROMPT", format!(
             "Please run this shell command in the foreground and wait for it to finish: python3 -c 'import time; {crash_marker}; time.sleep(30)'"
         ))
-        .env("ZERON_CRASH_MARKER", &crash_marker)
+        .env("ZEREN_CRASH_MARKER", &crash_marker)
         .process_group(0)
         .stdout(std::process::Stdio::piped())
         .kill_on_drop(true)
@@ -1436,18 +1436,18 @@ async fn crash_phase() {
             .with_test_writer()
             .try_init();
     }
-    let Some(dir) = std::env::var_os("ZERON_CRASH_DIR") else {
+    let Some(dir) = std::env::var_os("ZEREN_CRASH_DIR") else {
         return;
     };
-    let name = std::env::var("ZERON_TEST_HARNESS").unwrap_or_else(|_| "claude".into());
+    let name = std::env::var("ZEREN_TEST_HARNESS").unwrap_or_else(|_| "claude".into());
     let dir = std::path::PathBuf::from(dir);
     let core = engine(&dir, &name);
     let cwd = dir.to_str().unwrap().to_owned();
     send_to(
         &core,
-        restart_request(&name, &cwd, &std::env::var("ZERON_CRASH_PROMPT").unwrap()),
+        restart_request(&name, &cwd, &std::env::var("ZEREN_CRASH_PROMPT").unwrap()),
     );
-    let marker = std::env::var("ZERON_CRASH_MARKER").unwrap();
+    let marker = std::env::var("ZEREN_CRASH_MARKER").unwrap();
     wait_for(240, "the command to start", || probe_alive(&marker)).await;
     println!("CRASH-READY");
     tokio::time::sleep(Duration::from_secs(600)).await;

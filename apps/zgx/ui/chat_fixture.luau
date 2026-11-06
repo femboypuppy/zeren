@@ -225,7 +225,7 @@ ui.command {
 -- since switched to a branch of its own (the chat still names main).
 REFS["/tmp/atlas-wt/pr"] = {
 	{ name = "main", current = false },
-	{ name = "zeron/readme-pr", current = true, worktree = "/tmp/atlas-wt/pr" },
+	{ name = "zeren/readme-pr", current = true, worktree = "/tmp/atlas-wt/pr" },
 }
 ui.command {
 	id = "session_in_worktree",
@@ -345,11 +345,11 @@ invocations_stub.read = function(harness: string, target: any): any
 	note(`invocations:{harness}:{target.chat or target.space or "?"}`)
 	return settled({
 		rows = {
-			{ kind = "command", name = "review", label = "/review", detail = "Review the diff · <branch>", link = "[/review](zeron-invoke:7b226b696e64223a22636f6d6d616e64222c226e616d65223a22726576696577227d)" },
-			{ kind = "command", name = "compact", label = "/compact", detail = "Summarize the conversation", link = "[/compact](zeron-invoke:7b7d)" },
-			-- (The agent's own `/new`: Zeron's is `/zeron:new` beside it.)
-			{ kind = "command", name = "new", label = "/new", detail = "The agent's new", link = "[/new](zeron-invoke:7b7d)" },
-			{ kind = "skill", name = "code-review", label = "Code Review", detail = "Careful review — /s/code-review/SKILL.md", link = "[$code-review](zeron-invoke:7b7d)" },
+			{ kind = "command", name = "review", label = "/review", detail = "Review the diff · <branch>", link = "[/review](zeren-invoke:7b226b696e64223a22636f6d6d616e64222c226e616d65223a22726576696577227d)" },
+			{ kind = "command", name = "compact", label = "/compact", detail = "Summarize the conversation", link = "[/compact](zeren-invoke:7b7d)" },
+			-- (The agent's own `/new`: Zeren's is `/zeren:new` beside it.)
+			{ kind = "command", name = "new", label = "/new", detail = "The agent's new", link = "[/new](zeren-invoke:7b7d)" },
+			{ kind = "skill", name = "code-review", label = "Code Review", detail = "Careful review — /s/code-review/SKILL.md", link = "[$code-review](zeren-invoke:7b7d)" },
 		},
 	})
 end
@@ -490,8 +490,8 @@ ui.command {
 }
 
 -- The theme, for captures in both.
-ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeron-light") end }
-ui.command { id = "theme_dark", title = "Dark theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeron-dark") end }
+ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeren-light") end }
+ui.command { id = "theme_dark", title = "Dark theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeren-dark") end }
 ui.command { id = "opaque", title = "Opaque surfaces", run = function() require("@ds/material").frosted:set(false) end }
 ui.command { id = "frosted", title = "Frosted surfaces", run = function() require("@ds/material").frosted:set(true) end }
 
@@ -903,7 +903,7 @@ ui.command {
 	end,
 }
 -- Two comments a plugin left on a diff (Git's Changes, through
--- `zeron.compose_comment`; screens/plugins hands them on as this does): a
+-- `zeren.compose_comment`; screens/plugins hands them on as this does): a
 -- range of the changed file's lines with its code, and an old line.
 -- `test_plugin_comments` says which of the plugin's are still carried.
 ui.command {
@@ -1014,7 +1014,7 @@ panel_stub.open_file = function(session: any, path: string)
 	note(`open_file:{if type(session) == "table" then session.id else session}:{path}`)
 end
 -- The app taking web links (ds/links, as the shell sets it for "Open links
--- in Zeron"): each link opened is noted, nothing else happens.
+-- in Zeren"): each link opened is noted, nothing else happens.
 ui.command {
 	id = "set_opener",
 	title = "Take web links",
@@ -1026,10 +1026,10 @@ ui.command {
 		end
 	end,
 }
--- "Open links in" as the shell has it (`test_open_links`: "zeron" or
+-- "Open links in" as the shell has it (`test_open_links`: "zeren" or
 -- "external"), the panel's browser tab noting what it's sent (`panel:`); a
--- chat's Zeron link and Reveal in Finder noted as asked (ds/links' menus).
-local open_links = ui.state("test_open_links", "zeron")
+-- chat's Zeren link and Reveal in Finder noted as asked (ds/links' menus).
+local open_links = ui.state("test_open_links", "zeren")
 ui.command {
 	id = "set_links",
 	title = "Links as the shell sets them",
@@ -1040,15 +1040,15 @@ ui.command {
 			return true
 		end
 		Links.in_app = function(): boolean
-			return open_links:peek() == "zeron"
+			return open_links:peek() == "zeren"
 		end
 		Links.opener = function(url: string): boolean
-			return open_links:peek() == "zeron" and (Links.panel :: any)(url)
+			return open_links:peek() == "zeren" and (Links.panel :: any)(url)
 		end
 	end,
 }
 sessions_stub.link = function(id: string): any
-	return settled(`zeron://open/chat/{id}?workspace=w1`)
+	return settled(`zeren://open/chat/{id}?workspace=w1`)
 end
 local files_stub = (require :: any)("@app/screens/files/api")
 files_stub.reveal = function(target: any, path: string): any
@@ -1065,7 +1065,7 @@ ui.command {
 		store.messages:push {
 			id = "lu1",
 			role = "user",
-			text = "Look at [chat.rs](zeron-file:src/chat.rs) please, as in [Long chat](zeron-chat:s1), and [the site](https://example.com/)",
+			text = "Look at [chat.rs](zeren-file:src/chat.rs) please, as in [Long chat](zeren-chat:s1), and [the site](https://example.com/)",
 			at = "Sep 8, 1:50 PM",
 			copy = "Look at chat.rs please",
 		}
@@ -1297,7 +1297,7 @@ ui.command {
 	end,
 }
 
--- A plugin putting words into the composer (`zeron.compose.insert`).
+-- A plugin putting words into the composer (`zeren.compose.insert`).
 ui.command {
 	id = "insert_words",
 	title = "Insert words into the composer",

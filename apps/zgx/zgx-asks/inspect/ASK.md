@@ -1,6 +1,6 @@
 # Ask: `zgx inspect` frames that measure a whole interaction
 
-**Who needs it:** anyone measuring frame cost in Zeron's app, for example the panel's drag-resize work (Nov 1 2026): p95 per move, before and after a change, read from `inspect frames`.
+**Who needs it:** anyone measuring frame cost in Zeren's app, for example the panel's drag-resize work (Nov 1 2026): p95 per move, before and after a change, read from `inspect frames`.
 
 **The problems**, three, found while doing that:
 

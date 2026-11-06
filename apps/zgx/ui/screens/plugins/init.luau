@@ -1,6 +1,6 @@
 --!strict
 -- Plugins in the main window: the Plugins page in Settings, and what
--- plugins are shown of Zeron and may ask of it. Required once, as the
+-- plugins are shown of Zeren and may ask of it. Required once, as the
 -- main window starts (app.luau). The host (src/plugins) loads the plugins
 -- and your templates and keeps them to what they were allowed; this side
 -- is the app's:
@@ -9,23 +9,23 @@
 --   route. Every plugin has the route, the appearance and the session
 --   page's session id; "sessions.read", "profile.read" and "devices" grant
 --   the rest:
---     zeron.route    { name = "home" | "session" | "settings", session?, page?, project? }
---     zeron.page_session  the session page's session id, or nil
---     zeron.profile_id    your id
---     zeron.session  { id, title, project?, device? } or nil
---     zeron.project  { id, name } or nil (never its path)
---     zeron.device   { id, name } where you're working
---     zeron.devices  { { id, name, here } } your devices
---     zeron.appearance  "light" | "dark"
+--     zeren.route    { name = "home" | "session" | "settings", session?, page?, project? }
+--     zeren.page_session  the session page's session id, or nil
+--     zeren.profile_id    your id
+--     zeren.session  { id, title, project?, device? } or nil
+--     zeren.project  { id, name } or nil (never its path)
+--     zeren.device   { id, name } where you're working
+--     zeren.devices  { { id, name, here } } your devices
+--     zeren.appearance  "light" | "dark"
 -- - **What records are made from**, for the host alone (no plugin reads
 --   these; each reads its own `plugin.<id>.records`, holding only what it
 --   was allowed, src/plugins/records.rs):
 --     plugins.profile      { id, name, username, avatar, email }
 --     plugins.hide_emails  Settings → General's "hide email addresses"
--- - **What plugins ask**, through the host's actions (zeron.open,
---   zeron.compose.insert, a plugin's toast), arriving here as requests in
+-- - **What plugins ask**, through the host's actions (zeren.open,
+--   zeren.compose.insert, a plugin's toast), arriving here as requests in
 --   `plugins.request`: done in order, each once.
--- - **When a template or plugin fails**, Zeron's own takes its place: never
+-- - **When a template or plugin fails**, Zeren's own takes its place: never
 --   a placeholder. The host hears every script error and drops whichever
 --   template or plugin it's on (src/plugins/recovery.rs); a screen that
 --   fails to load or build inside the shell's boundary shows nothing for
@@ -47,7 +47,7 @@ local chat = require("@app/screens/chat")
 local ChatShared = require("@app/screens/chat/shared")
 local Cargo = require("@ds/composer_cargo")
 
--- Each plugin's review comments still on a draft (`zeron.compose_comment`),
+-- Each plugin's review comments still on a draft (`zeren.compose_comment`),
 -- told back to it: its key → the session it's in and whether its chip is
 -- under the pointer (`plugin.<id>.composed`), so the diff it was left on
 -- keeps a mark on its lines and lights them as the chip is pointed at.
@@ -93,14 +93,14 @@ require("@app/screens/plugins/waiting")
 -- What plugins see, written as it changes (each a steady table, so a
 -- plugin reading one hears only real changes).
 local out = {
-	route = ui.shared("zeron.route", { name = "home" } :: any),
-	session = ui.shared("zeron.session", nil :: any),
-	project = ui.shared("zeron.project", nil :: any),
-	device = ui.shared("zeron.device", nil :: any),
-	devices = ui.shared("zeron.devices", {} :: { any }),
-	appearance = ui.shared("zeron.appearance", "dark"),
-	page_session = ui.shared("zeron.page_session", nil :: string?),
-	profile_id = ui.shared("zeron.profile_id", nil :: string?),
+	route = ui.shared("zeren.route", { name = "home" } :: any),
+	session = ui.shared("zeren.session", nil :: any),
+	project = ui.shared("zeren.project", nil :: any),
+	device = ui.shared("zeren.device", nil :: any),
+	devices = ui.shared("zeren.devices", {} :: { any }),
+	appearance = ui.shared("zeren.appearance", "dark"),
+	page_session = ui.shared("zeren.page_session", nil :: string?),
+	profile_id = ui.shared("zeren.profile_id", nil :: string?),
 	profile = ui.shared("plugins.profile", {} :: any),
 	hide_emails = ui.shared("plugins.hide_emails", true),
 }
@@ -117,7 +117,7 @@ ui.effect(function()
 		put(out.page_session, id)
 	end
 end)
--- You, as far as Zeron knows you yet: the account's, then Settings'
+-- You, as far as Zeren knows you yet: the account's, then Settings'
 -- profile and username once they've loaded.
 ui.effect(function()
 	local user: any = auth.user:get()
@@ -216,7 +216,7 @@ local function run(r: any)
 		end
 	elseif r.kind == "link" and type(r.value) == "string" then
 		-- A plugin's link (the host checked "links.open" and that it's a web
-		-- link): where Zeron opens links.
+		-- link): where Zeren opens links.
 		require("@ds/links").open(r.value)
 	elseif r.kind == "toast" then
 		ds.toast.show { title = r.title, body = r.value }
@@ -253,7 +253,7 @@ ui.effect(function()
 			last = r.seq
 			local ok, why = pcall(run, r)
 			if not ok then
-				print(`zeron-zgx: a plugin's request failed: {why}`)
+				print(`zeren-zgx: a plugin's request failed: {why}`)
 			end
 		end
 	end
@@ -264,7 +264,7 @@ end)
 
 -- A screen that failed while a template or a plugin stands in for it:
 -- nothing in its place for this moment (never the "didn't load" one), and
--- the host told, which puts Zeron's own back.
+-- the host told, which puts Zeren's own back.
 boundary.on_fail(function(module: string, why: string): Node?
 	-- Ours when a plugin's copy failed (only theirs live in `.loaded`), or
 	-- when the error names a file a plugin or the template stands in for,

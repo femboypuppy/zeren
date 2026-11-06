@@ -107,7 +107,7 @@ export type Props = {
 	-- What assistive technology calls it ("Code", or the file's name).
 	label: string?,
 	-- The code's size in points (Settings' code font size), its rows
-	-- scaled with it; nil, the design system's (`$zeron.editor.size`). Read
+	-- scaled with it; nil, the design system's (`$zeren.editor.size`). Read
 	-- once: a new size is a new editor.
 	text_size: number?,
 	-- How the keyboard leaves it (Tab indents), read after its name: e.g.
@@ -160,11 +160,11 @@ local RUN_SECONDS, HISTORY = 1, 2000
 local CHAIN_STEP, CHAIN_SECONDS, CHAIN_REST = 128, 0.002, 16
 
 -- The code's size and a row's height for `size` points: the design
--- system's (`$zeron.editor.size` on `$zeron.editor.line`) at nil, rows
+-- system's (`$zeren.editor.size` on `$zeren.editor.line`) at nil, rows
 -- scaled with it otherwise, to the whole point.
 local function metrics(size: number?): (number, number)
-	local base = (ui.theme.get("zeron.editor.size") :: number?) or 13
-	local line = (ui.theme.get("zeron.editor.line") :: number?) or 20
+	local base = (ui.theme.get("zeren.editor.size") :: number?) or 13
+	local line = (ui.theme.get("zeren.editor.line") :: number?) or 20
 	if not size or size <= 0 or size == base then
 		return base, line
 	end
@@ -2533,8 +2533,8 @@ return ui.component(function(props: Props): Node
 		end
 		local p = pair:get()
 		if p then
-			mark(p[1], p[1], "$zeron.editor.bracket")
-			mark(p[2], p[2], "$zeron.editor.bracket")
+			mark(p[1], p[1], "$zeren.editor.bracket")
+			mark(p[2], p[2], "$zeren.editor.bracket")
 		end
 		if find_open:get() then
 			local cur = current:get()
@@ -2556,22 +2556,22 @@ return ui.component(function(props: Props): Node
 				if m[1] - 1 > hi then
 					break
 				end
-				mark(m[1], m[2], if i == cur then "$zeron.editor.match_current" else "$zeron.editor.match")
+				mark(m[1], m[2], if i == cur then "$zeren.editor.match_current" else "$zeren.editor.match")
 			end
 		end
 		return out
 	end)
 
-	-- The caret's row: Zeron's faint wash while editing; none in a viewer,
+	-- The caret's row: Zeren's faint wash while editing; none in a viewer,
 	-- but for a line gone to (washed in the accent, then fading).
 	local function row_color(): string
 		local f = flash:get()
 		if f == 2 then
-			return "$zeron.editor.reveal"
+			return "$zeren.editor.reveal"
 		elseif f == 1 then
-			return "$zeron.editor.current"
+			return "$zeren.editor.current"
 		end
-		return if readonly then "#00000000" else "$zeron.editor.current"
+		return if readonly then "#00000000" else "$zeren.editor.current"
 	end
 
 	---------------------------------------------------------------------------
@@ -2595,7 +2595,7 @@ return ui.component(function(props: Props): Node
 				local spans, out = base(string.sub(line, 1, tail), s)
 				local list = table.clone(spans)
 				local e = tail + #View.ELLIPSIS
-				table.insert(list, { tail + 1, e, "$text.tertiary", bg = "$zeron.editor.fold" })
+				table.insert(list, { tail + 1, e, "$text.tertiary", bg = "$zeren.editor.fold" })
 				table.insert(list, { e + 1, #line, "$text.tertiary" })
 				return list, (out :: number) + 1
 			end
@@ -2925,7 +2925,7 @@ return ui.component(function(props: Props): Node
 			h = 1,
 			pointer_events = "none",
 			draw = function(c)
-				c:rect(0, 0, 1, 1, "$zeron.editor.current")
+				c:rect(0, 0, 1, 1, "$zeren.editor.current")
 				ui.after(0, function()
 					local e = el()
 					if e and not settling then
@@ -3020,7 +3020,7 @@ return ui.component(function(props: Props): Node
 		if not add then
 			return nil
 		end
-		local box = (ui.theme.get("zeron.icon_button.sm") :: number?) or 22
+		local box = (ui.theme.get("zeren.icon_button.sm") :: number?) or 22
 		return ui.show(function(): boolean
 			return pointed() ~= nil
 		end, ui.div {
@@ -3124,7 +3124,7 @@ return ui.component(function(props: Props): Node
 						-- slides in it by `hx`.)
 						overflow = "hidden",
 						-- (On the textarea itself this loses the theme it is in.)
-						theme = { selection = "{zeron.editor.selection}" },
+						theme = { selection = "{zeren.editor.selection}" },
 						ui.presence(function(): string
 							return `{language() or ""}|{indent:get()}`
 						end, function(key: string): Node
@@ -3188,7 +3188,7 @@ return ui.component(function(props: Props): Node
 	local function toggles(): Node
 		return ui.row {
 			shrink = 0,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			items = "center",
 			toggle("ds.code_editor.match_case", "Aa", case),
 			toggle("ds.code_editor.whole_word", "ab", word),
@@ -3198,7 +3198,7 @@ return ui.component(function(props: Props): Node
 	-- Room for a chevron's width, so a row under the find row lines up with
 	-- its field.
 	local function under_chevron(): Node
-		return ui.div { w = "$zeron.icon_button.sm", shrink = 0 }
+		return ui.div { w = "$zeren.icon_button.sm", shrink = 0 }
 	end
 	local function bar_row(props_: ContainerProps): ContainerProps
 		props_.w_full = true
@@ -3224,7 +3224,7 @@ return ui.component(function(props: Props): Node
 				end, function()
 					replacing:toggle()
 				end),
-				ui.div { w = "$zeron.icon_button.sm", shrink = 0, items = "center", justify = "center", color = "$text.tertiary", Icon { name = "search", size = 14 } }
+				ui.div { w = "$zeren.icon_button.sm", shrink = 0, items = "center", justify = "center", color = "$text.tertiary", Icon { name = "search", size = 14 } }
 			),
 			TextField {
 				input_ref = find_input,
@@ -3268,7 +3268,7 @@ return ui.component(function(props: Props): Node
 			ui.div { grow = 0.001 },
 			ui.row {
 				shrink = 0,
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				items = "center",
 				glyph_button("ds.code_editor.previous_match", "arrow-up", function()
 					step(-1)
@@ -3367,10 +3367,10 @@ return ui.component(function(props: Props): Node
 	end
 
 	local status_bar = ui.row {
-		h = "$zeron.editor.status",
+		h = "$zeren.editor.status",
 		shrink = 0,
 		px = "$space.2",
-		gap = "$zeron.space.hair",
+		gap = "$zeren.space.hair",
 		items = "center",
 		border_sides = { 1, 0, 0, 0 },
 		border_color = "$border.subtle",

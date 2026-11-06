@@ -71,12 +71,12 @@ use std::collections::HashSet;
 use std::time::Duration;
 use tokio::sync::watch;
 
-use zeron_doc::{MessagePart, SessionCommandPayload};
-use zeron_proto::{
+use zeren_doc::{MessagePart, SessionCommandPayload};
+use zeren_proto::{
     AgentEvent, ChatConfig, CreateWorktreeOutcome, EngineInfo, HarnessId, HarnessUpdatePolicy,
     ProjectActionDraft, Space, ToolCall, WorkspaceScope,
 };
-use zeron_rpc::{
+use zeren_rpc::{
     LinkCache, RpcError, RpcReply, RpcService, capability_errors, methods, parse_params,
 };
 
@@ -168,7 +168,7 @@ struct RelayCommandParams {
     chat_id: String,
     /// The full command entry, client-minted id included — the exactly-once
     /// key the host claims in its processed ledger before executing.
-    entry: zeron_doc::SessionCommandEntry,
+    entry: zeren_doc::SessionCommandEntry,
 }
 
 #[derive(Debug, Deserialize)]
@@ -392,7 +392,7 @@ const CANVAS_TERMINAL_PREFIX: &str = "space-canvas:";
 /// `chat_image_root`), as configured: the jail matches a reply's path against
 /// it raw or canonical. Fails closed: no folder of its own (a legacy
 /// projectless chat runs in home), a relative or missing folder, and any
-/// folder that is `home` or above it, or holds one of `data` (Zeron's own
+/// folder that is `home` or above it, or holds one of `data` (Zeren's own
 /// dirs), are refused, comparing canonical forms. A scratch folder is
 /// resolved under `scratch_root`, never created: only a run creates it.
 fn chat_image_folder(
@@ -402,9 +402,9 @@ fn chat_image_folder(
     data: &[std::path::PathBuf],
 ) -> Result<std::path::PathBuf, &'static str> {
     let cwd = cwd
-        .filter(|cwd| !zeron_proto::projectless::is_home_cwd(cwd))
+        .filter(|cwd| !zeren_proto::projectless::is_home_cwd(cwd))
         .ok_or("the chat has no working folder of its own")?;
-    let folder = if zeron_proto::projectless::is_scratch_cwd(cwd) {
+    let folder = if zeren_proto::projectless::is_scratch_cwd(cwd) {
         scratch_root.join(cwd.trim().rsplit('/').next().unwrap_or_default())
     } else {
         std::path::PathBuf::from(crate::repos::expand_home(cwd)?)
@@ -422,7 +422,7 @@ fn chat_image_folder(
             .filter_map(|dir| std::fs::canonicalize(dir).ok())
             .any(|dir| dir.starts_with(&canonical))
     {
-        return Err("the chat works in the home folder, above it, or around Zeron's data");
+        return Err("the chat works in the home folder, above it, or around Zeren's data");
     }
     Ok(folder)
 }
@@ -594,11 +594,11 @@ struct ReadChatImageChunkParams {
     offset: u64,
 }
 
-const _: () = assert!(zeron_proto::VISUAL_MAX_BYTES == zeron_visual::MAX_SCRIPT_BYTES);
-const _: () = assert!(zeron_proto::VISUAL_MAX_ASSETS == zeron_visual::assets::MAX_ASSETS);
-const _: () = assert!(zeron_proto::VISUAL_MAX_ASSET_BYTES == zeron_visual::assets::MAX_ASSET_BYTES);
+const _: () = assert!(zeren_proto::VISUAL_MAX_BYTES == zeren_visual::MAX_SCRIPT_BYTES);
+const _: () = assert!(zeren_proto::VISUAL_MAX_ASSETS == zeren_visual::assets::MAX_ASSETS);
+const _: () = assert!(zeren_proto::VISUAL_MAX_ASSET_BYTES == zeren_visual::assets::MAX_ASSET_BYTES);
 const _: () = assert!(
-    zeron_proto::VISUAL_MAX_TOTAL_ASSET_BYTES == zeron_visual::assets::MAX_TOTAL_ASSET_BYTES
+    zeren_proto::VISUAL_MAX_TOTAL_ASSET_BYTES == zeren_visual::assets::MAX_TOTAL_ASSET_BYTES
 );
 
 #[derive(Debug, Deserialize)]
@@ -637,7 +637,7 @@ fn decode_visual_assets(
     assets: &std::collections::BTreeMap<String, String>,
 ) -> Result<Vec<(String, Vec<u8>)>, RpcError> {
     use base64::Engine as _;
-    use zeron_visual::assets::{MAX_ASSET_BYTES, MAX_ASSETS, MAX_TOTAL_ASSET_BYTES, valid_name};
+    use zeren_visual::assets::{MAX_ASSET_BYTES, MAX_ASSETS, MAX_TOTAL_ASSET_BYTES, valid_name};
     if assets.len() > MAX_ASSETS {
         return Err(RpcError::BadParams(format!(
             "a visual takes at most {MAX_ASSETS} assets"
@@ -714,15 +714,15 @@ enum MutateParams {
         /// Cwd override (isolated-worktree path); default = the space's folder.
         #[serde(default)]
         cwd: Option<String>,
-        /// The chat whose agent is creating this one (Zeron MCP); recorded
+        /// The chat whose agent is creating this one (Zeren MCP); recorded
         /// on the row as `parentChatId` for orchestration trees.
         #[serde(default)]
         parent_chat_id: Option<String>,
         /// What the child is to its parent (`childKind`: `side` | `subagent`,
-        /// the Zeron MCP's `kind`): kept on the row only with a parent. An
+        /// the Zeren MCP's `kind`): kept on the row only with a parent. An
         /// unknown kind reads as none (a side chat).
-        #[serde(default, deserialize_with = "zeron_proto::lenient_child_kind")]
-        child_kind: Option<zeron_proto::ChildKind>,
+        #[serde(default, deserialize_with = "zeren_proto::lenient_child_kind")]
+        child_kind: Option<zeren_proto::ChildKind>,
         /// Run on Cloud (the checkout picker's Cloud): the chat gets its own
         /// Cloud machine, cloning the project's GitHub repository.
         #[serde(default)]
@@ -759,7 +759,7 @@ enum MutateParams {
     SetSpaceIcon {
         space_id: String,
         #[serde(default)]
-        icon: Option<zeron_proto::SpaceIcon>,
+        icon: Option<zeren_proto::SpaceIcon>,
     },
     /// Hard delete: cascades to every chat (and session row) in the space.
     /// Live runs hosted here are interrupted best-effort.
@@ -795,9 +795,9 @@ enum MutateParams {
     /// Change one pin without replacing another device's edits.
     #[serde(rename_all = "camelCase")]
     ChangeSidebarPin {
-        change: zeron_proto::SidebarPinChange,
+        change: zeren_proto::SidebarPinChange,
     },
-    /// Full-config replace on the chat row (zeron `SetChatConfig`): the
+    /// Full-config replace on the chat row (zeren `SetChatConfig`): the
     /// composer's mid-session model / reasoning / options changes, LWW-synced
     /// so they survive restarts and reach every device.
     #[serde(rename_all = "camelCase")]
@@ -829,7 +829,7 @@ pub struct EngineRpc {
     terminals: Terminals,
     remote_terminals: crate::remote_terminals::RemoteTerminals,
     project_actions: ProjectActionsStore,
-    previews: Option<zeron_preview::PreviewService>,
+    previews: Option<zeren_preview::PreviewService>,
     change_requests: CheckoutChangeRequests,
     github: GitHubCli,
     diff_sync: CheckoutDiffSync,
@@ -837,7 +837,7 @@ pub struct EngineRpc {
     agent_accounts: AgentAccounts,
     auth: Option<Auth>,
     links: Option<std::sync::Arc<LinkCache>>,
-    updater: Option<zeron_update::Updater>,
+    updater: Option<zeren_update::Updater>,
     harness_updates: Option<crate::harness_updates::HarnessUpdateCoordinator>,
     local_import: Option<crate::local_import::LocalImporter>,
     /// Cloud runner only: vault grants (ListGithubRepos, credentialed CloneRepo).
@@ -870,12 +870,12 @@ impl EngineRpc {
         let engine_info = EngineInfo {
             device_id: doc_host.device_id().to_string(),
             workspace_scope,
-            cursor_sdk_version: Some(zeron_harness::CursorHarness::sdk_version().into()),
+            cursor_sdk_version: Some(zeren_harness::CursorHarness::sdk_version().into()),
             capabilities: {
-                let mut capabilities = zeron_proto::capabilities::current();
+                let mut capabilities = zeren_proto::capabilities::current();
                 if crate::desktop_notify::enabled() {
                     capabilities
-                        .push(zeron_proto::capabilities::DESKTOP_NOTIFICATIONS_V1.to_string());
+                        .push(zeren_proto::capabilities::DESKTOP_NOTIFICATIONS_V1.to_string());
                 }
                 capabilities
             },
@@ -917,7 +917,7 @@ impl EngineRpc {
         self
     }
 
-    pub fn with_previews(mut self, previews: zeron_preview::PreviewService) -> Self {
+    pub fn with_previews(mut self, previews: zeren_preview::PreviewService) -> Self {
         self.previews = Some(previews);
         self
     }
@@ -944,7 +944,7 @@ impl EngineRpc {
     }
 
     /// Attach the release checker (UpdateStatus stream + ApplyUpdate).
-    pub fn with_updater(mut self, updater: zeron_update::Updater) -> Self {
+    pub fn with_updater(mut self, updater: zeren_update::Updater) -> Self {
         self.updater = Some(updater);
         self
     }
@@ -1029,7 +1029,7 @@ impl EngineRpc {
             || self.workspace.read_devices().is_ok_and(|devices| {
                 devices.iter().any(|device| {
                     device.id == device_id
-                        && device.supports(zeron_proto::capabilities::PROVIDER_SWITCH_V1)
+                        && device.supports(zeren_proto::capabilities::PROVIDER_SWITCH_V1)
                 })
             })
     }
@@ -1067,7 +1067,7 @@ impl EngineRpc {
                 d.id == device_id
                     && d.capabilities
                         .iter()
-                        .any(|c| c == zeron_proto::CLOUD_ACCOUNT_CAPABILITY)
+                        .any(|c| c == zeren_proto::CLOUD_ACCOUNT_CAPABILITY)
             })
         })
     }
@@ -1158,9 +1158,9 @@ impl EngineRpc {
                 names.insert(0, default.clone());
             }
         }
-        let refs: Vec<zeron_proto::RepoRef> = names
+        let refs: Vec<zeren_proto::RepoRef> = names
             .into_iter()
-            .map(|name| zeron_proto::RepoRef {
+            .map(|name| zeren_proto::RepoRef {
                 current: p.default_branch.as_deref() == Some(name.as_str()),
                 name,
                 worktree_path: None,
@@ -1184,7 +1184,7 @@ impl EngineRpc {
         config: Option<&ChatConfig>,
     ) -> Result<Option<CloudHost>, RpcError> {
         let failed = |e: crate::EngineError| RpcError::Failed(e.to_string());
-        let on_cloud = |device_id: &str| device_id.starts_with(zeron_proto::CLOUD_DEVICE_PREFIX);
+        let on_cloud = |device_id: &str| device_id.starts_with(zeren_proto::CLOUD_DEVICE_PREFIX);
         // A side chat of a Cloud chat shares its machine (and files), unless
         // it asks for a Cloud session of its own.
         if !cloud
@@ -1257,7 +1257,7 @@ impl EngineRpc {
             .find(|repo| repo.full_name.eq_ignore_ascii_case(&full_name))
             .ok_or_else(|| {
                 RpcError::Failed(format!(
-                    "Cloud can't reach {full_name} — install the Zeron GitHub App on it in Settings → Cloud."
+                    "Cloud can't reach {full_name} — install the Zeren GitHub App on it in Settings → Cloud."
                 ))
             })?;
         let session = cloud_client
@@ -1289,7 +1289,7 @@ impl EngineRpc {
         }
     }
 
-    fn updater(&self) -> Result<&zeron_update::Updater, RpcError> {
+    fn updater(&self) -> Result<&zeren_update::Updater, RpcError> {
         self.updater
             .as_ref()
             .ok_or_else(|| RpcError::Failed("updates unavailable".into()))
@@ -1327,7 +1327,7 @@ impl EngineRpc {
     /// name an existing linked worktree for a new chat, but it is verified
     /// against the space repository before any filesystem walk begins.
     async fn file_search_root(&self, p: &FileSearchParams) -> Result<std::path::PathBuf, RpcError> {
-        let target = zeron_proto::WorkspaceTarget {
+        let target = zeren_proto::WorkspaceTarget {
             chat_id: p.chat_id.clone(),
             space_id: p.space_id.clone(),
             checkout_path: p.path.clone(),
@@ -1368,7 +1368,7 @@ impl EngineRpc {
     /// The one folder a chat's reply images (`![alt](path)`) may come from:
     /// its working folder on this host. Refused, failing closed, when the chat
     /// runs elsewhere, has no folder of its own, or works in the home folder,
-    /// above it, or around Zeron's own data — so a reply can never show an
+    /// above it, or around Zeren's own data — so a reply can never show an
     /// image from all of home, or another chat's attachments.
     fn chat_image_root(&self, chat_id: &str) -> Result<std::path::PathBuf, RpcError> {
         let refused = |why: &str| RpcError::BadParams(why.into());
@@ -1520,7 +1520,7 @@ impl EngineRpc {
 
     /// An agent login runs on `target`, but the browser that finishes it runs
     /// HERE: while the login waits on a loopback callback, this device's same
-    /// port forwards to it over P2P ([`zeron_preview::login`]). The forwarder
+    /// port forwards to it over P2P ([`zeren_preview::login`]). The forwarder
     /// opens when a reply first names the port and closes when the login
     /// finishes, fails, is cancelled or its time runs out; a port taken here
     /// fails the login with that reason instead of stranding the browser.
@@ -1530,7 +1530,7 @@ impl EngineRpc {
         method: &str,
         mut params: serde_json::Value,
     ) -> Result<RpcReply, RpcError> {
-        use zeron_proto::{AgentLoginPoll, AgentLoginStart, AgentLoginStatus};
+        use zeren_proto::{AgentLoginPoll, AgentLoginStart, AgentLoginStatus};
         let login_id = params
             .get("loginId")
             .and_then(|v| v.as_str())
@@ -1857,13 +1857,13 @@ impl EngineRpc {
         chat: &str,
     ) -> Result<
         (
-            zeron_harness::codex::realtime::RealtimeHandle,
-            tokio::sync::broadcast::Receiver<zeron_proto::voice::VoiceEvent>,
+            zeren_harness::codex::realtime::RealtimeHandle,
+            tokio::sync::broadcast::Receiver<zeren_proto::voice::VoiceEvent>,
             std::sync::Arc<crate::sessions::VoiceActivity>,
         ),
-        zeron_proto::voice::VoiceRejection,
+        zeren_proto::voice::VoiceRejection,
     > {
-        use zeron_proto::voice::VoiceRejection;
+        use zeren_proto::voice::VoiceRejection;
         // Without Codex here a retry can never connect: ask for an install.
         if !self
             .registry
@@ -1905,7 +1905,7 @@ impl EngineRpc {
                 // A voice orchestrator is hidden, so the chats it creates are
                 // the user's top-level sessions rather than its side chats.
                 let parent_chat_id = parent_chat_id
-                    .filter(|parent| !zeron_proto::voice::is_orchestrator_chat(parent));
+                    .filter(|parent| !zeren_proto::voice::is_orchestrator_chat(parent));
                 self.workspace
                     .create_chat_hosted(
                         &chat_id,
@@ -1933,7 +1933,7 @@ impl EngineRpc {
                 git_detected,
                 github_repo,
             } => match github_repo {
-                Some(repo) if device_id.starts_with(zeron_proto::CLOUD_DEVICE_PREFIX) => self
+                Some(repo) if device_id.starts_with(zeren_proto::CLOUD_DEVICE_PREFIX) => self
                     .workspace
                     .create_cloud_space(&space_id, &device_id, &path, name, &repo)
                     .map_err(failed),
@@ -1948,7 +1948,7 @@ impl EngineRpc {
                 .map_err(failed)
                 .map(drop),
             MutateParams::SetSpaceIcon { space_id, icon } => {
-                let icon = match icon.map(zeron_proto::SpaceIcon::normalized).transpose() {
+                let icon = match icon.map(zeren_proto::SpaceIcon::normalized).transpose() {
                     Ok(icon) => icon.flatten(),
                     Err(part) => return Err(RpcError::BadParams(format!("invalid icon: {part}"))),
                 };
@@ -1964,7 +1964,7 @@ impl EngineRpc {
                     .iter()
                     .filter(|chat| {
                         chat.space_id.as_deref() == Some(space_id.as_str())
-                            && zeron_proto::is_cloud_device(&chat.device_id, "")
+                            && zeren_proto::is_cloud_device(&chat.device_id, "")
                     })
                     .map(|chat| chat.id.clone())
                     .collect();
@@ -1974,7 +1974,7 @@ impl EngineRpc {
                     .iter()
                     .filter(|chat| {
                         chat.space_id.is_none()
-                            && zeron_proto::is_cloud_device(&chat.device_id, "")
+                            && zeren_proto::is_cloud_device(&chat.device_id, "")
                             && chat
                                 .parent_chat_id
                                 .as_ref()
@@ -2068,7 +2068,7 @@ impl EngineRpc {
                 }
                 if switching && !self.host_switches_providers(&chat_id) {
                     return Err(RpcError::Failed(
-                        "This chat's computer needs a newer Zeron to switch provider".into(),
+                        "This chat's computer needs a newer Zeren to switch provider".into(),
                     ));
                 }
                 self.voice.retire_chat(&chat_id);
@@ -2083,7 +2083,7 @@ impl EngineRpc {
                     .chat(&chat_id)
                     .ok()
                     .flatten()
-                    .is_some_and(|chat| zeron_proto::is_cloud_device(&chat.device_id, ""));
+                    .is_some_and(|chat| zeren_proto::is_cloud_device(&chat.device_id, ""));
                 // A Cloud chat's children on Cloud go with it: its delegates
                 // (each on a machine of its own, which would otherwise outlive
                 // the parent) and its side chats (on its machine, now gone).
@@ -2094,7 +2094,7 @@ impl EngineRpc {
                         .into_iter()
                         .filter(|chat| {
                             chat.parent_chat_id.as_deref() == Some(chat_id.as_str())
-                                && zeron_proto::is_cloud_device(&chat.device_id, "")
+                                && zeren_proto::is_cloud_device(&chat.device_id, "")
                         })
                         .map(|chat| chat.id)
                         .collect()
@@ -2163,13 +2163,13 @@ fn change_request_rpc_error(error: ChangeRequestError) -> RpcError {
 /// everything else is interactive and must fail fast.
 #[derive(Default)]
 pub(crate) struct Installations(
-    std::sync::Mutex<std::collections::HashMap<HarnessId, zeron_harness::CancellationToken>>,
+    std::sync::Mutex<std::collections::HashMap<HarnessId, zeren_harness::CancellationToken>>,
 );
 
 struct Installing<'a> {
     installs: &'a Installations,
     harness: HarnessId,
-    cancel: zeron_harness::CancellationToken,
+    cancel: zeren_harness::CancellationToken,
 }
 impl Drop for Installing<'_> {
     fn drop(&mut self) {
@@ -2187,7 +2187,7 @@ impl Installations {
         if installs.contains_key(&harness) {
             return Err(RpcError::Failed("already installing".into()));
         }
-        let cancel = zeron_harness::CancellationToken::new();
+        let cancel = zeren_harness::CancellationToken::new();
         installs.insert(harness, cancel.clone());
         Ok(Installing {
             installs: self,
@@ -2209,14 +2209,14 @@ impl Installations {
 
 async fn run_requested_install(
     harness: HarnessId,
-    cancel: zeron_harness::CancellationToken,
-) -> Result<(), zeron_harness::HarnessError> {
+    cancel: zeren_harness::CancellationToken,
+) -> Result<(), zeren_harness::HarnessError> {
     #[cfg(test)]
-    if let Ok(script) = std::env::var(format!("ZERON_INSTALLER_COMMAND_{harness:?}").to_uppercase())
+    if let Ok(script) = std::env::var(format!("ZEREN_INSTALLER_COMMAND_{harness:?}").to_uppercase())
     {
-        return zeron_harness::install::install_with_command(harness, &script, cancel).await;
+        return zeren_harness::install::install_with_command(harness, &script, cancel).await;
     }
-    zeron_harness::install::install_harness(harness, cancel).await
+    zeren_harness::install::install_harness(harness, cancel).await
 }
 
 async fn install_harness_with<F, Fut>(
@@ -2226,7 +2226,7 @@ async fn install_harness_with<F, Fut>(
 ) -> Result<Vec<crate::registry::HarnessDescriptor>, RpcError>
 where
     F: FnOnce() -> Fut,
-    Fut: std::future::Future<Output = Result<(), zeron_harness::HarnessError>>,
+    Fut: std::future::Future<Output = Result<(), zeren_harness::HarnessError>>,
 {
     // A Cloud device registers only Codex + Claude Code; installing anything
     // else would put a CLI on it that nothing may run (or probe).
@@ -2235,7 +2235,7 @@ where
             "{harness:?} is not available on this device"
         )));
     }
-    if !zeron_harness::install::can_install(harness) {
+    if !zeren_harness::install::can_install(harness) {
         return Err(RpcError::Failed(
             "No supported installer or required tools available on this device".into(),
         ));
@@ -2432,7 +2432,7 @@ fn forwardable(method: &str) -> bool {
             // → Plugins' device switcher lists, declines, turns off, installs
             // (from a link; it lands waiting there) and removes them on
             // another of your devices from this one. Allowing stays with
-            // that device's own window (`zeron_rpc::peer_refused`, both ends).
+            // that device's own window (`zeren_rpc::peer_refused`, both ends).
             | methods::LIST_PLUGINS
             | methods::WATCH_PLUGINS
             | methods::DECIDE_PLUGIN
@@ -2483,21 +2483,21 @@ where
     .boxed()
 }
 
-/// The transcript watch as delta frames (`zeron_doc::transcript_delta`): a
+/// The transcript watch as delta frames (`zeren_doc::transcript_delta`): a
 /// full `reset` first, then only changed entries per commit — the whole-Vec
 /// serialization here was the per-tick cost that scaled with transcript size.
 fn doc_messages_stream(
     rx: watch::Receiver<crate::doc_host::TranscriptSnapshot>,
-    doc: std::sync::Arc<zeron_doc::SessionDoc>,
+    doc: std::sync::Arc<zeren_doc::SessionDoc>,
 ) -> BoxStream<'static, serde_json::Value> {
-    use zeron_doc::transcript_delta::{TranscriptFrame, diff_transcript};
+    use zeren_doc::transcript_delta::{TranscriptFrame, diff_transcript};
     futures::stream::unfold(
         (
             rx,
             None::<crate::doc_host::TranscriptSnapshot>,
             doc,
             None,
-            zeron_doc::TranscriptBaseline::default(),
+            zeren_doc::TranscriptBaseline::default(),
         ),
         |(mut rx, mut prev, doc, mut previous_usage, mut opening_baseline)| async move {
             loop {
@@ -2513,7 +2513,7 @@ fn doc_messages_stream(
                 };
                 let replay_baseline = match prev.as_ref() {
                     None => {
-                        opening_baseline = zeron_doc::TranscriptBaseline::capture(&current.entries);
+                        opening_baseline = zeren_doc::TranscriptBaseline::capture(&current.entries);
                         Some(opening_baseline.clone())
                     }
                     Some(prev)
@@ -2547,7 +2547,7 @@ fn doc_messages_stream(
                     continue;
                 }
                 previous_usage = usage;
-                let value = serde_json::to_value(zeron_doc::TranscriptUpdate {
+                let value = serde_json::to_value(zeren_doc::TranscriptUpdate {
                     frame,
                     context_usage: usage,
                     replay_baseline,
@@ -2569,10 +2569,10 @@ async fn opening_doc_messages_stream(
     let (handle, preview) = tokio::task::spawn_blocking(move || {
         let handle = host.open(&chat_id)?;
         let entries = handle.doc().read_opening_tail(128)?;
-        let mut preview = serde_json::to_value(zeron_doc::TranscriptUpdate {
-            frame: zeron_doc::TranscriptFrame::reset(&entries),
+        let mut preview = serde_json::to_value(zeren_doc::TranscriptUpdate {
+            frame: zeren_doc::TranscriptFrame::reset(&entries),
             context_usage: handle.doc().context_usage(),
-            replay_baseline: Some(zeron_doc::TranscriptBaseline::capture(&entries)),
+            replay_baseline: Some(zeren_doc::TranscriptBaseline::capture(&entries)),
         })
         .map_err(|e| crate::EngineError::Other(e.to_string()))?;
         preview["historyPending"] = serde_json::Value::Bool(true);
@@ -2653,7 +2653,7 @@ impl RpcService for AuthRpc {
                 RpcReply::value(&serde_json::json!({ "url": url }))
             }
             methods::ACCESS_TOKEN => {
-                // Local IPC only: the relay refuses it (`zeron_rpc::local_only`).
+                // Local IPC only: the relay refuses it (`zeren_rpc::local_only`).
                 let (token, expires_at) = self
                     .auth
                     .access_token_with_expiry()
@@ -2784,7 +2784,7 @@ impl crate::remote_terminals::Relay for EngineRpc {
 impl RpcService for EngineRpc {
     async fn handle(&self, method: &str, params: serde_json::Value) -> Result<RpcReply, RpcError> {
         // An agent's chats: capped at its own access, runs as the chat is
-        // set, attributed by Zeron (rpc/agent_gate.rs). Before forwarding.
+        // set, attributed by Zeren (rpc/agent_gate.rs). Before forwarding.
         let params = self.agent_gate(method, params)?;
         // Device-addressed routing: forward calls that target another device over its
         // relay. The target compares the id to its own, so forwards cannot loop.
@@ -2801,8 +2801,8 @@ impl RpcService for EngineRpc {
                 ));
             }
             // Allowing a plugin is that device's person's, in its own window
-            // (the receiving side refuses it too: `zeron_rpc::peer_refused`).
-            if zeron_rpc::peer_refused(method, &params) {
+            // (the receiving side refuses it too: `zeren_rpc::peer_refused`).
+            if zeren_rpc::peer_refused(method, &params) {
                 return Err(RpcError::Failed(format!(
                     "{method}: only that device's own window can do that. It's waiting for you there."
                 )));
@@ -2819,7 +2819,7 @@ impl RpcService for EngineRpc {
                 ))
                 .await;
             }
-            if (target.starts_with(zeron_proto::CLOUD_DEVICE_PREFIX)
+            if (target.starts_with(zeren_proto::CLOUD_DEVICE_PREFIX)
                 || crate::cloud_accounts::is_cloud_accounts_target(&target))
                 && let Some(reply) = self.answer_for_cloud(&target, method, &params).await
             {
@@ -3139,8 +3139,8 @@ impl RpcService for EngineRpc {
                 let boundary = entries
                     .iter()
                     .rposition(|entry| {
-                        entry.role == zeron_doc::MessageRole::Assistant
-                            && entry.status == Some(zeron_doc::MessageStatus::Complete)
+                        entry.role == zeren_doc::MessageRole::Assistant
+                            && entry.status == Some(zeren_doc::MessageStatus::Complete)
                     })
                     .ok_or_else(|| {
                         RpcError::Failed(
@@ -3179,7 +3179,7 @@ impl RpcService for EngineRpc {
                     // sweep; the subagent's doc stays the source's.
                     for part in &mut entry.parts {
                         match part {
-                            zeron_doc::MessagePart::Input {
+                            zeren_doc::MessagePart::Input {
                                 resolved, answers, ..
                             } => {
                                 if !*resolved {
@@ -3188,10 +3188,10 @@ impl RpcService for EngineRpc {
                                 }
                                 *resolved = true;
                             }
-                            zeron_doc::MessagePart::Tool {
+                            zeren_doc::MessagePart::Tool {
                                 subagent_status, ..
-                            } if *subagent_status == Some(zeron_doc::SubagentStatus::Running) => {
-                                *subagent_status = Some(zeron_doc::SubagentStatus::Failed);
+                            } if *subagent_status == Some(zeren_doc::SubagentStatus::Running) => {
+                                *subagent_status = Some(zeren_doc::SubagentStatus::Failed);
                             }
                             _ => {}
                         }
@@ -3213,18 +3213,18 @@ impl RpcService for EngineRpc {
                         .unwrap_or_else(|| "New session".into());
                     target
                         .doc()
-                        .push_message(&zeron_doc::SessionMessageEntry {
+                        .push_message(&zeren_doc::SessionMessageEntry {
                             duration_ms: None,
                             id: marker_id.clone(),
-                            role: zeron_doc::MessageRole::System,
-                            parts: vec![zeron_doc::MessagePart::Fork {
+                            role: zeren_doc::MessageRole::System,
+                            parts: vec![zeren_doc::MessagePart::Fork {
                                 id: marker_id,
                                 source_chat_id: source.id.clone(),
                                 source_title,
                             }],
                             created_at: chrono::Utc::now().timestamp_millis(),
                             device_id: self.doc_host.device_id().to_owned(),
-                            status: Some(zeron_doc::MessageStatus::Complete),
+                            status: Some(zeren_doc::MessageStatus::Complete),
                             continuation_of: None,
                         })
                         .map_err(|e| RpcError::Failed(e.to_string()))?;
@@ -3467,7 +3467,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&serde_json::json!({}))
             }
             methods::SYNC_STATUS => {
-                fn room_json(s: &zeron_sync::RoomStatsSnapshot) -> serde_json::Value {
+                fn room_json(s: &zeren_sync::RoomStatsSnapshot) -> serde_json::Value {
                     serde_json::json!({
                         "connected": s.connected,
                         "synced": s.synced,
@@ -3480,7 +3480,7 @@ impl RpcService for EngineRpc {
                         "rejected": s.rejected,
                     })
                 }
-                fn chat2_json(s: &zeron_sync::ChatStatsSnapshot) -> serde_json::Value {
+                fn chat2_json(s: &zeren_sync::ChatStatsSnapshot) -> serde_json::Value {
                     serde_json::json!({
                         "connected": s.connected,
                         "cursor": s.cursor,
@@ -3525,7 +3525,7 @@ impl RpcService for EngineRpc {
                 self.doc_host.watch_transfers(),
             ))),
             methods::WATCH_PREVIEWS => {
-                let p: zeron_proto::WatchPreviewsParams = parse_params(params)?;
+                let p: zeren_proto::WatchPreviewsParams = parse_params(params)?;
                 if self
                     .workspace
                     .chat(&p.chat_id)
@@ -3576,11 +3576,11 @@ impl RpcService for EngineRpc {
                             .and_then(|p| p.file_name())
                             .map(|s| s.to_string_lossy().into_owned());
                         // Servers in this checkout, and any this chat's agent
-                        // or terminals started elsewhere. Only Zeron-started
+                        // or terminals started elsewhere. Only Zeren-started
                         // ones: an older peer advertises every listener.
                         snapshot.services.retain(|service| {
                             service.device_id == device
-                                && service.zeron_owned
+                                && service.zeren_owned
                                 && (service.chat_id.as_deref() == Some(chat_id.as_str())
                                     || cwd.as_ref().is_some_and(|cwd| {
                                         cwd == std::path::Path::new(&service.project_cwd)
@@ -3787,7 +3787,7 @@ impl RpcService for EngineRpc {
                 Ok(RpcReply::Stream(watch_stream(self.diff_sync.watch_diffs())))
             }
             methods::WATCH_WORKSPACE_GIT_STATUS => {
-                let request: zeron_proto::WatchWorkspaceFilesRequest = parse_params(params)?;
+                let request: zeren_proto::WatchWorkspaceFilesRequest = parse_params(params)?;
                 let workspace = self.workspace_files.resolve_target(&request.target).await?;
                 let rx = self.diff_sync.watch_git_statuses();
                 // Only this authorized checkout crosses the connection. None means
@@ -3808,7 +3808,7 @@ impl RpcService for EngineRpc {
                                 emitted = true;
                                 previous = next.clone();
                                 let value =
-                                    serde_json::to_value(zeron_proto::WorkspaceGitStatusFrame {
+                                    serde_json::to_value(zeren_proto::WorkspaceGitStatusFrame {
                                         status: next,
                                     })
                                     .ok()?;
@@ -3858,7 +3858,7 @@ impl RpcService for EngineRpc {
                 struct P {
                     repository: String,
                     #[serde(default)]
-                    filter: zeron_proto::ChangeRequestFilter,
+                    filter: zeren_proto::ChangeRequestFilter,
                     #[serde(default)]
                     after: Option<String>,
                     #[serde(default)]
@@ -4054,7 +4054,7 @@ impl RpcService for EngineRpc {
                         _ => crate::diff_sync::capture_diff(&self.repos, root).await,
                     }
                     .map_err(|e| RpcError::Failed(e.to_string()))?;
-                    RpcReply::value(&zeron_proto::CheckoutDiff {
+                    RpcReply::value(&zeren_proto::CheckoutDiff {
                         checkout_id: identity.id,
                         device_id: self.doc_host.device_id().to_string(),
                         cwd: identity.root.to_string_lossy().to_string(),
@@ -4126,8 +4126,8 @@ impl RpcService for EngineRpc {
                                 .is_some_and(|session| {
                                     matches!(
                                         session.status,
-                                        zeron_proto::SessionStatus::Working
-                                            | zeron_proto::SessionStatus::AwaitingInput
+                                        zeren_proto::SessionStatus::Working
+                                            | zeren_proto::SessionStatus::AwaitingInput
                                     )
                                 })
                         {
@@ -4154,7 +4154,7 @@ impl RpcService for EngineRpc {
                 // behind an allocation so every unrelated RPC does not carry that
                 // state in `EngineRpc::handle`'s stack frame.
                 Box::pin(async move {
-                    let p: zeron_proto::GetCheckoutFileDiffTextRequest = parse_params(params)?;
+                    let p: zeren_proto::GetCheckoutFileDiffTextRequest = parse_params(params)?;
                     let identity =
                         Box::pin(self.repos.checkout_identity(std::path::Path::new(&p.cwd)))
                             .await
@@ -4232,7 +4232,7 @@ impl RpcService for EngineRpc {
                             (snapshot, base, None)
                         }
                     };
-                    let stale = || zeron_proto::CheckoutFileDiffText {
+                    let stale = || zeren_proto::CheckoutFileDiffText {
                         diff_checksum: p.diff_checksum.clone(),
                         old_text: None,
                         new_text: None,
@@ -4299,7 +4299,7 @@ impl RpcService for EngineRpc {
                     if current.checksum != p.diff_checksum {
                         return RpcReply::value(&stale());
                     }
-                    RpcReply::value(&zeron_proto::CheckoutFileDiffText {
+                    RpcReply::value(&zeren_proto::CheckoutFileDiffText {
                         diff_checksum: p.diff_checksum,
                         old_text: pair.old_text,
                         new_text: pair.new_text,
@@ -4521,7 +4521,7 @@ impl RpcService for EngineRpc {
             }
             methods::GET_WORKTREE_SETTINGS => RpcReply::value(&self.repos.worktree_settings()),
             methods::SET_WORKTREE_SETTINGS => {
-                let settings: zeron_proto::WorktreeSettings = parse_params(params)?;
+                let settings: zeren_proto::WorktreeSettings = parse_params(params)?;
                 let status = self
                     .repos
                     .set_worktree_settings(settings)
@@ -4539,7 +4539,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&listing)
             }
             methods::SEARCH_HOME_FOLDERS => {
-                let request: zeron_proto::SearchHomeFoldersRequest = parse_params(params)?;
+                let request: zeren_proto::SearchHomeFoldersRequest = parse_params(params)?;
                 if request.query.chars().count() > 256 {
                     return Err(RpcError::BadParams(
                         "SearchHomeFolders query must not exceed 256 characters".into(),
@@ -4566,7 +4566,7 @@ impl RpcService for EngineRpc {
                     .list_drives()
                     .await
                     .map_err(|e| RpcError::Failed(e.to_string()))?;
-                RpcReply::value(&zeron_proto::DriveListing { drives })
+                RpcReply::value(&zeren_proto::DriveListing { drives })
             }
             methods::SEARCH_FILES => {
                 let p: FileSearchParams = parse_params(params)?;
@@ -4593,7 +4593,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&matches)
             }
             methods::LIST_WORKSPACE_DIRECTORY => {
-                let request: zeron_proto::ListWorkspaceDirectoryRequest = parse_params(params)?;
+                let request: zeren_proto::ListWorkspaceDirectoryRequest = parse_params(params)?;
                 let page = tokio::time::timeout(
                     crate::workspace_files::WORKSPACE_FILE_RPC_TIMEOUT,
                     self.workspace_files.list_directory(request),
@@ -4604,7 +4604,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&page)
             }
             methods::SEARCH_WORKSPACE_FILES => {
-                let request: zeron_proto::SearchWorkspaceFilesRequest = parse_params(params)?;
+                let request: zeren_proto::SearchWorkspaceFilesRequest = parse_params(params)?;
                 let matches = tokio::time::timeout(
                     crate::workspace_files::WORKSPACE_FILE_RPC_TIMEOUT,
                     self.workspace_files.search(request),
@@ -4615,7 +4615,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&matches)
             }
             methods::SEARCH_WORKSPACE_CONTENT => {
-                let request: zeron_proto::SearchWorkspaceContentRequest = parse_params(params)?;
+                let request: zeren_proto::SearchWorkspaceContentRequest = parse_params(params)?;
                 let result = tokio::time::timeout(
                     crate::workspace_files::WORKSPACE_FILE_RPC_TIMEOUT,
                     self.workspace_files.search_content(request),
@@ -4626,7 +4626,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&result)
             }
             methods::WARM_WORKSPACE_SEARCH => {
-                let request: zeron_proto::WarmWorkspaceSearchRequest = parse_params(params)?;
+                let request: zeren_proto::WarmWorkspaceSearchRequest = parse_params(params)?;
                 let result = tokio::time::timeout(
                     crate::workspace_files::WORKSPACE_FILE_RPC_TIMEOUT,
                     self.workspace_files.warm_search(request),
@@ -4637,7 +4637,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&result)
             }
             methods::READ_WORKSPACE_IMAGE => {
-                let request: zeron_proto::ReadWorkspaceImageRequest = parse_params(params)?;
+                let request: zeren_proto::ReadWorkspaceImageRequest = parse_params(params)?;
                 let chunk = tokio::time::timeout(
                     crate::workspace_files::WORKSPACE_FILE_RPC_TIMEOUT,
                     self.workspace_files.read_image(request),
@@ -4648,7 +4648,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&chunk)
             }
             methods::READ_WORKSPACE_FILE => {
-                let request: zeron_proto::ReadWorkspaceFileRequest = parse_params(params)?;
+                let request: zeren_proto::ReadWorkspaceFileRequest = parse_params(params)?;
                 let file = tokio::time::timeout(
                     crate::workspace_files::WORKSPACE_FILE_RPC_TIMEOUT,
                     self.workspace_files.read_file(request),
@@ -4659,7 +4659,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&file)
             }
             methods::DELETE_WORKSPACE_ENTRY => {
-                let request: zeron_proto::DeleteWorkspaceEntryRequest = parse_params(params)?;
+                let request: zeren_proto::DeleteWorkspaceEntryRequest = parse_params(params)?;
                 let outcome = self
                     .workspace_files
                     .delete_entry(request)
@@ -4668,7 +4668,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&outcome)
             }
             methods::MOVE_WORKSPACE_ENTRY => {
-                let request: zeron_proto::MoveWorkspaceEntryRequest = parse_params(params)?;
+                let request: zeren_proto::MoveWorkspaceEntryRequest = parse_params(params)?;
                 let outcome = self
                     .workspace_files
                     .move_entry(request)
@@ -4677,7 +4677,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&outcome)
             }
             methods::CREATE_WORKSPACE_ENTRY => {
-                let request: zeron_proto::CreateWorkspaceEntryRequest = parse_params(params)?;
+                let request: zeren_proto::CreateWorkspaceEntryRequest = parse_params(params)?;
                 let outcome = self
                     .workspace_files
                     .create_entry(request)
@@ -4686,7 +4686,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&outcome)
             }
             methods::WRITE_WORKSPACE_FILE => {
-                let request: zeron_proto::WriteWorkspaceFileRequest = parse_params(params)?;
+                let request: zeren_proto::WriteWorkspaceFileRequest = parse_params(params)?;
                 let outcome = tokio::time::timeout(
                     crate::workspace_files::WORKSPACE_FILE_RPC_TIMEOUT,
                     self.workspace_files.write_file(request),
@@ -4697,7 +4697,7 @@ impl RpcService for EngineRpc {
                 RpcReply::value(&outcome)
             }
             methods::WATCH_WORKSPACE_FILES => {
-                let request: zeron_proto::WatchWorkspaceFilesRequest = parse_params(params)?;
+                let request: zeren_proto::WatchWorkspaceFilesRequest = parse_params(params)?;
                 let subscription = self
                     .workspace_files
                     .watch_files(request)
@@ -5152,15 +5152,15 @@ impl RpcService for EngineRpc {
                     .title
                     .trim()
                     .chars()
-                    .take(zeron_proto::VISUAL_MAX_TITLE_CHARS)
+                    .take(zeren_proto::VISUAL_MAX_TITLE_CHARS)
                     .collect();
                 if title.is_empty() {
                     return Err(RpcError::BadParams("title is empty".into()));
                 }
-                if p.script.trim().is_empty() || p.script.len() > zeron_proto::VISUAL_MAX_BYTES {
+                if p.script.trim().is_empty() || p.script.len() > zeren_proto::VISUAL_MAX_BYTES {
                     return Err(RpcError::BadParams(format!(
                         "script must be 1 to {} bytes",
-                        zeron_proto::VISUAL_MAX_BYTES
+                        zeren_proto::VISUAL_MAX_BYTES
                     )));
                 }
                 // Before decoding and storing anything (checked again below).
@@ -5175,15 +5175,15 @@ impl RpcService for EngineRpc {
                 let uploads = self.uploads.clone();
                 let (stored_id, script) = (id.clone(), p.script);
                 let (path, report) = tokio::task::spawn_blocking(move || {
-                    let files = zeron_visual::Assets::new(
+                    let files = zeren_visual::Assets::new(
                         assets
                             .iter()
                             .map(|(name, bytes)| (name.clone(), bytes.as_slice().into()))
                             .collect(),
                     );
-                    let checked = zeron_visual::check_with_assets(
+                    let checked = zeren_visual::check_with_assets(
                         &script,
-                        zeron_visual::seed_for(&stored_id),
+                        zeren_visual::seed_for(&stored_id),
                         files,
                     );
                     let report = checked
@@ -5223,10 +5223,10 @@ impl RpcService for EngineRpc {
                     return Err(no_turn_for("show_image"));
                 }
                 // Bounded before decoding: base64 is 4 bytes per 3.
-                if p.data.len() > zeron_proto::IMAGE_MAX_BYTES.div_ceil(3) * 4 {
+                if p.data.len() > zeren_proto::IMAGE_MAX_BYTES.div_ceil(3) * 4 {
                     return Err(RpcError::BadParams(format!(
                         "an image is at most {} MB",
-                        zeron_proto::IMAGE_MAX_BYTES / (1024 * 1024)
+                        zeren_proto::IMAGE_MAX_BYTES / (1024 * 1024)
                     )));
                 }
                 let bytes = base64::engine::general_purpose::STANDARD
@@ -5292,7 +5292,7 @@ mod tests {
         assert!(second.voice.owns_chat("chat"));
         assert_eq!(
             second.voice.reserve("other").unwrap_err(),
-            zeron_proto::voice::VoiceRejection::Busy
+            zeren_proto::voice::VoiceRejection::Busy
         );
         let owner = second.voice.own(lease).unwrap();
         core.sessions.shutdown().await;
@@ -5311,7 +5311,7 @@ mod tests {
         )
         .unwrap();
         let rpc = core.rpc_service();
-        let orchestrator = format!("{}1", zeron_proto::voice::ORCHESTRATOR_CHAT_PREFIX);
+        let orchestrator = format!("{}1", zeren_proto::voice::ORCHESTRATOR_CHAT_PREFIX);
         for (chat, parent, expected) in [
             ("worker", orchestrator.as_str(), None),
             ("side", "ordinary", Some("ordinary")),
@@ -5341,7 +5341,7 @@ mod tests {
         )
         .unwrap();
         let rpc = core.rpc_service();
-        use zeron_proto::ChildKind;
+        use zeren_proto::ChildKind;
         for (chat, parent, kind, expected) in [
             ("sub", Some("main"), Some("subagent"), Some(ChildKind::Subagent)),
             ("side", Some("main"), Some("side"), Some(ChildKind::Side)),
@@ -5410,13 +5410,13 @@ mod tests {
     #[cfg(unix)]
     async fn installer_rpc_fixture(mode: &str) {
         use std::{os::unix::fs::PermissionsExt, sync::Arc};
-        if std::env::var_os("ZERON_INSTALL_FIXTURE_CHILD").is_none() {
+        if std::env::var_os("ZEREN_INSTALL_FIXTURE_CHILD").is_none() {
             let root = tempfile::tempdir().unwrap();
             let bin = root.path().join("bin");
             std::fs::create_dir(&bin).unwrap();
             let script = match mode {
                 "success" => {
-                    "test -z \"$ZERON_INSTALL_FIXTURE_CHILD\" && test -z \"$CLAUDECODE\" && printf '#!/bin/sh\\necho 99.0.0\\n' > \"$CODEX_EXECUTABLE\" && /bin/chmod +x \"$CODEX_EXECUTABLE\""
+                    "test -z \"$ZEREN_INSTALL_FIXTURE_CHILD\" && test -z \"$CLAUDECODE\" && printf '#!/bin/sh\\necho 99.0.0\\n' > \"$CODEX_EXECUTABLE\" && /bin/chmod +x \"$CODEX_EXECUTABLE\""
                 }
                 "failure" => "echo 'fixture failure api_key=private' >&2; exit 7",
                 "missing" => "exit 0",
@@ -5427,9 +5427,9 @@ mod tests {
             let test = format!("rpc::tests::installer_rpc_{mode}");
             let output = tokio::process::Command::new(std::env::current_exe().unwrap())
                 .args(["--exact", &test, "--nocapture", "--include-ignored"])
-                .env("ZERON_INSTALL_FIXTURE_CHILD", root.path())
-                .env("ZERON_INSTALLER_COMMAND_CODEX", script)
-                .env("ZERON_NO_LOGIN_SHELL", "1")
+                .env("ZEREN_INSTALL_FIXTURE_CHILD", root.path())
+                .env("ZEREN_INSTALLER_COMMAND_CODEX", script)
+                .env("ZEREN_NO_LOGIN_SHELL", "1")
                 .env("HOME", root.path())
                 .env("XDG_CONFIG_HOME", root.path().join("config"))
                 .env("CODEX_EXECUTABLE", bin.join("codex"))
@@ -5458,9 +5458,9 @@ mod tests {
             return;
         }
         let root =
-            std::path::PathBuf::from(std::env::var_os("ZERON_INSTALL_FIXTURE_CHILD").unwrap());
+            std::path::PathBuf::from(std::env::var_os("ZEREN_INSTALL_FIXTURE_CHILD").unwrap());
         let registry = Arc::new(HarnessRegistry::new());
-        registry.register(Arc::new(zeron_harness::CodexHarness::new()));
+        registry.register(Arc::new(zeren_harness::CodexHarness::new()));
         let core = crate::EngineCore::assemble(
             &root.join("engine"),
             registry.clone(),
@@ -5566,8 +5566,8 @@ mod tests {
         use sha2::{Digest, Sha512};
         use std::io::Write;
         use tokio::io::{AsyncReadExt, AsyncWriteExt};
-        use zeron_harness::archive_install::{ArchivePin, ensure_installed, installed_entry};
-        if std::env::var_os("ZERON_INSTALL_RPC_TEST").is_none() {
+        use zeren_harness::archive_install::{ArchivePin, ensure_installed, installed_entry};
+        if std::env::var_os("ZEREN_INSTALL_RPC_TEST").is_none() {
             let root = tempfile::tempdir().unwrap();
             let output = tokio::process::Command::new(std::env::current_exe().unwrap())
                 .args([
@@ -5575,8 +5575,8 @@ mod tests {
                     "rpc::tests::explicit_install_rpc_verifies_archive_and_refreshes_descriptors",
                     "--nocapture",
                 ])
-                .env("ZERON_INSTALL_RPC_TEST", "1")
-                .env("ZERON_ADAPTERS_DIR", root.path())
+                .env("ZEREN_INSTALL_RPC_TEST", "1")
+                .env("ZEREN_ADAPTERS_DIR", root.path())
                 .output()
                 .await
                 .unwrap();
@@ -5588,7 +5588,7 @@ mod tests {
             );
             return;
         }
-        if !zeron_harness::acp::can_install(HarnessId::Antigravity) {
+        if !zeren_harness::acp::can_install(HarnessId::Antigravity) {
             return;
         }
         let mut zip = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
@@ -5677,23 +5677,23 @@ mod tests {
         use crate::doc_host::{DocHost, DocHostConfig};
         use std::sync::Arc;
         let dir = tempfile::tempdir().unwrap();
-        let store = Arc::new(zeron_sync::DocsStore::open(dir.path()).unwrap());
+        let store = Arc::new(zeren_sync::DocsStore::open(dir.path()).unwrap());
         let host = DocHost::new(
             store,
             DocHostConfig {
                 device_id: "viewer".into(),
-                default_harness: zeron_proto::HarnessId::Mock,
+                default_harness: zeren_proto::HarnessId::Mock,
                 edge: None,
             },
         );
         let handle = host.open("whale").unwrap();
         handle
             .doc()
-            .push_message(&zeron_doc::SessionMessageEntry {
+            .push_message(&zeren_doc::SessionMessageEntry {
                 id: "turn".into(),
-                role: zeron_doc::MessageRole::Assistant,
+                role: zeren_doc::MessageRole::Assistant,
                 parts: (0..500)
-                    .map(|i| zeron_doc::MessagePart::Text {
+                    .map(|i| zeren_doc::MessagePart::Text {
                         id: format!("part-{i}"),
                         text: "local text".into(),
                     })
@@ -5747,8 +5747,8 @@ mod tests {
             .unwrap();
         let mut entries = Vec::new();
         for value in [full, live] {
-            let update: zeron_doc::TranscriptUpdate = serde_json::from_value(value).unwrap();
-            zeron_doc::apply_transcript_frame(&mut entries, update.frame).unwrap();
+            let update: zeren_doc::TranscriptUpdate = serde_json::from_value(value).unwrap();
+            zeren_doc::apply_transcript_frame(&mut entries, update.frame).unwrap();
         }
         assert_eq!(entries.len(), 3);
         assert_eq!(entries.last().unwrap().id, "live");
@@ -5760,10 +5760,10 @@ mod tests {
         let registry = HarnessRegistry::new();
         let executable = std::env::current_exe().unwrap();
         registry.register(std::sync::Arc::new(
-            zeron_harness::AcpHarness::grok().with_executable(executable.clone()),
+            zeren_harness::AcpHarness::grok().with_executable(executable.clone()),
         ));
         registry.register(std::sync::Arc::new(
-            zeron_harness::AcpHarness::antigravity().with_executable(executable),
+            zeren_harness::AcpHarness::antigravity().with_executable(executable),
         ));
         registry.set_enabled(HarnessId::Antigravity, true).unwrap();
 
@@ -5807,7 +5807,7 @@ mod tests {
         .expect("sidebar preferences params");
         assert!(matches!(
             p,
-            MutateParams::ChangeSidebarPin { change: zeron_proto::SidebarPinChange::Move { session_id, before, .. } }
+            MutateParams::ChangeSidebarPin { change: zeren_proto::SidebarPinChange::Move { session_id, before, .. } }
                 if session_id == "chat-b" && before.as_deref() == Some("chat-a")
         ));
     }
@@ -5954,7 +5954,7 @@ mod tests {
     fn chat_image_folders_fail_closed() {
         let home = tempfile::tempdir().unwrap();
         let project = home.path().join("code").join("app");
-        let data = home.path().join(".zeron");
+        let data = home.path().join(".zeren");
         let scratch_root = data.join("scratch");
         std::fs::create_dir_all(&project).unwrap();
         std::fs::create_dir_all(scratch_root.join("2026-10-25-a1b2c3d4")).unwrap();
@@ -5970,7 +5970,7 @@ mod tests {
             Ok(project.clone())
         );
         assert_eq!(
-            folder(Some("~/.zeron/scratch/2026-10-25-a1b2c3d4")),
+            folder(Some("~/.zeren/scratch/2026-10-25-a1b2c3d4")),
             Ok(scratch_root.join("2026-10-25-a1b2c3d4"))
         );
         let text = |path: &std::path::Path| path.to_string_lossy().into_owned();
@@ -5988,16 +5988,16 @@ mod tests {
             (Some("relative/app"), "not an absolute path"),
             (Some(missing.as_str()), "doesn't exist"),
             (
-                Some("~/.zeron/scratch/2026-10-25-zzzz9999"),
+                Some("~/.zeren/scratch/2026-10-25-zzzz9999"),
                 "doesn't exist",
             ),
             (Some(home_text.as_str()), "home folder, above it"),
             (Some(above_home.as_str()), "home folder, above it"),
             (Some(root.as_str()), "home folder, above it"),
-            (Some(data_text.as_str()), "around Zeron's data"),
-            (Some(scratch_text.as_str()), "around Zeron's data"),
-            (Some("~/.zeron/scratch/."), "around Zeron's data"),
-            (Some("~/.zeron/scratch/.."), "around Zeron's data"),
+            (Some(data_text.as_str()), "around Zeren's data"),
+            (Some(scratch_text.as_str()), "around Zeren's data"),
+            (Some("~/.zeren/scratch/."), "around Zeren's data"),
+            (Some("~/.zeren/scratch/.."), "around Zeren's data"),
         ] {
             let error = folder(cwd).expect_err(&format!("{cwd:?}"));
             assert!(error.contains(why), "{cwd:?}: {error}");
@@ -6109,14 +6109,14 @@ mod context_usage_tests {
     #[tokio::test]
     async fn replay_cutoff_travels_with_coalesced_backfill_and_live_content() {
         use crate::doc_host::{DocHost, DocHostConfig};
-        use zeron_sync::chat_client::ChatDocSink;
+        use zeren_sync::chat_client::ChatDocSink;
         let dir = tempfile::tempdir().unwrap();
-        let store = Arc::new(zeron_sync::DocsStore::open(dir.path()).unwrap());
+        let store = Arc::new(zeren_sync::DocsStore::open(dir.path()).unwrap());
         let host = DocHost::new(
             store.clone(),
             DocHostConfig {
                 device_id: "viewer".into(),
-                default_harness: zeron_proto::HarnessId::Mock,
+                default_harness: zeren_proto::HarnessId::Mock,
                 edge: None,
             },
         );
@@ -6124,23 +6124,23 @@ mod context_usage_tests {
         let sink = crate::chat2_host::EngineChatSink::new(&handle.doc_arc(), store, "replay-chat")
             .with_handle(Arc::downgrade(&handle));
         let mut stream = doc_messages_stream(handle.watch_messages(), handle.doc_arc());
-        let first: zeron_doc::TranscriptUpdate =
+        let first: zeren_doc::TranscriptUpdate =
             serde_json::from_value(stream.next().await.unwrap()).unwrap();
         assert!(first.replay_baseline.unwrap().entries.is_empty());
 
-        let source = zeron_doc::SessionDoc::init("replay-chat").unwrap();
+        let source = zeren_doc::SessionDoc::init("replay-chat").unwrap();
         let append = |id: &str| {
             source
-                .push_message(&zeron_doc::SessionMessageEntry {
+                .push_message(&zeren_doc::SessionMessageEntry {
                     id: id.into(),
-                    role: zeron_doc::MessageRole::Assistant,
-                    parts: vec![zeron_doc::MessagePart::Text {
+                    role: zeren_doc::MessageRole::Assistant,
+                    parts: vec![zeren_doc::MessagePart::Text {
                         id: "text".into(),
                         text: id.into(),
                     }],
                     created_at: 0,
                     device_id: "writer".into(),
-                    status: Some(zeron_doc::MessageStatus::Streaming),
+                    status: Some(zeren_doc::MessageStatus::Streaming),
                     continuation_of: None,
                     duration_ms: None,
                 })
@@ -6149,7 +6149,7 @@ mod context_usage_tests {
         append("cached");
         sink.apply_checkpoint(&source.export_snapshot().unwrap(), 0)
             .unwrap();
-        let checkpoint: zeron_doc::TranscriptUpdate = serde_json::from_value(
+        let checkpoint: zeren_doc::TranscriptUpdate = serde_json::from_value(
             tokio::time::timeout(std::time::Duration::from_secs(2), stream.next())
                 .await
                 .unwrap()
@@ -6184,7 +6184,7 @@ mod context_usage_tests {
         );
         // Neither the doc worker nor the RPC consumer ran between these
         // imports. They must not flatten their different presentation origins.
-        let update: zeron_doc::TranscriptUpdate = serde_json::from_value(
+        let update: zeren_doc::TranscriptUpdate = serde_json::from_value(
             tokio::time::timeout(std::time::Duration::from_secs(2), stream.next())
                 .await
                 .unwrap()
@@ -6195,8 +6195,8 @@ mod context_usage_tests {
         assert!(cutoff.entries.contains_key("away"));
         assert!(!cutoff.entries.contains_key("live"));
         let mut entries = vec![];
-        zeron_doc::apply_transcript_frame(&mut entries, checkpoint.frame).unwrap();
-        zeron_doc::apply_transcript_frame(&mut entries, update.frame).unwrap();
+        zeren_doc::apply_transcript_frame(&mut entries, checkpoint.frame).unwrap();
+        zeren_doc::apply_transcript_frame(&mut entries, update.frame).unwrap();
         assert_eq!(entries.len(), 3);
 
         let version = source.doc().oplog_vv();
@@ -6208,7 +6208,7 @@ mod context_usage_tests {
                 .unwrap(),
             3,
         );
-        let update: zeron_doc::TranscriptUpdate = serde_json::from_value(
+        let update: zeren_doc::TranscriptUpdate = serde_json::from_value(
             tokio::time::timeout(std::time::Duration::from_secs(2), stream.next())
                 .await
                 .unwrap()
@@ -6220,7 +6220,7 @@ mod context_usage_tests {
             "live updates must not resend the history watermark"
         );
         let mut reopened = doc_messages_stream(handle.watch_messages(), handle.doc_arc());
-        let opening: zeron_doc::TranscriptUpdate =
+        let opening: zeren_doc::TranscriptUpdate =
             serde_json::from_value(reopened.next().await.unwrap()).unwrap();
         assert_eq!(
             opening.replay_baseline.unwrap().entries.len(),
@@ -6233,14 +6233,14 @@ mod context_usage_tests {
     #[tokio::test]
     async fn replay_metadata_and_backfill_leave_interleaved_local_content_live() {
         use crate::doc_host::{DocHost, DocHostConfig};
-        use zeron_sync::chat_client::ChatDocSink;
+        use zeren_sync::chat_client::ChatDocSink;
         let dir = tempfile::tempdir().unwrap();
-        let store = Arc::new(zeron_sync::DocsStore::open(dir.path()).unwrap());
+        let store = Arc::new(zeren_sync::DocsStore::open(dir.path()).unwrap());
         let host = DocHost::new(
             store.clone(),
             DocHostConfig {
                 device_id: "host".into(),
-                default_harness: zeron_proto::HarnessId::Mock,
+                default_harness: zeren_proto::HarnessId::Mock,
                 edge: None,
             },
         );
@@ -6249,26 +6249,26 @@ mod context_usage_tests {
             .with_handle(Arc::downgrade(&handle));
         let mut stream = doc_messages_stream(handle.watch_messages(), handle.doc_arc());
         stream.next().await.unwrap();
-        let source = zeron_doc::SessionDoc::init("interleaved").unwrap();
+        let source = zeren_doc::SessionDoc::init("interleaved").unwrap();
         sink.apply_checkpoint(&source.export_snapshot().unwrap(), 0)
             .unwrap();
-        let entry = |id: &str| zeron_doc::SessionMessageEntry {
+        let entry = |id: &str| zeren_doc::SessionMessageEntry {
             id: id.into(),
-            role: zeron_doc::MessageRole::Assistant,
-            parts: vec![zeron_doc::MessagePart::Text {
+            role: zeren_doc::MessageRole::Assistant,
+            parts: vec![zeren_doc::MessagePart::Text {
                 id: "text".into(),
                 text: id.into(),
             }],
             created_at: 0,
             device_id: "host".into(),
-            status: Some(zeron_doc::MessageStatus::Streaming),
+            status: Some(zeren_doc::MessageStatus::Streaming),
             continuation_of: None,
             duration_ms: None,
         };
         handle.doc().push_message(&entry("local-before")).unwrap();
         source.update_context_usage(Some(10), Some(100)).unwrap();
         sink.apply_replay_row(&source.export_snapshot().unwrap(), 1);
-        let update: zeron_doc::TranscriptUpdate = serde_json::from_value(
+        let update: zeren_doc::TranscriptUpdate = serde_json::from_value(
             tokio::time::timeout(std::time::Duration::from_secs(2), stream.next())
                 .await
                 .unwrap()
@@ -6280,7 +6280,7 @@ mod context_usage_tests {
             "metadata must not reset ongoing live animations"
         );
         let mut entries = vec![];
-        zeron_doc::apply_transcript_frame(&mut entries, update.frame).unwrap();
+        zeren_doc::apply_transcript_frame(&mut entries, update.frame).unwrap();
         assert_eq!(entries[0].id, "local-before");
         let version = source.doc().oplog_vv();
         source.push_message(&entry("historical")).unwrap();
@@ -6293,7 +6293,7 @@ mod context_usage_tests {
             2,
         );
         handle.doc().push_message(&entry("local-after")).unwrap();
-        let update: zeron_doc::TranscriptUpdate = serde_json::from_value(
+        let update: zeren_doc::TranscriptUpdate = serde_json::from_value(
             tokio::time::timeout(std::time::Duration::from_secs(2), stream.next())
                 .await
                 .unwrap()
@@ -6303,7 +6303,7 @@ mod context_usage_tests {
         let baseline = update.replay_baseline.unwrap();
         assert_eq!(baseline.entries.len(), 1);
         assert!(baseline.entries.contains_key("historical"));
-        zeron_doc::apply_transcript_frame(&mut entries, update.frame).unwrap();
+        zeren_doc::apply_transcript_frame(&mut entries, update.frame).unwrap();
         assert_eq!(entries.len(), 4);
         host.shutdown_workers().await;
     }
@@ -6311,14 +6311,14 @@ mod context_usage_tests {
     #[tokio::test]
     async fn replay_preserves_each_watchers_opening_cutoff_without_consuming_live_text() {
         use crate::doc_host::{DocHost, DocHostConfig};
-        use zeron_sync::chat_client::ChatDocSink;
+        use zeren_sync::chat_client::ChatDocSink;
         let dir = tempfile::tempdir().unwrap();
-        let store = Arc::new(zeron_sync::DocsStore::open(dir.path()).unwrap());
+        let store = Arc::new(zeren_sync::DocsStore::open(dir.path()).unwrap());
         let host = DocHost::new(
             store.clone(),
             DocHostConfig {
                 device_id: "viewer".into(),
-                default_harness: zeron_proto::HarnessId::Mock,
+                default_harness: zeren_proto::HarnessId::Mock,
                 edge: None,
             },
         );
@@ -6326,9 +6326,9 @@ mod context_usage_tests {
         let sink =
             crate::chat2_host::EngineChatSink::new(&handle.doc_arc(), store, "cached-replay")
                 .with_handle(Arc::downgrade(&handle));
-        let source = zeron_doc::SessionDoc::init("cached-replay").unwrap();
-        let mut writer = zeron_doc::SegmentWriter::begin(&source, "reply", "host", 0).unwrap();
-        let text = |id: &str, value: &str| zeron_doc::MessagePart::Text {
+        let source = zeren_doc::SessionDoc::init("cached-replay").unwrap();
+        let mut writer = zeren_doc::SegmentWriter::begin(&source, "reply", "host", 0).unwrap();
+        let text = |id: &str, value: &str| zeren_doc::MessagePart::Text {
             id: id.into(),
             text: value.into(),
         };
@@ -6339,7 +6339,7 @@ mod context_usage_tests {
         // Cached content exists before the first watcher and never enters
         // the changed-parts tracker. It may not have been painted yet.
         let mut first = doc_messages_stream(handle.watch_messages(), handle.doc_arc());
-        let opening: zeron_doc::TranscriptUpdate =
+        let opening: zeren_doc::TranscriptUpdate =
             serde_json::from_value(first.next().await.unwrap()).unwrap();
         assert_eq!(
             opening.replay_baseline.unwrap().entries["reply"]["body"],
@@ -6349,7 +6349,7 @@ mod context_usage_tests {
         let live = text("body", "café histórico y nuevo");
         writer.sync(&[live.clone()]).unwrap();
         sink.apply_row(&source.export_snapshot().unwrap(), 1);
-        let update: zeron_doc::TranscriptUpdate = serde_json::from_value(
+        let update: zeren_doc::TranscriptUpdate = serde_json::from_value(
             tokio::time::timeout(std::time::Duration::from_secs(2), first.next())
                 .await
                 .unwrap()
@@ -6360,7 +6360,7 @@ mod context_usage_tests {
         // A later subscriber sees a longer historical prefix, but must not
         // change the first subscriber's ongoing live animation.
         let mut second = doc_messages_stream(handle.watch_messages(), handle.doc_arc());
-        let opening: zeron_doc::TranscriptUpdate =
+        let opening: zeren_doc::TranscriptUpdate =
             serde_json::from_value(second.next().await.unwrap()).unwrap();
         assert_eq!(
             opening.replay_baseline.unwrap().entries["reply"]["body"],
@@ -6377,7 +6377,7 @@ mod context_usage_tests {
                 (&mut first, "café histórico".len()),
                 (&mut second, "café histórico y nuevo".len()),
             ] {
-                let update: zeron_doc::TranscriptUpdate = serde_json::from_value(
+                let update: zeren_doc::TranscriptUpdate = serde_json::from_value(
                     tokio::time::timeout(std::time::Duration::from_secs(2), stream.next())
                         .await
                         .unwrap()
@@ -6403,23 +6403,23 @@ mod context_usage_tests {
     #[tokio::test]
     async fn reopening_rearms_history_for_previously_live_text() {
         use crate::doc_host::{DocHost, DocHostConfig};
-        use zeron_sync::chat_client::ChatDocSink;
+        use zeren_sync::chat_client::ChatDocSink;
         let dir = tempfile::tempdir().unwrap();
-        let store = Arc::new(zeron_sync::DocsStore::open(dir.path()).unwrap());
+        let store = Arc::new(zeren_sync::DocsStore::open(dir.path()).unwrap());
         let host = DocHost::new(
             store.clone(),
             DocHostConfig {
                 device_id: "viewer".into(),
-                default_harness: zeron_proto::HarnessId::Mock,
+                default_harness: zeren_proto::HarnessId::Mock,
                 edge: None,
             },
         );
         let handle = host.open("reopen").unwrap();
         let sink = crate::chat2_host::EngineChatSink::new(&handle.doc_arc(), store, "reopen")
             .with_handle(Arc::downgrade(&handle));
-        let source = zeron_doc::SessionDoc::init("reopen").unwrap();
-        let mut writer = zeron_doc::SegmentWriter::begin(&source, "reply", "host", 0).unwrap();
-        let part = |text: &str| zeron_doc::MessagePart::Text {
+        let source = zeren_doc::SessionDoc::init("reopen").unwrap();
+        let mut writer = zeren_doc::SegmentWriter::begin(&source, "reply", "host", 0).unwrap();
+        let part = |text: &str| zeren_doc::MessagePart::Text {
             id: "body".into(),
             text: text.into(),
         };
@@ -6438,7 +6438,7 @@ mod context_usage_tests {
         stream.next().await.unwrap();
         writer.sync(&[part("live plus recovered")]).unwrap();
         sink.apply_replay_row(&source.export_snapshot().unwrap(), 2);
-        let update: zeron_doc::TranscriptUpdate = serde_json::from_value(
+        let update: zeren_doc::TranscriptUpdate = serde_json::from_value(
             tokio::time::timeout(std::time::Duration::from_secs(2), stream.next())
                 .await
                 .unwrap()
@@ -6454,11 +6454,11 @@ mod context_usage_tests {
 
     #[tokio::test]
     async fn context_only_commits_reach_remote_watch_and_reconnect() {
-        let host = zeron_doc::SessionDoc::init("context-chat").unwrap();
+        let host = zeren_doc::SessionDoc::init("context-chat").unwrap();
         host.update_context_usage(Some(42000), Some(200000))
             .unwrap();
         // The viewing engine reads a replicated document, with no harness process.
-        let remote = Arc::new(zeron_doc::SessionDoc::from_doc(loro::LoroDoc::new()));
+        let remote = Arc::new(zeren_doc::SessionDoc::from_doc(loro::LoroDoc::new()));
         remote
             .doc()
             .import(&host.export_snapshot().unwrap())

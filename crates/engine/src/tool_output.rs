@@ -2,14 +2,14 @@
 //! read from the run journal of the device that ran it.
 //!
 //! The chat's doc keeps only a command's last few lines
-//! ([`zeron_doc::command_output_tail`]); the whole output never syncs
+//! ([`zeren_doc::command_output_tail`]); the whole output never syncs
 //! (docs/chat2-sync.md A1). A reader who expands a command asks its host for
 //! the rest, and the host answers from its own journal:
 //!
 //! - only a command's (`ToolCall::Exec`) output, never another tool's (file
 //!   reads, searches, fetches and MCP results stay on the host);
 //! - made safe to leave the host exactly as the doc's tail is
-//!   ([`zeron_doc::command_output_end`]): redacted before it is cut, and a
+//!   ([`zeren_doc::command_output_end`]): redacted before it is cut, and a
 //!   command that prints secrets by nature answers only the withheld note;
 //! - its last [`TOOL_OUTPUT_MAX_BYTES`], from a line's start, `trimmed` when
 //!   earlier output was let go;
@@ -20,7 +20,7 @@
 //! where the subagent's tools are recorded. A chat whose journal is gone (an
 //! old one, or one imported without it) answers [`ToolOutputError::NotAvailable`].
 
-use zeron_proto::{TOOL_OUTPUT_CHUNK_BYTES, TOOL_OUTPUT_MAX_BYTES, ToolCall, ToolOutputChunk};
+use zeren_proto::{TOOL_OUTPUT_CHUNK_BYTES, TOOL_OUTPUT_MAX_BYTES, ToolCall, ToolOutputChunk};
 
 use crate::run_journal::{JournalError, RunJournal};
 
@@ -62,7 +62,7 @@ pub fn read(
     };
     let result = exchange.result.ok_or(ToolOutputError::NotFinished)?;
     let whole = result.output.as_deref().and_then(|output| {
-        zeron_doc::command_output_end(command, output, usize::MAX, TOOL_OUTPUT_MAX_BYTES)
+        zeren_doc::command_output_end(command, output, usize::MAX, TOOL_OUTPUT_MAX_BYTES)
     });
     let (text, lines, trimmed) = match whole {
         Some(end) => (end.text, end.lines, end.truncated),
@@ -91,7 +91,7 @@ pub fn read(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zeron_proto::{AgentEvent, DoneStatus};
+    use zeren_proto::{AgentEvent, DoneStatus};
 
     fn call(id: &str, call: ToolCall) -> AgentEvent {
         AgentEvent::ToolCall {
@@ -171,8 +171,8 @@ mod tests {
         assert_eq!(last.exit_code, Some(0));
         assert!(!last.trimmed);
         // The doc kept ten of those lines and said how many there are.
-        let tail = zeron_doc::command_output_tail("cargo test", &output).unwrap();
-        assert_eq!(tail.text.lines().count(), zeron_doc::COMMAND_TAIL_MAX_LINES);
+        let tail = zeren_doc::command_output_tail("cargo test", &output).unwrap();
+        assert_eq!(tail.text.lines().count(), zeren_doc::COMMAND_TAIL_MAX_LINES);
         assert_eq!(tail.lines, last.lines);
     }
 
@@ -218,7 +218,7 @@ mod tests {
         // Exactly what the doc's tail would keep of it.
         assert_eq!(
             text,
-            zeron_proto::redact::redact_command_output(output).trim_end()
+            zeren_proto::redact::redact_command_output(output).trim_end()
         );
     }
 
@@ -233,7 +233,7 @@ mod tests {
             ),
         ]);
         let chunk = read(&journal, "chat-1", "t1", 0).unwrap();
-        assert_eq!(chunk.text, zeron_proto::redact::SECRET_OUTPUT_WITHHELD);
+        assert_eq!(chunk.text, zeren_proto::redact::SECRET_OUTPUT_WITHHELD);
         assert!(chunk.done && !chunk.trimmed);
         assert_eq!(chunk.exit_code, Some(0));
     }

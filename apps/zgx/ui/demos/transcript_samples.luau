@@ -21,7 +21,7 @@ index out of bounds: the len is 41 but the index is 41
 stack backtrace:
    0: rust_begin_unwind
    1: core::panicking::panic_fmt
-   2: zeron_ui::transcript::TranscriptView::render_rows
+   2: zeren_ui::transcript::TranscriptView::render_rows
    3: gpui::view::AnyView::render
 ```
 
@@ -56,7 +56,7 @@ ui.div {
 	w = 6,
 	h = 6,
 	rounded = 3,
-	bg = "$zeron.status.dot.working",
+	bg = "$zeren.status.dot.working",
 	opacity = ui.loop { from = 0.4, to = 1, duration = 1200 },
 }
 ```
@@ -176,7 +176,7 @@ Next: replies.]],
 	[[No. The reply's text is committed on its own timer, about 30 times a second, and each commit parses only the text added since the last one. The display then draws at its own rate.
 
 - Faster commits make no visible difference above roughly 30 a second.
-- Slower ones (Zeron's 8 a second) make the text arrive in visible lumps.
+- Slower ones (Zeren's 8 a second) make the text arrive in visible lumps.
 
 So the cadence is fixed, and the cost of each commit is the size of what arrived, not the size of the reply.]],
 }
@@ -213,10 +213,10 @@ local TOOLS: { { { any } } } = {
 		{ "read", "Read", "crates/ui/src/transcript.rs" },
 		{ "agent", "Asked a subagent to", "reproduce the panic on a second chat switch" },
 		{ "edit", "Edited", "crates/ui/src/transcript.rs", 23, 9 },
-		{ "exec", "Ran", "cargo test -p zeron-ui fold_" },
+		{ "exec", "Ran", "cargo test -p zeren-ui fold_" },
 		{ "todo", "Updated", "the plan" },
 	},
-	{ { "edit", "Edited", "ds/themes/zeron-light.json", 1, 1 } },
+	{ { "edit", "Edited", "ds/themes/zeren-light.json", 1, 1 } },
 	{
 		{ "read", "Read", "crates/ui/src/transcript.rs" },
 		{ "write", "Wrote", "ds/user_message.luau", 118 },

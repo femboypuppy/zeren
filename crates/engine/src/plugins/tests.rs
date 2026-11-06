@@ -27,7 +27,7 @@ async fn call(
     method: &str,
     params: serde_json::Value,
 ) -> Result<serde_json::Value, String> {
-    // Allowing and signing as Zeron's consent window does: with a review.
+    // Allowing and signing as Zeren's consent window does: with a review.
     let params = super::authority_tests::as_consent_window(plugins, method, params).await;
     match plugins.dispatch(method, params).await {
         Ok(RpcReply::Value(value)) => Ok(value),
@@ -84,16 +84,16 @@ async fn plugins_new_plugin_scaffolds_signs_and_is_on() {
     let dir = f.plugins.plugins_dir().join("hello");
     let init = std::fs::read_to_string(dir.join("init.luau")).unwrap();
     assert!(
-        init.starts_with("local zeron = require(\"./zeron\")(\"hello\")"),
+        init.starts_with("local zeren = require(\"./zeren\")(\"hello\")"),
         "{init}"
     );
     assert_eq!(
-        std::fs::read_to_string(dir.join("zeron.luau")).unwrap(),
+        std::fs::read_to_string(dir.join("zeren.luau")).unwrap(),
         scaffold::SDK
     );
     let snapshot = PathBuf::from(made["snapshot"].as_str().unwrap());
     assert!(snapshot.join("init.luau").is_file());
-    assert!(snapshot.join("zeron.luau").is_file());
+    assert!(snapshot.join("zeren.luau").is_file());
     assert!(snapshot.join(MANIFEST_FILE).is_file());
     // Its words, in English, signed and snapshotted with the rest.
     let english: serde_json::Value =
@@ -119,10 +119,10 @@ async fn plugins_new_plugin_scaffolds_signs_and_is_on() {
     let reserved = call(
         &f.plugins,
         methods::NEW_PLUGIN,
-        serde_json::json!({ "id": "zeron", "name": "Z" }),
+        serde_json::json!({ "id": "zeren", "name": "Z" }),
     )
     .await;
-    assert_eq!(reserved.unwrap_err(), "Zeron already uses that name");
+    assert_eq!(reserved.unwrap_err(), "Zeren already uses that name");
     assert!(
         call(
             &f.plugins,
@@ -551,7 +551,7 @@ async fn plugins_list_is_sorted_and_reports_broken() {
     };
     assert_eq!(by_id("bad")["status"], "broken");
     assert!(by_id("bad")["error"].as_str().unwrap().contains("native"));
-    assert_eq!(by_id("app")["error"], "Zeron already uses that name");
+    assert_eq!(by_id("app")["error"], "Zeren already uses that name");
     #[cfg(unix)]
     assert_eq!(by_id("linky")["error"], files::LINK_ERROR);
     assert!(
@@ -673,7 +673,7 @@ async fn allowed_plugin(f: &Fixture, id: &str, extra: serde_json::Value) -> serd
 async fn plugins_tools_through_the_broker_over_rpc() {
     struct Service(Plugins);
     #[async_trait::async_trait]
-    impl zeron_rpc::RpcService for Service {
+    impl zeren_rpc::RpcService for Service {
         async fn handle(
             &self,
             method: &str,
@@ -694,7 +694,7 @@ async fn plugins_tools_through_the_broker_over_rpc() {
     )
     .await;
     assert_eq!(on["status"], "on");
-    let client = Arc::new(zeron_rpc::memory_client(Arc::new(Service(
+    let client = Arc::new(zeren_rpc::memory_client(Arc::new(Service(
         f.plugins.clone(),
     ))));
     let tools = client
@@ -719,7 +719,7 @@ async fn plugins_tools_through_the_broker_over_rpc() {
         )
         .await
         .unwrap_err();
-    assert!(closed.to_string().starts_with("Open Zeron on "), "{closed}");
+    assert!(closed.to_string().starts_with("Open Zeren on "), "{closed}");
     assert!(closed.to_string().ends_with(" to use count_words"));
     let unknown = client
         .call(
@@ -1031,7 +1031,7 @@ async fn plugins_watch_plugins_emits_at_once_then_on_change() {
 }
 
 #[tokio::test]
-async fn plugins_zeron_s_own_are_allowed_what_they_ask_turn_off_and_never_go() {
+async fn plugins_zeren_s_own_are_allowed_what_they_ask_turn_off_and_never_go() {
     let f = fixture();
     let shipped = f.data.join("app-plugins");
     std::fs::create_dir_all(&shipped).unwrap();
@@ -1043,8 +1043,8 @@ async fn plugins_zeron_s_own_are_allowed_what_they_ask_turn_off_and_never_go() {
         .unwrap();
     let list = call(&f.plugins, methods::LIST_PLUGINS, serde_json::json!({})).await.unwrap();
     let all = list["plugins"].as_array().unwrap();
-    let theirs = all.iter().find(|p| p["id"] == "github" && p["builtin"] == true).expect("Zeron's");
-    assert_eq!(theirs["author"]["kind"], "zeron");
+    let theirs = all.iter().find(|p| p["id"] == "github" && p["builtin"] == true).expect("Zeren's");
+    assert_eq!(theirs["author"]["kind"], "zeren");
     assert_eq!(theirs["status"], "on");
     assert_eq!(theirs["allowed"], serde_json::json!(["github", "ui.add"]));
     assert!(theirs["snapshot"].is_string(), "on means a snapshot to load: {theirs}");
@@ -1066,9 +1066,9 @@ async fn plugins_zeron_s_own_are_allowed_what_they_ask_turn_off_and_never_go() {
 }
 
 #[tokio::test]
-async fn plugins_zeron_s_own_load_from_the_app_s_folder_with_none_of_yours_beside_it() {
+async fn plugins_zeren_s_own_load_from_the_app_s_folder_with_none_of_yours_beside_it() {
     // (The test above has a folder of yours by the same name, which hid that
-    // the snapshot was copied from `<data>/plugins/<id>`: Zeron's own never
+    // the snapshot was copied from `<data>/plugins/<id>`: Zeren's own never
     // had one, so it never loaded.)
     let f = fixture();
     let shipped = f.data.join("app-plugins");
@@ -1112,7 +1112,7 @@ async fn plugins_install_from_a_package_waits_for_consent_unless_yours() {
     let f = fixture();
     let fake = Arc::new(FakeDirectory::default());
     let ada = someone(&f, &fake, "ada");
-    let path = package_file(&f, "focus.zeron-plugin", &signed_package(&ada, "focus", "1.0.0", &["ui.add"], "return 1"));
+    let path = package_file(&f, "focus.zeren-plugin", &signed_package(&ada, "focus", "1.0.0", &["ui.add"], "return 1"));
     let installed = call(&f.plugins, methods::INSTALL_PLUGIN, serde_json::json!({ "path": path })).await.unwrap();
     assert_eq!(installed["update"], false);
     assert_eq!(installed["waiting"], true, "{installed}");
@@ -1130,7 +1130,7 @@ async fn plugins_install_from_a_package_waits_for_consent_unless_yours() {
 
     // Signed by this device's key: on at once, no asking.
     let own = signing::load_or_create_key(&f.data).unwrap();
-    let path = package_file(&f, "mine.zeron-plugin", &signed_package(&own, "mine", "1.0.0", &["ui.add", "links.open"], "return 1"));
+    let path = package_file(&f, "mine.zeren-plugin", &signed_package(&own, "mine", "1.0.0", &["ui.add", "links.open"], "return 1"));
     let mine = call(&f.plugins, methods::INSTALL_PLUGIN, serde_json::json!({ "path": path })).await.unwrap();
     assert_eq!((mine["plugin"]["status"].as_str(), mine["waiting"].as_bool()), (Some("on"), Some(false)), "{mine}");
     assert_eq!(mine["plugin"]["allowed"], serde_json::json!(["links.open", "ui.add"]));
@@ -1140,12 +1140,12 @@ async fn plugins_install_from_a_package_waits_for_consent_unless_yours() {
     let mut value: serde_json::Value =
         serde_json::from_slice(&signed_package(&ada, "evil", "1.0.0", &[], "return 1")).unwrap();
     value["files"]["init.luau"] = serde_json::json!(base64::Engine::encode(&base64::engine::general_purpose::STANDARD, b"return 2"));
-    let path = package_file(&f, "evil.zeron-plugin", &serde_json::to_vec(&value).unwrap());
+    let path = package_file(&f, "evil.zeren-plugin", &serde_json::to_vec(&value).unwrap());
     let refused = call(&f.plugins, methods::INSTALL_PLUGIN, serde_json::json!({ "path": path })).await.unwrap_err();
     assert_eq!(refused, install::WORDS.tampered);
     assert!(!f.plugins.plugins_dir().join("evil").exists());
     // Not a package at all.
-    let path = package_file(&f, "x.zeron-plugin", b"{}");
+    let path = package_file(&f, "x.zeren-plugin", b"{}");
     assert_eq!(call(&f.plugins, methods::INSTALL_PLUGIN, serde_json::json!({ "path": path })).await.unwrap_err(), install::WORDS.not_a_package);
 }
 
@@ -1154,7 +1154,7 @@ async fn plugins_updates_keep_consent_ask_for_new_permissions_and_refuse_tamperi
     let f = fixture();
     let fake = Arc::new(FakeDirectory::default());
     let ada = someone(&f, &fake, "ada");
-    let path = package_file(&f, "focus.zeron-plugin", &signed_package(&ada, "focus", "1.0.0", &["ui.add"], "return 1"));
+    let path = package_file(&f, "focus.zeren-plugin", &signed_package(&ada, "focus", "1.0.0", &["ui.add"], "return 1"));
     let installed = call(&f.plugins, methods::INSTALL_PLUGIN, serde_json::json!({ "path": path })).await.unwrap();
     call(&f.plugins, methods::DECIDE_PLUGIN, serde_json::json!({ "id": "focus", "allow": true, "hash": installed["plugin"]["hash"] }))
         .await
@@ -1214,7 +1214,7 @@ async fn plugins_an_unknown_authors_update_keeps_consent_by_key() {
     let f = fixture();
     // Signed out: no author can be checked.
     let (zed, _) = SigningKey::generate().unwrap();
-    let path = package_file(&f, "z.zeron-plugin", &signed_package(&zed, "zed", "1", &["ui.add"], "return 1"));
+    let path = package_file(&f, "z.zeren-plugin", &signed_package(&zed, "zed", "1", &["ui.add"], "return 1"));
     let installed = call(&f.plugins, methods::INSTALL_PLUGIN, serde_json::json!({ "path": path })).await.unwrap();
     assert_eq!(installed["plugin"]["author"]["kind"], "unknown");
     call(&f.plugins, methods::DECIDE_PLUGIN, serde_json::json!({ "id": "zed", "allow": true, "hash": installed["plugin"]["hash"] }))
@@ -1292,7 +1292,7 @@ async fn plugins_install_from_git_and_update_from_its_branch() {
     assert_ne!(moved.commit, source.commit, "the source follows the commit installed");
     // A folder with no plugin in it.
     let err = call(&f.plugins, methods::INSTALL_PLUGIN, serde_json::json!({ "url": url, "folder": "nothing" })).await.unwrap_err();
-    assert!(err.contains("no zeron-plugin.json"), "{err}");
+    assert!(err.contains("no zeren-plugin.json"), "{err}");
 }
 
 #[tokio::test]
@@ -1300,7 +1300,7 @@ async fn plugins_uninstall_removes_its_folder_decision_storage_and_update() {
     let f = fixture();
     let fake = Arc::new(FakeDirectory::default());
     let ada = someone(&f, &fake, "ada");
-    let path = package_file(&f, "focus.zeron-plugin", &signed_package(&ada, "focus", "1.0.0", &["ui.add"], "return 1"));
+    let path = package_file(&f, "focus.zeren-plugin", &signed_package(&ada, "focus", "1.0.0", &["ui.add"], "return 1"));
     let installed = call(&f.plugins, methods::INSTALL_PLUGIN, serde_json::json!({ "path": path })).await.unwrap();
     call(&f.plugins, methods::DECIDE_PLUGIN, serde_json::json!({ "id": "focus", "allow": true, "hash": installed["plugin"]["hash"] }))
         .await
@@ -1333,7 +1333,7 @@ async fn plugins_export_packs_a_plugin_that_installs_elsewhere() {
     let out = f.data.join("out");
     let exported = call(&f.plugins, methods::EXPORT_PLUGIN, serde_json::json!({ "id": "hello", "to": out })).await.unwrap();
     let path = PathBuf::from(exported["path"].as_str().unwrap());
-    assert_eq!(path, out.join("hello-0.1.0.zeron-plugin"));
+    assert_eq!(path, out.join("hello-0.1.0.zeren-plugin"));
     let package = install::parse(std::fs::read(&path).unwrap()).unwrap();
     assert_eq!(package.key, signing::load_key(&f.data).unwrap().public());
     // On another device of someone else's.
@@ -1354,15 +1354,15 @@ async fn theme_methods_write_this_device_s_files_and_tell_the_window() {
         Ok(RpcReply::Stream(stream)) => stream,
         _ => panic!("stream"),
     };
-    let nord = zeron_theme::builtin_registry().families.iter().flat_map(|fam| &fam.variants).find(|v| v.id == "nord").unwrap();
-    let dark = zeron_theme::catalog::Palette::of(nord).to_json(None);
+    let nord = zeren_theme::builtin_registry().families.iter().flat_map(|fam| &fam.variants).find(|v| v.id == "nord").unwrap();
+    let dark = zeren_theme::catalog::Palette::of(nord).to_json(None);
     let made = call(&f.plugins, methods::CREATE_THEME, serde_json::json!({ "name": "Ink", "dark": dark })).await.unwrap();
     assert_eq!(made["id"], "custom-ink");
     assert_eq!(told.next().await.unwrap(), serde_json::json!({ "changed": true }));
-    assert!(zeron_theme::CustomThemeLibrary::load(&f.data).unwrap().entry("custom-ink").is_some(), "in the data dir");
+    assert!(zeren_theme::CustomThemeLibrary::load(&f.data).unwrap().entry("custom-ink").is_some(), "in the data dir");
     call(&f.plugins, methods::USE_THEME, serde_json::json!({ "id": "custom-ink" })).await.unwrap();
     assert_eq!(told.next().await.unwrap(), serde_json::json!({ "changed": true }));
-    assert_eq!(zeron_theme::catalog::chosen(&f.data).dark.as_deref(), Some("custom-ink-dark"));
+    assert_eq!(zeren_theme::catalog::chosen(&f.data).dark.as_deref(), Some("custom-ink-dark"));
     // Reading tells nothing; a refusal says why and changes nothing.
     let listed = call(&f.plugins, methods::LIST_THEMES, serde_json::json!({})).await.unwrap();
     assert_eq!(listed["wearing"]["dark"]["theme"], "custom-ink");
@@ -1370,5 +1370,5 @@ async fn theme_methods_write_this_device_s_files_and_tell_the_window() {
     assert!(refused.contains("built in"), "{refused}");
     call(&f.plugins, methods::DELETE_THEME, serde_json::json!({ "id": "custom-ink" })).await.unwrap();
     assert_eq!(told.next().await.unwrap(), serde_json::json!({ "changed": true }));
-    assert!(zeron_theme::catalog::chosen(&f.data).is_empty());
+    assert!(zeren_theme::catalog::chosen(&f.data).is_empty());
 }

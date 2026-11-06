@@ -3,7 +3,7 @@
 -- window's full height, under the title bar's strip, and ends above the
 -- footer's buttons, dissolving into the window as it goes, so it is cut by
 -- nothing. Each card stands under a scrim of the window's colour
--- (`zeron.wall.scrim`: in the dark, a printed card is dimmed to the room's
+-- (`zeren.wall.scrim`: in the dark, a printed card is dimmed to the room's
 -- light and no brighter than the way on; in light the paper is near the
 -- window's own white and the scrim is clear), lifted from the one card under
 -- the pointer, which then tilts and shows its foil as a card does.
@@ -150,7 +150,7 @@ local Card = ui.component(function(p: CardProps): Node
 			holo = p.m.holo,
 			badges = p.m.badges,
 			still = p.still,
-			shadow = "$zeron.wall.shadow",
+			shadow = "$zeren.wall.shadow",
 			on_hover = hover,
 			glint = p.glint,
 		},
@@ -160,7 +160,7 @@ local Card = ui.component(function(p: CardProps): Node
 			right = 0,
 			top = 0,
 			bottom = 0,
-			rounded = "$zeron.card.radius",
+			rounded = "$zeren.card.radius",
 			overflow = "hidden",
 			-- (Wallpaper keeps its veil whole: the words stand on it.)
 			fade = if p.veiled then nil else { 0, ART_FADE },
@@ -169,7 +169,7 @@ local Card = ui.component(function(p: CardProps): Node
 			ui.div {
 				w_full = true,
 				h_full = true,
-				bg = if p.veiled then "$zeron.wall.veil" else "$zeron.wall.scrim",
+				bg = if p.veiled then "$zeren.wall.veil" else "$zeren.wall.scrim",
 				opacity = ui.tween(lift, { duration = LIFT, ease = "outQuad" }),
 			},
 		},

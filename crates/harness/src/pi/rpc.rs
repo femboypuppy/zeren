@@ -26,7 +26,7 @@ impl Client {
             .map_err(|_| HarnessError::Protocol("Pi stdin closed".into()))
     }
     pub fn request(&self, mut frame: Value) -> Result<String, HarnessError> {
-        let id = format!("zeron-{}", self.next_id.fetch_add(1, Ordering::Relaxed));
+        let id = format!("zeren-{}", self.next_id.fetch_add(1, Ordering::Relaxed));
         frame["id"] = Value::String(id.clone());
         self.send(frame)?;
         Ok(id)
@@ -123,7 +123,7 @@ impl Transport {
                 // not the whole run: drop it and pick up at the next line.
                 if bytes.len() + count > max_frame {
                     tracing::warn!(
-                        target: "zeron_harness::pi",
+                        target: "zeren_harness::pi",
                         "Pi RPC frame over {} MiB dropped",
                         max_frame / (1024 * 1024)
                     );
@@ -147,7 +147,7 @@ impl Transport {
                         // Stray output (a dependency's console.log) is not a
                         // reason to end the run.
                         None => tracing::warn!(
-                            target: "zeron_harness::pi",
+                            target: "zeren_harness::pi",
                             "unparseable Pi RPC line skipped"
                         ),
                     }

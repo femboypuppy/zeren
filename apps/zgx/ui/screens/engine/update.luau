@@ -17,7 +17,7 @@
 -- (`engine.interface`: `{ supported }`): an engine from before it (the
 -- stable app's, still running) is restarted as a stale one of this app's
 -- is, into the bundle's. One that still can't once restarted needs a newer
--- Zeron: the chip says so and opens About & updates, where turning beta off
+-- Zeren: the chip says so and opens About & updates, where turning beta off
 -- goes back to Stable.
 
 local sessions = require("@account/sessions")
@@ -80,7 +80,7 @@ end
 local function restart()
 	asked:set(true)
 	M.call_restart():after(function() end, function(err: any)
-		print(`zeron-zgx: the engine didn't restart: {err}`)
+		print(`zeren-zgx: the engine didn't restart: {err}`)
 		asked:set(false)
 	end)
 end
@@ -137,12 +137,12 @@ M.Notice = ui.component(function(): Node
 			h = ui.raw(30, "a sidebar row's height (ds/sidebar's SLOT)"),
 			shrink = 0,
 			px = "$space.2",
-			gap = "$zeron.space.tight",
+			gap = "$zeren.space.tight",
 			items = "center",
 			rounded = "$radius.lg",
-			bg = "$zeron.tone.neutral.wash",
-			hover = if mine then { bg = "$zeron.tone.neutral.edge" } else nil,
-			color = "$zeron.tone.neutral.ink",
+			bg = "$zeren.tone.neutral.wash",
+			hover = if mine then { bg = "$zeren.tone.neutral.edge" } else nil,
+			color = "$zeren.tone.neutral.ink",
 			cursor = if mine then "pointer" else nil,
 			on_click = if mine then restart else nil,
 			-- (An update's arrow while it's ours to restart, else a note.)
@@ -170,12 +170,12 @@ function M.Old(): Node
 		h = ui.raw(30, "a sidebar row's height (ds/sidebar's SLOT)"),
 		shrink = 0,
 		px = "$space.2",
-		gap = "$zeron.space.tight",
+		gap = "$zeren.space.tight",
 		items = "center",
 		rounded = "$radius.lg",
-		bg = "$zeron.tone.neutral.wash",
-		hover = { bg = "$zeron.tone.neutral.edge" },
-		color = "$zeron.tone.neutral.ink",
+		bg = "$zeren.tone.neutral.wash",
+		hover = { bg = "$zeren.tone.neutral.edge" },
+		color = "$zeren.tone.neutral.ink",
 		cursor = "pointer",
 		on_click = function()
 			local ok, route = pcall(function(): any

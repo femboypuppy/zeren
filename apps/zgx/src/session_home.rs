@@ -125,14 +125,14 @@ mod tests {
             "spaceId": "s",
             "actions": [{ "id": "a1", "name": "Dev", "command": "npm run dev", "icon": "play", "runOnWorktreeCreate": true }],
             "importableActions": [{ "name": "Test", "command": "cargo test", "icon": "test", "runOnWorktreeCreate": false }],
-            "projectFileIssue": "zeron.json: bad",
+            "projectFileIssue": "zeren.json: bad",
         });
         let out = snapshot_for_script(&snapshot);
         assert_eq!(out["actions"][0]["id"], "a1");
         assert_eq!(out["actions"][0]["setup"], true);
         assert!(out["importable"][0].get("id").is_none());
         assert_eq!(out["importable"][0]["icon"], "test");
-        assert_eq!(out["issue"], "zeron.json: bad");
+        assert_eq!(out["issue"], "zeren.json: bad");
         assert!(snapshot_for_script(&json!({ "actions": [], "importableActions": [] })).get("issue").is_none());
     }
 

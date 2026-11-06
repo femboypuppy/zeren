@@ -1,5 +1,5 @@
-//! `zeron`'s command line, for every binary that answers to it: the Zeron
-//! app (`apps/zeron`), its engine helper (`zeron-engine`) and the zgx
+//! `zeren`'s command line, for every binary that answers to it: the Zeren
+//! app (`apps/zeren`), its engine helper (`zeren-engine`) and the zgx
 //! interface (`apps/zgx`). One parser, one help text, one set of exit codes,
 //! with no engine and no interface linked in.
 //!
@@ -10,9 +10,9 @@
 //!   - a subcommand that runs the engine's code here ([`EngineCommand`]:
 //!     `headless`, `engine`, `login`, `logout`, `status`, `sync`, `quiesce`,
 //!     `mcp`, `plugin`, `template`). A binary that links the engine runs it
-//!     itself ([`Engines::InProcess`], `zeron_app::run_engine_command`); an
+//!     itself ([`Engines::InProcess`], `zeren_app::run_engine_command`); an
 //!     interface that doesn't hands the whole command line to the engine
-//!     helper beside it ([`Engines::Helper`]: `Contents/MacOS/Zeron Engine`
+//!     helper beside it ([`Engines::Helper`]: `Contents/MacOS/Zeren Engine`
 //!     in a macOS bundle), which replaces this process and runs it there.
 
 pub mod daemon;
@@ -31,14 +31,14 @@ pub use logging::{RotatingLog, init_logging, long_running_setup, open_log_file};
 
 #[derive(Parser)]
 #[command(
-    name = "zeron",
+    name = "zeren",
     version,
     about = "Multi-device controller for coding agents"
 )]
 struct Cli {
     #[command(subcommand)]
     command: Option<Command>,
-    /// Open a Zeron conversation URL.
+    /// Open a Zeren conversation URL.
     #[arg(value_name = "URL")]
     open_url: Option<String>,
     #[cfg(windows)]
@@ -50,7 +50,7 @@ struct Cli {
 enum Command {
     /// Run the engine without a UI (local-only unless a saved session enables sync).
     Headless,
-    /// The desktop app's background engine (`zeron-engine` where it ships
+    /// The desktop app's background engine (`zeren-engine` where it ships
     /// separately): started by the app, it keeps sessions running with the
     /// app closed.
     #[command(hide = true)]
@@ -72,23 +72,23 @@ enum Command {
     #[cfg(target_os = "linux")]
     /// Trigger an Appshot in the running headed instance (desktop shortcut fallback).
     Appshot,
-    /// Serve the Zeron MCP (Model Context Protocol) server on stdin/stdout,
+    /// Serve the Zeren MCP (Model Context Protocol) server on stdin/stdout,
     /// proxying to the running engine's IPC. Agents use it to create, read,
     /// and message chats. Logs go to stderr; stdout is the protocol.
     Mcp,
-    /// Make, sign, check and list plugins (through the running Zeron).
+    /// Make, sign, check and list plugins (through the running Zeren).
     Plugin {
         #[command(subcommand)]
         command: PluginCommand,
     },
-    /// List, make, use and delete templates: whole replacements of Zeron's
-    /// interface (through the running Zeron). `zeron template use zeron`
-    /// puts Zeron's own back.
+    /// List, make, use and delete templates: whole replacements of Zeren's
+    /// interface (through the running Zeren). `zeren template use zeren`
+    /// puts Zeren's own back.
     Template {
         #[command(subcommand)]
         command: TemplateCommand,
     },
-    /// Manage `zeron headless` as a background service (launchd / systemd --user).
+    /// Manage `zeren headless` as a background service (launchd / systemd --user).
     Daemon {
         #[command(subcommand)]
         command: DaemonCommand,
@@ -107,7 +107,7 @@ enum Command {
 
 #[derive(Subcommand)]
 enum DaemonCommand {
-    /// Install, enable, and start the service (captures ZERON_* env).
+    /// Install, enable, and start the service (captures ZEREN_* env).
     Install,
     /// Stop and remove the service.
     Uninstall,
@@ -123,7 +123,7 @@ enum DaemonCommand {
 
 #[derive(Subcommand)]
 pub enum PluginCommand {
-    /// Make a new plugin in Zeron's plugins folder, signed as you.
+    /// Make a new plugin in Zeren's plugins folder, signed as you.
     New {
         /// Its id: lowercase letters, digits and dashes.
         id: String,
@@ -138,25 +138,25 @@ pub enum PluginCommand {
     Sign { target: String },
     /// Check a plugin folder's signature and who made it.
     Verify { path: String },
-    /// List the plugins Zeron knows.
+    /// List the plugins Zeren knows.
     List,
 }
 
 #[derive(Subcommand)]
 pub enum TemplateCommand {
-    /// List the templates on this device, Zeron's own first.
+    /// List the templates on this device, Zeren's own first.
     List,
-    /// Run Zeron's window with a template. `zeron template use zeron` puts
-    /// Zeron's own back, even with Zeron closed.
+    /// Run Zeren's window with a template. `zeren template use zeren` puts
+    /// Zeren's own back, even with Zeren closed.
     Use { id: String },
-    /// Make a new template: a full copy of Zeron's interface to rewrite.
+    /// Make a new template: a full copy of Zeren's interface to rewrite.
     Create {
         /// Its id: lowercase letters, digits and dashes.
         id: String,
         /// Its name (defaults to the id).
         #[arg(long)]
         name: Option<String>,
-        /// A template to start from (defaults to Zeron's own).
+        /// A template to start from (defaults to Zeren's own).
         #[arg(long)]
         from: Option<String>,
     },
@@ -184,7 +184,7 @@ pub enum EngineCommand {
 /// Where this binary runs [`EngineCommand`]s.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Engines {
-    /// Here: the binary links the engine (`zeron`, `zeron-engine`).
+    /// Here: the binary links the engine (`zeren`, `zeren-engine`).
     InProcess,
     /// In the engine helper beside this binary, which replaces this process
     /// with the same arguments (an interface that doesn't link the engine).
@@ -230,19 +230,19 @@ pub fn run(version: &'static str, engines: Engines) -> Launch {
             Ok(exe) => exe,
             Err(error) => return Launch::Done(Err(error.into())),
         };
-        let error = zeron_launch::exec_helper(&exe, std::env::args_os().skip(1));
+        let error = zeren_launch::exec_helper(&exe, std::env::args_os().skip(1));
         return Launch::Done(Err(anyhow::anyhow!("couldn't start the engine: {error}")));
     }
     #[cfg(windows)]
     if let Some(pid) = cli.wait_for_exit {
-        if let Err(error) = zeron_update::windows::wait_for_exit(pid) {
+        if let Err(error) = zeren_update::windows::wait_for_exit(pid) {
             return Launch::Done(Err(error));
         }
     } else if matches!(
         &cli.command,
         None | Some(Command::Headless) | Some(Command::Engine)
     ) {
-        zeron_update::windows::cleanup_previous_image();
+        zeren_update::windows::cleanup_previous_image();
     }
     let long_running = matches!(&cli.command, None | Some(Command::Headless));
     let mode = if cli.command.is_some() {
@@ -250,9 +250,9 @@ pub fn run(version: &'static str, engines: Engines) -> Launch {
     } else {
         "headed"
     };
-    // `zeron mcp` owns stdout for the protocol: a single log line on it
+    // `zeren mcp` owns stdout for the protocol: a single log line on it
     // would corrupt the JSON-RPC stream, so its diagnostics go to stderr.
-    // The background engine logs on its own (`zeron_app::background`).
+    // The background engine logs on its own (`zeren_app::background`).
     if !matches!(&cli.command, Some(Command::Engine)) {
         init_logging(
             long_running,
@@ -287,7 +287,7 @@ pub fn run(version: &'static str, engines: Engines) -> Launch {
                 .map_err(anyhow::Error::from)
                 .and_then(|runtime| runtime.block_on(update_cli::update(&edge_url_from_env(), check))),
         ),
-        Some(Command::UpdateWatchdog) => Launch::Done(zeron_update::transaction::run_watchdog()),
+        Some(Command::UpdateWatchdog) => Launch::Done(zeren_update::transaction::run_watchdog()),
         Some(Command::Daemon { command }) => Launch::Done(match command {
             DaemonCommand::Install => daemon::install(&paths::data_dir()),
             DaemonCommand::Uninstall => daemon::uninstall(),
@@ -350,7 +350,7 @@ fn attach_parent_console() {
 
 /// Every subcommand path of the command line (`[]`, `["plugin"]`,
 /// `["plugin", "new"]`, …), hidden ones included: what the parity checks of
-/// each binary that runs it walk (`apps/zeron/tests/cli.rs`,
+/// each binary that runs it walk (`apps/zeren/tests/cli.rs`,
 /// `apps/zgx/tests/cli.rs`).
 pub fn subcommand_paths(version: &'static str) -> Vec<Vec<String>> {
     fn walk(command: &clap::Command, path: &mut Vec<String>, out: &mut Vec<Vec<String>>) {
@@ -369,15 +369,15 @@ pub fn subcommand_paths(version: &'static str) -> Vec<Vec<String>> {
     out
 }
 
-/// `zeron <path…> --help` as a binary named `zeron` prints it: clap's own
+/// `zeren <path…> --help` as a binary named `zeren` prints it: clap's own
 /// answer to those arguments.
 pub fn help_for(version: &'static str, path: &[String]) -> String {
-    let argv = std::iter::once("zeron".to_owned())
+    let argv = std::iter::once("zeren".to_owned())
         .chain(path.iter().cloned())
         .chain(std::iter::once("--help".to_owned()));
     match command(version).try_get_matches_from(argv) {
         Err(help) if help.kind() == clap::error::ErrorKind::DisplayHelp => help.render().to_string(),
-        other => panic!("zeron {} --help didn't print help: {other:?}", path.join(" ")),
+        other => panic!("zeren {} --help didn't print help: {other:?}", path.join(" ")),
     }
 }
 
@@ -419,7 +419,7 @@ mod tests {
     #[test]
     fn engine_commands_are_the_ones_that_run_the_engine() {
         let parse = |args: &[&str]| {
-            let argv = std::iter::once("zeron").chain(args.iter().copied());
+            let argv = std::iter::once("zeren").chain(args.iter().copied());
             Cli::from_arg_matches(&command("0.0.0").try_get_matches_from(argv).unwrap())
                 .unwrap()
                 .command
@@ -447,6 +447,6 @@ mod tests {
     #[test]
     fn the_version_is_the_build_s() {
         let version = command("0.2.136-beta.1").render_version();
-        assert_eq!(version.trim(), "zeron 0.2.136-beta.1");
+        assert_eq!(version.trim(), "zeren 0.2.136-beta.1");
     }
 }

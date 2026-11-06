@@ -29,7 +29,7 @@ end
 local GIVES = {
 	{ "On every device", "Pick up a chat on your phone or another computer, right where you left it." },
 	{ "Run agents anywhere", "Start work on any of your machines from whichever one you're at." },
-	{ "Zeron Cloud", "Hand chats to cloud machines that keep going while your computer sleeps." },
+	{ "Zeren Cloud", "Hand chats to cloud machines that keep going while your computer sleeps." },
 }
 
 -- Your devices (fictional): this Mac, a Linux box, a phone.
@@ -103,7 +103,7 @@ local function line(): Node
 			text_size = "$font.size.sm",
 			line_height = "$font.line.sm",
 			color = function()
-				return if shown:get() == "failed" then "$zeron.tone.danger.ink" else "$text.tertiary"
+				return if shown:get() == "failed" then "$zeren.tone.danger.ink" else "$text.tertiary"
 			end,
 		},
 		ui.show(function()

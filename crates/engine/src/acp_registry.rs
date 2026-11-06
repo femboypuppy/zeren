@@ -3,7 +3,7 @@
 //! removing one. The registry's index is fetched here, never by an app, and
 //! kept in `{data_dir}/acp-registry/` (with each agent's icon), so the
 //! page shows the last copy at once and a device offline still lists it.
-//! Installs and launches are [`zeron_harness::acp_registry`]'s; an added
+//! Installs and launches are [`zeren_harness::acp_registry`]'s; an added
 //! agent is a harness like any other ([`HarnessRegistry::register_registry_agent`]).
 //!
 //!   ListAcpRegistry { refresh? }  → { agents: [Listing], fetchedAt?, offline }
@@ -23,9 +23,9 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use zeron_harness::acp_registry::{self as reg, Entry, Readiness};
-use zeron_proto::{HarnessId, RegistryAgent};
-use zeron_rpc::{RpcError, RpcReply, methods};
+use zeren_harness::acp_registry::{self as reg, Entry, Readiness};
+use zeren_proto::{HarnessId, RegistryAgent};
+use zeren_rpc::{RpcError, RpcReply, methods};
 
 use crate::registry::HarnessRegistry;
 
@@ -63,7 +63,7 @@ pub struct Listing {
     /// registry publishes no checksum for (false); none for packages.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub checksum: Option<bool>,
-    /// The built-in harness Zeron drives this agent with, if it does.
+    /// The built-in harness Zeren drives this agent with, if it does.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub built_in: Option<String>,
     /// The version added on this device, if it is.
@@ -185,9 +185,9 @@ const SIGN_IN_FRESH: std::time::Duration = std::time::Duration::from_secs(5 * 60
 
 /// Each added agent's sign-in as it last said it (asking starts it).
 fn sign_ins()
--> &'static Mutex<std::collections::HashMap<RegistryAgent, (std::time::Instant, zeron_harness::acp::RegistrySignIn)>> {
+-> &'static Mutex<std::collections::HashMap<RegistryAgent, (std::time::Instant, zeren_harness::acp::RegistrySignIn)>> {
     static SIGN_INS: OnceLock<
-        Mutex<std::collections::HashMap<RegistryAgent, (std::time::Instant, zeron_harness::acp::RegistrySignIn)>>,
+        Mutex<std::collections::HashMap<RegistryAgent, (std::time::Instant, zeren_harness::acp::RegistrySignIn)>>,
     > = OnceLock::new();
     SIGN_INS.get_or_init(Default::default)
 }
@@ -197,9 +197,9 @@ pub(crate) fn forget_sign_in(agent: RegistryAgent) {
     sign_ins().lock().unwrap_or_else(PoisonError::into_inner).remove(&agent);
 }
 
-fn harness_of(agent: RegistryAgent) -> Result<zeron_harness::AcpHarness, RpcError> {
+fn harness_of(agent: RegistryAgent) -> Result<zeren_harness::AcpHarness, RpcError> {
     let record = reg::record(agent).ok_or_else(|| RpcError::Failed(format!("{} isn't added here", agent.registry_id())))?;
-    Ok(zeron_harness::AcpHarness::registry(agent, &record.name))
+    Ok(zeren_harness::AcpHarness::registry(agent, &record.name))
 }
 
 #[derive(Deserialize)]
@@ -515,7 +515,7 @@ impl AcpRegistry {
                 };
                 Listing {
                     id: e.id.clone(),
-                    harness: format!("{}{}", zeron_proto::REGISTRY_SLUG_PREFIX, e.id),
+                    harness: format!("{}{}", zeren_proto::REGISTRY_SLUG_PREFIX, e.id),
                     name: e.name.clone(),
                     version: e.version.clone(),
                     description: e.description.clone(),
@@ -542,7 +542,7 @@ impl AcpRegistry {
             }
             out.push(Listing {
                 id: record.id.clone(),
-                harness: format!("{}{}", zeron_proto::REGISTRY_SLUG_PREFIX, record.id),
+                harness: format!("{}{}", zeren_proto::REGISTRY_SLUG_PREFIX, record.id),
                 name: record.name.clone(),
                 version: record.version.clone(),
                 description: record.description.clone(),
@@ -569,7 +569,7 @@ impl AcpRegistry {
     /// Adds (or updates to the registry's version) one agent.
     async fn add(&self, id: &str) -> Result<reg::Record, RpcError> {
         if reg::built_in(id).is_some() {
-            return Err(RpcError::Failed("Zeron drives this agent itself".into()));
+            return Err(RpcError::Failed("Zeren drives this agent itself".into()));
         }
         // The registry's current entry (a fresh copy if this one is missing).
         let mut entry = self.cache().entries.iter().find(|e| e.id == id).cloned();

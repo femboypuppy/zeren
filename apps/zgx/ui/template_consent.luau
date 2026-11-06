@@ -23,7 +23,7 @@ return ui.column {
 	relative = true,
 	-- The window's glass, or (opaque) its colour: the main window's.
 	bg = function(): string
-		return if material.frosted:get() then "$zeron.window" else "$background"
+		return if material.frosted:get() then "$zeren.window" else "$background"
 	end,
 	consent.View(),
 	-- Its title bar's room, above the sheet (its top padding), moves the

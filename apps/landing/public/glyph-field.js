@@ -1,4 +1,4 @@
-// Zeron glyph field: the hero's background, a grid of glyphs set in engraved stone.
+// Zeren glyph field: the hero's background, a grid of glyphs set in engraved stone.
 //
 // Text is agent traces and zero-math, glyphs sit barely above the obsidian, a slow
 // violet light shaft sweeps through them (the canyon beam), the pointer leaves a
@@ -10,7 +10,7 @@
 // mountGlyphField(host, opts) → { destroy }
 
 const DEFAULT_LINES = [
-  'zeron run --harness claude',
+  'zeren run --harness claude',
   'lim n→∞ 1/n = 0',
   'git worktree add ../quiet-aperture',
   'codex › plan → edit → test',
@@ -23,7 +23,7 @@ const DEFAULT_LINES = [
   'await turn.complete()',
   'Σ tokens → ∅',
   'opencode › reasoning',
-  'ssh zeron@threshold',
+  'ssh zeren@threshold',
   'f(0) = 0',
   'claude › subagent › explore',
   'git merge --ff-only',

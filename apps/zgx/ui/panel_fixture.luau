@@ -145,12 +145,12 @@ local function fake_web(id: string): any
 		end,
 		run = function(_self: any, js: string)
 			-- (The picker's whole script, or a call into it: its first word.)
-			if string.find(js, "__zeronFind", 1, true) then
+			if string.find(js, "__zerenFind", 1, true) then
 				web_note("find:clear")
-			elseif string.find(js, "__zeronAnnotator.start", 1, true) then
+			elseif string.find(js, "__zerenAnnotator.start", 1, true) then
 				web_note("run:start")
 				-- (The pick's nonce, for the test to post with.)
-				web_nonce:set(tonumber(string.match(js, "__zeronAnnotator%.start%((%d+)") or "0") or 0)
+				web_nonce:set(tonumber(string.match(js, "__zerenAnnotator%.start%((%d+)") or "0") or 0)
 			elseif string.find(js, ".stop()", 1, true) then
 				web_note("run:stop")
 			elseif string.find(js, ".sync(", 1, true) then
@@ -170,7 +170,7 @@ local function fake_web(id: string): any
 		-- A script asked for its answer: the find's (three matches, the
 		-- first current; a step moves it), else nothing.
 		eval = function(_self: any, js: string, reply: ((value: any, err: string?) -> ())?)
-			if string.find(js, "__zeronFind", 1, true) then
+			if string.find(js, "__zerenFind", 1, true) then
 				local q = string.match(js, "%.find%((%b\"\")") or string.match(js, "%.find%(('[^']*')")
 				local by = string.match(js, "%.step%((%-?%d+)%)")
 				web_note(if q then `find:{string.sub(q, 2, -2)}` elseif by then `step:{by}` else "find:clear")
@@ -416,7 +416,7 @@ ui.command {
 		Panel.open_file(session:peek(), open_path:peek(), nil, open_at:peek())
 	end,
 }
--- A plugin's tab (the Git plugin's, from ZERON_ZGX_DEV_PLUGINS), opened as
+-- A plugin's tab (the Git plugin's, from ZEREN_ZGX_DEV_PLUGINS), opened as
 -- its own rows open it (Panel.open_plugin_tab): for captures beside the
 -- panel's own tabs.
 -- Git's Changes and History, each its own kind of tab, as the plugin asks

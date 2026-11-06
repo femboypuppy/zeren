@@ -323,7 +323,7 @@ local function folder(w: Workspace, v: View, props: Props, here: () -> Where?): 
 		min_h = 0,
 		rounded = radius,
 		-- The bars' buttons sit in the card's corners: concentric.
-		theme = if radius then { zeron = { icon_button = { radius = control.nest(radius, 1, 6) } } } else nil,
+		theme = if radius then { zeren = { icon_button = { radius = control.nest(radius, 1, 6) } } } else nil,
 		tree = {
 			model = w.model,
 			active = v.active,
@@ -614,7 +614,7 @@ local Folder = ui.component(function(props: Props): Node
 		if ok then
 			return built
 		end
-		print(`zeron-zgx: the files pane didn't build: {built}`)
+		print(`zeren-zgx: the files pane didn't build: {built}`)
 		return ds.EmptyState {
 			icon = "danger-triangle",
 			size = "sm",

@@ -177,7 +177,7 @@ function M.state(kind: status.Kind): Node
 		h = 16,
 		items = "center",
 		justify = "center",
-		color = `$zeron.status.{kind}`,
+		color = `$zeren.status.{kind}`,
 		tooltip = k.long,
 		label = k.long,
 		if k.glyph then status.StatusIcon { kind = kind, size = 14 } else status.StatusDot { kind = kind, size = 6 },
@@ -232,7 +232,7 @@ export type CornerProps = {
 
 -- The corner as a row wears it: its state (or time) at rest; under the
 -- pointer, its action, its glyph on the state's own centre; ⌘ held alone,
--- its jump's keys in its place (as Zeron's). The two share one box as wide
+-- its jump's keys in its place (as Zeren's). The two share one box as wide
 -- as the wider (what's at rest stays, unseen, so its width holds): ⌘1 fits
 -- where a time stood and nothing moves, and a wider Ctrl+1 widens the
 -- corner, the badges before it giving way, never drawn over.
@@ -282,11 +282,11 @@ function M.Corner(props: CornerProps): Node
 	}
 end
 
--- A pull request's badge, as Zeron's: its glyph and number in its state's
+-- A pull request's badge, as Zeren's: its glyph and number in its state's
 -- colour, on a wash of it; its state and title a tooltip.
 function M.pr_badge(pr: { number: number, state: string?, title: string? }): Node
 	local state = pr.state or "open"
-	local hue = `$zeron.pr.{state}`
+	local hue = `$zeren.pr.{state}`
 	local known = state == "open" or state == "merged" or state == "closed" or state == "draft"
 	local named = locale.s(`ds.sidebar.pr.{if known then state else "open"}`)
 	return ui.row {
@@ -294,7 +294,7 @@ function M.pr_badge(pr: { number: number, state: string?, title: string? }): Nod
 		relative = true,
 		h = 16,
 		px = "$space.1",
-		gap = "$zeron.space.hair",
+		gap = "$zeren.space.hair",
 		items = "center",
 		rounded = "$radius.sm",
 		tooltip = if pr.title
@@ -311,7 +311,7 @@ function M.pr_badge(pr: { number: number, state: string?, title: string? }): Nod
 	}
 end
 
--- Subagents running under it (Zeron's running_pill.rs): its working dot
+-- Subagents running under it (Zeren's running_pill.rs): its working dot
 -- and how many (99+ past that), on a wash of the working hue; none, nothing.
 function M.subagents(n: () -> number): Node
 	return ui.show(
@@ -329,7 +329,7 @@ function M.subagents(n: () -> number): Node
 			label = function(): string
 				return locale.s("ds.sidebar.subagents_running", { n = n() })
 			end,
-			ui.div { absolute = true, left = 0, right = 0, top = 0, bottom = 0, rounded = "$radius.full", bg = "$zeron.status.working", opacity = 0.1 },
+			ui.div { absolute = true, left = 0, right = 0, top = 0, bottom = 0, rounded = "$radius.full", bg = "$zeren.status.working", opacity = 0.1 },
 			status.StatusDot { kind = "working", size = 5 },
 			ui.text {
 				function(): string
@@ -338,21 +338,21 @@ function M.subagents(n: () -> number): Node
 				end,
 				text_size = "$font.size.xs",
 				weight = "$font.weight.medium",
-				color = "$zeron.status.working",
+				color = "$zeren.status.working",
 				tabular = true,
 			},
 		}
 	)
 end
 
--- A group's tree, as Zeron's transcript draws its tools: a hairline trunk
+-- A group's tree, as Zeren's transcript draws its tools: a hairline trunk
 -- down from under the group's tile (`trunk`: how far in), and at each row
 -- a rounded elbow off it toward the row. `last`: the trunk ends there.
 -- `through`: outer groups' trunks going on past this row (with two levels
 -- of groups, the outer one's, past an inner group's rows), by x.
 export type Tree = { last: () -> boolean, trunk: () -> number, through: (() -> { number })? }
 -- The elbow's radius, how far the gutter runs past it, and the break
--- between the branch's tip and what starts the row (Zeron's 6, 0, 4).
+-- between the branch's tip and what starts the row (Zeren's 6, 0, 4).
 M.BEND, M.REACH, M.BREAK = 6, 0, 4
 function M.gutter(t: Tree): number
 	return t.trunk() + M.BEND + M.REACH
@@ -402,7 +402,7 @@ function M.on_tree(body: Node, now_tree: () -> Tree?, lead_at: () -> number, gap
 			pointer_events = "none",
 			draw = function(c, _, h)
 				for _, tx in (t.through :: () -> { number })() do
-					c:fill(tree_line.trunk(tx, h), "$zeron.tree")
+					c:fill(tree_line.trunk(tx, h), "$zeren.tree")
 				end
 				local x = t.trunk()
 				-- The branch meets the title's line where it reads (a compact
@@ -414,7 +414,7 @@ function M.on_tree(body: Node, now_tree: () -> Tree?, lead_at: () -> number, gap
 					h = h,
 					bend = M.BEND,
 					on = not t.last(),
-				}, "$zeron.tree")
+				}, "$zeren.tree")
 			end,
 		},
 	}
@@ -840,7 +840,7 @@ function M.Row(props: RowProps): Node
 		title = ui.row {
 			grow = 1,
 			min_w = 0,
-			gap = "$zeron.space.tight",
+			gap = "$zeren.space.tight",
 			items = "center",
 			ui.show(props.title_lead_shown or function(): boolean
 				return true
@@ -870,7 +870,7 @@ function M.Row(props: RowProps): Node
 			else nil,
 		words = ui.column {
 			w_full = true,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			M.line(
 				ui.row {
 					class = "session-title",

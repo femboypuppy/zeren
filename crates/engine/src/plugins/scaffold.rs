@@ -5,33 +5,33 @@ use std::path::Path;
 use super::manifest::MANIFEST_FILE;
 
 /// The plugin SDK, kept by the app side.
-pub const SDK: &str = include_str!("../../../../apps/zgx/plugins-sdk/zeron.luau");
+pub const SDK: &str = include_str!("../../../../apps/zgx/plugins-sdk/zeren.luau");
 
 pub fn init_luau(id: &str, name: &str) -> String {
     format!(
-        r#"local zeron = require("./zeron")("{id}")
+        r#"local zeren = require("./zeren")("{id}")
 
 -- {name}
 --
--- Zeron loads this file when the plugin is on, and reloads it as you save.
--- zeron.luau's header (next to this file) lists what each helper does and
--- which permission in zeron-plugin.json it needs. This plugin asks for none
+-- Zeren loads this file when the plugin is on, and reloads it as you save.
+-- zeren.luau's header (next to this file) lists what each helper does and
+-- which permission in zeren-plugin.json it needs. This plugin asks for none
 -- yet: add the ones you use there.
 --
 -- For example, with "ui.add":
 --
---   zeron.menu {{ kind = "session", id = "hello", label = zeron.s("hello.label"),
---     run = function(session) zeron.toast(zeron.s("hello.toast")) end }}
+--   zeren.menu {{ kind = "session", id = "hello", label = zeren.s("hello.label"),
+--     run = function(session) zeren.toast(zeren.s("hello.toast")) end }}
 --
 -- Its words are in locales/: en.json, and a file per language beside it
--- (zh-Hans.json, …). zeron.t(key) shows one in Zeron's language as it
--- changes, zeron.s(key) gives it as text now; a language or a key the
+-- (zh-Hans.json, …). zeren.t(key) shows one in Zeren's language as it
+-- changes, zeren.s(key) gives it as text now; a language or a key the
 -- plugin lacks shows its English.
 "#
     )
 }
 
-/// The plugin's English words (`locales/en.json`), what `zeron.t` shows.
+/// The plugin's English words (`locales/en.json`), what `zeren.t` shows.
 pub fn english(name: &str) -> serde_json::Value {
     serde_json::json!({
         "hello": {
@@ -71,7 +71,7 @@ pub fn write(
     let result = (|| -> std::io::Result<()> {
         std::fs::create_dir_all(dir)?;
         std::fs::write(dir.join("init.luau"), init_luau(id, name))?;
-        std::fs::write(dir.join("zeron.luau"), SDK)?;
+        std::fs::write(dir.join("zeren.luau"), SDK)?;
         std::fs::create_dir_all(dir.join("locales"))?;
         std::fs::write(
             dir.join("locales").join("en.json"),

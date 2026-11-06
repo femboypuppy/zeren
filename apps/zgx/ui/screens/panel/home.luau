@@ -5,7 +5,7 @@
 -- (away, when it can't be reached), its project and its branch, with what
 -- the branch adds over its base (`+N −M`, opening the branch's changes in
 -- the Git tab); then the project's run actions (shell/actions_ui.rs: a row
--- runs one in a terminal tab of its own, its gear edits it, a zeron.json
+-- runs one in a terminal tab of its own, its gear edits it, a zeren.json
 -- action not yet added imports, Add action adds one). Then what can open
 -- here, each with the one key that opens it: Browser B, File viewer F,
 -- Terminal T, Side chat S, Fork chat K (plugins' rows after them,
@@ -218,7 +218,7 @@ local function info(sid: string): Node
 	return ui.column {
 		id = "panel-home-info",
 		w_full = true,
-		gap = "$zeron.list.gap",
+		gap = "$zeren.list.gap",
 		PanelHome.Row {
 			id = "panel-home-device",
 			lead = ui.presence(function(): string
@@ -288,14 +288,14 @@ local function info(sid: string): Node
 				label = branch,
 				tooltip = branch,
 				-- Plugins' part of the row (the Git plugin's +N −M), after its
-				-- name: a slot no plugin can offer, under Zeron's own name, given
+				-- name: a slot no plugin can offer, under Zeren's own name, given
 				-- the branch.
 				trail = ui.row {
 					id = "panel-home-branch-slot",
 					shrink = 0,
 					items = "center",
 					provide = { panel_branch = branch_info },
-					ui.slot("zeron.panel.branch", { direction = "row", items = "center" }),
+					ui.slot("zeren.panel.branch", { direction = "row", items = "center" }),
 				},
 			},
 			-- Plugins' rows of their own under the branch (GitHub's pull
@@ -305,7 +305,7 @@ local function info(sid: string): Node
 				id = "panel-home-details",
 				w_full = true,
 				provide = { panel_details = branch_info },
-				ui.slot("zeron.panel.details", { w_full = true }),
+				ui.slot("zeren.panel.details", { w_full = true }),
 			},
 		}),
 	}
@@ -632,7 +632,7 @@ local function actions(props: Props, sid: string): Node
 			rounded = "$radius.lg",
 			cursor = "pointer",
 			bg = function(): string
-				return if on() then "$zeron.selected.flat.bg" else "#00000000"
+				return if on() then "$zeren.selected.flat.bg" else "#00000000"
 			end,
 			color = function(): string
 				return if on() then "$text.primary" else "$text.secondary"
@@ -715,7 +715,7 @@ local function actions(props: Props, sid: string): Node
 	end, ui.column {
 		id = "panel-home-actions",
 		w_full = true,
-		gap = "$zeron.list.gap",
+		gap = "$zeren.list.gap",
 		PanelHome.Heading { label = locale.t("panel.home.actions") },
 		ui.show(function(): boolean
 			local s = now()
@@ -728,7 +728,7 @@ local function actions(props: Props, sid: string): Node
 			return s ~= nil and s.state == "failed"
 		end, ui.column {
 			w_full = true,
-			gap = "$zeron.list.gap",
+			gap = "$zeren.list.gap",
 			note(function(): string
 				local s = now()
 				return if s and s.message then s.message else ""
@@ -751,14 +751,14 @@ local function actions(props: Props, sid: string): Node
 				return a.id
 			end,
 			w_full = true,
-			gap = "$zeron.list.gap",
+			gap = "$zeren.list.gap",
 		}),
 		ui.each(imports, import_row, {
 			key = function(d: any): string
 				return d.name
 			end,
 			w_full = true,
-			gap = "$zeron.list.gap",
+			gap = "$zeren.list.gap",
 		}),
 		ui.show(function(): boolean
 			local s = now()
@@ -1107,7 +1107,7 @@ local function lanes(props: Props, sid: string): Node
 		gap = "$space.3",
 		ui.column {
 			w_full = true,
-			gap = "$zeron.list.gap",
+			gap = "$zeren.list.gap",
 			part("panel-home-ports", "panel-home-port-list", "panel.home.ports", "ports", function(): { any }
 				return ports:get()
 			end, function(l: any): string
@@ -1141,7 +1141,7 @@ local function lanes(props: Props, sid: string): Node
 					min_w = 0,
 					truncate = true,
 					text_size = "$font.size.sm",
-					color = "$zeron.tone.warning.ink",
+					color = "$zeren.tone.warning.ink",
 				},
 			}),
 		},
@@ -1265,12 +1265,12 @@ M.Page = ui.component(function(props: Props): Node
 		ui.column {
 			id = "panel-home-open",
 			w_full = true,
-			gap = "$zeron.list.gap",
+			gap = "$zeren.list.gap",
 			PanelHome.Heading { label = locale.t("panel.home.open") },
 			ui.column {
 				hook = "panel.empty",
 				w_full = true,
-				gap = "$zeron.list.gap",
+				gap = "$zeren.list.gap",
 				table.unpack(rows),
 			},
 		}

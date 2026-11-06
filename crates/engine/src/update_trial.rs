@@ -1,18 +1,18 @@
-//! The engine's side of an update ([`zeron_update::transaction`]): settle what an
+//! The engine's side of an update ([`zeren_update::transaction`]): settle what an
 //! earlier start left before anything opens the data directory, and as a new
 //! version on trial, prove it's ready before it's allowed to stay.
 
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use zeron_proto::WorkspaceScope;
-use zeron_update::transaction;
+use zeren_proto::WorkspaceScope;
+use zeren_update::transaction;
 
 use crate::{EngineConfig, EngineCore, InstanceLock};
 
 /// How long a predecessor gets to let go of the data directory.
 const HANDOFF: Duration = Duration::from_secs(60);
-/// How long a new version gets to reach Zeron's servers. A box nobody can reach
+/// How long a new version gets to reach Zeren's servers. A box nobody can reach
 /// is as stranded as one that doesn't start, and there's no point sitting
 /// through the whole deadline to find out.
 const EDGE_PROOF: Duration = Duration::from_secs(3 * 60);
@@ -51,7 +51,7 @@ pub(crate) fn refuse_mid_update(data_dir: &Path) -> Result<(), crate::EngineErro
         .is_some_and(|update| matches!(update.phase, Phase::Trial | Phase::Restoring));
     if mid_update && !transaction::in_trial() {
         return Err(crate::EngineError::Other(
-            "Zeron is finishing an update. Try again in a moment.".into(),
+            "Zeren is finishing an update. Try again in a moment.".into(),
         ));
     }
     Ok(())
@@ -67,10 +67,10 @@ fn fail(data_dir: &Path, why: &str) -> ! {
 /// Answering on the port with the data calls open, through the same front door
 /// clients use.
 async fn answers_on_its_port(port: u16, data_dir: &Path) -> Result<(), String> {
-    let client = zeron_rpc::connect_ipc(port, Some(data_dir))
+    let client = zeren_rpc::connect_ipc(port, Some(data_dir))
         .await
         .map_err(|err| format!("it isn't answering on its port ({err})"))?;
-    for method in [zeron_rpc::methods::ENGINE_INFO, zeron_rpc::methods::ENGINE_READY] {
+    for method in [zeren_rpc::methods::ENGINE_INFO, zeren_rpc::methods::ENGINE_READY] {
         client
             .call(method, serde_json::json!({}))
             .await
@@ -103,7 +103,7 @@ struct Proof {
 
 impl Proof {
     /// Its databases open and read (migrations included: assembly ran them), it
-    /// serves clients, and a signed-in device is back on Zeron's servers, so
+    /// serves clients, and a signed-in device is back on Zeren's servers, so
     /// other devices can reach it. Sessions wait until after this.
     async fn run(&self) -> Result<(), String> {
         self.workspace
@@ -126,7 +126,7 @@ impl Proof {
             tokio::time::sleep(Duration::from_millis(500)).await;
         }
         if edge_answers(&self.edge_url).await {
-            return Err("it couldn't connect to Zeron's servers".into());
+            return Err("it couldn't connect to Zeren's servers".into());
         }
         tracing::warn!("no network during the update trial; not holding that against it");
         Ok(())
@@ -186,10 +186,10 @@ pub(crate) fn commit_without_a_profile(config: &EngineConfig) {
     }
     let (port, data_dir) = (config.ipc_port, config.data_dir.clone());
     tokio::spawn(async move {
-        let client = zeron_rpc::connect_ipc(port, Some(&data_dir)).await;
+        let client = zeren_rpc::connect_ipc(port, Some(&data_dir)).await;
         let answered = match client {
             Ok(client) => client
-                .call(zeron_rpc::methods::ENGINE_INFO, serde_json::json!({}))
+                .call(zeren_rpc::methods::ENGINE_INFO, serde_json::json!({}))
                 .await
                 .map(drop)
                 .map_err(|err| err.to_string()),

@@ -1,7 +1,7 @@
 //! The ACP registry through the engine's RPCs, on an isolated engine: a
 //! registry served on the loopback lists a build of the fake ACP agent;
 //! `ListAcpRegistry` lists it as this device sees it (its build, checksum,
-//! icon, the agents Zeron drives itself marked built in); `AddAcpAgent`
+//! icon, the agents Zeren drives itself marked built in); `AddAcpAgent`
 //! installs it and it becomes a harness, which `ListHarnesses` shows only to
 //! a client that asks for registry agents, with its icon, and whose models
 //! come from its own handshake; `RemoveAcpAgent` takes it away again.
@@ -14,9 +14,9 @@ use std::path::PathBuf;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use zeron_engine::EngineCore;
-use zeron_proto::HarnessId;
-use zeron_rpc::methods;
+use zeren_engine::EngineCore;
+use zeren_proto::HarnessId;
+use zeren_rpc::methods;
 
 fn fake_agent() -> Vec<u8> {
     let script = std::fs::read(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../harness/tests/fixtures/fake-acp.sh")).unwrap();
@@ -40,7 +40,7 @@ async fn serve(files: Vec<(String, Vec<u8>)>) {
         .map(|(p, b)| (p, String::from_utf8(b.clone()).map(|t| t.replace("PORT", &port.to_string()).into_bytes()).unwrap_or(b)))
         .collect();
     unsafe {
-        std::env::set_var("ZERON_ACP_REGISTRY_URL", format!("http://127.0.0.1:{port}/registry.json"));
+        std::env::set_var("ZEREN_ACP_REGISTRY_URL", format!("http://127.0.0.1:{port}/registry.json"));
     }
     tokio::spawn(async move {
         loop {
@@ -73,17 +73,17 @@ fn find<'a>(list: &'a Value, key: &str, id: &str) -> Option<&'a Value> {
 async fn registry_agents_are_listed_added_as_harnesses_and_removed() {
     let dir = tempfile::tempdir().unwrap();
     unsafe {
-        std::env::set_var("ZERON_ACP_REGISTRY_LOOPBACK", "1");
-        std::env::set_var("ZERON_AGENTS_DIR", dir.path().join("agents"));
+        std::env::set_var("ZEREN_ACP_REGISTRY_LOOPBACK", "1");
+        std::env::set_var("ZEREN_AGENTS_DIR", dir.path().join("agents"));
     }
     let build = fake_agent();
     let sha = format!("{:x}", Sha256::digest(&build));
-    let platform = zeron_harness::acp_registry::platform().unwrap();
+    let platform = zeren_harness::acp_registry::platform().unwrap();
     let index = json!({
         "version": "1.0.0",
         "agents": [
             { "id": "fake-agent", "name": "Fake Agent", "version": "2.0.0", "description": "Answers in scripts.",
-              "authors": ["Zeron tests <tests@zeron.sh>"], "license": "MIT", "repository": "https://github.com/zeronsh/fake-agent",
+              "authors": ["Zeren tests <tests@zeron.sh>"], "license": "MIT", "repository": "https://github.com/zeronsh/fake-agent",
               "icon": "http://127.0.0.1:PORT/fake-agent.svg",
               "distribution": { "binary": { platform: { "archive": "http://127.0.0.1:PORT/fake.tar.gz", "cmd": "./agent", "sha256": sha } } } },
             { "id": "claude-acp", "name": "Claude Agent", "version": "0.99.1", "description": "Built in.",
@@ -101,10 +101,10 @@ async fn registry_agents_are_listed_added_as_harnesses_and_removed() {
     ])
     .await;
 
-    let core = EngineCore::assemble(dir.path(), zeron_engine::registry::default_registry().into(), HarnessId::Mock, None)
+    let core = EngineCore::assemble(dir.path(), zeren_engine::registry::default_registry().into(), HarnessId::Mock, None)
         .expect("an isolated engine");
-    zeron_engine::acp_registry::start(dir.path(), &core.registry);
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    zeren_engine::acp_registry::start(dir.path(), &core.registry);
+    let client = zeren_rpc::memory_client(core.rpc_service());
 
     let listed = client.call(methods::LIST_ACP_REGISTRY, json!({ "refresh": true })).await.unwrap();
     assert_eq!(listed["offline"], false, "{listed}");
@@ -116,7 +116,7 @@ async fn registry_agents_are_listed_added_as_harnesses_and_removed() {
     assert!(fake["icon"].as_str().is_some_and(|i| i.contains("<svg")), "{fake}");
     assert!(fake.get("added").is_none());
     assert_eq!(find(&listed["agents"], "id", "claude-acp").unwrap()["builtIn"], "claude-code");
-    // Zeron's own can't be added again.
+    // Zeren's own can't be added again.
     assert!(client.call(methods::ADD_ACP_AGENT, json!({ "id": "claude-acp" })).await.is_err());
 
     let added = client.call(methods::ADD_ACP_AGENT, json!({ "id": "fake-agent" })).await.unwrap();
@@ -159,10 +159,10 @@ async fn registry_agents_are_listed_added_as_harnesses_and_removed() {
     assert_eq!(status["installedVersion"], "2.0.0", "{status}");
     assert_eq!(status["latestVersion"], "2.0.0");
     assert_eq!(status["phase"], "current");
-    assert_eq!(status["source"], "managed-by-zeron");
+    assert_eq!(status["source"], "managed-by-zeren");
     assert_eq!(status["canApply"], true);
-    let url = std::env::var("ZERON_ACP_REGISTRY_URL").unwrap();
-    unsafe { std::env::set_var("ZERON_ACP_REGISTRY_URL", url.replace("registry.json", "registry-newer.json")) };
+    let url = std::env::var("ZEREN_ACP_REGISTRY_URL").unwrap();
+    unsafe { std::env::set_var("ZEREN_ACP_REGISTRY_URL", url.replace("registry.json", "registry-newer.json")) };
     client.call(methods::LIST_ACP_REGISTRY, json!({ "refresh": true })).await.unwrap();
     let statuses = client
         .call(methods::CHECK_HARNESS_UPDATES, json!({ "harness": "acp.fake-agent" }))
@@ -177,10 +177,10 @@ async fn registry_agents_are_listed_added_as_harnesses_and_removed() {
         .await
         .expect("a policy for a registry agent");
     // …which takes it on its own, no chat running on it.
-    let agent0 = zeron_proto::RegistryAgent::new("fake-agent").unwrap();
+    let agent0 = zeren_proto::RegistryAgent::new("fake-agent").unwrap();
     let mut version = String::new();
     for _ in 0..100 {
-        version = zeron_harness::acp_registry::record(agent0).unwrap().version;
+        version = zeren_harness::acp_registry::record(agent0).unwrap().version;
         if version == "2.1.0" {
             break;
         }
@@ -210,8 +210,8 @@ async fn registry_agents_are_listed_added_as_harnesses_and_removed() {
         let mode = std::fs::metadata(dir.path().join("agents/fake-agent/env")).unwrap().permissions().mode();
         assert_eq!(mode & 0o777, 0o600);
     }
-    let agent = zeron_proto::RegistryAgent::new("fake-agent").unwrap();
-    let (_, _, env) = zeron_harness::acp_registry::launch(agent).unwrap();
+    let agent = zeren_proto::RegistryAgent::new("fake-agent").unwrap();
+    let (_, _, env) = zeren_harness::acp_registry::launch(agent).unwrap();
     assert!(env.contains(&("FAKE_KEY".to_owned(), "sk-1".to_owned())), "{env:?}");
 
     // One of your own, through the same harness.

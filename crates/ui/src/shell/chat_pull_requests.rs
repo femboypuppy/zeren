@@ -1,6 +1,6 @@
 //! Pull requests opened from a chat — a transcript link or a sidebar badge —
 //! as tabs in the focused session's right pane, so several can sit beside
-//! one conversation: Zeron's own view, or a Browser tab when Settings asks.
+//! one conversation: Zeren's own view, or a Browser tab when Settings asks.
 
 use super::*;
 use crate::pull_request_detail::PullRequestDetailPage;

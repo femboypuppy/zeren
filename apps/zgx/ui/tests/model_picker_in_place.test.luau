@@ -72,7 +72,7 @@ test("moving between models keeps the reasoning slider", function()
 	expect(node(app, nil, "REASONING")).never.to_be_nil()
 end)
 
--- The chosen model's options sit under it, above its reasoning (Zeron's
+-- The chosen model's options sit under it, above its reasoning (Zeren's
 -- tray, the lead first): each a row opening its choices beside the panel,
 -- the choice made shown on it. A pick is kept by option id; the option's
 -- own start is no pick.

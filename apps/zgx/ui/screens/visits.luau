@@ -1,5 +1,5 @@
 -- Visits: each time a place opens (a setup step, a settings page), a new
--- visit. What a place asks Zeron as it opens (your agents, your profile,
+-- visit. What a place asks Zeren as it opens (your agents, your profile,
 -- the members) is asked once a visit, not again as a hot reload builds it
 -- again: zgx tells a reload from a place opening again by nothing but kept
 -- state like this.

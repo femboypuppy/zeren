@@ -75,7 +75,7 @@ local function under(parent: State<boolean>, key: string, props: any): Node
 		ui.div {
 			w_full = true,
 			opacity = function()
-				return if parent:get() then 1 else "$zeron.disabled"
+				return if parent:get() then 1 else "$zeren.disabled"
 			end,
 			disabled = function()
 				return not parent:get()

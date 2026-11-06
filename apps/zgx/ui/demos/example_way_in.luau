@@ -77,7 +77,7 @@ return {
 						-- (The intro's own words, art outside the ds, scaled to the still.)
 						font = ui.raw("Instrument Serif", "the intro's own type, art outside the ds"),
 						text_size = ui.raw(56, "the intro's words, at this still's scale"),
-						color = "$zeron.scene.words",
+						color = "$zeren.scene.words",
 					},
 					Onboarding.WayIn { id = "way_in", label = "Get started", size = "lg" }
 				),

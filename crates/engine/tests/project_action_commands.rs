@@ -2,11 +2,11 @@
 #![cfg(unix)]
 
 use std::time::Duration;
-use zeron_engine::project_actions::{
+use zeren_engine::project_actions::{
     MAX_PROJECT_ACTION_COMMAND_BYTES, launch_project_action, launch_project_setup_action,
 };
-use zeron_engine::{ProjectActionsStore, Terminals};
-use zeron_proto::{ProjectActionDraft, ProjectActionIcon};
+use zeren_engine::{ProjectActionsStore, Terminals};
+use zeren_proto::{ProjectActionDraft, ProjectActionIcon};
 
 #[tokio::test]
 async fn manual_and_setup_actions_preserve_long_multiline_commands() {
@@ -17,7 +17,7 @@ async fn manual_and_setup_actions_preserve_long_multiline_commands() {
     let terminals = Terminals::new();
     for setup in [false, true] {
         let prefix = "printf '%s' '";
-        let suffix = "' > payload\nprintf '%s' \"$ZERON_PROJECT_ROOT\" > project-root\nprintf '%s' \"$ZERON_WORKTREE_PATH\" > worktree-path\nprintf '%s' 'quotes: \" $() ` ; é' > literal\n";
+        let suffix = "' > payload\nprintf '%s' \"$ZEREN_PROJECT_ROOT\" > project-root\nprintf '%s' \"$ZEREN_WORKTREE_PATH\" > worktree-path\nprintf '%s' 'quotes: \" $() ` ; é' > literal\n";
         let payload =
             "a".repeat(MAX_PROJECT_ACTION_COMMAND_BYTES - prefix.len() - suffix.trim_end().len());
         let command = format!("{prefix}{payload}{suffix}");
@@ -90,7 +90,7 @@ async fn actions_mark_what_they_start_with_their_terminal() {
             None,
             ProjectActionDraft {
                 name: "Dev server".into(),
-                command: "printf '%s' \"$ZERON_ORIGIN\" > origin".into(),
+                command: "printf '%s' \"$ZEREN_ORIGIN\" > origin".into(),
                 icon: ProjectActionIcon::Test,
                 run_on_worktree_create: false,
             },
@@ -99,7 +99,7 @@ async fn actions_mark_what_they_start_with_their_terminal() {
     let action = snapshot.actions.last().unwrap();
     let run = launch_project_action(&terminals, action, root.path(), root.path(), 80, 24).unwrap();
     terminals.associate_chat(&run.terminal.id, "chat").unwrap();
-    let expected = zeron_proto::terminal_origin(&run.terminal.id);
+    let expected = zeren_proto::terminal_origin(&run.terminal.id);
     tokio::time::timeout(Duration::from_secs(10), async {
         while std::fs::read_to_string(root.path().join("origin")).ok() != Some(expected.clone()) {
             tokio::time::sleep(Duration::from_millis(20)).await;

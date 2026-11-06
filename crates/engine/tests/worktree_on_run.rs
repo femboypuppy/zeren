@@ -1,7 +1,7 @@
 //! Host-side worktree materialization: a Run command carrying a
 //! `WorktreeSpec` creates the isolated worktree on the HOST at drain time
 //! (the durable replacement for the composer's old blocking CreateWorktree
-//! relay RPC), runs there, and stamps the chat row's cwd + `zeron/<name>`
+//! relay RPC), runs there, and stamps the chat row's cwd + `zeren/<name>`
 //! branch. A second spec-carrying Run for the same chat REUSES the checkout
 //! instead of minting another.
 
@@ -14,10 +14,10 @@ use async_trait::async_trait;
 use futures::StreamExt;
 use futures::stream::BoxStream;
 
-use zeron_doc::{MessageRole, MessageStatus, SessionCommandPayload, SessionMessageEntry};
-use zeron_engine::{EngineCore, HarnessRegistry};
-use zeron_harness::{Harness, HarnessError, RunControls};
-use zeron_proto::{
+use zeren_doc::{MessageRole, MessageStatus, SessionCommandPayload, SessionMessageEntry};
+use zeren_engine::{EngineCore, HarnessRegistry};
+use zeren_harness::{Harness, HarnessError, RunControls};
+use zeren_proto::{
     AgentEvent, DoneStatus, HarnessId, Model, ProjectActionDraft, ProjectActionIcon,
     ReasoningLevel, RunRequest, SandboxLevel, SteeringMode, WorktreeSpec,
 };
@@ -213,10 +213,10 @@ async fn check_worktree_setup_and_reuse(use_project_symlink: bool, test_setup: b
         .expect("create project");
     // Save through the same RPC as the editor: the Space may use an alias
     // while the queued WorktreeSpec carries the canonical repository path.
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     client
         .call(
-            zeron_rpc::methods::SET_WORKTREE_SETTINGS,
+            zeren_rpc::methods::SET_WORKTREE_SETTINGS,
             serde_json::json!({
                 "useCustomDirectory": true,
                 "customDirectory": worktrees_root,
@@ -227,12 +227,12 @@ async fn check_worktree_setup_and_reuse(use_project_symlink: bool, test_setup: b
     if test_setup {
         client
         .call(
-            zeron_rpc::methods::UPSERT_PROJECT_ACTION,
+            zeren_rpc::methods::UPSERT_PROJECT_ACTION,
             serde_json::json!({
                 "spaceId": "space-worktree-run",
                 "action": ProjectActionDraft {
                     name: "Setup".into(),
-                    command: "printf '%s' \"$ZERON_PROJECT_ROOT\" > setup-project-root; printf '%s' \"$ZERON_WORKTREE_PATH\" > setup-worktree-path; printf setup > setup-marker".into(),
+                    command: "printf '%s' \"$ZEREN_PROJECT_ROOT\" > setup-project-root; printf '%s' \"$ZEREN_WORKTREE_PATH\" > setup-worktree-path; printf setup > setup-marker".into(),
                     icon: ProjectActionIcon::Configure,
                     run_on_worktree_create: true,
                 }
@@ -246,7 +246,7 @@ async fn check_worktree_setup_and_reuse(use_project_symlink: bool, test_setup: b
     // resolves the project folder), then the queued Run carries the spec.
     client
         .call(
-            zeron_rpc::methods::MUTATE,
+            zeren_rpc::methods::MUTATE,
             serde_json::json!({
                 "op": "createChat",
                 "chatId": CHAT,
@@ -310,7 +310,7 @@ async fn check_worktree_setup_and_reuse(use_project_symlink: bool, test_setup: b
     }
 
     // The chat row follows: cwd repointed at the worktree, branch stamped
-    // with the actual zeron/<name> (the composer only knew the base).
+    // with the actual zeren/<name> (the composer only knew the base).
     let chat = core
         .workspace
         .chat(CHAT)
@@ -319,7 +319,7 @@ async fn check_worktree_setup_and_reuse(use_project_symlink: bool, test_setup: b
     assert_eq!(chat.cwd.as_deref(), Some(first_cwd.as_str()));
     let branch = chat.branch.expect("branch stamped");
     assert!(
-        branch.starts_with("zeron/"),
+        branch.starts_with("zeren/"),
         "stamped branch is the worktree's own: {branch}"
     );
 
@@ -328,7 +328,7 @@ async fn check_worktree_setup_and_reuse(use_project_symlink: bool, test_setup: b
     let next_root = tmp_path.join("new-worktree-location");
     client
         .call(
-            zeron_rpc::methods::SET_WORKTREE_SETTINGS,
+            zeren_rpc::methods::SET_WORKTREE_SETTINGS,
             serde_json::json!({
                 "useCustomDirectory": true,
                 "customDirectory": next_root,
@@ -373,12 +373,12 @@ async fn check_worktree_setup_and_reuse(use_project_symlink: bool, test_setup: b
     assert_eq!(std::fs::read_dir(&next_root).unwrap().count(), 0);
     // The browser must be able to descend from the canonical saved location.
     let nested =
-        zeron_proto::device_paths::child_folder(&next_root.to_string_lossy(), "Carpeta 日本語");
+        zeren_proto::device_paths::child_folder(&next_root.to_string_lossy(), "Carpeta 日本語");
     std::fs::create_dir(&nested).unwrap();
     assert!(std::path::Path::new(&nested).is_dir());
     let listing = core.repos.list_folders(Some(nested.clone())).await.unwrap();
     assert!(same_file::is_same_file(&listing.path, &nested).unwrap());
-    let parent = zeron_proto::device_paths::parent_folder(&listing.path).unwrap();
+    let parent = zeren_proto::device_paths::parent_folder(&listing.path).unwrap();
     let listing = core.repos.list_folders(Some(parent)).await.unwrap();
     assert!(
         listing
@@ -390,7 +390,7 @@ async fn check_worktree_setup_and_reuse(use_project_symlink: bool, test_setup: b
     let next_chat = "chat-after-location-change";
     client
         .call(
-            zeron_rpc::methods::MUTATE,
+            zeren_rpc::methods::MUTATE,
             serde_json::json!({
                 "op": "createChat", "chatId": next_chat, "deviceId": core.device_id,
             }),
@@ -475,13 +475,13 @@ async fn worktree_location_supports_long_windows_files() {
     git(&repo, &["config", "core.longpaths", "false"]);
     // Exercise a launchable checkout above Git's separate GIT_DIR limit.
     let destination = root.join("a".repeat(210 - root.to_string_lossy().encode_utf16().count()));
-    let repos = zeron_engine::Repos::with_worktrees_root(
+    let repos = zeren_engine::Repos::with_worktrees_root(
         &root.join("settings"),
         "test-device",
         root.join("default"),
     );
     repos
-        .set_worktree_settings(zeron_proto::WorktreeSettings {
+        .set_worktree_settings(zeren_proto::WorktreeSettings {
             use_custom_directory: true,
             custom_directory: Some(destination.to_string_lossy().into_owned()),
         })
@@ -537,7 +537,7 @@ async fn worktree_location_rejects_unlaunchable_windows_destinations() {
     let tmp = tempfile::tempdir().unwrap();
     let root = tmp.path().canonicalize().unwrap();
     let default_root = root.join("default");
-    let repos = zeron_engine::Repos::with_worktrees_root(
+    let repos = zeren_engine::Repos::with_worktrees_root(
         &root.join("settings"),
         "test",
         default_root.clone(),
@@ -548,7 +548,7 @@ async fn worktree_location_rejects_unlaunchable_windows_destinations() {
     }
     let previous = repos.worktree_settings();
     let error = repos
-        .set_worktree_settings(zeron_proto::WorktreeSettings {
+        .set_worktree_settings(zeren_proto::WorktreeSettings {
             use_custom_directory: true,
             custom_directory: Some(destination.to_string_lossy().into_owned()),
         })
@@ -583,7 +583,7 @@ async fn worktree_location_rejects_unlaunchable_windows_destinations() {
     );
     let near_limit = root.join("a".repeat(250 - root.to_string_lossy().encode_utf16().count()));
     repos
-        .set_worktree_settings(zeron_proto::WorktreeSettings {
+        .set_worktree_settings(zeren_proto::WorktreeSettings {
             use_custom_directory: true,
             custom_directory: Some(near_limit.to_string_lossy().into_owned()),
         })
@@ -603,6 +603,6 @@ async fn worktree_location_rejects_unlaunchable_windows_destinations() {
             .await
             .unwrap()
             .iter()
-            .all(|branch| !branch.starts_with("zeron/"))
+            .all(|branch| !branch.starts_with("zeren/"))
     );
 }

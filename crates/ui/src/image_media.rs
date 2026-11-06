@@ -193,7 +193,7 @@ pub(crate) fn svg_options() -> usvg::Options<'static> {
 }
 
 pub(crate) fn decode_image(mime: &str, bytes: Vec<u8>) -> Result<MediaImage, String> {
-    if bytes.len() > zeron_proto::MAX_WORKSPACE_IMAGE_BYTES {
+    if bytes.len() > zeren_proto::MAX_WORKSPACE_IMAGE_BYTES {
         return Err("Image exceeds preview size limit".into());
     }
     if mime == "image/svg+xml" {
@@ -201,7 +201,7 @@ pub(crate) fn decode_image(mime: &str, bytes: Vec<u8>) -> Result<MediaImage, Str
         let (width, height) = (tree.size().width(), tree.size().height());
         // Re-serialize the parsed tree: scripts, HTML and external resources never reach GPUI.
         let svg = tree.to_string(&usvg::WriteOptions::default());
-        if svg.len() > zeron_proto::MAX_WORKSPACE_IMAGE_BYTES {
+        if svg.len() > zeren_proto::MAX_WORKSPACE_IMAGE_BYTES {
             return Err("Prepared SVG exceeds preview size limit".into());
         }
         // Account the raster that exists, not the largest one any view could
@@ -217,7 +217,7 @@ pub(crate) fn decode_image(mime: &str, bytes: Vec<u8>) -> Result<MediaImage, Str
         };
         return Ok(media.preview_for_view((900.0, 480.0), 2.0));
     }
-    decode_raster_image(bytes, zeron_proto::MAX_WORKSPACE_IMAGE_BYTES)
+    decode_raster_image(bytes, zeren_proto::MAX_WORKSPACE_IMAGE_BYTES)
 }
 
 /// Repository icons retain only a small static thumbnail, even for large source logos.
@@ -225,7 +225,7 @@ pub(crate) fn decode_project_icon(mime: &str, bytes: Vec<u8>) -> Result<MediaIma
     if mime == "image/svg+xml" {
         decode_image(mime, bytes).map(|media| media.for_view((16.0, 16.0), 2.0, 4096))
     } else {
-        decode_raster_image_bounded(bytes, zeron_proto::MAX_WORKSPACE_IMAGE_BYTES, Some(64))
+        decode_raster_image_bounded(bytes, zeren_proto::MAX_WORKSPACE_IMAGE_BYTES, Some(64))
     }
 }
 
@@ -258,8 +258,8 @@ pub(crate) fn decode_raster_image(bytes: Vec<u8>, max_bytes: usize) -> Result<Me
 /// decoder allocation.
 pub(crate) fn raster_limits() -> image::Limits {
     let mut limits = image::Limits::default();
-    limits.max_image_width = Some(zeron_proto::IMAGE_MAX_SIDE);
-    limits.max_image_height = Some(zeron_proto::IMAGE_MAX_SIDE);
+    limits.max_image_width = Some(zeren_proto::IMAGE_MAX_SIDE);
+    limits.max_image_height = Some(zeren_proto::IMAGE_MAX_SIDE);
     limits.max_alloc = Some(64 * 1024 * 1024);
     limits
 }
@@ -336,7 +336,7 @@ mod tests {
 
     #[test]
     fn svg_text_survives_an_unavailable_font() {
-        assert_svg_text_is_visible("Zeron Missing SVG Test Font");
+        assert_svg_text_is_visible("Zeren Missing SVG Test Font");
         assert_svg_text_is_visible(".SystemUIFont");
     }
 
@@ -441,7 +441,7 @@ mod tests {
         assert!(
             decode_image(
                 "image/png",
-                vec![0; zeron_proto::MAX_WORKSPACE_IMAGE_BYTES + 1]
+                vec![0; zeren_proto::MAX_WORKSPACE_IMAGE_BYTES + 1]
             )
             .is_err()
         );

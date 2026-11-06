@@ -1,8 +1,8 @@
 //! Agent visuals: Luau scripts an agent shows inline in its reply through
-//! Zeron's `show_visual` MCP tool (charts, tables, dashboards, simulations,
+//! Zeren's `show_visual` MCP tool (charts, tables, dashboards, simulations,
 //! 3D views).
 //!
-//! A script returns a tree of `ui.*` nodes ([`zeron_visual`]), and this module
+//! A script returns a tree of `ui.*` nodes ([`zeren_visual`]), and this module
 //! renders it with the same GPUI elements, type scale, and theme as the
 //! transcript around it. Nothing foreign is hosted: a visual scrolls, clips,
 //! fades under the glass composer, and takes the pointer exactly like a
@@ -25,7 +25,7 @@ use gpui::{
     Pixels, Point, Render, SharedString, StatefulInteractiveElement, Styled, StyledText, Task,
     TextAlign, TextRun, Window, canvas, div, point, px,
 };
-use zeron_visual::{
+use zeren_visual::{
     Align, ChartKind, DrawCmd, HandlerArg, HandlerId, Justify, Node, NodeKind, Token,
 };
 
@@ -47,7 +47,7 @@ pub struct VisualFrame {
     id: SharedString,
     title: SharedString,
     load: Load,
-    runtime: Option<Rc<RefCell<zeron_visual::Visual>>>,
+    runtime: Option<Rc<RefCell<zeren_visual::Visual>>>,
     tree: Option<Rc<Node>>,
     /// Bumped on every render of the tree: draw caches key on it.
     generation: u64,
@@ -83,13 +83,13 @@ struct Local {
 #[derive(Default)]
 struct ShaderCache {
     /// The newest frame and the uniforms it was drawn with.
-    shown: Option<(zeron_visual::shader::ShaderUniforms, Arc<gpui::RenderImage>)>,
+    shown: Option<(zeren_visual::shader::ShaderUniforms, Arc<gpui::RenderImage>)>,
     /// Frames started, and the wall time the last one was started at.
     frame: u32,
     last_time: f64,
     /// Buffers carried between frames (feedback, simulations); away on the
     /// render thread while a frame renders.
-    gpu: Option<zeron_visual_gpu::ShaderState>,
+    gpu: Option<zeren_visual_gpu::ShaderState>,
     rendering: bool,
 }
 
@@ -106,14 +106,14 @@ struct SceneCache {
     generation: u64,
     /// Bumped with every new drawing, so an image of an older one is stale.
     drawing: u64,
-    scene: Arc<zeron_visual::Scene>,
+    scene: Arc<zeren_visual::Scene>,
     /// The newest image, and what it was rendered for.
     image: Option<(RasterKey, SceneImage)>,
     /// How long the last supersampled software render took: cheap scenes
     /// stay supersampled while the camera moves.
     final_cost: Option<std::time::Duration>,
     /// GPU targets kept between frames; away while a frame renders.
-    gpu: Option<zeron_visual_gpu::SceneState>,
+    gpu: Option<zeren_visual_gpu::SceneState>,
     rendering: bool,
 }
 
@@ -125,7 +125,7 @@ struct RasterKey {
     zoom: f32,
     size: (f32, f32),
     pixel_scale: f32,
-    quality: zeron_visual::Quality,
+    quality: zeren_visual::Quality,
     palette: u64,
     drawing: u64,
 }
@@ -134,7 +134,7 @@ struct RasterKey {
 struct SceneImage {
     image: Arc<gpui::RenderImage>,
     hints: Arc<Vec<([f32; 2], f32, String)>>,
-    labels: Arc<Vec<zeron_visual::RasterLabel>>,
+    labels: Arc<Vec<zeren_visual::RasterLabel>>,
 }
 
 /// A rendered frame as an image GPUI can paint (off the main thread).
@@ -219,15 +219,15 @@ impl VisualFrame {
                     {
                         for name in names
                             .into_iter()
-                            .filter(|name| zeron_visual::assets::valid_name(name))
-                            .take(zeron_visual::assets::MAX_ASSETS)
+                            .filter(|name| zeren_visual::assets::valid_name(name))
+                            .take(zeren_visual::assets::MAX_ASSETS)
                         {
                             if let Some(bytes) = read(format!("{stem}-asset-{name}")).await {
                                 files.insert(name, Arc::<[u8]>::from(bytes));
                             }
                         }
                     }
-                    let assets = zeron_visual::Assets::new(files);
+                    let assets = zeren_visual::Assets::new(files);
                     let _ = this.update(cx, |this, cx| match script {
                         Some(script) => this.start(&script, assets, cx),
                         None => {
@@ -261,12 +261,12 @@ impl VisualFrame {
 
     /// Run a script's setup and first render (the engine already ran the
     /// same script before publishing it, so failures here are rare).
-    fn start(&mut self, script: &str, assets: zeron_visual::Assets, cx: &mut Context<Self>) {
+    fn start(&mut self, script: &str, assets: zeren_visual::Assets, cx: &mut Context<Self>) {
         // The row id ends with the part's visual id, which the engine
         // seeded its check with: the reader sees the same random data.
         let visual_id = self.id.rsplit('#').next().unwrap_or(&self.id);
-        let seed = zeron_visual::seed_for(visual_id);
-        match zeron_visual::Visual::load(script, seed) {
+        let seed = zeren_visual::seed_for(visual_id);
+        match zeren_visual::Visual::load(script, seed) {
             Ok(visual) => {
                 let visual = visual.with_assets(assets);
                 self.runtime = Some(Rc::new(RefCell::new(visual)));
@@ -308,7 +308,7 @@ impl VisualFrame {
         cx.notify();
     }
 
-    fn fail(&mut self, error: zeron_visual::VisualError, cx: &mut Context<Self>) {
+    fn fail(&mut self, error: zeren_visual::VisualError, cx: &mut Context<Self>) {
         tracing::warn!(visual = %self.id, %error, "visual script error");
         self.error = Some(error.message.into());
         cx.emit(VisualLayoutChanged);
@@ -434,7 +434,7 @@ impl Palette {
         }
     }
 
-    fn color(&self, color: zeron_visual::Color) -> Hsla {
+    fn color(&self, color: zeren_visual::Color) -> Hsla {
         let mut out = self.token(color.token);
         if let Some((other, t)) = color.mix {
             out = mix_rgb(out, self.token(other), t);
@@ -457,12 +457,12 @@ fn mix_rgb(a: Hsla, b: Hsla, t: f32) -> Hsla {
     .into()
 }
 
-fn weight(weight: zeron_visual::Weight) -> FontWeight {
+fn weight(weight: zeren_visual::Weight) -> FontWeight {
     match weight {
-        zeron_visual::Weight::Regular => FontWeight::NORMAL,
-        zeron_visual::Weight::Medium => FontWeight::MEDIUM,
-        zeron_visual::Weight::Semibold => FontWeight::SEMIBOLD,
-        zeron_visual::Weight::Bold => FontWeight::BOLD,
+        zeren_visual::Weight::Regular => FontWeight::NORMAL,
+        zeren_visual::Weight::Medium => FontWeight::MEDIUM,
+        zeren_visual::Weight::Semibold => FontWeight::SEMIBOLD,
+        zeren_visual::Weight::Bold => FontWeight::BOLD,
     }
 }
 
@@ -481,7 +481,7 @@ fn ui_font(theme: &Theme, mono: bool, w: FontWeight, italic: bool) -> gpui::Font
     font
 }
 
-fn rems(size: zeron_visual::TextSize) -> (gpui::Rems, gpui::Rems) {
+fn rems(size: zeren_visual::TextSize) -> (gpui::Rems, gpui::Rems) {
     let (size, line_height) = size.metrics();
     (
         crate::typography::ui_rems(size),
@@ -490,7 +490,7 @@ fn rems(size: zeron_visual::TextSize) -> (gpui::Rems, gpui::Rems) {
 }
 
 /// A text size in window pixels at the reader's interface size.
-fn text_px(size: zeron_visual::TextSize, window: &Window) -> (Pixels, Pixels) {
+fn text_px(size: zeren_visual::TextSize, window: &Window) -> (Pixels, Pixels) {
     let (size, line_height) = rems(size);
     (
         size.to_pixels(window.rem_size()),
@@ -797,14 +797,14 @@ impl VisualFrame {
 
     fn stack(
         &mut self,
-        stack: &zeron_visual::Stack,
+        stack: &zeren_visual::Stack,
         path: &str,
         theme: &Theme,
         palette: &Palette,
         window: &mut Window,
         cx: &mut Context<Self>,
     ) -> AnyElement {
-        let horizontal = stack.axis == zeron_visual::Axis::Horizontal;
+        let horizontal = stack.axis == zeren_visual::Axis::Horizontal;
         let mut el = div().flex().gap(px(stack.gap));
         el = if horizontal {
             el.flex_row().when(stack.wrap, |el| el.flex_wrap())
@@ -876,7 +876,7 @@ impl VisualFrame {
     /// between rows, no outer box or fills.
     fn table(
         &mut self,
-        table: &zeron_visual::TableNode,
+        table: &zeren_visual::TableNode,
         path: &str,
         theme: &Theme,
         palette: &Palette,
@@ -951,7 +951,7 @@ impl VisualFrame {
     }
 }
 
-fn text_element(text: &zeron_visual::Text, theme: &Theme, palette: &Palette) -> AnyElement {
+fn text_element(text: &zeren_visual::Text, theme: &Theme, palette: &Palette) -> AnyElement {
     let (size, line_height) = rems(text.size);
     let base_color = text.color.map(|c| palette.color(c)).unwrap_or(theme.text);
     let mut content = String::new();
@@ -995,11 +995,11 @@ fn stat(
     value: &str,
     label: &str,
     delta: Option<&str>,
-    tone: Option<zeron_visual::Color>,
+    tone: Option<zeren_visual::Color>,
     theme: &Theme,
     palette: &Palette,
 ) -> AnyElement {
-    let (size, line_height) = rems(zeron_visual::TextSize::Xxl);
+    let (size, line_height) = rems(zeren_visual::TextSize::Xxl);
     // A tone marks the change, not the figure; a figure with no change
     // takes the tone itself.
     let tone = tone.map(|c| palette.color(c));
@@ -1227,7 +1227,7 @@ impl VisualFrame {
 
     fn canvas(
         &mut self,
-        node: &zeron_visual::Canvas,
+        node: &zeren_visual::Canvas,
         key: SharedString,
         cx: &mut Context<Self>,
     ) -> AnyElement {
@@ -1313,7 +1313,7 @@ impl VisualFrame {
                         size.0,
                         size.1,
                         time,
-                        pointer.map(|(x, y, down)| zeron_visual::Pointer { x, y, down }),
+                        pointer.map(|(x, y, down)| zeren_visual::Pointer { x, y, down }),
                     );
                     let mut state = local.borrow_mut();
                     match drawn {
@@ -1415,7 +1415,7 @@ fn fill_convex(points: &[Point<Pixels>], color: Hsla, window: &mut Window) {
 fn paint_text(
     text: &str,
     at: Point<Pixels>,
-    size: zeron_visual::TextSize,
+    size: zeren_visual::TextSize,
     w: FontWeight,
     mono: bool,
     color: Hsla,
@@ -1577,7 +1577,7 @@ impl VisualFrame {
     /// animates, painted as an image like any other.
     fn shader(
         &mut self,
-        node: &zeron_visual::ShaderNode,
+        node: &zeren_visual::ShaderNode,
         key: SharedString,
         cx: &mut Context<Self>,
     ) -> AnyElement {
@@ -1634,7 +1634,7 @@ impl VisualFrame {
             el = self.orbit_handlers(el, &key, spin, cx);
         }
         let names: Vec<String> = node.inputs.iter().map(|(n, _)| n.clone()).collect();
-        let mut inputs = [[0.0f32; 4]; zeron_visual::shader::MAX_INPUTS / 4];
+        let mut inputs = [[0.0f32; 4]; zeren_visual::shader::MAX_INPUTS / 4];
         for (i, (_, value)) in node.inputs.iter().enumerate() {
             inputs[i / 4][i % 4] = *value;
         }
@@ -1643,12 +1643,12 @@ impl VisualFrame {
             .as_ref()
             .map(|runtime| runtime.borrow().assets().clone())
             .unwrap_or_default();
-        let textures: Vec<zeron_visual::TextureData> = node
+        let textures: Vec<zeren_visual::TextureData> = node
             .textures
             .iter()
             // A missing one keeps its slot (and samples as clear).
             .map(|name| {
-                zeron_visual::TextureData::Encoded(
+                zeren_visual::TextureData::Encoded(
                     assets.get(name).unwrap_or_else(|| Arc::from([])),
                 )
             })
@@ -1711,7 +1711,7 @@ impl VisualFrame {
                     } else {
                         (time - entry.last_time).max(0.0)
                     };
-                    let uniforms = zeron_visual::shader::ShaderUniforms {
+                    let uniforms = zeren_visual::shader::ShaderUniforms {
                         resolution: [size.0 as f32, size.1 as f32, scale, 0.0],
                         mouse,
                         camera: [yaw, orbit.pitch, zoom, 0.0],
@@ -1742,8 +1742,8 @@ impl VisualFrame {
                             textures.clone(),
                         );
                         let render = cx.background_executor().spawn(async move {
-                            let rendered = zeron_visual_gpu::render_shader(
-                                &zeron_visual_gpu::ShaderSpec {
+                            let rendered = zeren_visual_gpu::render_shader(
+                                &zeren_visual_gpu::ShaderSpec {
                                     image: &code,
                                     buffers: &buffers,
                                     inputs: &names,
@@ -1812,7 +1812,7 @@ impl VisualFrame {
 
     fn scene(
         &mut self,
-        node: &zeron_visual::SceneNode,
+        node: &zeren_visual::SceneNode,
         key: SharedString,
         cx: &mut Context<Self>,
     ) -> AnyElement {
@@ -1835,7 +1835,7 @@ impl VisualFrame {
             Some(_) => orbit.yaw,
             None => orbit.yaw + spin * orbit.spin_epoch.elapsed().as_secs_f32(),
         };
-        let camera = zeron_visual::Camera {
+        let camera = zeren_visual::Camera {
             yaw,
             pitch: orbit.pitch,
             zoom: node.zoom,
@@ -1918,10 +1918,10 @@ impl VisualFrame {
                     // Quality only steers the software renderer; on the GPU
                     // a finished drag mustn't render the same frame again.
                     let quality =
-                        if (moving || dragging) && !cheap && !zeron_visual_gpu::available() {
-                            zeron_visual::Quality::Draft
+                        if (moving || dragging) && !cheap && !zeren_visual_gpu::available() {
+                            zeren_visual::Quality::Draft
                         } else {
-                            zeron_visual::Quality::Final
+                            zeren_visual::Quality::Final
                         };
                     let size = (f32::from(bounds.size.width), f32::from(bounds.size.height));
                     let entry = state.scenes.get_mut(&key)?;
@@ -1953,7 +1953,7 @@ impl VisualFrame {
                             let started = Instant::now();
                             let mut cost = None;
                             let (width, height, bgra, hints, labels) =
-                                match zeron_visual_gpu::render_scene(
+                                match zeren_visual_gpu::render_scene(
                                     &scene,
                                     camera,
                                     size.0,
@@ -1976,7 +1976,7 @@ impl VisualFrame {
                                             quality,
                                             &rgba,
                                         );
-                                        if quality == zeron_visual::Quality::Final {
+                                        if quality == zeren_visual::Quality::Final {
                                             cost = Some(started.elapsed());
                                         }
                                         (
@@ -2070,7 +2070,7 @@ impl VisualFrame {
                         paint_text(
                             &hint,
                             bounds.origin,
-                            zeron_visual::TextSize::Sm,
+                            zeren_visual::TextSize::Sm,
                             FontWeight::MEDIUM,
                             false,
                             paint_palette.text,
@@ -2145,7 +2145,7 @@ fn domain(lo: f64, hi: f64, include_zero: bool) -> (f64, f64, Vec<f64>) {
     if (hi - lo).abs() < f64::EPSILON {
         hi = lo + lo.abs().max(1.0);
     }
-    let ticks = zeron_visual::nice_ticks(lo, hi, 4);
+    let ticks = zeren_visual::nice_ticks(lo, hi, 4);
     let step = if ticks.len() > 1 {
         ticks[1] - ticks[0]
     } else {
@@ -2153,10 +2153,10 @@ fn domain(lo: f64, hi: f64, include_zero: bool) -> (f64, f64, Vec<f64>) {
     };
     let lo = (lo / step).floor() * step;
     let hi = (hi / step).ceil() * step;
-    (lo, hi, zeron_visual::nice_ticks(lo, hi, 4))
+    (lo, hi, zeren_visual::nice_ticks(lo, hi, 4))
 }
 
-fn value_range(chart: &zeron_visual::Chart) -> (f64, f64) {
+fn value_range(chart: &zeren_visual::Chart) -> (f64, f64) {
     let (mut lo, mut hi) = (f64::INFINITY, f64::NEG_INFINITY);
     if chart.kind == ChartKind::Scatter {
         for (_, y) in chart.series.iter().flat_map(|s| &s.points) {
@@ -2191,7 +2191,7 @@ fn value_range(chart: &zeron_visual::Chart) -> (f64, f64) {
     (chart.y_min.unwrap_or(lo), chart.y_max.unwrap_or(hi))
 }
 
-fn categories(chart: &zeron_visual::Chart) -> usize {
+fn categories(chart: &zeren_visual::Chart) -> usize {
     chart
         .series
         .iter()
@@ -2201,7 +2201,7 @@ fn categories(chart: &zeron_visual::Chart) -> usize {
         .max(chart.x.len())
 }
 
-fn measure(text: &str, size: zeron_visual::TextSize, window: &Window, cx: &App) -> f32 {
+fn measure(text: &str, size: zeren_visual::TextSize, window: &Window, cx: &App) -> f32 {
     let theme = Theme::of(cx);
     let (font_size, _) = text_px(size, window);
     let run = TextRun {
@@ -2223,7 +2223,7 @@ fn measure(text: &str, size: zeron_visual::TextSize, window: &Window, cx: &App) 
 impl VisualFrame {
     fn chart(
         &mut self,
-        chart: &zeron_visual::Chart,
+        chart: &zeren_visual::Chart,
         key: SharedString,
         theme: &Theme,
         palette: &Palette,
@@ -2357,7 +2357,7 @@ impl VisualFrame {
 }
 
 fn nearest_point(
-    chart: &zeron_visual::Chart,
+    chart: &zeren_visual::Chart,
     plot: Bounds<Pixels>,
     pointer: Point<Pixels>,
 ) -> Option<(usize, usize)> {
@@ -2379,7 +2379,7 @@ fn nearest_point(
     best.map(|(_, s, p)| (s, p))
 }
 
-fn x_extent(chart: &zeron_visual::Chart) -> (f64, f64) {
+fn x_extent(chart: &zeren_visual::Chart) -> (f64, f64) {
     chart
         .series
         .iter()
@@ -2390,14 +2390,14 @@ fn x_extent(chart: &zeron_visual::Chart) -> (f64, f64) {
 }
 
 fn plan_chart(
-    chart: &zeron_visual::Chart,
+    chart: &zeren_visual::Chart,
     bounds: Bounds<Pixels>,
     hover: Option<usize>,
     hover_point: Option<(usize, usize)>,
     window: &mut Window,
     cx: &mut App,
 ) -> ChartPlan {
-    use zeron_visual::TextSize::Xs;
+    use zeren_visual::TextSize::Xs;
     let (_, tick_line) = text_px(Xs, window);
     let tick_line = f32::from(tick_line);
     let scatter = chart.kind == ChartKind::Scatter;
@@ -2465,13 +2465,13 @@ fn plan_chart(
 }
 
 fn paint_chart_plan(
-    chart: &zeron_visual::Chart,
+    chart: &zeren_visual::Chart,
     plan: &ChartPlan,
     palette: &Palette,
     window: &mut Window,
     cx: &mut App,
 ) {
-    use zeron_visual::TextSize::Xs;
+    use zeren_visual::TextSize::Xs;
     let plot = plan.plot;
     if plot.size.width <= px(4.0) || plot.size.height <= px(4.0) {
         return;
@@ -2762,13 +2762,13 @@ mod tests {
     fn every_token_resolves_against_the_theme() {
         for theme in [Theme::dark(), Theme::light()] {
             let palette = Palette::new(&theme);
-            for name in zeron_visual::TOKEN_NAMES {
+            for name in zeren_visual::TOKEN_NAMES {
                 let token = Token::parse(name).unwrap();
                 let color = palette.token(token);
                 assert!(color.a > 0.0, "{name}");
             }
             assert_eq!(palette.token(Token::Text), theme.text);
-            let half = palette.color(zeron_visual::Color::token(Token::Accent).with_alpha(0.5));
+            let half = palette.color(zeren_visual::Color::token(Token::Accent).with_alpha(0.5));
             assert!((half.a - theme.accent.a * 0.5).abs() < 1e-6);
         }
     }

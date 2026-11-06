@@ -12,8 +12,8 @@ use std::time::{Duration, Instant};
 use gpui::{
     AnyElement, Context, Entity, SharedString, Subscription, Task, Window, div, prelude::*, px,
 };
-use zeron_proto::{BillingLink, BillingPlan, BillingStatus};
-use zeron_rpc::methods;
+use zeren_proto::{BillingLink, BillingPlan, BillingStatus};
+use zeren_rpc::methods;
 
 use crate::popover::{self, Loadable};
 use crate::settings::search::{SearchAnchor, SettingId};
@@ -940,7 +940,7 @@ impl Render for BillingPage {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zeron_proto::{BillingCredits, BillingPack, BillingSubscription};
+    use zeren_proto::{BillingCredits, BillingPack, BillingSubscription};
 
     fn status(plan: Option<&str>, extra: f64, cancel: bool) -> BillingStatus {
         let plans = vec![

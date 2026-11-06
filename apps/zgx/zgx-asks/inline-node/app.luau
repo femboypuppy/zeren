@@ -1,5 +1,5 @@
 -- Repro: a paragraph that needs a drawn thing inside its text, on its
--- baseline, wrapping with the words (inline LaTeX math, as Zeron's replies
+-- baseline, wrapping with the words (inline LaTeX math, as Zeren's replies
 -- show it: "where $e^{i\pi} + 1 = 0$ holds").
 --
 -- Today a paragraph is `ui.rich` of `ui.span`s, and the only non-text a span

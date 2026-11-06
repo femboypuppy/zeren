@@ -7,11 +7,11 @@
 //! engine has checked it again. A change reloads the window's scripts,
 //! keeping their state.
 //!
-//! The window itself runs your active template (`live`): Zeron's own
+//! The window itself runs your active template (`live`): Zeren's own
 //! interface with the template's files on top, in `<data>/templates/.live/`,
 //! rewritten as you switch or save and reloaded in place.
 //!
-//! What plugins reach of Zeron, besides the hooks and screens zgx gives
+//! What plugins reach of Zeren, besides the hooks and screens zgx gives
 //! them (`grants::HOOKS`): read-only shared state the app keeps
 //! (`grants::SHARED_READ`, screens/plugins), the app's actions
 //! (`grants::ACTIONS`), and their own calls and actions, `plugin.<id>.*`:
@@ -88,8 +88,8 @@ const INBOX: usize = 256;
 const REQUESTS: usize = 32;
 /// The most a menu item's label says.
 const LABEL: usize = 60;
-/// Plugin ids that are Zeron's own.
-const RESERVED: &[&str] = &["templates", "zeron", "app"];
+/// Plugin ids that are Zeren's own.
+const RESERVED: &[&str] = &["templates", "zeren", "app"];
 /// How many of a template's files may fall back in a run before the whole
 /// template is set aside (it isn't converging: its root depends on them).
 const MOST_FALLBACKS: usize = 12;
@@ -252,7 +252,7 @@ pub struct Bridge {
     /// its files' stamp and the approvals file's.
     trust: RefCell<Option<((String, String, String), bool)>>,
     /// A template's files that failed (`<id>:<rel>`, by the file as it stood),
-    /// Zeron's showing in their place until they change.
+    /// Zeren's showing in their place until they change.
     failed_files: RefCell<recovery::Failures>,
     /// Templates set aside whole (by id, as their files were), until edited.
     broken: RefCell<recovery::Failures>,
@@ -280,7 +280,7 @@ pub struct Bridge {
     /// Each plugin's GitHub ("github", lent by proxy): what it hears of the
     /// sessions it shows, and the engine's watches of them (`github`).
     gh: RefCell<HashMap<String, Gh>>,
-    /// Each plugin's storage (`zeron.store`): its `plugin.<id>.store` and
+    /// Each plugin's storage (`zeren.store`): its `plugin.<id>.store` and
     /// what it holds, kept in `<data>/plugins/.storage/<id>.json`.
     stores: RefCell<HashMap<String, Store>>,
     /// Each plugin's settings (`settings`): what it declares and what you
@@ -309,9 +309,9 @@ pub struct Bridge {
 /// What plugins may read and ask of the app, each behind its permission,
 /// and every declared hook behind "ui.add".
 pub fn expose_surface(host: &ScriptHost) {
-    // Names under `zeron` are the app's alone, whatever a plugin is called
+    // Names under `zeren` are the app's alone, whatever a plugin is called
     // (its slots and commands are its own names anyway).
-    host.reserve_prefix("zeron");
+    host.reserve_prefix("zeren");
     // Adding before or after any element, by any selector, is "ui.add"'s
     // (replacing is "ui.change"'s, an OverrideElement of the selector as
     // written).
@@ -354,7 +354,7 @@ pub fn expose_own(host: &ScriptHost, id: &str) {
 /// (`auth::set_up`), on the same connection, so plugins load as setup
 /// finishes, with no relaunch. Settings → Plugins says so meanwhile.
 fn connect(b: &Rc<Bridge>, rpc: &Rpc) {
-    // Zeron's own plugins, shipped beside the app's scripts: the engine
+    // Zeren's own plugins, shipped beside the app's scripts: the engine
     // scans them with yours (each connection: an engine started again
     // forgets).
     let builtin = builtin_dir();
@@ -365,7 +365,7 @@ fn connect(b: &Rc<Bridge>, rpc: &Rpc) {
                 async move { call("SetBuiltinPlugins", json!({ "dir": builtin })).await }
             });
             if let Err(error) = asked.await {
-                eprintln!("zeron-zgx: Zeron's own plugins weren't loaded: {error}");
+                eprintln!("zeren-zgx: Zeren's own plugins weren't loaded: {error}");
             }
         });
     }
@@ -539,7 +539,7 @@ pub fn install(cx: &mut WindowContext, host: &ScriptHost) {
     *bridge.records_effect.borrow_mut() = Some(effect);
 
     // Every script error, blamed on a template or a plugin when it's
-    // theirs: that one makes way for Zeron's own (after this turn, never
+    // theirs: that one makes way for Zeren's own (after this turn, never
     // reloading from inside the error's report).
     let weak = Rc::downgrade(&bridge);
     host.on_error(move |error| {
@@ -649,20 +649,20 @@ async fn off_thread<T: Send + 'static>(work: impl FnOnce() -> T + Send + 'static
     heard.recv().await
 }
 
-/// The main window's app file: `.live/app.luau`, laid down now from Zeron's
+/// The main window's app file: `.live/app.luau`, laid down now from Zeren's
 /// own and the active template (before the window's host is made, which
 /// fixes its file), or `ui/app.luau` where there's no templates folder.
-/// The `--zeron-template` launch flag makes Zeron's own the active one first.
+/// The `--zeren-template` launch flag makes Zeren's own the active one first.
 pub fn prepare_live() -> PathBuf {
     let fallback = crate::ui_dir().join("app.luau");
     let Some(root) = templates_root() else { return fallback };
     // The per-screen templates' copies (Oct 31, development only): gone.
     let _ = std::fs::remove_dir_all(root.join(".loaded"));
-    // Safe mode (preview.rs): as Zeron last closed, ⌥ held now, or a
-    // template that crashed the last two launches. `--zeron-template` is
+    // Safe mode (preview.rs): as Zeren last closed, ⌥ held now, or a
+    // template that crashed the last two launches. `--zeren-template` is
     // the same, asked on the command line.
     preview::read_at_launch();
-    if ZERON_TEMPLATE.swap(false, std::sync::atomic::Ordering::Relaxed) {
+    if ZEREN_TEMPLATE.swap(false, std::sync::atomic::Ordering::Relaxed) {
         preview::enter_safe();
     }
     {
@@ -671,8 +671,8 @@ pub fn prepare_live() -> PathBuf {
         preview::set_template_running(id != live::BUILTIN);
         preview::set((!preview::trusted(&root, &id)).then(|| preview::Preview { name: template_name(&root, &id), id: id.clone() }));
     }
-    if let Err(error) = live::sync_zeron(&crate::ui_dir(), &root) {
-        eprintln!("zeron-zgx: Zeron's own interface wasn't copied ({error}); running it from ui/");
+    if let Err(error) = live::sync_zeren(&crate::ui_dir(), &root) {
+        eprintln!("zeren-zgx: Zeren's own interface wasn't copied ({error}); running it from ui/");
         return fallback;
     }
     // The built-in themes once installed as templates, retired: one in use
@@ -695,19 +695,19 @@ pub fn prepare_live() -> PathBuf {
             root.join(live::LIVE).join("app.luau")
         }
         Err(error) => {
-            eprintln!("zeron-zgx: the template wasn't laid down ({error}); running Zeron's own from ui/");
+            eprintln!("zeren-zgx: the template wasn't laid down ({error}); running Zeren's own from ui/");
             fallback
         }
     }
 }
 
-/// The host's own menu item's action ("Use Zeron v3").
-pub const USE_ZERON_TEMPLATE: &str = "zeron.use-zeron-template";
+/// The host's own menu item's action ("Use Zeren v3").
+pub const USE_ZEREN_TEMPLATE: &str = "zeren.use-zeren-template";
 /// The host's own "Keep <template>…": the keep sheet for the one in preview.
-pub const KEEP_TEMPLATE: &str = "zeron.keep-template";
+pub const KEEP_TEMPLATE: &str = "zeren.keep-template";
 
 /// One of the host's own commands (its menu items and its toasts' buttons:
-/// never a script's, `zeron.` being the host's).
+/// never a script's, `zeren.` being the host's).
 pub fn host_command(id: &str) {
     // (A test hears what ran instead: Revert's safe mode would be written
     // to the app's own data folder.)
@@ -718,13 +718,13 @@ pub fn host_command(id: &str) {
     }
     #[allow(unreachable_code)]
     match id {
-        USE_ZERON_TEMPLATE => use_zeron_template(),
+        USE_ZEREN_TEMPLATE => use_zeren_template(),
         KEEP_TEMPLATE => {
             if let (Some(p), Some(b)) = (preview::current(), BRIDGE.with(|b| b.borrow().upgrade())) {
                 template_consent::keep(&b, &p.id);
             }
         }
-        other => eprintln!("zeron-zgx: no host command {other}"),
+        other => eprintln!("zeren-zgx: no host command {other}"),
     }
 }
 
@@ -741,11 +741,11 @@ pub(crate) fn spawn_on_bridge(work: impl std::future::Future<Output = ()> + 'sta
     }
 }
 
-static ZERON_TEMPLATE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+static ZEREN_TEMPLATE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
 
-/// `--zeron-template`: Zeron's own as the main window opens.
-pub fn ask_zeron_template() {
-    ZERON_TEMPLATE.store(true, std::sync::atomic::Ordering::Relaxed);
+/// `--zeren-template`: Zeren's own as the main window opens.
+pub fn ask_zeren_template() {
+    ZEREN_TEMPLATE.store(true, std::sync::atomic::Ordering::Relaxed);
 }
 
 thread_local! {
@@ -786,14 +786,14 @@ pub fn shortcuts_taken(list: Vec<crate::menu_bar::Dropped>) {
 
 /// What a plugin's row says of its commands shown without their shortcut
 /// (`lost`, at least one), naming another plugin by `name_of` its id: "Its
-/// ⌘J for “Open board” is already Zeron's (Toggle terminal), so it's in the
+/// ⌘J for “Open board” is already Zeren's (Toggle terminal), so it's in the
 /// menu bar without one."
 pub(crate) fn shortcut_notice(lost: &[crate::menu_bar::Dropped], name_of: impl Fn(&str) -> String) -> String {
     use crate::menu_bar::Why;
     let first = &lost[0];
     let key = shortcut_words(&first.key);
     let mut words = match &first.why {
-        Why::Zerons(title) => format!("Its {key} for “{}” is already Zeron's ({title}), so it's in the menu bar without one.", first.title),
+        Why::Zerens(title) => format!("Its {key} for “{}” is already Zeren's ({title}), so it's in the menu bar without one.", first.title),
         Why::Plugins(other) => format!("Its {key} for “{}” is already {}'s, so it's in the menu bar without one.", first.title, name_of(other)),
         Why::NoKey => format!("Its {key} for “{}” isn't a key a menu can show, so it's in the menu bar without one.", first.title),
         Why::NoModifier => format!("Its {key} for “{}” has no ⌘, ⌃ or ⌥, so it would take that key from everything you type in. It's in the menu bar without one.", first.title),
@@ -820,7 +820,7 @@ pub(crate) fn shortcut_words(key: &str) -> String {
     out
 }
 
-/// Zeron's design system lent to every plugin, those loaded later too: a
+/// Zeren's design system lent to every plugin, those loaded later too: a
 /// plugin requires `@ds/…` into its own VM (zgx's `Capability::Package`),
 /// from the app running now, beside `entry` (the main window's from
 /// `.live`), so its components match whichever template is in use. It
@@ -834,7 +834,7 @@ pub fn lend_design_system(host: ScriptHost, entry: &Path) -> ScriptHost {
     with_catalog(host, &ui)
 }
 
-/// Zeron's words (ui/locales) loaded by the host itself (zgx's
+/// Zeren's words (ui/locales) loaded by the host itself (zgx's
 /// `ScriptHost::i18n`), before any script runs: zgx runs plugins before the
 /// app, and keeps one catalog per host, so the design system lent to a
 /// plugin shows them in the language chosen from the first load, as the app
@@ -850,28 +850,28 @@ fn with_catalog(host: ScriptHost, ui: &Path) -> ScriptHost {
     host.i18n(locales, "en")
 }
 
-/// Zeron's own plugins, shipped beside the app's scripts (`ui/`).
+/// Zeren's own plugins, shipped beside the app's scripts (`ui/`).
 pub fn builtin_dir() -> PathBuf {
     crate::ui_dir().parent().map(|p| p.join("plugins-builtin")).unwrap_or_default()
 }
 
-/// Development only: the plugin folders `ZERON_ZGX_DEV_PLUGINS` names
+/// Development only: the plugin folders `ZEREN_ZGX_DEV_PLUGINS` names
 /// (`:`-separated) loaded into a window opened by entry (a fixture), each
 /// on and granted what its manifest asks, with no engine: for drawing a
-/// plugin in a fixture (`zeron-zgx github_capture_fixture.luau --inspect`).
+/// plugin in a fixture (`zeren-zgx github_capture_fixture.luau --inspect`).
 /// Its own actions are heard and dropped; the fixture plays the host.
-/// `ZERON_ZGX_DEV_GITHUB` names a JSON file that plays GitHub for them
+/// `ZEREN_ZGX_DEV_GITHUB` names a JSON file that plays GitHub for them
 /// (`dev_github`).
 pub fn dev_plugins(host: &ScriptHost) {
-    let Some(dirs) = crate::dev::switch("ZERON_ZGX_DEV_PLUGINS") else { return };
+    let Some(dirs) = crate::dev::switch("ZEREN_ZGX_DEV_PLUGINS") else { return };
     expose_surface(host);
     let plugin_network = network::Network::default();
     host.fetch_policy(plugin_network.clone());
     let mut hosts = Vec::new();
     let mut plugins = Vec::new();
     for dir in std::env::split_paths(&dirs) {
-        let Ok(text) = std::fs::read_to_string(dir.join("zeron-plugin.json")) else {
-            eprintln!("zeron-zgx: dev plugin {}: no zeron-plugin.json", dir.display());
+        let Ok(text) = std::fs::read_to_string(dir.join("zeren-plugin.json")) else {
+            eprintln!("zeren-zgx: dev plugin {}: no zeren-plugin.json", dir.display());
             continue;
         };
         let Ok(manifest) = serde_json::from_str::<Json>(&text) else { continue };
@@ -892,7 +892,7 @@ pub fn dev_plugins(host: &ScriptHost) {
         host.shared(&format!("plugin.{id}.settings"), json_value(&Json::Object(values)));
         for name in grants::OWN_ACTIONS {
             let key = format!("plugin.{id}.{name}");
-            host.action(key.clone(), move |v: Value| eprintln!("zeron-zgx: dev plugin: {key} {}", v.to_json()));
+            host.action(key.clone(), move |v: Value| eprintln!("zeren-zgx: dev plugin: {key} {}", v.to_json()));
         }
         // Its programs, run for real (those its manifest names), and its
         // database in a folder of the run's own, never a data dir's.
@@ -911,7 +911,7 @@ pub fn dev_plugins(host: &ScriptHost) {
         });
         dev_github(host, &id);
         dev_service(host, &id);
-        eprintln!("zeron-zgx: dev plugin {id} from {}", dir.display());
+        eprintln!("zeren-zgx: dev plugin {id} from {}", dir.display());
         plugins.extend(item.plugin());
     }
     plugin_network.set(hosts);
@@ -919,16 +919,16 @@ pub fn dev_plugins(host: &ScriptHost) {
 }
 
 /// Development only: GitHub played from the JSON file
-/// `ZERON_ZGX_DEV_GITHUB` names, for a dev plugin `id` (the GitHub plugin
+/// `ZEREN_ZGX_DEV_GITHUB` names, for a dev plugin `id` (the GitHub plugin
 /// drawn in a fixture, or offscreen by src/audit_shots.rs): each call
 /// answered by its `op` (`pr`, `diff`, `list`, `repository`, `file_url`),
 /// writes as done, and `records` and `store` published as the bridge would.
 fn dev_github(host: &ScriptHost, id: &str) {
-    let Some(path) = crate::dev::switch("ZERON_ZGX_DEV_GITHUB") else { return };
+    let Some(path) = crate::dev::switch("ZEREN_ZGX_DEV_GITHUB") else { return };
     let answers: Json = match std::fs::read_to_string(&path).map_err(|e| e.to_string()).and_then(|t| serde_json::from_str(&t).map_err(|e| e.to_string())) {
         Ok(json) => json,
         Err(error) => {
-            eprintln!("zeron-zgx: ZERON_ZGX_DEV_GITHUB: {error}");
+            eprintln!("zeren-zgx: ZEREN_ZGX_DEV_GITHUB: {error}");
             return;
         }
     };
@@ -947,7 +947,7 @@ fn dev_github(host: &ScriptHost, id: &str) {
             let asked = value_json(&asked);
             let all = format!("{} {}", asked["args"], asked["stdin"].as_str().unwrap_or_default());
             let hit = played.iter().find(|p| p["match"].as_array().into_iter().flatten().all(|w| w.as_str().is_some_and(|w| all.contains(w)))).cloned();
-            eprintln!("zeron-zgx: dev plugin run {} {}", if hit.is_some() { "played" } else { "real" }, asked["args"]);
+            eprintln!("zeren-zgx: dev plugin run {} {}", if hit.is_some() { "played" } else { "real" }, asked["args"]);
             let real = real.clone();
             async move {
                 match hit {
@@ -967,16 +967,16 @@ fn dev_github(host: &ScriptHost, id: &str) {
 }
 
 /// Development only: a device's plugin service played from the JSON file
-/// `ZERON_ZGX_DEV_SERVICE` names, for a dev plugin `id` (the Git plugin
-/// drawn in a fixture): each call (`zeron.service(device):call`) answered
+/// `ZEREN_ZGX_DEV_SERVICE` names, for a dev plugin `id` (the Git plugin
+/// drawn in a fixture): each call (`zeren.service(device):call`) answered
 /// by its method's entry (`changes` by its scope), `fail` (method →
 /// "reason: words") refused as the engine refuses, anything else done.
 fn dev_service(host: &ScriptHost, id: &str) {
-    let Some(path) = crate::dev::switch("ZERON_ZGX_DEV_SERVICE") else { return };
+    let Some(path) = crate::dev::switch("ZEREN_ZGX_DEV_SERVICE") else { return };
     let answers: Json = match std::fs::read_to_string(&path).map_err(|e| e.to_string()).and_then(|t| serde_json::from_str(&t).map_err(|e| e.to_string())) {
         Ok(json) => json,
         Err(error) => {
-            eprintln!("zeron-zgx: ZERON_ZGX_DEV_SERVICE: {error}");
+            eprintln!("zeren-zgx: ZEREN_ZGX_DEV_SERVICE: {error}");
             return;
         }
     };
@@ -1007,16 +1007,16 @@ pub fn set_view(handle: zgx::compose::ViewHandle) {
     }
 }
 
-/// "Use Zeron v3" (the host's own menu item, and Revert in its toast, which no
-/// template can take away): safe mode (preview.rs), so Zeron's own runs
+/// "Use Zeren v3" (the host's own menu item, and Revert in its toast, which no
+/// template can take away): safe mode (preview.rs), so Zeren's own runs
 /// whatever `.active` says until you pick a template on the Templates page,
 /// and the terminals templates started are closed. The window follows.
-pub fn use_zeron_template() {
+pub fn use_zeren_template() {
     preview::enter_safe();
     if let Some(root) = templates_root()
         && let Err(error) = live::set_active(&root, live::BUILTIN)
     {
-        eprintln!("zeron-zgx: Zeron's template wasn't chosen: {error}");
+        eprintln!("zeren-zgx: Zeren's template wasn't chosen: {error}");
     }
     if let Some(b) = BRIDGE.with(|b| b.borrow().upgrade()) {
         b.chose.set(true);
@@ -1135,7 +1135,7 @@ impl Bridge {
     }
 
     /// Every module a plugin or the template stands in for now: where a
-    /// screen that fails falls back to Zeron's own (screens/plugins).
+    /// screen that fails falls back to Zeren's own (screens/plugins).
     fn replaced(&self) -> Vec<Value> {
         let loaded = self.loaded.borrow();
         let mut out: Vec<Value> = self
@@ -1191,9 +1191,9 @@ impl Bridge {
             self.forget(&id, &old);
         }
         self.state.set("ready");
-        // `ZERON_ZGX_REVIEW=<id>` (development): that plugin's sheet at
+        // `ZEREN_ZGX_REVIEW=<id>` (development): that plugin's sheet at
         // launch, its window serving devtools (run without --inspect).
-        if let Some(id) = crate::dev::switch("ZERON_ZGX_REVIEW").and_then(|v| v.into_string().ok())
+        if let Some(id) = crate::dev::switch("ZEREN_ZGX_REVIEW").and_then(|v| v.into_string().ok())
             && !self.reviewed.replace(true)
         {
             consent::review(&self.me(), &id, None);
@@ -1236,7 +1236,7 @@ impl Bridge {
             records.set(Value::record([("profile", Value::record(Vec::<(&str, Value)>::new()))]));
         }
         let changed_sidebar = grants::capabilities(id, &old.permissions(), &old.change(), &[])
-            .contains(&Capability::Named("zeron.sidebar.filter".into()));
+            .contains(&Capability::Named("zeren.sidebar.filter".into()));
         if changed_sidebar {
             self.host.shared("sidebar.filter", Value::Nil).set(Value::Nil);
         }
@@ -1260,7 +1260,7 @@ impl Bridge {
         // Where each may reach, before anything of it runs.
         self.network.set(items.iter().filter(|i| want.iter().any(|p| p.name == i.id())).map(|i| (i.id().to_string(), i.network_hosts())));
         // Each one's own words (`locales/`, read again: a new version brings
-        // its own), for the SDK's `zeron.t`.
+        // its own), for the SDK's `zeren.t`.
         for item in items.iter().filter(|i| want.iter().any(|p| p.name == i.id())) {
             if let Some(dir) = item.json["snapshot"].as_str() {
                 locales::publish(&self.host, item.id(), Path::new(dir));
@@ -1308,7 +1308,7 @@ impl Bridge {
 
     fn reload(&self) {
         if let Err(error) = self.host.reload() {
-            eprintln!("zeron-zgx: the window didn't reload with its plugins: {error}");
+            eprintln!("zeren-zgx: the window didn't reload with its plugins: {error}");
             self.blame(&error);
         }
     }
@@ -1319,7 +1319,7 @@ impl Bridge {
     /// organization chosen) it's watched `again`, and the list follows.
     fn wait_for_setup(self: &Rc<Self>, again: crate::engine::rpc::Again) {
         if self.state.get() != "setup" {
-            eprintln!("zeron-zgx: plugins: waiting for the account's setup to be finished");
+            eprintln!("zeren-zgx: plugins: waiting for the account's setup to be finished");
             self.state.set("setup");
             self.publish_page();
         }
@@ -1346,7 +1346,7 @@ impl Bridge {
 
     /// The template file or plugin `error` is on, if any, makes way. An
     /// error the window couldn't load past (`reload`'s) that isn't on one of
-    /// the template's files is on its whole: Zeron's own comes back.
+    /// the template's files is on its whole: Zeren's own comes back.
     fn blame(&self, error: &str) {
         self.blame_as(error, false);
     }
@@ -1382,7 +1382,7 @@ impl Bridge {
         if !self.failed_plugins.borrow_mut().fail(id, item.hash(), &recovery::reason(error)) {
             return;
         }
-        eprintln!("zeron-zgx: plugin {id} failed and is withdrawn: {}", recovery::first_line(error));
+        eprintln!("zeren-zgx: plugin {id} failed and is withdrawn: {}", recovery::first_line(error));
         let why = self.failed_plugins.borrow().why(id).unwrap_or_default().to_string();
         self.request(
             "plugin_failed",
@@ -1392,7 +1392,7 @@ impl Bridge {
         self.apply();
     }
 
-    /// The active template's file `rel` failed: Zeron's own shows in its
+    /// The active template's file `rel` failed: Zeren's own shows in its
     /// place until the file changes.
     fn file_failed(&self, rel: &str, error: &str) {
         let Some(root) = self.templates_dir() else { return };
@@ -1411,13 +1411,13 @@ impl Bridge {
             self.template_broken(error);
             return;
         }
-        eprintln!("zeron-zgx: template {id}: {rel} failed, showing Zeron's own: {}", recovery::first_line(error));
+        eprintln!("zeren-zgx: template {id}: {rel} failed, showing Zeren's own: {}", recovery::first_line(error));
         let what = if rel.ends_with(".luau") { templates::title(&templates::module_of(rel)) } else { rel.to_string() };
         self.request("template_failed", &what, Value::from(rel));
         self.look();
     }
 
-    /// The active template can't run: the window goes back to Zeron's own
+    /// The active template can't run: the window goes back to Zeren's own
     /// whole, and the template shows as broken until it's edited.
     fn template_broken(&self, error: &str) {
         let Some(root) = self.templates_dir() else { return };
@@ -1428,18 +1428,18 @@ impl Bridge {
         if !self.broken.borrow_mut().fail(&id, &live::template_stamp(&root.join(&id)), error) {
             return;
         }
-        eprintln!("zeron-zgx: template {id} can't run, showing Zeron's own: {}", recovery::first_line(error));
+        eprintln!("zeren-zgx: template {id} can't run, showing Zeren's own: {}", recovery::first_line(error));
         let name = template_name(&root, &id);
         self.request("template_broken", &name, Value::from(id.as_str()));
         self.look();
     }
 
-    /// The window's interface, brought up to date: Zeron's own as this build
+    /// The window's interface, brought up to date: Zeren's own as this build
     /// has it, the active template on top (less what failed), and reloaded
     /// if anything in it changed.
     ///
     /// The file work runs off this thread, in two steps: a survey (`ui/`
-    /// and the template as they stand, by a stat each; `.zeron` copied again
+    /// and the template as they stand, by a stat each; `.zeren` copied again
     /// only if `ui/` changed), then, if what `.live` is made from changed,
     /// the compose. What failed is decided here between them. One look at
     /// a time; one asked meanwhile runs after.
@@ -1475,7 +1475,7 @@ impl Bridge {
     /// it's made from changed, and the window told.
     async fn looked(self: Rc<Self>, root: &Path, survey: live::Survey) {
         if let Err(error) = &survey.synced {
-            eprintln!("zeron-zgx: Zeron's own interface wasn't copied: {error}");
+            eprintln!("zeren-zgx: Zeren's own interface wasn't copied: {error}");
             return;
         }
         let id = survey.id.clone();
@@ -1486,7 +1486,7 @@ impl Bridge {
         };
         let want = live::Laid { ui_stamp: survey.ui_stamp, id: id.clone(), template_stamp: survey.template_stamp, whole_failed, failed };
         let compose = *self.laid.borrow() != want;
-        // Only Zeron's own ui/ changed (a save while developing): the host
+        // Only Zeren's own ui/ changed (a save while developing): the host
         // watches `.live`, so the files laid down reload it once, as any
         // save. A template switched, edited or set aside reloads here, its
         // failure to load blamed on the template (`blame_as`, loading).
@@ -1494,7 +1494,7 @@ impl Bridge {
             let l = self.laid.borrow();
             l.id != want.id || l.template_stamp != want.template_stamp || l.whole_failed != want.whole_failed || l.failed != want.failed
         };
-        // Whether it runs with Zeron's powers (preview.rs): known before the
+        // Whether it runs with Zeren's powers (preview.rs): known before the
         // window reloads into it, so a preview's first line already runs
         // gated. Hashed again only when its files or what you kept change.
         let approvals = preview::approvals_path().map(|p| live::file_stamp(&p)).unwrap_or_default();
@@ -1550,7 +1550,7 @@ impl Bridge {
                 *self.overlay.borrow_mut() = overlay;
                 *self.laid.borrow_mut() = want;
             }
-            Some(Err(error)) => eprintln!("zeron-zgx: the template wasn't laid over Zeron's own: {error}"),
+            Some(Err(error)) => eprintln!("zeren-zgx: the template wasn't laid over Zeren's own: {error}"),
             None => {}
         }
         self.publish_templates();
@@ -1558,7 +1558,7 @@ impl Bridge {
         if (kept || (changed > 0 && template))
             && let Err(error) = self.host.reload()
         {
-            eprintln!("zeron-zgx: the window didn't reload: {}", recovery::first_line(&error));
+            eprintln!("zeren-zgx: the window didn't reload: {}", recovery::first_line(&error));
             self.blame_as(&error, true);
         }
         // What failed as a preview, laid down as it is now.
@@ -1619,7 +1619,7 @@ impl Bridge {
                 ("description", Value::from(t.description.as_str())),
                 ("author", Value::from(t.author.as_str())),
                 ("version", Value::from(t.version.as_str())),
-                ("zeron_version", Value::from(t.zeron_version.as_str())),
+                ("zeren_version", Value::from(t.zeren_version.as_str())),
                 ("builtin", Value::from(t.id == live::BUILTIN || t.official.is_some())),
                 ("active", Value::from(t.id == active)),
                 ("status", Value::from(state)),
@@ -1628,7 +1628,7 @@ impl Bridge {
                 fields.push(("error", Value::from(error.as_str())));
             }
             // The colours its preview is drawn in (looks.rs): none for one
-            // that changes none of Zeron's.
+            // that changes none of Zeren's.
             let look = self.looks.look(&root, &t.id);
             if !look.is_null() {
                 fields.push(("look", json_value(&look)));
@@ -1669,7 +1669,7 @@ impl Bridge {
         // A plugin that failed here shows so, with why, whatever the engine
         // says of it; one placed where the template in use has nothing says
         // where it won't show, and one whose place zgx refused says why.
-        // What the window running now names (its template's, or Zeron's),
+        // What the window running now names (its template's, or Zeren's),
         // as zgx reports it, and what each contribution does now.
         let (ids, classes, tree) = self.elements_report().map(|r| elements::from_report(&r)).unwrap_or_default();
         let contributions = self.host.contributions();
@@ -1682,7 +1682,7 @@ impl Bridge {
                 if let Some(why) = self.failed_plugins.borrow().why(i.id()) {
                     i.json["failed"] = Json::String(why.to_string());
                 }
-                // A shortcut it lost to Zeron's (or another plugin's).
+                // A shortcut it lost to Zeren's (or another plugin's).
                 if let Some(lost) = SHORTCUTS_TAKEN.with(|t| t.borrow().get(i.id()).cloned())
                     && !lost.is_empty()
                 {
@@ -1803,7 +1803,7 @@ impl Bridge {
         if problems.get(plugin).is_some_and(|(hash, said)| hash == item.hash() && *said == words) {
             return;
         }
-        eprintln!("zeron-zgx: plugin {plugin}: {words}");
+        eprintln!("zeren-zgx: plugin {plugin}: {words}");
         problems.insert(plugin.to_string(), (item.hash().to_string(), words));
         drop(problems);
         self.publish_page();
@@ -1874,8 +1874,8 @@ impl Bridge {
 
     /// An agent's call of a plugin's tool, from the engine.
     fn tool_call(&self, call: &Json) {
-        if std::env::var_os("ZERON_ZGX_PLUGIN_LOG").is_some() {
-            eprintln!("zeron-zgx: plugins: a tool call: {call}");
+        if std::env::var_os("ZEREN_ZGX_PLUGIN_LOG").is_some() {
+            eprintln!("zeren-zgx: plugins: a tool call: {call}");
         }
         let id = call["callId"].as_str().unwrap_or("").to_string();
         let plugin = call["plugin"].as_str().unwrap_or("").to_string();
@@ -1895,7 +1895,7 @@ impl Bridge {
         let loaded = self.loaded.borrow().iter().any(|p| p.name == plugin && plugin != "templates");
         if !loaded {
             let name = self.item(&plugin).map(|i| i.name().to_string()).unwrap_or(plugin.clone());
-            answer_tool(id, false, Json::Null, format!("{name} isn't on in Zeron right now"));
+            answer_tool(id, false, Json::Null, format!("{name} isn't on in Zeren right now"));
             return;
         }
         let mut fields = vec![
@@ -1910,8 +1910,8 @@ impl Bridge {
 
     /// The plugin answered a call.
     fn result(&self, plugin: &str, answer: &Value) {
-        if std::env::var_os("ZERON_ZGX_PLUGIN_LOG").is_some() {
-            eprintln!("zeron-zgx: plugins: {plugin} answered {}", answer.to_json());
+        if std::env::var_os("ZEREN_ZGX_PLUGIN_LOG").is_some() {
+            eprintln!("zeren-zgx: plugins: {plugin} answered {}", answer.to_json());
         }
         let id = answer.field("id").map(text).unwrap_or_default();
         let Some(call) = self.take_call(plugin, &id) else { return };
@@ -1940,7 +1940,7 @@ impl Bridge {
             ("data", json_value(&message["data"])),
             ("at", Value::from(message["at"].as_f64().unwrap_or(0.))),
         ];
-        // A service's event (`zeron.emit`), for `zeron.service(device):on`;
+        // A service's event (`zeren.emit`), for `zeren.service(device):on`;
         // `here`: this device's own service.
         if let Some(event) = message["event"].as_str() {
             fields.push(("event", Value::from(event)));
@@ -2037,7 +2037,7 @@ impl Bridge {
                 }
             }
         });
-        // Its service (`zeron.service(device?):call`): on this device, or on
+        // Its service (`zeren.service(device?):call`): on this device, or on
         // another of yours. A refusal fails the promise as "<reason>: <words>".
         host.async_action(format!("plugin.{id}.service_call"), {
             let plugin = plugin.clone();
@@ -2054,7 +2054,7 @@ impl Bridge {
                     }
                     let reply = call("CallPluginService", params).await.map_err(|e| {
                         if e.contains("unknown method") {
-                            "old_engine: This device's Zeron is from before plugin services".to_string()
+                            "old_engine: This device's Zeren is from before plugin services".to_string()
                         } else {
                             e
                         }
@@ -2144,7 +2144,7 @@ impl Bridge {
                     match done {
                         Ok(true) => b.publish_settings(true, &[]),
                         Ok(false) => {}
-                        Err(why) => eprintln!("zeron-zgx: plugin {plugin}: a setting's status wasn't shown: {why}"),
+                        Err(why) => eprintln!("zeren-zgx: plugin {plugin}: a setting's status wasn't shown: {why}"),
                     }
                 }
             }
@@ -2174,7 +2174,7 @@ impl Bridge {
                 }
             }
         });
-        // Its database (`zeron.db`): its own, no grant.
+        // Its database (`zeren.db`): its own, no grant.
         host.async_action(format!("plugin.{id}.db"), {
             let plugin = plugin.clone();
             move |asked| {
@@ -2197,7 +2197,7 @@ impl Bridge {
                     let asked = value_json(&asked);
                     let (method, mut params) = github::call(&asked, |p| item.as_ref().is_some_and(|i| i.may(p)))?;
                     // Asked for a session's pull request: on the device its
-                    // checkout lives on, as Zeron's own viewer asks.
+                    // checkout lives on, as Zeren's own viewer asks.
                     let sessions = bridge
                         .as_ref()
                         .map(|b| value_json(&b.host.shared("sessions", Value::Nil).signal().with_untracked(Value::clone)))
@@ -2211,7 +2211,7 @@ impl Bridge {
                         object.insert("targetDeviceId".into(), json!(device));
                     }
                     // A project's repository and pull requests: on the device
-                    // its folder is on; the folder itself stays Zeron's.
+                    // its folder is on; the folder itself stays Zeren's.
                     if let (Some(project), Some(object)) = (asked["project"].as_str(), params.as_object_mut()) {
                         if let Some(device) = device_of("projects", project) {
                             object.insert("targetDeviceId".into(), json!(device));
@@ -2297,10 +2297,10 @@ impl Bridge {
                 if let Some(b) = me.upgrade()
                     && b.item(&plugin).is_some_and(|i| i.may("compose"))
                 {
-                    let shown = text(&b.host.shared("zeron.page_session", Value::Nil).signal().with_untracked(Value::clone));
+                    let shown = text(&b.host.shared("zeren.page_session", Value::Nil).signal().with_untracked(Value::clone));
                     match comment(&asked, &shown) {
                         Some(asked) => b.request("compose_comment", &plugin, asked),
-                        None => eprintln!("zeron-zgx: plugin {plugin}: a comment for a chat not shown, refused"),
+                        None => eprintln!("zeren-zgx: plugin {plugin}: a comment for a chat not shown, refused"),
                     }
                 }
             }
@@ -2331,17 +2331,17 @@ impl Bridge {
         });
     }
 
-    /// A web link a plugin opens ("links.open"): where Zeron opens links
+    /// A web link a plugin opens ("links.open"): where Zeren opens links
     /// (Settings → Links' "Open links in": the panel's browser tab beside the
     /// session, or the default browser), `http:` and `https:` alone.
     fn open_url(&self, plugin: &str, url: &str) {
         let Some(item) = self.item(plugin) else { return };
         if !item.may("links.open") {
-            eprintln!("zeron-zgx: plugin {plugin}: open_url without \"links.open\"");
+            eprintln!("zeren-zgx: plugin {plugin}: open_url without \"links.open\"");
             return;
         }
         if !surfaces::web_link(url) {
-            eprintln!("zeron-zgx: plugin {plugin}: open_url takes http and https links");
+            eprintln!("zeren-zgx: plugin {plugin}: open_url takes http and https links");
             return;
         }
         let name = item.name().to_string();
@@ -2354,24 +2354,24 @@ impl Bridge {
     fn open_tab(&self, plugin: &str, asked: &Json) {
         let Some(item) = self.item(plugin) else { return };
         if !item.may("panel.tabs") {
-            eprintln!("zeron-zgx: plugin {plugin}: open_tab without \"panel.tabs\"");
+            eprintln!("zeren-zgx: plugin {plugin}: open_tab without \"panel.tabs\"");
             return;
         }
         match surfaces::tab(asked) {
             // (A page's panel only its own plugin's.)
             Ok(tab) if tab.get("page").is_some_and(|p| p["plugin"] != plugin) => {
-                eprintln!("zeron-zgx: plugin {plugin}: open_tab on another plugin's page");
+                eprintln!("zeren-zgx: plugin {plugin}: open_tab on another plugin's page");
             }
             Ok(mut tab) => {
                 tab["plugin"] = json!(plugin);
                 let name = item.name().to_string();
                 self.request("panel_tab", &name, json_value(&tab));
             }
-            Err(why) => eprintln!("zeron-zgx: plugin {plugin}: {why}"),
+            Err(why) => eprintln!("zeren-zgx: plugin {plugin}: {why}"),
         }
     }
 
-    /// A plugin keeps a value (`zeron.store`): in its storage, at most
+    /// A plugin keeps a value (`zeren.store`): in its storage, at most
     /// `store::MAX_BYTES` in all; `null` lets it go.
     fn store_set(&self, plugin: &str, asked: &Json) {
         let Some(key) = asked["key"].as_str().filter(|k| !k.is_empty() && k.len() <= 200).map(str::to_string) else { return };
@@ -2411,7 +2411,7 @@ impl Bridge {
                 id: i.id().to_string(),
                 name: i.name().to_string(),
                 hash: i.hash().to_string(),
-                // Zeron's own, as the engine says (shipped in the app,
+                // Zeren's own, as the engine says (shipped in the app,
                 // allowed as it ships, never edited).
                 builtin: i.json["builtin"].as_bool() == Some(true),
             })
@@ -2458,7 +2458,7 @@ impl Bridge {
     fn github_watch(&self, plugin: &str, list: &Json) {
         let Some(item) = self.item(plugin) else { return };
         if !item.may("github") {
-            eprintln!("zeron-zgx: plugin {plugin}: watch_pr without \"github\"");
+            eprintln!("zeren-zgx: plugin {plugin}: watch_pr without \"github\"");
             return;
         }
         let sessions = value_json(&self.host.shared("sessions", Value::Nil).signal().with_untracked(Value::clone));
@@ -2548,7 +2548,7 @@ impl Bridge {
             w.watch = None;
             w.retry.ended()
         };
-        eprintln!("zeron-zgx: plugin {plugin}: {session}'s pull request watch ended ({why}); again in {}s", wait.as_secs());
+        eprintln!("zeren-zgx: plugin {plugin}: {session}'s pull request watch ended ({why}); again in {}s", wait.as_secs());
         let me = Rc::downgrade(self);
         let (plugin, session, key) = (plugin.to_string(), session.to_string(), key.to_string());
         self.tasks.spawn(async move {
@@ -2599,12 +2599,12 @@ impl Bridge {
     fn add_page(&self, plugin: &str, asked: &Json) {
         let Some(item) = self.item(plugin) else { return };
         if !item.may("pages.add") {
-            eprintln!("zeron-zgx: plugin {plugin}: add_page without \"pages.add\"");
+            eprintln!("zeren-zgx: plugin {plugin}: add_page without \"pages.add\"");
             return;
         }
         let page = match surfaces::page(asked) {
             Ok(page) => page,
-            Err(why) => return eprintln!("zeron-zgx: plugin {plugin}: {why}"),
+            Err(why) => return eprintln!("zeren-zgx: plugin {plugin}: {why}"),
         };
         {
             let mut pages = self.pages.borrow_mut();
@@ -2613,7 +2613,7 @@ impl Bridge {
             match list.iter_mut().find(|p| p["id"] == page["id"]) {
                 Some(same) if *same == page => return,
                 Some(same) => *same = page,
-                None if full => return eprintln!("zeron-zgx: plugin {plugin}: at most {MAX_PAGES} pages"),
+                None if full => return eprintln!("zeren-zgx: plugin {plugin}: at most {MAX_PAGES} pages"),
                 None => list.push(page),
             }
         }
@@ -2732,7 +2732,7 @@ impl Bridge {
         let region = surfaces::around(&found, 24., bounds.width, bounds.height)
             .ok_or("None of its nodes shows now, so there's nothing of it to picture")?;
         let (w, h, pixels) = surfaces::crop(image.pixels(), image.width(), image.height(), region, scale);
-        let dir = engine::data_dir().ok_or("Zeron's data folder isn't known")?.join("plugins").join(".snapshots");
+        let dir = engine::data_dir().ok_or("Zeren's data folder isn't known")?.join("plugins").join(".snapshots");
         let path = dir.join(format!("{plugin}.png"));
         surfaces::save_png(&path, w, h, &pixels)?;
         Ok(json!({
@@ -2785,7 +2785,7 @@ impl Bridge {
     }
 
     /// The main window's actions (its scripts', never a plugin's: none is
-    /// exposed but `zeron.open` and `zeron.compose.insert`).
+    /// exposed but `zeren.open` and `zeren.compose.insert`).
     fn actions(&self) {
         let host = &self.host;
         let me = Rc::downgrade(&self.me());
@@ -2845,7 +2845,7 @@ impl Bridge {
                 if let Some(b) = me.upgrade()
                     && let Err(why) = b.setting_set(&value_json(&asked))
                 {
-                    eprintln!("zeron-zgx: plugins: a setting wasn't set: {why}");
+                    eprintln!("zeren-zgx: plugins: a setting wasn't set: {why}");
                 }
             }
         });
@@ -2868,7 +2868,7 @@ impl Bridge {
                 }
             }
         });
-        // Someone else's plugin, from a .zeron-plugin file or a link (a
+        // Someone else's plugin, from a .zeren-plugin file or a link (a
         // package, a GitHub release, a git repository). The engine verifies
         // it first; anyone else's waits for the consent window. Another
         // device installs from a link only: a file here isn't there.
@@ -2886,7 +2886,7 @@ impl Bridge {
                         _ => return Err("Choose a plugin file or paste a link".into()),
                     };
                     let reply = call_on(&me, device, "InstallPlugin", params).await?;
-                    eprintln!("zeron-zgx: plugins: installed {}", reply["plugin"]["id"].as_str().unwrap_or("?"));
+                    eprintln!("zeren-zgx: plugins: installed {}", reply["plugin"]["id"].as_str().unwrap_or("?"));
                     Ok(json_value(&reply))
                 }
             }
@@ -2964,7 +2964,7 @@ impl Bridge {
                     // (A preview can't switch templates: preview.rs.)
                     preview::refuse("templates.use")?;
                     template_call("UseTemplate", json!({ "id": text(&id) })).await?;
-                    // Chosen here, on Zeron's own Templates page (never a
+                    // Chosen here, on Zeren's own Templates page (never a
                     // template's: screens/templates is never templated):
                     // out of safe mode, and no notice of the switch.
                     preview::leave_safe();
@@ -2977,7 +2977,7 @@ impl Bridge {
                 }
             }
         });
-        // A new template by the name it's given: a copy of Zeron's own.
+        // A new template by the name it's given: a copy of Zeren's own.
         host.async_action("templates.create", {
             let me = me.clone();
             move |name| {
@@ -3040,8 +3040,8 @@ impl Bridge {
             let id = arg.field("id").map(text).unwrap_or_default();
             let mut path = arg.field("path").map(text).unwrap_or_default();
             // (A save dialog's name, its extension taken off.)
-            if !path.is_empty() && !path.ends_with(".zeron-template") {
-                path.push_str(".zeron-template");
+            if !path.is_empty() && !path.ends_with(".zeren-template") {
+                path.push_str(".zeren-template");
             }
             template_call("ExportTemplate", json!({ "id": id, "path": path })).await.map(|v| json_value(&v))
         });
@@ -3096,7 +3096,7 @@ impl Bridge {
                     let reply = template_call("UpdateTemplate", json!({ "id": text(&id) })).await?;
                     if let Some(b) = me.upgrade() {
                         // A new version with new code waits for you, as an
-                        // import does: in Zeron's own consent window.
+                        // import does: in Zeren's own consent window.
                         if let Some(name) = reply["pending"].as_str() {
                             b.told.borrow_mut().insert(format!("template:{name}"));
                             template_consent::review(&b, name);
@@ -3128,7 +3128,7 @@ impl Bridge {
                     }
                     return;
                 }
-                let dir = if id == live::BUILTIN { root.join(live::ZERON) } else { root.join(&id) };
+                let dir = if id == live::BUILTIN { root.join(live::ZEREN) } else { root.join(&id) };
                 if live::plain(&id) && dir.is_dir() {
                     reveal(&dir);
                 }
@@ -3151,7 +3151,7 @@ impl Bridge {
             }
         });
         // What plugins may ask of the app, through screens/plugins.
-        host.action("zeron.open", {
+        host.action("zeren.open", {
             let me = me.clone();
             move |to| {
                 if let Some(b) = me.upgrade() {
@@ -3159,7 +3159,7 @@ impl Bridge {
                 }
             }
         });
-        host.action("zeron.compose.insert", {
+        host.action("zeren.compose.insert", {
             let me = me.clone();
             move |text_| {
                 if let Some(b) = me.upgrade() {
@@ -3231,7 +3231,7 @@ fn set_off_action(host: &ScriptHost, me: Weak<Bridge>) {
             preview::refuse("plugins.set_off")?;
             let (id, device) = remote::id_and_device(&arg);
             let off = arg.field("off").is_some_and(Value::truthy);
-            eprintln!("zeron-zgx: plugins: {id} turned {} from Settings", if off { "off" } else { "on" });
+            eprintln!("zeren-zgx: plugins: {id} turned {} from Settings", if off { "off" } else { "on" });
             call_on(&me, device, "SetPluginOff", json!({ "id": id, "off": off })).await.map(|_| Value::Nil)
         }
     });
@@ -3269,18 +3269,18 @@ fn answer_tool(id: String, ok: bool, value: Json, error: String) {
             params["error"] = Json::String(error);
         }
         let said = engine::get().call("PluginToolResult", params).await;
-        if std::env::var_os("ZERON_ZGX_PLUGIN_LOG").is_some() {
-            eprintln!("zeron-zgx: plugins: the answer went: {said:?}");
+        if std::env::var_os("ZEREN_ZGX_PLUGIN_LOG").is_some() {
+            eprintln!("zeren-zgx: plugins: the answer went: {said:?}");
         }
         if let Err(e) = said {
-            eprintln!("zeron-zgx: a tool's answer didn't reach the agent: {e}");
+            eprintln!("zeren-zgx: a tool's answer didn't reach the agent: {e}");
         }
     });
 }
 
 fn reveal(dir: &Path) {
     if let Err(error) = open::that_detached(dir) {
-        eprintln!("zeron-zgx: the folder didn't open: {error}");
+        eprintln!("zeren-zgx: the folder didn't open: {error}");
     }
 }
 
@@ -3374,14 +3374,14 @@ mod network_tests;
 
 #[cfg(test)]
 mod menu_tests {
-    /// "Use Zeron v3" is the host's own, in View, whatever the
+    /// "Use Zeren v3" is the host's own, in View, whatever the
     /// scripts declare (none here, as when a template broke before any).
     #[test]
-    fn the_host_s_menu_always_has_a_way_back_to_zeron_s_template() {
+    fn the_host_s_menu_always_has_a_way_back_to_zeren_s_template() {
         let menus = format!("{:?}", crate::menu_bar::Bar::of(&[], &[], &[], None).menus);
         assert!(menus.contains("View"), "{menus}");
-        assert!(menus.contains("Use Zeron v3"), "{menus}");
-        assert!(menus.contains(super::USE_ZERON_TEMPLATE), "{menus}");
+        assert!(menus.contains("Use Zeren v3"), "{menus}");
+        assert!(menus.contains(super::USE_ZEREN_TEMPLATE), "{menus}");
     }
 
     fn command(id: &str, title: &str, menu: &str) -> zgx_script::Command {
@@ -3389,22 +3389,22 @@ mod menu_tests {
     }
 
     /// R12: a template that registers the host's own action (or any
-    /// `zeron.` id) can't take the menu bar away: the platform refuses a
+    /// `zeren.` id) can't take the menu bar away: the platform refuses a
     /// whole bar with an action twice, so the host leaves the script's out,
     /// and the bar it sets is one the platform takes, with one way back.
     #[test]
-    fn a_template_registering_use_zeron_template_keeps_the_menu_bar() {
+    fn a_template_registering_use_zeren_template_keeps_the_menu_bar() {
         let commands = vec![
-            command(super::USE_ZERON_TEMPLATE, "Stay Here", "View"),
+            command(super::USE_ZEREN_TEMPLATE, "Stay Here", "View"),
             command(super::KEEP_TEMPLATE, "Keep Me", "View"),
-            command("zeron.anything", "Mine", "File"),
+            command("zeren.anything", "Mine", "File"),
             command("new-chat", "New Chat", "File"),
         ];
         let bar = crate::menu_bar::Bar::of(&commands, &[], &[], None).menus;
         let shown = format!("{bar:?}");
         assert!(zgx_desktop::app_menu_bar(bar, |_| {}).is_ok(), "the platform takes the bar: {shown}");
-        assert_eq!(shown.matches(super::USE_ZERON_TEMPLATE).count(), 1, "{shown}");
-        assert!(shown.contains("Use Zeron v3") && !shown.contains("Stay Here") && !shown.contains("Keep Me"), "{shown}");
-        assert!(!shown.contains("zeron.anything") && shown.contains("New Chat"), "{shown}");
+        assert_eq!(shown.matches(super::USE_ZEREN_TEMPLATE).count(), 1, "{shown}");
+        assert!(shown.contains("Use Zeren v3") && !shown.contains("Stay Here") && !shown.contains("Keep Me"), "{shown}");
+        assert!(!shown.contains("zeren.anything") && shown.contains("New Chat"), "{shown}");
     }
 }

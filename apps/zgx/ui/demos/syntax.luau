@@ -71,13 +71,13 @@ local function editor(id: string, value: State<string>): Node
 		line_numbers = true,
 		font = "$font.mono",
 		-- The textarea takes its type size as a number, not a token.
-		size = ui.theme.get("zeron.prose.code.size") :: number,
+		size = ui.theme.get("zeren.prose.code.size") :: number,
 		tab = "    ",
 		current_line = "$hover",
 		-- No inset on the scrolling sides: a textarea clips inside its padding.
 		py = 0,
 		pr = 0,
-		line_height = "$zeron.editor.line",
+		line_height = "$zeren.editor.line",
 		w_full = true,
 		h = EDITOR_H,
 		bg = "$surface.sunken",
@@ -92,8 +92,8 @@ local function reading(id: string): Node
 	for _, line in Syntax.lines(samples[id] or "", id) do
 		local rich: RichProps = {
 			font = "$font.mono",
-			text_size = "$zeron.prose.code.size",
-			line_height = "$zeron.prose.code.line",
+			text_size = "$zeren.prose.code.size",
+			line_height = "$zeren.prose.code.line",
 			literal = true,
 		}
 		for _, run in line do
@@ -165,7 +165,7 @@ local verdict = if #result.failed == 0
 return {
 	id = "syntax",
 	title = "Syntax highlighting",
-	about = "Code coloured as it's typed: every language Zeron shows, incremental line by line.",
+	about = "Code coloured as it's typed: every language Zeren shows, incremental line by line.",
 	demo = function(): Node
 		return ui.column {
 			gap = "$space.4",

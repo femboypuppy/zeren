@@ -244,7 +244,7 @@ impl Stream {
             return None;
         }
         // SAFETY: a NUL-terminated label, and no attributes: a serial queue.
-        let queue = DispatchQueue(unsafe { dispatch_queue_create(c"zeron-zgx templates".as_ptr(), std::ptr::null()) });
+        let queue = DispatchQueue(unsafe { dispatch_queue_create(c"zeren-zgx templates".as_ptr(), std::ptr::null()) });
         // SAFETY: the stream is created and not yet started; `queue` lives as
         // long as `Self` (it's released after the stream is invalidated).
         let started = unsafe {
@@ -420,7 +420,7 @@ mod tests {
     /// Under the temporary folder, which is behind a link (`/var` is
     /// `/private/var`): watched as named, heard as resolved.
     fn scratch(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("zeron-zgx-{name}-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("zeren-zgx-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         dir

@@ -3,13 +3,13 @@
 //! a light shader.
 //!
 //! To preview visuals a desktop rendered instead, point
-//! `ZERON_DEMO_VISUALS` at a JSON list of `{ "id", "title", "path" }` (the
+//! `ZEREN_DEMO_VISUALS` at a JSON list of `{ "id", "title", "path" }` (the
 //! part's id and title, and its script on disk): the demo chat shows those,
 //! reading each script and the files stored beside it.
 
 use std::sync::OnceLock;
 
-use zeron_doc::parts::MessagePart;
+use zeren_doc::parts::MessagePart;
 
 #[derive(serde::Deserialize)]
 pub(crate) struct Local {
@@ -18,11 +18,11 @@ pub(crate) struct Local {
     pub path: String,
 }
 
-/// Visuals listed by `ZERON_DEMO_VISUALS` (empty without it).
+/// Visuals listed by `ZEREN_DEMO_VISUALS` (empty without it).
 pub(crate) fn local() -> &'static [Local] {
     static LOCAL: OnceLock<Vec<Local>> = OnceLock::new();
     LOCAL.get_or_init(|| {
-        let Ok(list) = std::env::var("ZERON_DEMO_VISUALS") else {
+        let Ok(list) = std::env::var("ZEREN_DEMO_VISUALS") else {
             return Vec::new();
         };
         std::fs::read(&list)
@@ -55,7 +55,7 @@ pub(crate) const DEMO_VISUALS: &[(&str, &str, &str)] = &[
 ];
 
 pub(crate) fn path(id: &str) -> String {
-    format!("/Users/dev/.zeron/uploads/{id}-visual.luau")
+    format!("/Users/dev/.zeren/uploads/{id}-visual.luau")
 }
 
 /// The file at `path`, if it's a demo visual's.
@@ -156,7 +156,7 @@ mod tests {
     #[test]
     fn demo_visuals_pass_the_engine_check() {
         for (id, _, script) in super::DEMO_VISUALS {
-            zeron_visual::check(script, zeron_visual::seed_for(id))
+            zeren_visual::check(script, zeren_visual::seed_for(id))
                 .unwrap_or_else(|e| panic!("{id}: {e}"));
         }
     }

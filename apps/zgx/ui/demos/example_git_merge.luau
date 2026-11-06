@@ -55,7 +55,7 @@ return {
 					description = "ui/ds/tokens.luau and ui/ds/sidebar.luau changed on main too. Resolve them on the branch, then merge.",
 					lead = git.glyph("danger-triangle", "danger"),
 					-- Narrow, the way to resolve under the words, not beside them.
-					control = if narrow then nil else ds.Button { "Resolve in Zeron", tone = "secondary", size = "sm" },
+					control = if narrow then nil else ds.Button { "Resolve in Zeren", tone = "secondary", size = "sm" },
 					badge = nil,
 				}
 			end
@@ -101,7 +101,7 @@ return {
 				ds.Settings.Group {
 					standing(state, narrow),
 					if state == "conflicts" and narrow
-						then ui.div { w_full = true, px = "$space.4", pb = "$space.4", ds.Button { "Resolve in Zeron", tone = "secondary", size = "sm", w_full = true } }
+						then ui.div { w_full = true, px = "$space.4", pb = "$space.4", ds.Button { "Resolve in Zeren", tone = "secondary", size = "sm", w_full = true } }
 						else nil,
 				},
 				git.checks_block { list = checks_for(state), open = git.checks_open },

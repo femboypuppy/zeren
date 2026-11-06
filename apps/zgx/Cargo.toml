@@ -1,28 +1,28 @@
-# Zeron's interface in zgx (https://zgx.zeron.sh), starting with onboarding.
+# Zeren's interface in zgx (https://zgx.zeron.sh), starting with onboarding.
 #
 # A workspace of its own, not a member of the root one: zgx builds against
 # patched crates (its `[patch.crates-io]`, mirrored below), and a patch here
 # must not reach gpui's wgpu renderer in the shipping app. It tracks zgx's
-# `main` branch, pinned by commit when Zeron needs one ahead of main.
+# `main` branch, pinned by commit when Zeren needs one ahead of main.
 
 [workspace]
 
 [package]
-name = "zeron-zgx"
+name = "zeren-zgx"
 version = "0.0.0"
 edition = "2024"
 license = "MIT"
 publish = false
 
 [[bin]]
-name = "zeron-zgx"
+name = "zeren-zgx"
 path = "src/main.rs"
 
 [features]
-# Zeron.app's beta (scripts/package-zgx-beta.sh): this interface as the
-# Zeron app itself, with the production edge and sign-in only (nothing of
-# staging's built in) and Zeron.app's own engine (the bundle's `Zeron Engine`,
-# ~/.zeron, port 27654), managed as Zeron.app manages it. Without it, the app
+# Zeren.app's beta (scripts/package-zgx-beta.sh): this interface as the
+# Zeren app itself, with the production edge and sign-in only (nothing of
+# staging's built in) and Zeren.app's own engine (the bundle's `Zeren Engine`,
+# ~/.zeren, port 27654), managed as Zeren.app manages it. Without it, the app
 # stays on staging (src/auth.rs, src/engine/manager.rs).
 beta = []
 # The layout benchmarks that read a probed zgx (docs/zgx-layout-probe.patch;
@@ -50,7 +50,7 @@ zgx-script = { git = "https://github.com/zeronsh/zgx", rev = "88ff58c08b6318eb2e
 # the formats `ui.image` shows (no features of its own: the ones zgx-desktop
 # turns on).
 zgx-gpu = { git = "https://github.com/zeronsh/zgx", rev = "88ff58c08b6318eb2e05bb2a22128fefdfca8db9", default-features = false }
-# Each plugin's own database (`zeron.db`, src/plugins/db.rs): SQLite,
+# Each plugin's own database (`zeren.db`, src/plugins/db.rs): SQLite,
 # built in; `limits` to keep one from attaching any other file.
 rusqlite = { version = "0.32", features = ["bundled", "limits", "hooks"] }
 # `fetch`: zgx's own transport for `ui.fetch` and remote images (HTTP and
@@ -101,22 +101,22 @@ base64 = "0.22"
 zatex = { path = "../../crates/zatex", features = ["bundled"] }
 # Imported VS Code themes (src/themes.rs): the shipping app's theme crate,
 # its importer, library file and error words.
-zeron-theme = { path = "../../crates/theme" }
+zeren-theme = { path = "../../crates/theme" }
 # (A preview's process label and redacted command line, one copy with the
 # engine that advertises them; no dependencies.)
-zeron-preview-label = { path = "../../crates/preview-label" }
-# Zeron's command line (`zeron headless`, `zeron login`, …: src/main.rs),
+zeren-preview-label = { path = "../../crates/preview-label" }
+# Zeren's command line (`zeren headless`, `zeren login`, …: src/main.rs),
 # the engine helper's start-up (src/engine/manager.rs) and the app's own
 # updates and release channel (src/about.rs): the shipping app's crates,
 # with no engine and no GPUI in them.
-zeron-cli = { path = "../../crates/cli" }
-zeron-launch = { path = "../../crates/launch" }
-# `zeron://` links: a chat's (src/sessions.rs, src/links.rs) and a clicked
+zeren-cli = { path = "../../crates/cli" }
+zeren-launch = { path = "../../crates/launch" }
+# `zeren://` links: a chat's (src/sessions.rs, src/links.rs) and a clicked
 # banner's, the shipping app's formats.
-zeron-notify = { path = "../../crates/notify" }
+zeren-notify = { path = "../../crates/notify" }
 # (A message between chats: its routing header, read as the engine writes it.)
-zeron-proto = { path = "../../crates/proto" }
-zeron-update = { path = "../../crates/update" }
+zeren-proto = { path = "../../crates/proto" }
+zeren-update = { path = "../../crates/update" }
 tokio = { version = "1", features = ["rt-multi-thread", "sync", "time"] }
 # Templates' theme files, JSON with comments, read for their previews
 # (src/plugins/looks.rs), as the theme crate reads them.
@@ -124,12 +124,12 @@ json5 = "0.4"
 # Agent visuals (src/visuals.rs): the shipping app's sandboxed runtime for
 # `show_visual` scripts, and its offscreen GPU renderer for their scenes and
 # shaders (the same wgpu zgx draws with).
-zeron-visual = { path = "../../crates/visual" }
+zeren-visual = { path = "../../crates/visual" }
 # The rules plugins are held to (paths, programs, network), the engine's own.
-zeron-plugin-guard = { path = "../../crates/plugin-guard" }
-zeron-visual-gpu = { path = "../../crates/visual-gpu" }
+zeren-plugin-guard = { path = "../../crates/plugin-guard" }
+zeren-visual-gpu = { path = "../../crates/visual-gpu" }
 # Their frames' pixel loops, optimized in debug builds too (below).
-zeron-zgx-pixels = { path = "pixels" }
+zeren-zgx-pixels = { path = "pixels" }
 
 # The app's macOS appearance (`appearance`): the same objc2 zgx builds on.
 [target.'cfg(target_os = "macos")'.dependencies]
@@ -178,7 +178,7 @@ opt-level = 1
 
 # A path dependency in this folder is a member, which `"*"` leaves out: the
 # per-frame pixel loops, optimized (unoptimized, 46 ms a 2x frame).
-[profile.dev.package.zeron-zgx-pixels]
+[profile.dev.package.zeren-zgx-pixels]
 opt-level = 3
 
 [profile.release]

@@ -101,7 +101,7 @@ test("@ in a new side chat searches its project", function()
 	expect(calls(app)).to_contain("search:p1:lib")
 end)
 
-test("/ in a side chat offers the agent's commands, then Zeron's", function()
+test("/ in a side chat offers the agent's commands, then Zeren's", function()
 	local app = open()
 	app:type(BOX, "/")
 	app:frames(30)

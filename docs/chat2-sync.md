@@ -50,7 +50,7 @@ Stops new whales being born. No protocol changes; additive on the existing s2 ro
   (Exec) tool part keeps the redacted end of its output: its last **10 lines or
   1 KB**, whichever is less, plus additive `exitCode`, `outputBytes` (the whole
   output's size) and `outputTruncated` (written only when earlier output was cut).
-  Secrets are redacted before the cut (`zeron_proto::redact::redact_command_output`),
+  Secrets are redacted before the cut (`zeren_proto::redact::redact_command_output`),
   and commands that print secrets by nature (`env`, `cat .env`, `gh auth token`, …)
   keep only a "not kept" note. So a session grows by at most ~1 KB per command, the
   sync budget above still holds, and every other tool's output stays out of the doc.
@@ -60,7 +60,7 @@ Stops new whales being born. No protocol changes; additive on the existing s2 ro
   {chatId, toolId, offset}` (relay-forwardable, answered only by the chat's host,
   not open to agents' scoped token) reads the call and result from the journal and
   serves the output's last 1 MB in 48 KB chunks, through the same withholding and
-  redaction as the tail (`zeron_doc::command_output_end`). Commands only; a chat
+  redaction as the tail (`zeren_doc::command_output_end`). Commands only; a chat
   whose journal is gone answers that the output isn't kept.
 
 **A2. Output sidecar.** *[PARKED 2026-08-10 (v0.1.30): product call — no R2
@@ -163,7 +163,7 @@ root).
 
 Estimate: 4–5 days.
 
-**C4. iOS** (`apps/ios/Zeron/Sync/`): `ChatRoomClient.swift` cloned from
+**C4. iOS** (`apps/ios/Zeren/Sync/`): `ChatRoomClient.swift` cloned from
 `RegistryClient.swift`; delete `LoroProtocol.swift` once s2 dies. Shared framing test
 vectors across Rust/TS/Swift (registry precedent). Estimate: 3–4 days, can trail
 desktop by a release.
@@ -228,7 +228,7 @@ explicit request; the real healing is M1.
 
 ## Observability / acceptance
 
-- `zeron sync` gains per-chat `cursor / headSeq / floorLag / pendingPushes`.
+- `zeren sync` gains per-chat `cursor / headSeq / floorLag / pendingPushes`.
 - Alert-shaped stat: any room with `headSeq - checkpointSeq` bytes > 2 MB or
   checkpoint age > 7 days (the passive failure mode this design trades into — make it
   visible from day one; silent truncation of the old wedge class must not become

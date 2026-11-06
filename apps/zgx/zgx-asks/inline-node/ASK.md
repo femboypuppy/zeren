@@ -1,6 +1,6 @@
 # Ask: a node inside a paragraph's text
 
-**Who needs it:** Zeron's replies, for inline LaTeX math ("where $e^{i\pi} + 1 = 0$ holds"). It would also serve file-link chips, mention pills and emoji images, which Zeron's shipping app draws over reserved space in a line.
+**Who needs it:** Zeren's replies, for inline LaTeX math ("where $e^{i\pi} + 1 = 0$ holds"). It would also serve file-link chips, mention pills and emoji images, which Zeren's shipping app draws over reserved space in a line.
 
 **What exists:** a paragraph is `ui.rich { "text", ui.span { … } }`. The only non-text a span holds is `icon = { src, size, gap, tint }`: a square SVG, centred in the line (`compose_rich.rs`, `InlineIcon`, `(rect.height - icon.size) / 2`). A formula has its own width, and its own height above and below the baseline. Here it is 74 × 22, with 6 below the baseline.
 
@@ -33,4 +33,4 @@ Either of these, in order of preference:
 - We'd hand it an SVG of the formula's outlines (zatex's `Formula::to_svg`, `fill="currentColor"` so it takes the span's colour and follows the theme).
 - We'd also need the same `text =` for copy.
 
-With either, Zeron's inline math matches its display math (`ds/math.luau`, which draws on a `ui.canvas`). Until then, inline math shows as its TeX in an inline code chip.
+With either, Zeren's inline math matches its display math (`ds/math.luau`, which draws on a `ui.canvas`). Until then, inline math shows as its TeX in an inline code chip.

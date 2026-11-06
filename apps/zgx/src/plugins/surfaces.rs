@@ -1,6 +1,6 @@
-//! What plugins add to Zeron beyond a node in place: tabs in a chat's panel
+//! What plugins add to Zeren beyond a node in place: tabs in a chat's panel
 //! (`panel.tabs`) and pages of their own in the sidebar (`pages.add`), each
-//! drawn by Zeron as an empty placeholder (`.plugin-tab.plugin-<id>`,
+//! drawn by Zeren as an empty placeholder (`.plugin-tab.plugin-<id>`,
 //! `.plugin-page.plugin-<id>`) that the plugin fills by selector; and what an
 //! agent is told of where a plugin's nodes landed (`plugin_status`): the
 //! places they matched, and a picture of the window cut to them.
@@ -40,7 +40,7 @@ pub fn tab(asked: &Json) -> Result<Json, String> {
         _ => None,
     };
     if session.is_none() && page.is_none() {
-        return Err("open_tab needs the panel's session or page (zeron.need(\"panel\"))".into());
+        return Err("open_tab needs the panel's session or page (zeren.need(\"panel\"))".into());
     }
     let kind = name(&asked["kind"], 40).ok_or("open_tab needs a `kind`: letters, digits, - and _")?;
     let title = title(&asked["title"], 80).ok_or("open_tab needs a `title`")?;
@@ -226,7 +226,7 @@ mod tests {
     fn only_web_links_open() {
         assert!(web_link("https://github.com/zeronsh/zgx/pull/1264"));
         assert!(web_link("http://localhost:3000/"));
-        for bad in ["file:///etc/passwd", "javascript:alert(1)", "zeron://settings", "https://", "https:///x", "https://a b", "ftp://x"] {
+        for bad in ["file:///etc/passwd", "javascript:alert(1)", "zeren://settings", "https://", "https:///x", "https://a b", "ftp://x"] {
             assert!(!web_link(bad), "{bad}");
         }
     }

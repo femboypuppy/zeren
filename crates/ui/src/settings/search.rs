@@ -79,7 +79,7 @@ settings_index! {
         "titles rename sessions model"),
     (WorktreeLocation, General, Some("Git"), "Custom worktree location",
         "folder directory path checkout branches"),
-    (CommitCredit, General, Some("Git"), "Credit Zeron in commits",
+    (CommitCredit, General, Some("Git"), "Credit Zeren in commits",
         "co-author coauthor attribution bot commit message"),
     (ColorScheme, Appearance, None, "Color scheme",
         "system light dark mode"),
@@ -795,7 +795,7 @@ mod tests {
         };
         assert_eq!(top("credits"), Target::Setting(SettingId::Credits));
         // Signed out, Billing's credits are gone: only General's near
-        // spelling ("Credit Zeron in commits") is left.
+        // spelling ("Credit Zeren in commits") is left.
         let hits = search("credits", signed_out);
         assert!(!hits.is_empty() && hits.iter().all(|hit| signed_out(hit.entry.section)));
         assert_eq!(

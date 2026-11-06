@@ -78,7 +78,7 @@ local next_id = ui.state("ds_toasts_next", 0)
 -- there, over the modal that holds it, and not under it.
 local fronts = ui.state("ds_toasts_fronts", 0)
 -- Where the stack stands, in points up from the window's foot: over the
--- host's own toasts (a template in preview, signing keys: drawn by Zeron
+-- host's own toasts (a template in preview, signing keys: drawn by Zeren
 -- itself, in the same corner), as the main window's host measures them
 -- (src/plugins/host_bar.rs `follow`). 16 where no host says (another
 -- window; a plugin, which can't read it).
@@ -247,7 +247,7 @@ local Card = ui.component(function(props: { toast: any }): Node
 	end
 	-- (Its props typed; the menus' glass laid on them in place.)
 	local card: ContainerProps = {
-		w = "$zeron.toast.width",
+		w = "$zeren.toast.width",
 		pl = "$space.4",
 		pr = "$space.2",
 		py = "$space.3",
@@ -262,13 +262,13 @@ local Card = ui.component(function(props: { toast: any }): Node
 		ui.div {
 			pt = ui.raw(1, "centres the 16 glyph on an 18 line"),
 			shrink = 0,
-			color = if tone == "neutral" then "$text.secondary" else `$zeron.tone.{tone}.ink`,
+			color = if tone == "neutral" then "$text.secondary" else `$zeren.tone.{tone}.ink`,
 			Icon { name = GLYPH[tone], size = 16 },
 		},
 		ui.column {
 			grow = 1,
 			min_w = 0,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			ui.text { t.title, text_size = "$font.size.md", line_height = "$font.line.md", weight = "$font.weight.medium", color = "$text.primary", wrap = true },
 			if t.body
 				then ui.text { t.body, text_size = "$font.size.sm", line_height = "$font.line.sm", color = "$text.secondary", wrap = true }
@@ -297,7 +297,7 @@ local Card = ui.component(function(props: { toast: any }): Node
 		ui.div {
 			-- In the corner: as far from the top as from the end, concentric.
 			mt = ui.raw(-4, "as far from the top as from the end"),
-			theme = { zeron = { icon_button = { radius = control.nest("$radius.xl", 1, "$space.2") } } },
+			theme = { zeren = { icon_button = { radius = control.nest("$radius.xl", 1, "$space.2") } } },
 			shrink = 0,
 			opacity = if t.duration == 0
 				then 1

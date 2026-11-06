@@ -1,11 +1,11 @@
--- That an agent is working on a reply, as Zeron's transcript says it under
+-- That an agent is working on a reply, as Zeren's transcript says it under
 -- the turn: the working loader, a word for it ("Noodling…") that rolls to
 -- another every seven seconds, and how long it has been at it.
 --
 -- `Working { since = seconds }`: `since` in `ui.now() / 1000` seconds, when
 -- the turn began (or a function of it); `seed` picks where the words start
 -- (a chat's own). `sending`: the message is on its way, its turn not yet
--- begun: "Sending…" and no clock, as Zeron's trailer bridges that gap
+-- begun: "Sending…" and no clock, as Zeren's trailer bridges that gap
 -- (transcript.rs `sending_bridge`); the word and the clock start with the
 -- turn.
 
@@ -15,10 +15,10 @@ local locale = require("@self/locale")
 
 export type Props = { since: number | () -> number, seed: number?, sending: (() -> boolean)? }
 
--- Zeron's words (transcript.rs, `FLAVOUR_WORDS`, their keys), each held
+-- Zeren's words (transcript.rs, `FLAVOUR_WORDS`, their keys), each held
 -- this long.
 local WORDS = {
-	"ds.working.words.zeroning",
+	"ds.working.words.zerening",
 	"ds.working.words.thinking",
 	"ds.working.words.pondering",
 	"ds.working.words.scheming",

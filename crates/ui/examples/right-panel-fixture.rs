@@ -9,12 +9,12 @@
 //!   undocked; `right-tabs-hover-{inactive,active,plus}.png` hover states
 //! - `result.txt`: window size, scale factor and the run's notes
 //!
-//!     cargo build -p zeron-ui --example right-panel-fixture --features appshots-fixture
+//!     cargo build -p zeren-ui --example right-panel-fixture --features appshots-fixture
 //!     target/debug/examples/right-panel-fixture <out-dir>
 //!
-//! ZERON_PALETTE_LIGHT=1 renders the light theme. Clicks land at computed
-//! logical positions; override with ZERON_RIGHT_TERMINAL=x,y and
-//! ZERON_RIGHT_TREE=x,y0 (the explorer's first row) when a layout moves.
+//! ZEREN_PALETTE_LIGHT=1 renders the light theme. Clicks land at computed
+//! logical positions; override with ZEREN_RIGHT_TERMINAL=x,y and
+//! ZEREN_RIGHT_TREE=x,y0 (the explorer's first row) when a layout moves.
 use anyhow::Context as _;
 use gpui::{AppContext, Bounds, WindowBounds, WindowOptions, px, size};
 use serde_json::json;
@@ -22,7 +22,7 @@ use std::{
     path::{Path, PathBuf},
     sync::Arc,
 };
-use zeron_ui::*;
+use zeren_ui::*;
 
 const WINDOW: (f32, f32) = (1440.0, 900.0);
 const SIDEBAR: f32 = 256.0;
@@ -97,8 +97,8 @@ pub fn resolve(root: &Path, relative: &str) -> Option<PathBuf> {
 
 const MAIN_RS: &str = "fn main() {\n    println!(\"hello\");\n}\n";
 const SHELL_RS: &str = "pub struct Shell;\n";
-const CARGO_TOML: &str = "[package]\nname = \"zeron\"\nversion = \"0.1.0\"\nedition = \"2024\"\n";
-const README: &str = "# zeron\n\nScratch checkout for the right-panel stills.\n";
+const CARGO_TOML: &str = "[package]\nname = \"zeren\"\nversion = \"0.1.0\"\nedition = \"2024\"\n";
+const README: &str = "# zeren\n\nScratch checkout for the right-panel stills.\n";
 
 fn xy(var: &str, default: (f32, f32)) -> (f32, f32) {
     std::env::var(var)
@@ -264,7 +264,7 @@ async fn film(
     // project: 44px rows, 8px gaps) centre in the pane below the titlebar.
     let content_mid = theme::Theme::TITLEBAR_HEIGHT + (WINDOW.1 - theme::Theme::TITLEBAR_HEIGHT) / 2.0;
     let terminal_at = xy(
-        "ZERON_RIGHT_TERMINAL",
+        "ZEREN_RIGHT_TERMINAL",
         (target_left + RIGHT_PANE / 2.0, content_mid - 26.0),
     );
     notes.push_str(&format!("terminal row click {terminal_at:?}\n"));
@@ -273,7 +273,7 @@ async fn film(
     action(window, cx, Box::new(shell::ToggleFiles));
     pause(cx, 1500).await;
     let files_left = WINDOW.0 - settings::FILES_PANEL_DEFAULT;
-    let (tree_x, tree_y0) = xy("ZERON_RIGHT_TREE", (files_left + 60.0, 113.5));
+    let (tree_x, tree_y0) = xy("ZEREN_RIGHT_TREE", (files_left + 60.0, 113.5));
     notes.push_str(&format!("tree row0 click ({tree_x}, {tree_y0})\n"));
     click(window, cx, (tree_x, tree_y0)).await;
     pause(cx, 1000).await;
@@ -328,7 +328,7 @@ fn main() -> anyhow::Result<()> {
     }
     tracing_subscriber::fmt().with_env_filter("warn").init();
     let temp = tempfile::tempdir()?;
-    let checkout = temp.path().join("zeron");
+    let checkout = temp.path().join("zeren");
     write_checkout(&checkout)?;
     let checkout = checkout.canonicalize()?;
     let checkout_str = checkout.to_string_lossy().into_owned();
@@ -336,19 +336,19 @@ fn main() -> anyhow::Result<()> {
     let runtime = tokio::runtime::Runtime::new()?;
     let _guard = runtime.enter();
     let core = runtime.block_on(async {
-        zeron_engine::EngineCore::assemble(
+        zeren_engine::EngineCore::assemble(
             &temp.path().join("engine"),
-            Arc::new(zeron_engine::HarnessRegistry::new()),
-            zeron_proto::HarnessId::Mock,
+            Arc::new(zeren_engine::HarnessRegistry::new()),
+            zeren_proto::HarnessId::Mock,
             None,
         )
     })?;
     let device = core.device_id.clone();
-    let space: zeron_proto::Space = serde_json::from_value(json!({
-        "id": "prod-space", "deviceId": device, "path": checkout_str, "name": "zeron",
+    let space: zeren_proto::Space = serde_json::from_value(json!({
+        "id": "prod-space", "deviceId": device, "path": checkout_str, "name": "zeren",
         "gitDetected": true, "createdAt": "2026-10-30T00:00:00Z"
     }))?;
-    let chat: zeron_proto::Chat = serde_json::from_value(json!({
+    let chat: zeren_proto::Chat = serde_json::from_value(json!({
         "id": "prod-chat", "deviceId": device, "title": "Right panel parity",
         "archived": false, "cwd": checkout_str, "spaceId": "prod-space",
         "createdAt": "2026-10-30T00:00:00Z",
@@ -362,7 +362,7 @@ fn main() -> anyhow::Result<()> {
     let ipc_port = std::net::TcpListener::bind("127.0.0.1:0")?
         .local_addr()?
         .port();
-    let _ipc = runtime.block_on(zeron_engine::serve_ipc(ipc_port, &data, core.rpc_service()))?;
+    let _ipc = runtime.block_on(zeren_engine::serve_ipc(ipc_port, &data, core.rpc_service()))?;
     let boot = EngineBootConfig {
         data_dir: data.clone(),
         ipc_port,
@@ -370,12 +370,12 @@ fn main() -> anyhow::Result<()> {
         edge_token: None,
         org_id: None,
         workos_client_id: None,
-        default_harness: zeron_proto::HarnessId::Mock,
+        default_harness: zeren_proto::HarnessId::Mock,
     };
     let handle = runtime.block_on(state::EngineHandle::bootstrap(boot.clone()))?;
 
-    let light = std::env::var_os("ZERON_PALETTE_LIGHT").is_some();
-    let glass = std::env::var_os("ZERON_RIGHT_GLASS").is_some();
+    let light = std::env::var_os("ZEREN_PALETTE_LIGHT").is_some();
+    let glass = std::env::var_os("ZEREN_RIGHT_GLASS").is_some();
     gpui_platform::application()
         .with_assets(icons::Assets)
         .run(move |cx| {
@@ -386,7 +386,7 @@ fn main() -> anyhow::Result<()> {
             settings.right_pane_width = RIGHT_PANE;
             settings.github_star_banner_dismissed = true;
             if !glass {
-                settings.surface = zeron_theme::SurfacePreference::Opaque;
+                settings.surface = zeren_theme::SurfacePreference::Opaque;
             }
             settings.save(&data).unwrap();
             settings::init(settings.clone(), data.clone(), cx);
@@ -421,8 +421,8 @@ fn main() -> anyhow::Result<()> {
             let state = cx.new(|_| {
                 let mut s = state::AppState::new();
                 s.fixture_attachment_engine(handle);
-                s.connection = zeron_proto::view::ConnectionStatus::Ready;
-                s.workspace_scope = Some(zeron_proto::WorkspaceScope::Local);
+                s.connection = zeren_proto::view::ConnectionStatus::Ready;
+                s.workspace_scope = Some(zeren_proto::WorkspaceScope::Local);
                 s.local_device_id = Some(device.clone());
                 s.devices = serde_json::from_value(json!([
                     {"id": device, "name": "Studio Mac", "platform": "macos", "lastSeenAt": null}
@@ -470,7 +470,7 @@ fn main() -> anyhow::Result<()> {
                 pause(cx, 800).await;
                 state.update(cx, |s, cx| {
                     s.receive_transcript_frame(
-                        zeron_doc::TranscriptFrame::Reset {
+                        zeren_doc::TranscriptFrame::Reset {
                             reset: serde_json::from_value(entries).unwrap(),
                         },
                         cx,

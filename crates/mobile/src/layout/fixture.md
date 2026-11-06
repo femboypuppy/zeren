@@ -29,9 +29,9 @@ fn main() {
 
 | Crate | Role | Lines |
 |:------|:----:|------:|
-| zeron-text | measurement + line breaking | 3,100 |
-| zeron-markdown | incremental parse | 1,700 |
-| zeron-mobile | layout + FFI | 1,400 |
+| zeren-text | measurement + line breaking | 3,100 |
+| zeren-markdown | incremental parse | 1,700 |
+| zeren-mobile | layout + FFI | 1,400 |
 
 Math sits on the line: $E = mc^2$, $\frac{a}{b}$ and $\sum_{i=1}^{n} x_i$ grow
 their lines only as much as they need.

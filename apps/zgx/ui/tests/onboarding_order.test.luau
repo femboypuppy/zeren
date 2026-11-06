@@ -5,7 +5,7 @@
 -- a username, naming the organization, or (signed in) Sign in. The cases
 -- are in ui/onboarding_order.luau, mounted (the modules need `ui`, which only
 -- a mounted app has). Run with `zgx test ui onboarding`. Nothing here
--- reaches Zeron: its calls fail in a test, and what it would answer is set
+-- reaches Zeren: its calls fail in a test, and what it would answer is set
 -- straight on the state.
 
 test("setup goes through its steps in order for every kind of account", function()

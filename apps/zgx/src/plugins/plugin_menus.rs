@@ -1,13 +1,13 @@
-//! Menus a plugin offers other plugins. Zeron's own menus take plugins'
-//! items by kind (`zeron.menu { kind = "session" | "file", … }`); a plugin
+//! Menus a plugin offers other plugins. Zeren's own menus take plugins'
+//! items by kind (`zeren.menu { kind = "session" | "file", … }`); a plugin
 //! can offer menus of its own the same way, named under its id (the Git
 //! plugin's `git.commit`, a History row's), and other plugins add items to
-//! them with the same call (`zeron.menu { kind = "git.commit", … }`, "ui.add").
+//! them with the same call (`zeren.menu { kind = "git.commit", … }`, "ui.add").
 //!
 //! The host keeps every plugin's items and publishes to each plugin only
 //! those for its own menus (`plugin.<id>.menu_items`). Choosing one, the
 //! offering plugin asks the host (`plugin.<id>.menu_run`), which runs it in
-//! the plugin that added it (a `menu` call, as Zeron's menus do), given the
+//! the plugin that added it (a `menu` call, as Zeren's menus do), given the
 //! context the offering plugin says: plain data, never a function. A plugin
 //! can run items only in its own menus.
 
@@ -15,7 +15,7 @@ use zgx_script::Value;
 
 use crate::auth::text;
 
-/// A menu's kind: one of Zeron's (`session`, `file`), or a plugin's
+/// A menu's kind: one of Zeren's (`session`, `file`), or a plugin's
 /// (`<plugin id>.<name>`).
 pub fn valid_kind(kind: &str) -> bool {
     if kind == "session" || kind == "file" {

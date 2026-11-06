@@ -18,11 +18,11 @@ use gpui::{
     prelude::*, px,
 };
 
-use zeron_proto::{
+use zeren_proto::{
     CloudState, CloudStatus, CloudUsage, GithubConnectProgress, GithubConnectState,
     GithubDeviceFlow, VaultProvider, VaultStatus,
 };
-use zeron_rpc::methods;
+use zeren_rpc::methods;
 
 use crate::cloud::{self, CloudAction, ProviderLink};
 use crate::popover::{self, Loadable};
@@ -739,7 +739,7 @@ impl CloudPage {
             Loadable::Idle | Loadable::Loading => return None,
             Loadable::Error(error) => {
                 let copy = if error.starts_with("unknown method") {
-                    "This version of Zeron can't manage Cloud yet.".to_string()
+                    "This version of Zeren can't manage Cloud yet.".to_string()
                 } else {
                     format!("Couldn't check Cloud: {error}")
                 };
@@ -1020,7 +1020,7 @@ impl CloudPage {
     /// happens on GitHub, and refresh re-reads the list after.
     fn render_repositories(
         &self,
-        repos: Option<Vec<zeron_proto::GithubRepo>>,
+        repos: Option<Vec<zeren_proto::GithubRepo>>,
         install_url: String,
         theme: &Theme,
         cx: &mut Context<Self>,
@@ -1183,7 +1183,7 @@ impl CloudPage {
             "Enter this code on GitHub",
             vec![text(
                 theme.text_muted,
-                "Approve Zeron there; this page moves on by itself.",
+                "Approve Zeren there; this page moves on by itself.",
             )],
             None,
             vec![
@@ -1261,7 +1261,7 @@ impl CloudPage {
                             .bg(if ran { bar_color } else { empty_color }),
                     )
             });
-        let axis = |day: Option<&zeron_proto::CloudUsageDay>| {
+        let axis = |day: Option<&zeren_proto::CloudUsageDay>| {
             day.map(|d| cloud::short_day(&d.day)).unwrap_or_default()
         };
         let mut meta = vec![text(
@@ -1404,11 +1404,11 @@ mod tests {
 
     fn connection(
         provider: VaultProvider,
-        status: zeron_proto::VaultConnectionStatus,
+        status: zeren_proto::VaultConnectionStatus,
         devices: &[&str],
         account: &str,
-    ) -> zeron_proto::VaultConnection {
-        zeron_proto::VaultConnection {
+    ) -> zeren_proto::VaultConnection {
+        zeren_proto::VaultConnection {
             provider,
             status,
             authorized_devices: devices.iter().map(|d| d.to_string()).collect(),
@@ -1423,7 +1423,7 @@ mod tests {
     /// with the GitHub code and the delete dialog open.
     #[gpui::test]
     fn every_state_renders(cx: &mut gpui::TestAppContext) {
-        use zeron_proto::VaultConnectionStatus::{Connected, NeedsReconnect};
+        use zeren_proto::VaultConnectionStatus::{Connected, NeedsReconnect};
         let dir = tempfile::tempdir().unwrap();
         cx.update(|cx| {
             crate::settings::init(crate::settings::UiSettings::default(), dir.path(), cx);
@@ -1465,14 +1465,14 @@ mod tests {
                     connection(VaultProvider::Github, Connected, &["cloud-1"], "octocat"),
                 ],
                 devices: vec![
-                    zeron_proto::VaultDevice {
+                    zeren_proto::VaultDevice {
                         device_id: "cloud-s1".into(),
                         kind: "cloud".into(),
                         enrolled_at: 0,
                         revoked_at: None,
                         parent_id: Some("cloud-1".into()),
                     },
-                    zeron_proto::VaultDevice {
+                    zeren_proto::VaultDevice {
                         device_id: "old".into(),
                         kind: "laptop".into(),
                         enrolled_at: 0,
@@ -1480,7 +1480,7 @@ mod tests {
                         parent_id: None,
                     },
                 ],
-                github_install_url: Some("https://github.com/apps/zeron/installations/new".into()),
+                github_install_url: Some("https://github.com/apps/zeren/installations/new".into()),
             },
             VaultStatus {
                 available: true,
@@ -1530,7 +1530,7 @@ mod tests {
                         from: "2026-07-08".into(),
                         to: "2026-10-05".into(),
                         days: (0..days)
-                            .map(|d| zeron_proto::CloudUsageDay {
+                            .map(|d| zeren_proto::CloudUsageDay {
                                 day: format!("2026-10-{:02}", d % 28 + 1),
                                 credits: [0.0, 12.0, 340.0][d % 3],
                             })

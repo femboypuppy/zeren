@@ -1,5 +1,5 @@
-module zeron_coreFFI {
-    header "zeron_coreFFI.h"
+module zeren_coreFFI {
+    header "zeren_coreFFI.h"
     export *
     use "Darwin"
     use "_Builtin_stdbool"

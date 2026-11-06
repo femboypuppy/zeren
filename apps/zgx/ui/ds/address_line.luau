@@ -44,15 +44,15 @@ return function(props: Props): Node
 				text_size = "$font.size.sm",
 				line_height = "$font.line.sm",
 				color = function()
-					return if props.status() == "taken" then "$zeron.tone.danger.ink" else "$text.secondary"
+					return if props.status() == "taken" then "$zeren.tone.danger.ink" else "$text.secondary"
 				end,
 			},
 		},
 		ui.row {
 			items = "center",
 			show("checking", progress.ProgressRing { size = 12, tone = "neutral", label = locale.t("ds.address_line.checking_label") }, locale.t("ds.address_line.checking"), "$text.tertiary"),
-			show("free", ui.div { y = -0.5, Icon { name = "check-circle", size = 12 } }, locale.t("ds.address_line.available"), "$zeron.tone.success.ink"),
-			show("taken", ui.div { y = -0.5, Icon { name = "close-circle", size = 12 } }, locale.t("ds.address_line.taken"), "$zeron.tone.danger.ink"),
+			show("free", ui.div { y = -0.5, Icon { name = "check-circle", size = 12 } }, locale.t("ds.address_line.available"), "$zeren.tone.success.ink"),
+			show("taken", ui.div { y = -0.5, Icon { name = "close-circle", size = 12 } }, locale.t("ds.address_line.taken"), "$zeren.tone.danger.ink"),
 		},
 	}
 end

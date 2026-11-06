@@ -56,7 +56,7 @@ return {
 					p = "$space.1",
 					w = 220,
 					ui.row {
-						gap = "$zeron.space.hair",
+						gap = "$zeren.space.hair",
 						items = "center",
 						ui.text { "3 of 12", grow = 1, px = "$space.2", text_size = "$font.size.xs", color = "$text.tertiary" },
 						ds.IconButton { icon = "arrow-up", label = "Previous Match", size = "sm", tooltip_side = "bottom" },

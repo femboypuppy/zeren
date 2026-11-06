@@ -46,7 +46,7 @@ local function merged_number(subject: string?): number?
 	return tonumber(n)
 end
 
-return function(zeron: any, pulls: any)
+return function(zeren: any, pulls: any)
 	local M = {}
 	M.repository = repository
 
@@ -162,7 +162,7 @@ return function(zeron: any, pulls: any)
 		return ui.row {
 			class = "github-commit-pr",
 			role = "link",
-			label = zeron.s("git_history.open_pr", { number = pr.number, title = pr.title or "" }),
+			label = zeren.s("git_history.open_pr", { number = pr.number, title = pr.title or "" }),
 			tooltip = if pr.title then Tooltip { pr.title } else nil,
 			cursor = "pointer",
 			shrink = 0,
@@ -181,15 +181,15 @@ return function(zeron: any, pulls: any)
 	end
 
 	-- The author's picture over Git's face.
-	zeron.place {
+	zeren.place {
 		at = "slot:git.commit.face",
 		after = function(): Node
-			local c = zeron.context("git_commit")
+			local c = zeren.context("git_commit")
 			local repo = c and repository(c.remote_url)
 			if not repo then
 				return ui.div {}
 			end
-			local size = tonumber(zeron.context("git_face")) or 18
+			local size = tonumber(zeren.context("git_face")) or 18
 			local known_of = M.commit(repo, c.sha)
 			return ui.show(function(): boolean
 				local k = known_of()
@@ -199,7 +199,7 @@ return function(zeron: any, pulls: any)
 				role = "img",
 				label = function(): string
 					local k = known_of()
-					return zeron.s("git_history.picture", { login = (k and k.login) or c.author })
+					return zeren.s("git_history.picture", { login = (k and k.login) or c.author })
 				end,
 				people.face({
 					id = c.email or c.author,
@@ -214,15 +214,15 @@ return function(zeron: any, pulls: any)
 	}
 
 	-- The pull request a commit came in by, after its refs.
-	zeron.place {
+	zeren.place {
 		at = "slot:git.commit",
 		after = function(): Node
-			local c = zeron.context("git_commit")
+			local c = zeren.context("git_commit")
 			local repo = c and repository(c.remote_url)
 			if not repo then
 				return ui.div {}
 			end
-			local panel = zeron.context("panel")
+			local panel = zeren.context("panel")
 			local known_of = M.commit(repo, c.sha)
 			local fallback = merged_number(c.subject)
 			return ui.presence(function(): string
@@ -244,15 +244,15 @@ return function(zeron: any, pulls: any)
 	}
 
 	-- An opened commit's head: its pull request, and its page on GitHub.
-	zeron.place {
+	zeren.place {
 		at = "slot:git.commit.head",
 		after = function(): Node
-			local c = zeron.context("git_commit")
+			local c = zeren.context("git_commit")
 			local repo = c and repository(c.remote_url)
 			if not repo then
 				return ui.div {}
 			end
-			local panel = zeron.context("panel")
+			local panel = zeren.context("panel")
 			local known_of = M.commit(repo, c.sha)
 			return ui.row {
 				id = "github-commit-head",
@@ -268,11 +268,11 @@ return function(zeron: any, pulls: any)
 				IconButton {
 					id = "github-view-commit",
 					icon = "arrow-up-right",
-					label = zeron.s("git_history.view"),
+					label = zeren.s("git_history.view"),
 					size = "sm",
 					tone = "quiet",
 					on_click = function()
-						zeron.open_url(commit_url(repo, c.sha))
+						zeren.open_url(commit_url(repo, c.sha))
 					end,
 				},
 			}
@@ -283,29 +283,29 @@ return function(zeron: any, pulls: any)
 	local function with_repo(context: any, run: (repo: string, sha: string) -> ())
 		local repo = type(context) == "table" and repository(context.remote_url)
 		if not repo or type(context.sha) ~= "string" then
-			zeron.toast(zeron.s("git_history.not_github"))
+			zeren.toast(zeren.s("git_history.not_github"))
 			return
 		end
 		run(repo, context.sha)
 	end
-	zeron.menu {
+	zeren.menu {
 		kind = "git.commit",
 		id = "github-view-commit",
-		label = zeron.s("git_history.view"),
+		label = zeren.s("git_history.view"),
 		run = function(context: any)
 			with_repo(context, function(repo: string, sha: string)
-				zeron.open_url(commit_url(repo, sha))
+				zeren.open_url(commit_url(repo, sha))
 			end)
 		end,
 	}
-	zeron.menu {
+	zeren.menu {
 		kind = "git.commit",
 		id = "github-copy-commit-link",
-		label = zeron.s("git_history.copy_link"),
+		label = zeren.s("git_history.copy_link"),
 		run = function(context: any)
 			with_repo(context, function(repo: string, sha: string)
 				ui.clipboard.write(commit_url(repo, sha))
-				zeron.toast(zeron.s("git_history.copied"))
+				zeren.toast(zeren.s("git_history.copied"))
 			end)
 		end,
 	}

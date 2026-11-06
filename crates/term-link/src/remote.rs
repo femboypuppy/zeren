@@ -30,9 +30,9 @@ use async_trait::async_trait;
 use futures::StreamExt;
 use futures::stream::BoxStream;
 use tokio::sync::{mpsc, watch};
-use zeron_preview::mux::BoxIo;
-use zeron_proto::TerminalEvent;
-use zeron_rpc::{RpcError, methods};
+use zeren_preview::mux::BoxIo;
+use zeren_proto::TerminalEvent;
+use zeren_rpc::{RpcError, methods};
 
 use crate::link::{self, Link, Outgoing};
 
@@ -84,17 +84,17 @@ pub trait Direct: Send + Sync + 'static {
 }
 
 #[async_trait]
-impl Direct for zeron_preview::viewer::ViewerPeers {
+impl Direct for zeren_preview::viewer::ViewerPeers {
     async fn ready(&self, device: &str) -> bool {
-        zeron_preview::viewer::ViewerPeers::ready(self, device).await
+        zeren_preview::viewer::ViewerPeers::ready(self, device).await
     }
     async fn open(&self, device: &str, service: &str) -> anyhow::Result<BoxIo> {
         Ok(Box::new(
-            zeron_preview::viewer::ViewerPeers::open(self, device, service).await?,
+            zeren_preview::viewer::ViewerPeers::open(self, device, service).await?,
         ))
     }
     async fn changed(&self) {
-        zeron_preview::viewer::ViewerPeers::changed(self).await
+        zeren_preview::viewer::ViewerPeers::changed(self).await
     }
 }
 
@@ -108,7 +108,7 @@ pub enum TerminalPath {
 }
 
 #[async_trait]
-impl Direct for zeron_preview::PreviewService {
+impl Direct for zeren_preview::PreviewService {
     async fn ready(&self, device: &str) -> bool {
         self.peer_ready(device).await
     }

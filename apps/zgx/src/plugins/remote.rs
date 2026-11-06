@@ -146,7 +146,7 @@ pub fn load(bridge: &Rc<Bridge>) {
                 watch(&b, &device, run);
             }
             Err(error) => {
-                eprintln!("zeron-zgx: plugins: {device}'s plugins unavailable: {error}");
+                eprintln!("zeren-zgx: plugins: {device}'s plugins unavailable: {error}");
                 b.remote.state.set("offline");
                 b.remote.publish();
             }

@@ -1,5 +1,5 @@
--- A new chat's wallpaper, as Zeron's: whatever stands in it (a picture of
--- your own, or what a plugin draws there) under one of Zeron's effects,
+-- A new chat's wallpaper, as Zeren's: whatever stands in it (a picture of
+-- your own, or what a plugin draws there) under one of Zeren's effects,
 -- drawn over it as one picture (dither, ASCII, halftone, scanlines), faded
 -- from the top, full, to nothing at its foot. The main window's new chat
 -- draws it; the gallery's App shell shows it (and every effect).
@@ -17,7 +17,7 @@
 -- effect, crossfades (an effect is its layer's shader, given as it is
 -- made); `intensity` and `density` change in place.
 --
--- `Picture { src, w, h, x, y, zoom }` is a picture laid in it as Zeron lays
+-- `Picture { src, w, h, x, y, zoom }` is a picture laid in it as Zeren lays
 -- its new-thread background: covering the box, `zoom` times that (1 to 4),
 -- the overflow cut at `x`, `y` (0 to 1: from the left or top edge, 0.5
 -- centred). `w`, `h` are its size in pixels.
@@ -52,10 +52,10 @@ export type Props = {
 
 export type Picture = { src: string, w: number, h: number, x: number?, y: number?, zoom: number? }
 
--- The effects, in the order Settings lists them (Zeron's).
+-- The effects, in the order Settings lists them (Zeren's).
 M.EFFECTS = { "none", "dither", "ascii", "halftone", "scanlines" }
 
--- The zoom a picture takes, at least and at most (Zeron's).
+-- The zoom a picture takes, at least and at most (Zeren's).
 M.MIN_ZOOM, M.MAX_ZOOM = 1, 4
 
 -- What each strength and density is, on the effect's shader.

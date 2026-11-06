@@ -64,7 +64,7 @@ const LIMIT_REACHED: &[&str] = &[
 /// The problem `message` reports, if signing in can fix it.
 pub fn provider_problem(message: &str) -> Option<ProviderProblem> {
     let text = message.to_ascii_lowercase();
-    // Cloud credits are Zeron's, not the provider's: not a sign-in.
+    // Cloud credits are Zeren's, not the provider's: not a sign-in.
     if text.contains("out of credits") || text.contains("cloud credits") {
         return None;
     }

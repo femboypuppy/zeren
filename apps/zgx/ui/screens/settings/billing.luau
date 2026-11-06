@@ -255,7 +255,7 @@ function M.view(): Node
 				w_full = true,
 				h = 4,
 				rounded = "$radius.full",
-				bg = "$zeron.secondary.bg",
+				bg = "$zeren.secondary.bg",
 				overflow = "hidden",
 				role = "img",
 				label = function(): string
@@ -273,7 +273,7 @@ function M.view(): Node
 					w = function(): string
 						return `{share("extra") * 100}%`
 					end,
-					bg = "$zeron.tone.accent.edge",
+					bg = "$zeren.tone.accent.edge",
 				},
 			}),
 		}
@@ -340,10 +340,10 @@ function M.view(): Node
 			p = "$space.4",
 			gap = "$space.1",
 			rounded = "$radius.xl",
-			bg = "$zeron.settings.card",
+			bg = "$zeren.settings.card",
 			border = 1,
 			border_color = function(): string
-				return if current() then "$zeron.selected.ring" else "$zeron.settings.edge"
+				return if current() then "$zeren.selected.ring" else "$zeren.settings.edge"
 			end,
 			role = "group",
 			label = ui.t("settings.billing.plan.card_name", { plan = p.name }),

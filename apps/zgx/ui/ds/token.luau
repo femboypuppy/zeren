@@ -3,7 +3,7 @@
 -- host makes (src/plugins/tokens.rs), never the path or the text. zgx
 -- copies whatever an element provides into any plugin that asks, so a
 -- plugin finds what's behind a token only through its own grants (the
--- SDK's `zeron.context("file")`, `zeron.need("code")`).
+-- SDK's `zeren.context("file")`, `zeren.need("code")`).
 --
 --   provide = { file = token.file(path) }
 --   provide = { code = token.block({ lang = lang, source = text }) }
@@ -23,12 +23,12 @@ end
 
 -- A file's token, by its path.
 function M.file(path: string?): string?
-	return made("zeron.file_token", path)
+	return made("zeren.file_token", path)
 end
 
 -- A block's token, by what it holds (`{ lang, source }`, or a formula's TeX).
 function M.block(value: any): string?
-	return made("zeron.block_token", value)
+	return made("zeren.block_token", value)
 end
 
 return M

@@ -1,6 +1,6 @@
--- The window's fit (screens/shell/fit_policy): Zeron's policy (crates/ui
+-- The window's fit (screens/shell/fit_policy): Zeren's policy (crates/ui
 -- shell/panel_layout.rs `horizontal_panel_fit`, shell.rs `content_split`,
--- `right_pane_max_width`), its cases as Zeron's own tests have them
+-- `right_pane_max_width`), its cases as Zeren's own tests have them
 -- (shell.rs `right_pane_ceiling_preserves_the_chat_floor`,
 -- `right_pane_takeover_consumes_the_chat_column`; panel_interaction_tests
 -- `panels_share_space_…`: their widths and which column a narrow window
@@ -25,7 +25,7 @@ test("expanded, the panel takes all of the chat's room", function()
 end)
 
 test("the panel's share is half of what the tools leave, within the least", function()
-	-- (Zeron's lifecycle test: 1600 wide, sidebar 300, Files 377 / 286.)
+	-- (Zeren's lifecycle test: 1600 wide, sidebar 300, Files 377 / 286.)
 	expect(fit.content_split(1600 - 377)).to_be(611.5)
 	expect(fit.content_split(1600 - 300 - 377)).to_be(461.5)
 	expect(fit.content_split(1600 - 300 - 286)).to_be(507)
@@ -41,7 +41,7 @@ end)
 
 test("a narrow window hides the column opened longest ago, not the others", function()
 	-- Right opened, then Files, then the sidebar: Files is the oldest of
-	-- those that must give way (Zeron's 1000-wide step).
+	-- those that must give way (Zeren's 1000-wide step).
 	local f = fit.panels(1000, 300, col(true, 5), col(true, 4), col(true, 3), false)
 	expect(f.sidebar).to_be(true)
 	expect(f.right).to_be(true)
@@ -54,7 +54,7 @@ test("a narrow window hides the column opened longest ago, not the others", func
 end)
 
 test("short of room, the sidebar narrows to what's left before it hides", function()
-	-- (Zeron's 1130-wide step: 1130 - 300 - 360 - 220.)
+	-- (Zeren's 1130-wide step: 1130 - 300 - 360 - 220.)
 	local f = fit.panels(1130, 300, col(true, 1), col(true, 2), col(true, 3), false)
 	expect(f.sidebar).to_be(true)
 	expect(f.sidebar_limit).to_be(250)

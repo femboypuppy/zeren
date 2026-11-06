@@ -89,10 +89,10 @@ pub fn inspect(dir: &Path, under_plugins: bool) -> Inspected {
             return fail(inspected, super::files::LINK_ERROR.into());
         }
         Ok(meta) if meta.is_file() => {}
-        _ => return fail(inspected, "It has no zeron-plugin.json".into()),
+        _ => return fail(inspected, "It has no zeren-plugin.json".into()),
     }
     let Ok(bytes) = std::fs::read(&manifest_path) else {
-        return fail(inspected, "Its zeron-plugin.json can't be read".into());
+        return fail(inspected, "Its zeren-plugin.json can't be read".into());
     };
     inspected.manifest_bytes = bytes;
     let manifest = match Manifest::parse(&inspected.manifest_bytes) {
@@ -166,7 +166,7 @@ pub struct PluginItem {
     pub mcp: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
-    /// One of Zeron's own (shipped inside the app): allowed what it asks as
+    /// One of Zeren's own (shipped inside the app): allowed what it asks as
     /// it ships, on unless turned off, never removed or edited.
     #[serde(skip_serializing_if = "std::ops::Not::not")]
     pub builtin: bool,
@@ -199,7 +199,7 @@ fn icon_svg(dir: &Path, manifest: &serde_json::Value) -> Option<String> {
     if !rel.ends_with(".svg") {
         return None;
     }
-    let path = zeron_plugin_guard::path::join(dir, rel).ok()?;
+    let path = zeren_plugin_guard::path::join(dir, rel).ok()?;
     let meta = std::fs::symlink_metadata(&path).ok()?;
     if !meta.is_file() || meta.len() > MAX {
         return None;
@@ -306,11 +306,11 @@ pub fn entry(inspected: Inspected, author: Author, state: &State) -> Entry {
     }
 }
 
-/// One of Zeron's own plugins, from the app's folder of them: allowed
+/// One of Zeren's own plugins, from the app's folder of them: allowed
 /// exactly what its manifest asks (a new version's asks come with it), on
-/// unless you turned it off (`off`), its author Zeron.
+/// unless you turned it off (`off`), its author Zeren.
 pub fn builtin_entry(inspected: Inspected, off: bool) -> Entry {
-    let mut entry = entry(inspected, Author::Zeron, &State::default());
+    let mut entry = entry(inspected, Author::Zeren, &State::default());
     entry.item.builtin = true;
     entry.item.own = false;
     if entry.item.status != Status::Broken {
@@ -375,8 +375,8 @@ mod tests {
         let mismatch = inspect(&write_plugin(root.path(), "other", manifest("focus")), true);
         assert!(mismatch.error.unwrap().contains("doesn't match"));
 
-        let reserved = inspect(&write_plugin(root.path(), "zeron", manifest("zeron")), true);
-        assert_eq!(reserved.error.as_deref(), Some("Zeron already uses that name"));
+        let reserved = inspect(&write_plugin(root.path(), "zeren", manifest("zeren")), true);
+        assert_eq!(reserved.error.as_deref(), Some("Zeren already uses that name"));
 
         let mut no_entry = manifest("noentry");
         no_entry["entry"] = serde_json::json!("main.luau");
@@ -392,7 +392,7 @@ mod tests {
             .iter()
             .map(|p| p.file_name().unwrap().to_string_lossy().into_owned())
             .collect();
-        assert_eq!(names, vec!["empty", "focus", "noentry", "other", "zeron"]);
+        assert_eq!(names, vec!["empty", "focus", "noentry", "other", "zeren"]);
     }
 
     #[test]

@@ -1,4 +1,4 @@
--- The shell's shortcuts, one list (screens/shell/keys): Zeron's defaults,
+-- The shell's shortcuts, one list (screens/shell/keys): Zeren's defaults,
 -- each id and each key once, each in a group Settings lists.
 
 local keys = require("../screens/shell/keys")
@@ -20,7 +20,7 @@ test("each shortcut is one command's, on one key, in a known group", function()
 	end
 end)
 
-test("Zeron's defaults", function()
+test("Zeren's defaults", function()
 	local want = {
 		["shell.toggle_sidebar"] = "cmd+b",
 		["shell.toggle_files"] = "cmd+r",
@@ -51,12 +51,12 @@ test("a shortcut another screen makes is listed as it makes it", function()
 	expect(k.elsewhere).to_be(true)
 end)
 
-test("Reload Zeron and Reload interface are the app's, with no key of their own", function()
+test("Reload Zeren and Reload interface are the app's, with no key of their own", function()
 	for _, id in { "shell.reload", "shell.reload_interface" } do
 		local k = keys.get(id) :: any
 		expect(k).never.to_be_nil()
 		expect(k.group).to_be("App")
 		expect(k.key).to_be("")
 	end
-	expect((keys.get("shell.reload") :: any).title).to_be("Reload Zeron")
+	expect((keys.get("shell.reload") :: any).title).to_be("Reload Zeren")
 end)

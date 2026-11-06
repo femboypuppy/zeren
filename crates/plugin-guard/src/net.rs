@@ -1,4 +1,4 @@
-//! Where a plugin's requests may go (`zeron.fetch`, "network").
+//! Where a plugin's requests may go (`zeren.fetch`, "network").
 //!
 //! "network" is the internet: public addresses. Never, unless the manifest
 //! names the host: this device (`localhost`, `127.0.0.1`, `::1`), your

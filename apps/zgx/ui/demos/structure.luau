@@ -132,7 +132,7 @@ return {
 					w = 440,
 					layout.KeyValue {
 						items = {
-							{ key = "Branch", value = "zeron/primitives", mono = true, copy = true },
+							{ key = "Branch", value = "zeren/primitives", mono = true, copy = true },
 							{ key = "Base", value = "main", mono = true },
 							{ key = "Author", value = people.Person { id = "ada", name = "Ada Lovelace", size = 18 } },
 							{ key = "State", value = badge.PullRequest { state = "open", size = "md" } },
@@ -157,9 +157,9 @@ return {
 						h = 200,
 						relative = true,
 						rounded = "$radius.xl",
-						bg = "$zeron.settings.card",
+						bg = "$zeren.settings.card",
 						border = 1,
-						border_color = "$zeron.settings.edge",
+						border_color = "$zeren.settings.edge",
 						overflow = "hidden",
 						on_resize = function(size)
 							rail_view:set(size.h)

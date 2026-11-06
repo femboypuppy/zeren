@@ -6,7 +6,7 @@
 --
 -- It is a Surface (ds/surface) at `depth = "flat"`, as the sidebar's rows
 -- are: under the pointer the theme's `$hover` wash, pressed `$pressed`,
--- the chosen one on the flat selection (`$zeron.selected.flat.bg`). Flat
+-- the chosen one on the flat selection (`$zeren.selected.flat.bg`). Flat
 -- means the wash alone: no edge, no lift, no shadow, no highlight. And in
 -- a card it washes edge to edge, with no corner of its own: the card's
 -- corner clips the first row and the last, so a row under the pointer
@@ -34,7 +34,7 @@ export type Props = {
 
 -- What it's drawn with, for what checks that every list hovers alike.
 local M = {}
-M.HOVER, M.PRESSED, M.SELECTED = "$hover", "$pressed", "$zeron.selected.flat.bg"
+M.HOVER, M.PRESSED, M.SELECTED = "$hover", "$pressed", "$zeren.selected.flat.bg"
 
 function M.ListRow(props: Props): Node
 	local on_click = props.on_click

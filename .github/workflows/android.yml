@@ -3,7 +3,7 @@ name: Android
 # Builds the Android APK and Play App Bundle whenever the app or its Rust core changes. Pull
 # requests get it as a workflow artifact; main also publishes it to the
 # `comet-native-releases` R2 bucket, served at
-# zeron.sh/releases/zeron-android-arm64.apk (the website's download, served
+# zeron.sh/releases/zeren-android-arm64.apk (the website's download, served
 # `no-cache` since every build replaces it), with a copy named for its version
 # and build number — so never replaced, and cacheable for good — and sha256s.
 #
@@ -63,11 +63,11 @@ permissions:
 env:
   NDK_VERSION: 29.0.14206865
   # Phones: arm64 only (an x86_64 core would double the download for emulators).
-  ZERON_ANDROID_ABIS: arm64-v8a
+  ZEREN_ANDROID_ABIS: arm64-v8a
   # Published builds (main): thin LTO, stripped — the profile iOS archives use,
   # about 10% smaller. Pull requests take the quicker `mobile` profile (AGP
   # still strips its debug info).
-  ZERON_ANDROID_PROFILE: ${{ github.event_name != 'pull_request' && 'mobile-dist' || 'mobile' }}
+  ZEREN_ANDROID_PROFILE: ${{ github.event_name != 'pull_request' && 'mobile-dist' || 'mobile' }}
 
 jobs:
   apk:
@@ -132,26 +132,26 @@ jobs:
             echo "signed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          keystore="$RUNNER_TEMP/zeron-release.jks"
+          keystore="$RUNNER_TEMP/zeren-release.jks"
           printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$keystore"
           chmod 600 "$keystore"
           {
-            echo "ZERON_ANDROID_KEYSTORE=$keystore"
-            echo "ZERON_ANDROID_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
-            echo "ZERON_ANDROID_KEY_ALIAS=$KEY_ALIAS"
-            echo "ZERON_ANDROID_KEY_PASSWORD=$KEY_PASSWORD"
+            echo "ZEREN_ANDROID_KEYSTORE=$keystore"
+            echo "ZEREN_ANDROID_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+            echo "ZEREN_ANDROID_KEY_ALIAS=$KEY_ALIAS"
+            echo "ZEREN_ANDROID_KEY_PASSWORD=$KEY_PASSWORD"
           } >> "$GITHUB_ENV"
           echo "signed=true" >> "$GITHUB_OUTPUT"
 
       - name: assemble release APK and Play App Bundle
         working-directory: apps/android
-        run: ./gradlew :app:assembleRelease :app:bundleRelease -PzeronVersionCode="$BUILD_NUMBER" --console=plain --no-configuration-cache
+        run: ./gradlew :app:assembleRelease :app:bundleRelease -PzerenVersionCode="$BUILD_NUMBER" --console=plain --no-configuration-cache
 
       - name: package
         run: |
           mkdir -p out/android
-          apk="out/android/zeron-$VERSION-$BUILD_NUMBER-android-arm64.apk"
-          aab="out/android/zeron-$VERSION-$BUILD_NUMBER-android-arm64.aab"
+          apk="out/android/zeren-$VERSION-$BUILD_NUMBER-android-arm64.apk"
+          aab="out/android/zeren-$VERSION-$BUILD_NUMBER-android-arm64.aab"
           cp apps/android/app/build/outputs/apk/release/app-release.apk "$apk"
           cp apps/android/app/build/outputs/bundle/release/app-release.aab "$aab"
           "$ANDROID_HOME/build-tools/37.0.0/apksigner" verify --print-certs "$apk"
@@ -187,7 +187,7 @@ jobs:
 
       - name: remove signing key
         if: always()
-        run: rm -f "$RUNNER_TEMP/zeron-release.jks"
+        run: rm -f "$RUNNER_TEMP/zeren-release.jks"
 
   play:
     name: Upload to Google Play testing
@@ -255,7 +255,7 @@ jobs:
       - name: upload to R2 (zeron.sh/releases/*)
         if: env.CLOUDFLARE_API_TOKEN != ''
         run: |
-          apk="out/android/zeron-$VERSION-$BUILD_NUMBER-android-arm64.apk"
+          apk="out/android/zeren-$VERSION-$BUILD_NUMBER-android-arm64.apk"
           (cd out/android && sha256sum -c "$(basename "$apk").sha256")
           put() {
             npx wrangler@4 r2 object put "comet-native-releases/$1" --file "$2" --remote \
@@ -268,6 +268,6 @@ jobs:
           immutable="public, max-age=31536000, immutable"
           put "$(basename "$apk")" "$apk" "$type" "$immutable"
           put "$(basename "$apk").sha256" "$apk.sha256" text/plain "$immutable"
-          put zeron-android-arm64.apk "$apk" "$type" "no-cache"
-          sed "s/$(basename "$apk")/zeron-android-arm64.apk/" "$apk.sha256" > latest.sha256
-          put zeron-android-arm64.apk.sha256 latest.sha256 text/plain "no-cache"
+          put zeren-android-arm64.apk "$apk" "$type" "no-cache"
+          sed "s/$(basename "$apk")/zeren-android-arm64.apk/" "$apk.sha256" > latest.sha256
+          put zeren-android-arm64.apk.sha256 latest.sha256 text/plain "no-cache"

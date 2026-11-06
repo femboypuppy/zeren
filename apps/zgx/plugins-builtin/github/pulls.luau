@@ -239,8 +239,8 @@ local function remote_repository(listing: string?): string?
 	return nil
 end
 
-return function(zeron: any)
-	local gh = Gh(zeron)
+return function(zeren: any)
+	local gh = Gh(zeren)
 	local M = {}
 	M.task = gh.task
 	M.parse = parse
@@ -256,13 +256,13 @@ return function(zeron: any)
 	-- The pull request at `url`, as GitHub has it now. Unless `refresh`,
 	-- what was kept is told first (`kept`), so it shows at once.
 	-- How long what was kept stands as GitHub's word without asking again
-	-- (Zeron's own: five minutes).
+	-- (Zeren's own: five minutes).
 	local FRESH_SECONDS = 5 * 60
 
 	function M.pr(url: string, refresh: boolean?, kept: ((d: any) -> ())?): Gh.Task
 		local owner, name, number = parse(url)
 		if not owner then
-			return failed(zeron.s("pulls.not_pr"))
+			return failed(zeren.s("pulls.not_pr"))
 		end
 		local key = `pr:{owner}/{name}#{number}`
 		return gh.task(function(resolve, reject)
@@ -270,7 +270,7 @@ return function(zeron: any)
 				gh.graphql(DETAIL, { owner = owner, name = name, number = number }):after(function(data: any)
 					local pr = data.repository and data.repository.pullRequest
 					if not pr then
-						reject(zeron.s("pulls.not_found"))
+						reject(zeren.s("pulls.not_found"))
 						return
 					end
 					local d = shape(pr, data.viewer and data.viewer.login, data.repository)
@@ -302,7 +302,7 @@ return function(zeron: any)
 	function M.diff(url: string, at: { head: string?, base: string? }): Gh.Task
 		local owner, name, number = parse(url)
 		if not owner then
-			return failed(zeron.s("pulls.not_pr"))
+			return failed(zeren.s("pulls.not_pr"))
 		end
 		local key = `diff:{owner}/{name}#{number}:{at.head or ""}:{at.base or ""}`
 		return gh.task(function(resolve, reject)
@@ -331,14 +331,14 @@ return function(zeron: any)
 	-- A comment on the pull request, as you.
 	function M.comment(url: string, body: string): Gh.Task
 		local owner, name, number = parse(url)
-		return if owner then gh.rest("POST", `repos/{owner}/{name}/issues/{number}/comments`, { body = body }) else failed(zeron.s("pulls.not_pr"))
+		return if owner then gh.rest("POST", `repos/{owner}/{name}/issues/{number}/comments`, { body = body }) else failed(zeren.s("pulls.not_pr"))
 	end
 
 	-- A comment on a line of a file, at a commit, as you.
 	function M.line_comment(url: string, at: { path: string, line: number, side: string, commit: string }, body: string): Gh.Task
 		local owner, name, number = parse(url)
 		if not owner then
-			return failed(zeron.s("pulls.not_pr"))
+			return failed(zeren.s("pulls.not_pr"))
 		end
 		return gh.rest("POST", `repos/{owner}/{name}/pulls/{number}/comments`, {
 			body = body,
@@ -387,7 +387,7 @@ return function(zeron: any)
 	function M.merge(url: string, d: any, method: string, delete_branch: boolean): Gh.Task
 		local owner, name = parse(url)
 		if not owner or type(d.id) ~= "string" then
-			return failed(zeron.s("pulls.not_pr"))
+			return failed(zeren.s("pulls.not_pr"))
 		end
 		local how = if method == "rebase" then "REBASE" elseif method == "merge" then "MERGE" else "SQUASH"
 		return gh.task(function(resolve, reject)
@@ -397,7 +397,7 @@ return function(zeron: any)
 			):after(function(data: any)
 				local merged = data.mergePullRequest and data.mergePullRequest.pullRequest and data.mergePullRequest.pullRequest.merged
 				if not merged then
-					reject(zeron.s("pulls.not_merged"))
+					reject(zeren.s("pulls.not_merged"))
 					return
 				end
 				if delete_branch and not d.isCrossRepository and type(d.headRefName) == "string" and d.headRefName ~= "" then
@@ -504,7 +504,7 @@ return function(zeron: any)
 				end)
 			elseif o.refresh and not o.after then
 				-- (Refresh pressed again within 15 seconds of an answer asks
-				-- nothing: that answer is GitHub's word still, as Zeron's.)
+				-- nothing: that answer is GitHub's word still, as Zeren's.)
 				gh.cached(key, function(value: any?, at: number?)
 					if type(value) == "table" and at and os.time() - at < 15 then
 						resolve(value)
@@ -522,7 +522,7 @@ return function(zeron: any)
 	-- (`owner/name`), kept once known.
 	function M.repository(path: string?): Gh.Task
 		if type(path) ~= "string" or path == "" then
-			return failed(zeron.s("pulls.no_folder"))
+			return failed(zeren.s("pulls.no_folder"))
 		end
 		local key = `repo:{path}`
 		return gh.task(function(resolve, reject)
@@ -539,18 +539,18 @@ return function(zeron: any)
 				-- one through a local proxy: then the folder's remotes, read
 				-- as gh would choose among them.)
 				local function from_remotes()
-					zeron.run("git", { "remote", "-v" }, { cwd = path, timeout = 30 }):after(function(r: any)
+					zeren.run("git", { "remote", "-v" }, { cwd = path, timeout = 30 }):after(function(r: any)
 						local name = if type(r) == "table" and r.status == 0 then remote_repository(r.stdout) else nil
 						if name then
 							found(name)
 						else
-							reject(zeron.s("pulls.no_repo"))
+							reject(zeren.s("pulls.no_repo"))
 						end
 					end, function(err: any)
 						reject(tostring(if type(err) == "table" and err.message then err.message else err))
 					end)
 				end
-				zeron.run("gh", { "repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner" }, { cwd = path, timeout = 30 }):after(function(r: any)
+				zeren.run("gh", { "repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner" }, { cwd = path, timeout = 30 }):after(function(r: any)
 					local name = if type(r) == "table" and r.status == 0 then string.match(r.stdout or "", "^%s*(%S+)") else nil
 					if name and string.match(name, "^[^/]+/[^/]+$") then
 						found(name)

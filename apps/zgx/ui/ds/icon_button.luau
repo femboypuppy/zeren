@@ -26,7 +26,7 @@ local recipe = ui.variants {
 		items = "center",
 		justify = "center",
 		p = 0,
-		rounded = "$zeron.icon_button.radius",
+		rounded = "$zeren.icon_button.radius",
 		bg = "#00000000",
 		cursor = "pointer",
 		hover = { bg = "$hover", color = "$text.primary" },
@@ -35,9 +35,9 @@ local recipe = ui.variants {
 	},
 	variants = {
 		size = {
-			sm = { w = "$zeron.icon_button.sm", h = "$zeron.icon_button.sm" },
-			md = { w = "$zeron.icon_button.md", h = "$zeron.icon_button.md" },
-			lg = { w = "$zeron.icon_button.lg", h = "$zeron.icon_button.lg" },
+			sm = { w = "$zeren.icon_button.sm", h = "$zeren.icon_button.sm" },
+			md = { w = "$zeren.icon_button.md", h = "$zeren.icon_button.md" },
+			lg = { w = "$zeren.icon_button.lg", h = "$zeren.icon_button.lg" },
 		},
 		tone = {
 			normal = { color = "$text.secondary" },
@@ -46,8 +46,8 @@ local recipe = ui.variants {
 			-- the danger's wash and ink (a menu's destructive row's).
 			danger = {
 				color = "$text.tertiary",
-				hover = { bg = "$zeron.menu.danger", color = "$danger" },
-				active = { bg = "$zeron.menu.danger", color = "$danger" },
+				hover = { bg = "$zeren.menu.danger", color = "$danger" },
+				active = { bg = "$zeren.menu.danger", color = "$danger" },
 			},
 		},
 		-- Lit: what it opens is open (the hover wash, held, the ink full;
@@ -60,7 +60,7 @@ local recipe = ui.variants {
 	defaults = { size = "md", tone = "normal", lit = false },
 }
 
-local GLYPH = { sm = "$zeron.icon_button.glyph.sm", md = "$zeron.icon_button.glyph.md", lg = "$zeron.icon_button.glyph.lg" }
+local GLYPH = { sm = "$zeren.icon_button.glyph.sm", md = "$zeren.icon_button.glyph.md", lg = "$zeren.icon_button.glyph.lg" }
 
 export type Size = "sm" | "md" | "lg"
 export type Tone = "normal" | "quiet" | "danger"

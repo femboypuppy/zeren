@@ -1,13 +1,13 @@
 //! `ui.shader`: a fragment shader the desktop runs on the GPU, in the
 //! convention agents already know from Shadertoy. The script supplies
-//! `void mainImage(out vec4 fragColor, in vec2 fragCoord)`; Zeron wraps it in
+//! `void mainImage(out vec4 fragColor, in vec2 fragCoord)`; Zeren wraps it in
 //! a complete GLSL program with the usual inputs and validates it here, so a
 //! compile error reaches the agent (with its line) before the reader sees it.
 //!
 //! Inputs, as in Shadertoy: `iResolution` (vec3, pixels), `iTime` and
 //! `iTimeDelta` (seconds), `iFrame` (int), `iMouse` (vec4: xy while the
 //! button is down, zw where it went down, negative z/w once released;
-//! origin bottom-left). Zeron adds `iCamera` (vec4: yaw, pitch, zoom, 0),
+//! origin bottom-left). Zeren adds `iCamera` (vec4: yaw, pitch, zoom, 0),
 //! which the reader orbits by dragging when `orbit = true`, and named number
 //! inputs the script binds to its state (`inputs = { speed = s.speed }`
 //! makes `speed` a float in the shader).
@@ -95,43 +95,43 @@ pub fn program(code: &str, inputs: &[String]) -> (String, usize) {
     let mut header = String::from(
         "#version 450\n\
          layout(set = 0, binding = 0) uniform ZeronShader {\n\
-         \x20   vec4 zeron_resolution;\n\
+         \x20   vec4 zeren_resolution;\n\
          \x20   vec4 iMouse;\n\
          \x20   vec4 iCamera;\n\
-         \x20   vec4 zeron_time;\n\
-         \x20   vec4 zeron_inputs[4];\n\
+         \x20   vec4 zeren_time;\n\
+         \x20   vec4 zeren_inputs[4];\n\
          \x20   vec4 iChannelResolution[4];\n\
          };\n\
-         layout(set = 0, binding = 1) uniform texture2D zeron_channel0;\n\
-         layout(set = 0, binding = 2) uniform texture2D zeron_channel1;\n\
-         layout(set = 0, binding = 3) uniform texture2D zeron_channel2;\n\
-         layout(set = 0, binding = 4) uniform texture2D zeron_channel3;\n\
-         layout(set = 0, binding = 5) uniform texture2D zeron_noise;\n\
-         layout(set = 0, binding = 6) uniform sampler zeron_clamp;\n\
-         layout(set = 0, binding = 7) uniform sampler zeron_repeat;\n\
-         layout(set = 0, binding = 8) uniform texture2D zeron_texture0;\n\
-         layout(set = 0, binding = 9) uniform texture2D zeron_texture1;\n\
-         layout(set = 0, binding = 10) uniform texture2D zeron_texture2;\n\
-         layout(set = 0, binding = 11) uniform texture2D zeron_texture3;\n\
-         layout(location = 0) out vec4 zeron_color;\n\
-         #define iChannel0 sampler2D(zeron_channel0, zeron_clamp)\n\
-         #define iChannel1 sampler2D(zeron_channel1, zeron_clamp)\n\
-         #define iChannel2 sampler2D(zeron_channel2, zeron_clamp)\n\
-         #define iChannel3 sampler2D(zeron_channel3, zeron_clamp)\n\
-         #define iNoise sampler2D(zeron_noise, zeron_repeat)\n\
-         #define iTexture0 sampler2D(zeron_texture0, zeron_repeat)\n\
-         #define iTexture1 sampler2D(zeron_texture1, zeron_repeat)\n\
-         #define iTexture2 sampler2D(zeron_texture2, zeron_repeat)\n\
-         #define iTexture3 sampler2D(zeron_texture3, zeron_repeat)\n\
-         #define iResolution (zeron_resolution.xyz)\n\
-         #define iTime (zeron_time.x)\n\
-         #define iTimeDelta (zeron_time.y)\n\
-         #define iFrame (int(zeron_time.z))\n",
+         layout(set = 0, binding = 1) uniform texture2D zeren_channel0;\n\
+         layout(set = 0, binding = 2) uniform texture2D zeren_channel1;\n\
+         layout(set = 0, binding = 3) uniform texture2D zeren_channel2;\n\
+         layout(set = 0, binding = 4) uniform texture2D zeren_channel3;\n\
+         layout(set = 0, binding = 5) uniform texture2D zeren_noise;\n\
+         layout(set = 0, binding = 6) uniform sampler zeren_clamp;\n\
+         layout(set = 0, binding = 7) uniform sampler zeren_repeat;\n\
+         layout(set = 0, binding = 8) uniform texture2D zeren_texture0;\n\
+         layout(set = 0, binding = 9) uniform texture2D zeren_texture1;\n\
+         layout(set = 0, binding = 10) uniform texture2D zeren_texture2;\n\
+         layout(set = 0, binding = 11) uniform texture2D zeren_texture3;\n\
+         layout(location = 0) out vec4 zeren_color;\n\
+         #define iChannel0 sampler2D(zeren_channel0, zeren_clamp)\n\
+         #define iChannel1 sampler2D(zeren_channel1, zeren_clamp)\n\
+         #define iChannel2 sampler2D(zeren_channel2, zeren_clamp)\n\
+         #define iChannel3 sampler2D(zeren_channel3, zeren_clamp)\n\
+         #define iNoise sampler2D(zeren_noise, zeren_repeat)\n\
+         #define iTexture0 sampler2D(zeren_texture0, zeren_repeat)\n\
+         #define iTexture1 sampler2D(zeren_texture1, zeren_repeat)\n\
+         #define iTexture2 sampler2D(zeren_texture2, zeren_repeat)\n\
+         #define iTexture3 sampler2D(zeren_texture3, zeren_repeat)\n\
+         #define iResolution (zeren_resolution.xyz)\n\
+         #define iTime (zeren_time.x)\n\
+         #define iTimeDelta (zeren_time.y)\n\
+         #define iFrame (int(zeren_time.z))\n",
     );
     for (i, name) in inputs.iter().enumerate().take(MAX_INPUTS) {
         let lane = ["x", "y", "z", "w"][i % 4];
         header.push_str(&format!(
-            "#define {name} (zeron_inputs[{}].{lane})\n",
+            "#define {name} (zeren_inputs[{}].{lane})\n",
             i / 4
         ));
     }
@@ -154,7 +154,7 @@ pub fn program(code: &str, inputs: &[String]) -> (String, usize) {
          void main() {{\n\
          \x20   vec4 color = vec4(0.0, 0.0, 0.0, 1.0);\n\
          \x20   mainImage(color, gl_FragCoord.xy);\n\
-         \x20   zeron_color = color;\n\
+         \x20   zeren_color = color;\n\
          }}\n"
     );
     (program, lines)
@@ -170,7 +170,7 @@ pub fn valid_input_name(name: &str) -> bool {
     starts
         && chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
         && !name.starts_with("gl_")
-        && !name.starts_with("zeron_")
+        && !name.starts_with("zeren_")
         && !matches!(
             name,
             "iResolution"
@@ -284,6 +284,6 @@ mod tests {
         assert!(!valid_input_name("2k"));
         assert!(!valid_input_name("iTime"));
         assert!(!valid_input_name("gl_Position"));
-        assert!(!valid_input_name("zeron_x"));
+        assert!(!valid_input_name("zeren_x"));
     }
 }

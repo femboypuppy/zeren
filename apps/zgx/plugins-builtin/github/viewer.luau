@@ -1,9 +1,9 @@
 --!strict
 -- A pull request in a chat's panel (the `github-pr` tab), and beside the
 -- board's list: the gallery's review (demos/example_git_review), drawn from
--- Zeron's design system as it is lent to plugins (`@ds`, the running app's,
+-- Zeren's design system as it is lent to plugins (`@ds`, the running app's,
 -- so it follows the template in use), with what GitHub says of it. Its
--- behaviour is Zeron's viewer's (crates/ui/src/pull_request_detail.rs).
+-- behaviour is Zeren's viewer's (crates/ui/src/pull_request_detail.rs).
 --
 -- Its header: its state and number, its title, who opened it and when,
 -- from which branch into which, how much it changes; a way to it on GitHub
@@ -181,7 +181,7 @@ local function humanize(raw: string): string
 	return string.upper(string.sub(text, 1, 1)) .. string.sub(text, 2)
 end
 
--- What a status says and how it stands, as Zeron's viewer has them
+-- What a status says and how it stands, as Zeren's viewer has them
 -- (`status_style`): passing, failing, running, or anything else.
 local function style(raw: string): (string, string)
 	local key = string.gsub(string.upper(raw), " ", "_")
@@ -197,7 +197,7 @@ end
 
 -- Its checks, as the design system's: each its name, how it stands, and a
 -- way to its page on GitHub, where it has one.
-local function checks_of(zeron: any, d: Detail): { git.Check }
+local function checks_of(zeren: any, d: Detail): { git.Check }
 	local out: { git.Check } = {}
 	for _, c in d.statusCheckRollup or {} do
 		local label, kind = style(check_status(c))
@@ -210,7 +210,7 @@ local function checks_of(zeron: any, d: Detail): { git.Check }
 			link = if link and link ~= "" then (if kind == "failing" then T.s("checks.see_failed") else T.s("checks.details")) else "",
 			on_open = if link and link ~= ""
 				then function()
-					zeron.open_url(link)
+					zeren.open_url(link)
 				end
 				else nil,
 		})
@@ -467,7 +467,7 @@ local function prose(text: string, size: ("md" | "sm")?, window: Window?): Node
 		min_w = 0,
 		gap = "$space.3",
 		theme = if size
-			then { zeron = { prose = { size = `\{font.size.{size}\}`, line = `\{font.line.{size}\}` } } }
+			then { zeren = { prose = { size = `\{font.size.{size}\}`, line = `\{font.line.{size}\}` } } }
 			else nil,
 		table.unpack(segments(read(text), window)),
 	}
@@ -664,7 +664,7 @@ end)
 
 local ThreadBlock = ui.component(function(props: {
 	t: Thread,
-	zeron: any,
+	zeren: any,
 	gh: any,
 	url: string,
 	ctx: git.BlockCtx,
@@ -724,7 +724,7 @@ local ThreadBlock = ui.component(function(props: {
 				label = T.s("viewer.open_github"),
 				role = "link",
 				on_click = function()
-					props.zeron.open_url(link)
+					props.zeren.open_url(link)
 				end,
 			})
 		end
@@ -821,16 +821,16 @@ local function by_file(diff: string): { [string]: { lines: { git.Line }, status:
 	return out
 end
 
-return function(zeron: any, pulls: any): (props: { tab: any }) -> Node
-	T = zeron
-	-- A link in GitHub's words opens where Zeron opens links: this VM's own
+return function(zeren: any, pulls: any): (props: { tab: any }) -> Node
+	T = zeren
+	-- A link in GitHub's words opens where Zeren opens links: this VM's own
 	-- copy of the design system's links, set for the plugin's markdown.
 	Links.opener = function(url: string): boolean
-		zeron.open_url(url)
+		zeren.open_url(url)
 		return true
 	end
-	-- Its menus: Open, where Zeron opens links ("links.open"), the only
-	-- place it may. Copy link needs "clipboard" in zeron-plugin.json, which
+	-- Its menus: Open, where Zeren opens links ("links.open"), the only
+	-- place it may. Copy link needs "clipboard" in zeren-plugin.json, which
 	-- it doesn't ask for: left out until it does.
 	Links.system = false
 	Links.can_copy = false
@@ -866,7 +866,7 @@ return function(zeron: any, pulls: any): (props: { tab: any }) -> Node
 		local page_ref = ui.ref()
 		local resized_to = 0
 		local settle_stop: (() -> ())? = nil
-		local locale = ui.shared("zeron.locale", "en")
+		local locale = ui.shared("zeren.locale", "en")
 		-- The Code tab's: the diff (asked once, the first time it shows), the
 		-- file chosen (the window's width) and the files open in place (a
 		-- pane's), the folders folded, the filter, where its lists stand, the
@@ -1055,7 +1055,7 @@ return function(zeron: any, pulls: any): (props: { tab: any }) -> Node
 			end
 			local link = gh.file_url(url, path, d and (if gone then d.baseRefOid else d.headRefOid))
 			if link then
-				zeron.open_url(link)
+				zeren.open_url(link)
 			end
 		end
 
@@ -1107,7 +1107,7 @@ return function(zeron: any, pulls: any): (props: { tab: any }) -> Node
 							build = function(ctx: git.BlockCtx): Node
 								return ThreadBlock {
 									t = t,
-									zeron = zeron,
+									zeren = zeren,
 									gh = gh,
 									url = url,
 									ctx = ctx,
@@ -1719,7 +1719,7 @@ return function(zeron: any, pulls: any): (props: { tab: any }) -> Node
 		-- once, by the checks block, which then comes first: it is what a
 		-- reviewer needs before the description.
 		local function summary(d: Detail, narrow: boolean): Node
-			local list = checks_of(zeron, d)
+			local list = checks_of(zeren, d)
 			local any_failed = false
 			for _, c in list do
 				any_failed = any_failed or c.state == "failing"
@@ -1790,7 +1790,7 @@ return function(zeron: any, pulls: any): (props: { tab: any }) -> Node
 			}
 		end
 
-		-- What a review did, as Zeron's viewer says it.
+		-- What a review did, as Zeren's viewer says it.
 		local VERB: { [string]: string } = {
 			APPROVED = "viewer.activity.verbs.approved",
 			CHANGES_REQUESTED = "viewer.activity.verbs.changes",
@@ -1824,7 +1824,7 @@ return function(zeron: any, pulls: any): (props: { tab: any }) -> Node
 						where_label = T.s("viewer.activity.open_where", { at = at }),
 						on_where = if link and link ~= ""
 							then function()
-								zeron.open_url(link)
+								zeren.open_url(link)
 							end
 							else nil,
 					})
@@ -1932,7 +1932,7 @@ return function(zeron: any, pulls: any): (props: { tab: any }) -> Node
 				anchor = trigger,
 				label = T.s("viewer.more"),
 				placement = { side = "bottom", align = "end", offset = 4 },
-				w = ui.theme.get("zeron.menu.width") :: number?,
+				w = ui.theme.get("zeren.menu.width") :: number?,
 				p = 0,
 				gap = 0,
 				rounded = "$radius.lg",
@@ -1981,7 +1981,7 @@ return function(zeron: any, pulls: any): (props: { tab: any }) -> Node
 					size = "sm",
 					tone = "quiet",
 					on_click = function()
-						zeron.open_url(d.url or url)
+						zeren.open_url(d.url or url)
 					end,
 				},
 				more,
@@ -1992,7 +1992,7 @@ return function(zeron: any, pulls: any): (props: { tab: any }) -> Node
 		-- the tabs and what the tab shows. Code keeps to the panel's height
 		-- and scrolls in its parts; the others scroll as one.
 		local function page(d: Detail, narrow: boolean, split: boolean, fixed: boolean): Node
-			local list = checks_of(zeron, d)
+			local list = checks_of(zeren, d)
 			local passed, failing, running = 0, false, false
 			for _, c in list do
 				passed += if c.state == "passing" then 1 else 0
@@ -2026,7 +2026,7 @@ return function(zeron: any, pulls: any): (props: { tab: any }) -> Node
 			-- cards hanging past: the header, the first tab's label, the
 			-- badges' words.
 			local space1 = (ui.theme.get("space.1") :: number?) or 4
-			local badge_pad = (ui.theme.get("zeron.space.tight") :: number?) or 6
+			local badge_pad = (ui.theme.get("zeren.space.tight") :: number?) or 6
 			head = ui.div { id = "github-pr-head", w_full = true, px = Settings.inset(), head }
 			local tabs = ui.div {
 				id = "github-pr-tabs",

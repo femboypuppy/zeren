@@ -13,8 +13,8 @@ use std::path::PathBuf;
 
 use sha2::{Digest, Sha256};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use zeron_harness::{AcpHarness, Harness, acp_registry as reg};
-use zeron_proto::{HarnessId, RegistryAgent};
+use zeren_harness::{AcpHarness, Harness, acp_registry as reg};
+use zeren_proto::{HarnessId, RegistryAgent};
 
 fn fixture() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/fake-acp.sh")
@@ -68,8 +68,8 @@ async fn a_registry_agent_installs_launches_and_is_removed() {
     let root = tempfile::tempdir().unwrap();
     // SAFETY: this file's only test; nothing else reads the environment.
     unsafe {
-        std::env::set_var("ZERON_AGENTS_DIR", root.path());
-        std::env::set_var("ZERON_ACP_REGISTRY_LOOPBACK", "1");
+        std::env::set_var("ZEREN_AGENTS_DIR", root.path());
+        std::env::set_var("ZEREN_ACP_REGISTRY_LOOPBACK", "1");
     }
     let built = archive();
     let sha = format!("{:x}", Sha256::digest(&built));
@@ -91,7 +91,7 @@ async fn a_registry_agent_installs_launches_and_is_removed() {
         "agents": [
             {
                 "id": "fake-agent", "name": "Fake Agent", "version": "1.2.3",
-                "description": "Answers in scripts.", "authors": ["Zeron tests"], "license": "MIT",
+                "description": "Answers in scripts.", "authors": ["Zeren tests"], "license": "MIT",
                 "icon": format!("{base}/icon.svg"),
                 "distribution": { "binary": { platform: {
                     "archive": format!("{base}/fake.tar.gz"), "cmd": "./fake/agent",

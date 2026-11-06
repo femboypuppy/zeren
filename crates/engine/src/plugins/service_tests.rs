@@ -5,15 +5,15 @@ use super::*;
 use serde_json::json;
 
 const SERVICE: &str = r#"
-local zeron = require("./zeron")("svc")
-zeron.serve("hello", function(args, call)
-	return { hi = args.name, from = call.from.id, device = zeron.device.id }
+local zeren = require("./zeren")("svc")
+zeren.serve("hello", function(args, call)
+	return { hi = args.name, from = call.from.id, device = zeren.device.id }
 end, { safe = true })
-zeron.serve("shout", function(args)
-	zeron.emit("shouted", { word = args.word })
+zeren.serve("shout", function(args)
+	zeren.emit("shouted", { word = args.word })
 	return true
 end)
-zeron.tool { name = "count", run = function(args) return #args.text end }
+zeren.tool { name = "count", run = function(args) return #args.text end }
 "#;
 
 struct Fixture {
@@ -29,7 +29,7 @@ fn fixture() -> Fixture {
 }
 
 async fn call(plugins: &Plugins, method: &str, params: serde_json::Value) -> serde_json::Value {
-    // Allowing and signing as Zeron's consent window does: with a review.
+    // Allowing and signing as Zeren's consent window does: with a review.
     let params = super::authority_tests::as_consent_window(plugins, method, params).await;
     match plugins.dispatch(method, params).await {
         Ok(RpcReply::Value(value)) => value,
@@ -43,7 +43,7 @@ async fn write(plugins: &Plugins, version: &str, manifest: serde_json::Value, se
     let dir = plugins.plugins_dir().join("svc");
     std::fs::create_dir_all(&dir).unwrap();
     std::fs::write(dir.join("init.luau"), "return nil").unwrap();
-    std::fs::write(dir.join("zeron.luau"), scaffold::SDK).unwrap();
+    std::fs::write(dir.join("zeren.luau"), scaffold::SDK).unwrap();
     if let Some(service) = service {
         std::fs::write(dir.join("service.luau"), service).unwrap();
     }
@@ -157,7 +157,7 @@ async fn a_peer_is_refused_with_a_reason() {
     let refused = serve(&f.plugins, "2.0.0", "hello").await;
     assert_eq!(refused["reason"], reason::VERSION_MISMATCH, "{refused}");
     assert!(refused["message"].as_str().unwrap().contains("1.0.0"), "{refused}");
-    // A method it doesn't serve, and one that's Zeron's.
+    // A method it doesn't serve, and one that's Zeren's.
     assert_eq!(serve(&f.plugins, "1.0.0", "nope").await["reason"], reason::UNKNOWN_METHOD);
     assert_eq!(serve(&f.plugins, "1.0.0", "@nope").await["reason"], reason::BAD_CALL);
     // Turned off here.
@@ -250,10 +250,10 @@ async fn the_checkout_status_example_answers_from_git() {
     let example = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../apps/zgx/plugins-dev/checkout-status");
     let dir = f.plugins.plugins_dir().join("checkout-status");
     std::fs::create_dir_all(&dir).unwrap();
-    for file in ["zeron-plugin.json", "init.luau", "service.luau"] {
+    for file in ["zeren-plugin.json", "init.luau", "service.luau"] {
         std::fs::copy(example.join(file), dir.join(file)).unwrap();
     }
-    std::fs::write(dir.join("zeron.luau"), scaffold::SDK).unwrap();
+    std::fs::write(dir.join("zeren.luau"), scaffold::SDK).unwrap();
     let signed = call(&f.plugins, methods::SIGN_PLUGIN, json!({ "id": "checkout-status" })).await;
     let decided = call(
         &f.plugins,

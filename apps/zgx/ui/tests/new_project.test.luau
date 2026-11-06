@@ -1,4 +1,4 @@
--- New project, as Zeron adds one: every way in opens the same palette
+-- New project, as Zeren adds one: every way in opens the same palette
 -- (⌘⇧N, the palette's "New project", the project filter's, the
 -- composer's); its pages walk a device's places and folders through the
 -- engine; "Add this folder" makes the project on that device and lands in a

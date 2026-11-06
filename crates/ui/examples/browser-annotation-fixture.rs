@@ -8,7 +8,7 @@ use std::{
     net::TcpListener,
     sync::Arc,
 };
-use zeron_ui::*;
+use zeren_ui::*;
 
 const SITE: &str = include_str!("browser-annotation-site.html");
 
@@ -63,7 +63,7 @@ fn serve_site() -> u16 {
 
 fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
-        .with_env_filter(std::env::var("ZERON_FIXTURE_LOG").unwrap_or_else(|_| "warn".into()))
+        .with_env_filter(std::env::var("ZEREN_FIXTURE_LOG").unwrap_or_else(|_| "warn".into()))
         .init();
     let site = format!("http://127.0.0.1:{}/", serve_site());
     let temp = tempfile::tempdir()?;
@@ -77,10 +77,10 @@ fn main() -> anyhow::Result<()> {
     std::fs::write(workspace.join("src/pricing.css"), ".plan-card {}\n")?;
     let runtime = tokio::runtime::Runtime::new()?;
     let core = runtime.block_on(async {
-        zeron_engine::EngineCore::assemble(
+        zeren_engine::EngineCore::assemble(
             &temp.path().join("engine"),
-            Arc::new(zeron_engine::default_registry()),
-            zeron_proto::HarnessId::ClaudeCode,
+            Arc::new(zeren_engine::default_registry()),
+            zeren_proto::HarnessId::ClaudeCode,
             None,
         )
     })?;
@@ -97,7 +97,7 @@ fn main() -> anyhow::Result<()> {
     let data = temp.path().join("ui");
     std::fs::create_dir(&data)?;
     // Publish the IPC bearer where the attaching viewport looks for it.
-    let _ipc = runtime.block_on(zeron_engine::serve_ipc(ipc_port, &data, core.rpc_service()))?;
+    let _ipc = runtime.block_on(zeren_engine::serve_ipc(ipc_port, &data, core.rpc_service()))?;
     let boot = EngineBootConfig {
         data_dir: data.clone(),
         ipc_port,
@@ -105,14 +105,14 @@ fn main() -> anyhow::Result<()> {
         edge_token: None,
         org_id: None,
         workos_client_id: None,
-        default_harness: zeron_proto::HarnessId::ClaudeCode,
+        default_harness: zeren_proto::HarnessId::ClaudeCode,
     };
     let handle = runtime.block_on(state::EngineHandle::bootstrap(boot.clone()))?;
     let chats = core.workspace.read_chats()?;
     let device = core.device_id.clone();
     // A sent message with two annotations, and the exact text a harness
     // receives for it (the real expansion, shown back as the reply).
-    let team = zeron_proto::annotation::BrowserAnnotation {
+    let team = zeren_proto::annotation::BrowserAnnotation {
         index: 1,
         url: site.clone(),
         title: "Northwind · Overview".into(),
@@ -137,7 +137,7 @@ fn main() -> anyhow::Result<()> {
             ["background-color".into(), "rgb(18, 21, 29)".into()],
         ],
     };
-    let toggle = zeron_proto::annotation::BrowserAnnotation {
+    let toggle = zeren_proto::annotation::BrowserAnnotation {
         index: 2,
         element: "div.toggle".into(),
         selector: "main > div.toggle".into(),
@@ -161,7 +161,7 @@ fn main() -> anyhow::Result<()> {
         team.link(),
         toggle.link()
     );
-    let received = zeron_proto::annotation::annotation_prompt(&sent);
+    let received = zeren_proto::annotation::annotation_prompt(&sent);
     let entries = json!([
         {"id": "u1", "role": "user", "createdAt": 1788900000000_i64, "deviceId": device,
          "parts": [{"id": "t", "kind": "text", "text": "The pricing cards feel cramped. Can you tighten the hierarchy?"}]},
@@ -176,10 +176,10 @@ fn main() -> anyhow::Result<()> {
 {received}
 ````")}]},
     ]);
-    // ZERON_FIXTURE_QUESTION=1: end on a pending agent question whose
+    // ZEREN_FIXTURE_QUESTION=1: end on a pending agent question whose
     // multi-line answer shows the panel growing with its text.
     let mut entries = entries;
-    if std::env::var_os("ZERON_FIXTURE_QUESTION").is_some() {
+    if std::env::var_os("ZEREN_FIXTURE_QUESTION").is_some() {
         entries.as_array_mut().unwrap().push(json!(
             {"id": "a3", "role": "assistant", "createdAt": 1788900004000_i64, "deviceId": device, "status": "streaming",
              "parts": [{"id": "q", "kind": "input", "requestId": "r1", "resolved": false, "questions": [{
@@ -211,8 +211,8 @@ And shorten the feature lists."}]}]}
                 cx,
             );
             theme_library::init(data.clone(), cx);
-            // ZERON_FIXTURE_LIGHT=1: the light appearance.
-            let mode = if std::env::var_os("ZERON_FIXTURE_LIGHT").is_some() {
+            // ZEREN_FIXTURE_LIGHT=1: the light appearance.
+            let mode = if std::env::var_os("ZEREN_FIXTURE_LIGHT").is_some() {
                 appearance::AppearanceMode::Light
             } else {
                 appearance::AppearanceMode::Dark
@@ -237,8 +237,8 @@ And shorten the feature lists."}]}]}
             let state = cx.new(|_| {
                 let mut s = state::AppState::new();
                 s.fixture_attachment_engine(handle);
-                s.connection = zeron_proto::view::ConnectionStatus::Ready;
-                s.workspace_scope = Some(zeron_proto::WorkspaceScope::Development);
+                s.connection = zeren_proto::view::ConnectionStatus::Ready;
+                s.workspace_scope = Some(zeren_proto::WorkspaceScope::Development);
                 s.local_device_id = Some(device.clone());
                 s.devices = vec![
                     serde_json::from_value(json!({"id": device, "name": "This device",
@@ -275,7 +275,7 @@ And shorten the feature lists."}]}]}
                     .await;
                 state.update(cx, |s, cx| {
                     s.receive_transcript_frame(
-                        zeron_doc::TranscriptFrame::Reset {
+                        zeren_doc::TranscriptFrame::Reset {
                             reset: serde_json::from_value(entries).unwrap(),
                         },
                         cx,

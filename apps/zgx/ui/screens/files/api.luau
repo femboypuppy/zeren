@@ -1,7 +1,7 @@
 -- A session's files, as the host reaches them (src/files.rs): its folders
 -- listed one at a time, its files read, saved, made, moved and deleted, and
 -- what changes on disk. Each call is a promise (`:after(on_value, on_error)`);
--- an error's message is "offline" when Zeron can't be reached, else a line
+-- an error's message is "offline" when Zeren can't be reached, else a line
 -- for the screen. Tests stub these functions (ui/files_fixture.luau).
 --
 --   api.list(target, dir)          { checkout, can_move, can_delete, truncated,

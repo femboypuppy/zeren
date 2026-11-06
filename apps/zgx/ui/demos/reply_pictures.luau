@@ -30,7 +30,7 @@ end)
 local function reply(group: string, text: string): Node
 	return ui.column {
 		w_full = true,
-		max_w = ui.theme.get("zeron.prose.measure") :: number,
+		max_w = ui.theme.get("zeren.prose.measure") :: number,
 		Markdown { text = text, pictures = pictures, group = group },
 	}
 end

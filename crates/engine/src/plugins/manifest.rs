@@ -1,4 +1,4 @@
-//! `zeron-plugin.json`: parsing and validation (contract "Manifest").
+//! `zeren-plugin.json`: parsing and validation (contract "Manifest").
 //!
 //! The raw JSON [`serde_json::Value`] is kept beside the typed view: the
 //! signature and the content hash cover the manifest exactly as written
@@ -8,7 +8,7 @@ use std::collections::BTreeMap;
 
 use serde::Serialize;
 
-pub const MANIFEST_FILE: &str = "zeron-plugin.json";
+pub const MANIFEST_FILE: &str = "zeren-plugin.json";
 
 /// Every permission a manifest may ask for.
 pub const KNOWN_PERMISSIONS: &[&str] = &[
@@ -45,9 +45,9 @@ pub const KNOWN_PERMISSIONS: &[&str] = &[
 ];
 
 /// Ids the app keeps for itself.
-pub const RESERVED_IDS: &[&str] = &["templates", "zeron", "app"];
+pub const RESERVED_IDS: &[&str] = &["templates", "zeren", "app"];
 
-pub const RESERVED_ID_ERROR: &str = "Zeron already uses that name";
+pub const RESERVED_ID_ERROR: &str = "Zeren already uses that name";
 
 /// `^[a-z0-9][a-z0-9-]{1,39}$`, and not one of [`RESERVED_IDS`].
 pub fn check_id(id: &str) -> Result<(), String> {
@@ -71,7 +71,7 @@ pub fn check_id(id: &str) -> Result<(), String> {
 /// A program a manifest may name to run (`commands`): its name alone, as
 /// it's found on the PATH, never a path (`gh`, `git`, `node`, `python3`).
 pub fn valid_command(name: &str) -> bool {
-    zeron_plugin_guard::commands::valid_name(name)
+    zeren_plugin_guard::commands::valid_name(name)
 }
 
 /// A service's file: a relative `.luau` path inside the plugin, without
@@ -86,11 +86,11 @@ pub fn valid_service_path(path: &str) -> bool {
 }
 
 /// What's wrong with a `ui.change` entry, if anything. An entry names an
-/// element of Zeron's by selector, as zgx matches plugin targets: `#id`,
+/// element of Zeren's by selector, as zgx matches plugin targets: `#id`,
 /// `.class`, `hook:name`, `role:name`, `"name"` or a bare id, with `>>`
 /// between ancestors. It never names a module (`@app/…`: zgx would let
 /// the plugin run as the app), everything (`*`), a node's number, row or
-/// nth match, or Zeron's plugin placeholders (`.plugin-…`, each plugin's
+/// nth match, or Zeren's plugin placeholders (`.plugin-…`, each plugin's
 /// own through "panel.tabs" and "pages.add" alone).
 pub fn change_target_problem(target: &str) -> Option<String> {
     let refuse = |why: &str| Some(format!("It can't change \"{target}\": {why}"));
@@ -130,7 +130,7 @@ pub fn change_target_problem(target: &str) -> Option<String> {
                 return refuse("it isn't a selector (#id, .class, hook:name, role:name or \"name\")");
             }
             if class && name.starts_with("plugin-") {
-                return refuse("plugins' tabs, pages and badges are their own and Zeron's");
+                return refuse("plugins' tabs, pages and badges are their own and Zeren's");
             }
         }
     }
@@ -247,16 +247,16 @@ fn parse_signature(value: &serde_json::Value) -> Result<SignatureSpec, ()> {
 }
 
 impl Manifest {
-    /// Parse `zeron-plugin.json`'s bytes. `Err` = not a JSON object.
+    /// Parse `zeren-plugin.json`'s bytes. `Err` = not a JSON object.
     pub fn parse(bytes: &[u8]) -> Result<Self, String> {
         let raw: serde_json::Value = serde_json::from_slice(bytes)
-            .map_err(|_| "Its zeron-plugin.json isn't valid JSON".to_string())?;
+            .map_err(|_| "Its zeren-plugin.json isn't valid JSON".to_string())?;
         Self::from_value(raw)
     }
 
     pub fn from_value(raw: serde_json::Value) -> Result<Self, String> {
         let Some(object) = raw.as_object() else {
-            return Err("Its zeron-plugin.json isn't a JSON object".into());
+            return Err("Its zeren-plugin.json isn't a JSON object".into());
         };
         let mut problems: Vec<String> = Vec::new();
         let text = |key: &str, problems: &mut Vec<String>, required: bool| -> String {
@@ -427,14 +427,14 @@ impl Manifest {
             .find(|p| !KNOWN_PERMISSIONS.contains(&p.as_str()))
         {
             return Some(format!(
-                "It asks for \"{unknown}\", which isn't a permission Zeron knows"
+                "It asks for \"{unknown}\", which isn't a permission Zeren knows"
             ));
         }
         let asks = |p: &str| self.permissions.iter().any(|have| have == p);
         if !self.network_hosts.is_empty() && !asks("network") {
             return Some("It names hosts to reach but doesn't ask for \"network\"".into());
         }
-        if let Err(problem) = zeron_plugin_guard::net::Policy::new(&self.network_hosts) {
+        if let Err(problem) = zeren_plugin_guard::net::Policy::new(&self.network_hosts) {
             return Some(problem);
         }
         if !self.tools.is_empty() && !asks("tools") {
@@ -469,7 +469,7 @@ impl Manifest {
             _ => {}
         }
         if !self.ui.change.is_empty() && !asks("ui.change") {
-            return Some("It changes parts of Zeron but doesn't ask for \"ui.change\"".into());
+            return Some("It changes parts of Zeren but doesn't ask for \"ui.change\"".into());
         }
         if let Some(problem) = self.ui.change.iter().find_map(|t| change_target_problem(t)) {
             return Some(problem);
@@ -480,7 +480,7 @@ impl Manifest {
         for screen in &self.ui.replace {
             if !screen.starts_with("@app/screens/") {
                 return Some(format!(
-                    "It can only replace Zeron's screens, not \"{screen}\""
+                    "It can only replace Zeren's screens, not \"{screen}\""
                 ));
             }
             let protected = ["@app/screens/plugins", "@app/screens/shell/settings"];
@@ -653,7 +653,7 @@ mod tests {
         assert!(check_id("-a").is_err());
         assert!(check_id("Focus").is_err());
         assert!(check_id(&"a".repeat(41)).is_err());
-        assert_eq!(check_id("zeron").unwrap_err(), RESERVED_ID_ERROR);
+        assert_eq!(check_id("zeren").unwrap_err(), RESERVED_ID_ERROR);
         assert_eq!(check_id("app").unwrap_err(), RESERVED_ID_ERROR);
         assert_eq!(check_id("templates").unwrap_err(), RESERVED_ID_ERROR);
         assert!(valid_tool_name("count_words"));

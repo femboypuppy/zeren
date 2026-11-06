@@ -1,10 +1,10 @@
 -- Mentions in the draft: `@` a file or folder, `/` a command, `$` a skill
--- (Zeron's triggers, crates/ui/src/composer.rs: `@` and `/` after a space
+-- (Zeren's triggers, crates/ui/src/composer.rs: `@` and `/` after a space
 -- or at a start, `$` not before a digit, none inside code). As one is
 -- typed, a popover opens at the caret with what matches, its first row
 -- lit; ↑ and ↓ move, Enter or Tab take the row, Escape puts the popover
 -- away until the token is typed at again. A row chosen lands in the draft
--- as its token and a space: a file by its name alone (as Zeron's chips name
+-- as its token and a space: a file by its name alone (as Zeren's chips name
 -- it), the shortest end of its path that tells it from another of that
 -- name; the path it stands for is kept beside the draft (`refs`).
 --
@@ -313,7 +313,7 @@ function M.use(opts: Use)
 			key = function(item: Item): string
 				return item.value
 			end,
-			gap = "$zeron.list.gap",
+			gap = "$zeren.list.gap",
 		})
 		local skeleton: { Node } = {}
 		for _ = 1, 3 do
@@ -339,7 +339,7 @@ function M.use(opts: Use)
 				p = "$space.1",
 				gap = 0,
 				Menu.Heading { title },
-				ui.show(loading, ui.column { gap = "$zeron.list.gap", table.unpack(skeleton) }),
+				ui.show(loading, ui.column { gap = "$zeren.list.gap", table.unpack(skeleton) }),
 				ui.show(function()
 					return not loading() and #shown:get() == 0
 				end, ui.row {

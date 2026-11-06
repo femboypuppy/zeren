@@ -1,8 +1,8 @@
 -- What a drop does, over what it lands on, while files are carried over it
--- (Zeron's shell.rs `attachment_drop_overlay`): the area dimmed by the
+-- (Zeren's shell.rs `attachment_drop_overlay`): the area dimmed by the
 -- scrim, "Drop to attach" on a small pill of the menus' glass in the middle
 -- so it reads over whatever is under it, in either theme. There at once and
--- gone at once, as Zeron's is; it never takes the pointer (the drop goes to
+-- gone at once, as Zeren's is; it never takes the pointer (the drop goes to
 -- what's under it).
 --
 -- `DropOverlay { shown = function() return carrying() end, id = "chat-drop" }`
@@ -16,7 +16,7 @@ export type Props = { shown: () -> boolean, id: string?, label: string? }
 return function(props: Props): Node
 	-- The pill: glass lying flat on the dimmed area (no drop shadow and no
 	-- hairline: a label over a page, not a menu over it. The menus' neutral
-	-- edge reads as a gray ring round a tinted theme's fill; Zeron's own
+	-- edge reads as a gray ring round a tinted theme's fill; Zeren's own
 	-- overlay draws none).
 	local pill = glass.style({
 		rounded = "$radius.full",
@@ -39,7 +39,7 @@ return function(props: Props): Node
 			items = "center",
 			justify = "center",
 			pointer_events = "none",
-			bg = "$zeron.drop.scrim",
+			bg = "$zeren.drop.scrim",
 			ui.row(pill :: any),
 		}
 	)

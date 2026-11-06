@@ -499,7 +499,7 @@ fn write_settings_at(path: &std::path::Path, changes: serde_json::Map<String, Js
 fn play(data: &[u8]) {
     static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
     let id = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-    let path = std::env::temp_dir().join(format!("zeron-zgx-sound-{}-{id}.wav", std::process::id()));
+    let path = std::env::temp_dir().join(format!("zeren-zgx-sound-{}-{id}.wav", std::process::id()));
     if std::fs::write(&path, data).is_err() {
         return;
     }
@@ -559,7 +559,7 @@ async fn delete_signed_in(confirm: &str) -> Result<(), Outcome> {
         return Err("failed");
     }
     if let Err(error) = crate::auth::open_sign_in(url) {
-        eprintln!("zeron-zgx: account: the browser didn't open: {error}");
+        eprintln!("zeren-zgx: account: the browser didn't open: {error}");
         return Err("failed");
     }
     let until = std::time::Instant::now() + STEP_UP_WAIT;
@@ -677,7 +677,7 @@ fn photo_file(dir: &std::path::Path, url: &str) -> Result<std::path::PathBuf, St
     if path.is_file() {
         return Ok(path);
     }
-    let agent = ureq::AgentBuilder::new().timeout(std::time::Duration::from_secs(15)).user_agent("zeron-zgx").build();
+    let agent = ureq::AgentBuilder::new().timeout(std::time::Duration::from_secs(15)).user_agent("zeren-zgx").build();
     let response = agent.get(url).call().map_err(|_| "failed".to_string())?;
     if !response.content_type().to_ascii_lowercase().starts_with("image/") {
         return Err("invalid".into());

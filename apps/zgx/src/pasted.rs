@@ -1,7 +1,7 @@
 //! A picture pasted into the composer (a screenshot, an image editor's or a
 //! browser's copy): the clipboard holds pixels, not a file, and a message's
 //! attachments are files, so the host writes it out as a PNG and the
-//! composer carries that, as Zeron's composer does (`paste_image`).
+//! composer carries that, as Zeren's composer does (`paste_image`).
 //!
 //!   chat.paste_image   the clipboard's image as a PNG in this app's own
 //!                      temporary folder: its path, or nil when the
@@ -37,7 +37,7 @@ pub fn install(host: &ScriptHost, platform: Rc<RefCell<Option<PlatformService>>>
 /// Where pasted pictures are kept until they're sent: this app's own folder
 /// in the system's temporary one.
 fn folder() -> PathBuf {
-    std::env::temp_dir().join("zeron-zgx-pasted")
+    std::env::temp_dir().join("zeren-zgx-pasted")
 }
 
 /// `pixels` (RGBA8, `w` by `h`) as a PNG of its own in `dir`, named for when
@@ -86,7 +86,7 @@ mod tests {
 
     #[test]
     fn a_pasted_picture_is_written_as_a_png_of_its_own() {
-        let dir = std::env::temp_dir().join(format!("zeron-zgx-pasted-test-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("zeren-zgx-pasted-test-{}", std::process::id()));
         let pixels = [255u8, 0, 0, 255, 0, 0, 255, 128];
         let a = write_png(&dir, 2, 1, &pixels).expect("written");
         let b = write_png(&dir, 2, 1, &pixels).expect("written again");

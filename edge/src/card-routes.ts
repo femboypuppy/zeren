@@ -39,7 +39,7 @@ const PAGE_PATH = /^\/(?:@|%40|c\/)/i;
 const PAGE_NAME = /^\/(?:@|%40|c\/)([^/]*)(?:\/(player|card\.png))?\/?$/i;
 
 /** The X handle the share page names as the card's site. */
-const X_SITE = "@zeron";
+const X_SITE = "@zeren";
 
 /** What the pages may load: their own script, style, fonts and art, no
  * inline script; the player may be framed by X (and ourselves), the page
@@ -77,7 +77,7 @@ const missingPage = (): Response =>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex" />
-<title>No card here — Zeron</title>
+<title>No card here — Zeren</title>
 <style>
   body { margin: 0; min-height: 100vh; display: grid; place-items: center; text-align: center;
          background: #0a0a0a; color: #ededed; font: 15px/1.6 ui-sans-serif, system-ui, sans-serif; }

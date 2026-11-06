@@ -117,8 +117,8 @@ local engine: { [string]: any } = {
 	GetCommitCredit = { enabled = false, cloud = false },
 	GetWorktreeSettings = {
 		settings = { useCustomDirectory = false },
-		defaultDirectory = "~/.zeron/worktrees",
-		effectiveDirectory = "~/.zeron/worktrees",
+		defaultDirectory = "~/.zeren/worktrees",
+		effectiveDirectory = "~/.zeren/worktrees",
 	},
 	GetTitleSettings = {},
 	GetNativeSubagents = { switchable = { "claude-code" }, off = {} },
@@ -179,7 +179,7 @@ local answers: { [string]: (arg: any) -> any } = {
 	end,
 	-- A photo's file: the app's own PNG, whatever the address.
 	["account.photo_file"] = function()
-		return settled("assets/favicons/zeron.png")
+		return settled("assets/favicons/zeren.png")
 	end,
 	["account.remove_photo"] = function()
 		me.avatar = nil
@@ -383,7 +383,7 @@ end
 -- A photo picked: the app's own PNG, so a headless host can draw it.
 stub.open_files = function(_opts: any): any
 	log("open_files")
-	return settled({ { path = "assets/favicons/zeron.png", name = "zeron.png", size = 1, type = "image/png" } })
+	return settled({ { path = "assets/favicons/zeren.png", name = "zeren.png", size = 1, type = "image/png" } })
 end
 
 -- The account's own calls (account/api), the same way.
@@ -555,9 +555,9 @@ ui.command {
 		local t = require("@ds/look").window_theme() or {}
 		window_theme:set({
 			accent = t.accent,
-			keyword = t["zeron.syntax.keyword"],
+			keyword = t["zeren.syntax.keyword"],
 			body = t["font.size.md"],
-			window = t["zeron.window"],
+			window = t["zeren.window"],
 			sans = t["font.sans"],
 			mono = t["font.mono"],
 			secondary = t["text.secondary"],

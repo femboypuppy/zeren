@@ -15,7 +15,7 @@ local MESSAGE: { Lightbox.Item } = {
 	{ src = "assets/art/plate-1-night.jpg", name = "night.jpg" },
 }
 -- A picture smaller than any window.
-local TINY: { Lightbox.Item } = { { src = "assets/favicons/zeron.png", name = "tiny.png" } }
+local TINY: { Lightbox.Item } = { { src = "assets/favicons/zeren.png", name = "tiny.png" } }
 -- A picture whose size was said wrong (a stale size kept for a path an agent
 -- has since written over: 868 by 617 said as 400 by 400).
 local STALE: { Lightbox.Item } = { { src = "assets/composer/shell.png", name = "stale.png", w = 400, h = 400 } }

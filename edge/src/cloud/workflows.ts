@@ -212,15 +212,15 @@ const ttlFor = (env: Env, provider: SandboxProvider) =>
 /** Everything a session sandbox is provisioned with: its enrollment and its
  * project. Used as the create-time env and passed again to the install. */
 const sessionEnv = (p: ProvisionParams): SessionEnv => ({
-  ZERON_RUNNER_ENROLL: `${p.orgId}.${p.userId}.${p.deviceId}.${p.enrollCode}`,
-  ZERON_EDGE_URL: p.edgeUrl,
-  ZERON_DEVICE_NAME: "Cloud session",
-  ZERON_DEVICE_PLATFORM: "cloud",
-  ZERON_CLOUD_ACCOUNT: p.accountDeviceId,
-  ZERON_CLOUD_CHAT: p.chatId,
-  ZERON_CLOUD_REPO: p.project.cloneUrl,
-  ZERON_CLOUD_PATH: p.project.path,
-  ZERON_CLOUD_BRANCH: p.project.defaultBranch
+  ZEREN_RUNNER_ENROLL: `${p.orgId}.${p.userId}.${p.deviceId}.${p.enrollCode}`,
+  ZEREN_EDGE_URL: p.edgeUrl,
+  ZEREN_DEVICE_NAME: "Cloud session",
+  ZEREN_DEVICE_PLATFORM: "cloud",
+  ZEREN_CLOUD_ACCOUNT: p.accountDeviceId,
+  ZEREN_CLOUD_CHAT: p.chatId,
+  ZEREN_CLOUD_REPO: p.project.cloneUrl,
+  ZEREN_CLOUD_PATH: p.project.path,
+  ZEREN_CLOUD_BRANCH: p.project.defaultBranch
 });
 
 /**

@@ -49,7 +49,7 @@ local function publish(list: { any })
 	plugins.now:set({ state = "ready", list = list })
 end
 local function pending(list: { any })
-	templates.now:set({ state = "ready", active = "zeron", list = {}, pending = list })
+	templates.now:set({ state = "ready", active = "zeren", list = {}, pending = list })
 end
 
 local function command(id: string, run: () -> ())

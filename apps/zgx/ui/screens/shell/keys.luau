@@ -1,6 +1,6 @@
 -- The main window's shortcuts, one list: what the shell's commands are
 -- made from (screens/shell/init, each its `ui.command`, its menu item and
--- its key) and what Settings → Shortcuts lists. Zeron's defaults (crates/ui
+-- its key) and what Settings → Shortcuts lists. Zeren's defaults (crates/ui
 -- settings.rs `default_combo_on`), as zgx's actions have them.
 --
 --   keys.LIST            { { id, title, key, group, menu, reserved? }, … }
@@ -12,7 +12,7 @@
 --
 -- `group`: where Settings lists it ("Sessions", "Panels", "Go", "App");
 -- `menu`: the menu bar's menu it's in; `reserved`: a focused terminal
--- never has it first (Zeron's keep their shortcuts from a page);
+-- never has it first (Zeren's keep their shortcuts from a page);
 -- `elsewhere`: another screen makes its command (the shell makes the rest).
 
 export type Key = {
@@ -60,7 +60,7 @@ for _, k in
 		{ id = "shell.find", title = "Find", key = "cmd+f", group = "App", menu = "Edit" },
 		{ id = "shell.close", title = "Close", key = "cmd+w", group = "App", menu = "File", reserved = true },
 		-- (No key of their own: Settings → Shortcuts can give them one.)
-		{ id = "shell.reload", title = "Reload Zeron", key = "", group = "App", menu = "View" },
+		{ id = "shell.reload", title = "Reload Zeren", key = "", group = "App", menu = "View" },
 		{ id = "shell.reload_interface", title = "Reload interface", key = "", group = "App", menu = "View" },
 	} :: { Key }
 do

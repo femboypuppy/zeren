@@ -6,8 +6,8 @@
 //! verbose CLI — tokens. [`redact_output`] keeps the human part ("Device code
 //! request failed: 503") and replaces the rest. The doc fold runs a
 //! command's output tail through it before the tail enters a chat's doc
-//! (zeron-doc `command_output_tail`). (Harness crash diagnostics use the
-//! narrower credential-marker redaction in zeron-harness's crate root.)
+//! (zeren-doc `command_output_tail`). (Harness crash diagnostics use the
+//! narrower credential-marker redaction in zeren-harness's crate root.)
 
 /// `text` with terminal escapes stripped and every secret-shaped token
 /// replaced:
@@ -1082,8 +1082,8 @@ mod tests {
             assert_eq!(redact_output(url), kept);
         }
         assert_eq!(
-            redact_output("https://github.com/zeronsh/zeron"),
-            "https://github.com/zeronsh/zeron"
+            redact_output("https://github.com/femboypuppy/zeren"),
+            "https://github.com/femboypuppy/zeren"
         );
     }
 
@@ -1210,7 +1210,7 @@ mod tests {
             "digest [redacted]"
         );
         // Paths stay readable.
-        let path = "/tmp/zeron/data/agent-accounts/.login-0123456789abcdef/auth.json";
+        let path = "/tmp/zeren/data/agent-accounts/.login-0123456789abcdef/auth.json";
         assert_eq!(redact_output(path), path);
     }
 

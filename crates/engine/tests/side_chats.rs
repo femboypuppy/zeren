@@ -1,14 +1,14 @@
 use async_trait::async_trait;
 use futures::{StreamExt, stream::BoxStream};
 use std::sync::{Arc, Mutex};
-use zeron_doc::{MessagePart, MessageRole, MessageStatus, SessionMessageEntry, SubagentStatus};
-use zeron_engine::{EngineCore, HarnessRegistry};
-use zeron_harness::{Harness, HarnessError, RunControls};
-use zeron_proto::{
+use zeren_doc::{MessagePart, MessageRole, MessageStatus, SessionMessageEntry, SubagentStatus};
+use zeren_engine::{EngineCore, HarnessRegistry};
+use zeren_harness::{Harness, HarnessError, RunControls};
+use zeren_proto::{
     AgentEvent, DoneStatus, HarnessId, Model, ReasoningLevel, RunRequest, SandboxLevel,
     SteeringMode, ToolCall,
 };
-use zeron_rpc::methods;
+use zeren_rpc::methods;
 
 struct Capture(Arc<Mutex<Vec<RunRequest>>>);
 #[async_trait]
@@ -129,10 +129,10 @@ async fn fork_is_frozen_durable_idempotent_and_has_an_independent_provider_sessi
             MessageStatus::Streaming,
         ))
         .unwrap();
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     let params = serde_json::json!({ "chatId": "side", "sourceChatId": "main", "targetDeviceId": core.device_id });
     let fork = client
-        .call_as::<zeron_proto::Chat>(methods::FORK_SIDE_CHAT, params.clone())
+        .call_as::<zeren_proto::Chat>(methods::FORK_SIDE_CHAT, params.clone())
         .await
         .unwrap();
     assert_eq!(fork.parent_chat_id.as_deref(), Some("main"));
@@ -148,7 +148,7 @@ async fn fork_is_frozen_durable_idempotent_and_has_an_independent_provider_sessi
     assert_eq!(copied[2].status, Some(MessageStatus::Complete));
     assert_eq!(
         copied[2].parts,
-        vec![zeron_doc::MessagePart::Fork {
+        vec![zeren_doc::MessagePart::Fork {
             id: "fork:side".into(),
             source_chat_id: "main".into(),
             source_title: "Main conversation".into(),
@@ -194,21 +194,21 @@ async fn fork_is_frozen_durable_idempotent_and_has_an_independent_provider_sessi
     .unwrap();
     let request = requests.lock().unwrap()[0].clone();
     assert_eq!(request.resume, None);
-    // The host stamps its MCP server onto the run: this binary's `zeron
+    // The host stamps its MCP server onto the run: this binary's `zeren
     // mcp`, dialing the served port, identified as the side chat.
     let mcp = request
         .mcp
         .clone()
-        .expect("run carries the zeron MCP server");
-    assert_eq!(mcp.name, "zeron");
+        .expect("run carries the zeren MCP server");
+    assert_eq!(mcp.name, "zeren");
     assert_eq!(mcp.args, ["mcp"]);
-    assert_eq!(mcp.env["ZERON_IPC_PORT"], "27699");
-    assert_eq!(mcp.env["ZERON_CHAT_ID"], "side");
-    assert_eq!(mcp.env["ZERON_DEVICE_ID"], core.device_id);
+    assert_eq!(mcp.env["ZEREN_IPC_PORT"], "27699");
+    assert_eq!(mcp.env["ZEREN_CHAT_ID"], "side");
+    assert_eq!(mcp.env["ZEREN_DEVICE_ID"], core.device_id);
     // The IPC bearer rides as a path to the owner-only file, never inline:
     // harness CLIs may receive this env on their (world-readable) argv.
-    assert_eq!(mcp.env["ZERON_IPC_TOKEN_FILE"], "/data/ipc-token");
-    assert!(!mcp.env.contains_key("ZERON_IPC_TOKEN"));
+    assert_eq!(mcp.env["ZEREN_IPC_TOKEN_FILE"], "/data/ipc-token");
+    assert!(!mcp.env.contains_key("ZEREN_IPC_TOKEN"));
     assert!(request.prompt.contains("PINEAPPLE"));
     assert!(!request.prompt.contains("unfinished turn"));
     assert_eq!(source.doc().read_entries().unwrap().len(), 4);
@@ -271,7 +271,7 @@ async fn cannot_fork_an_empty_chat_or_overwrite_a_main_chat() {
     core.workspace
         .create_chat("main", None, Some(&core.device_id), None, None)
         .unwrap();
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     assert!(
         client
             .call(
@@ -323,11 +323,11 @@ async fn forking_a_side_chat_can_land_as_a_sibling_under_the_main_chat() {
             MessageStatus::Complete,
         ))
         .unwrap();
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     // A first-level side chat, then its own fork button: the copy hangs
     // under MAIN (the side chat's parent), not under the side chat.
     let side = client
-        .call_as::<zeron_proto::Chat>(
+        .call_as::<zeren_proto::Chat>(
             methods::FORK_SIDE_CHAT,
             serde_json::json!({ "chatId": "side", "sourceChatId": "main" }),
         )
@@ -357,7 +357,7 @@ async fn forking_a_side_chat_can_land_as_a_sibling_under_the_main_chat() {
         ))
         .unwrap();
     let sibling = client
-        .call_as::<zeron_proto::Chat>(
+        .call_as::<zeren_proto::Chat>(
             methods::FORK_SIDE_CHAT,
             serde_json::json!({
                 "chatId": "side-2",
@@ -380,7 +380,7 @@ async fn forking_a_side_chat_can_land_as_a_sibling_under_the_main_chat() {
     let seams: Vec<_> = entries
         .iter()
         .filter_map(|e| match e.parts.first() {
-            Some(zeron_doc::MessagePart::Fork { source_title, .. }) => Some(source_title.clone()),
+            Some(zeren_doc::MessagePart::Fork { source_title, .. }) => Some(source_title.clone()),
             _ => None,
         })
         .collect();
@@ -388,7 +388,7 @@ async fn forking_a_side_chat_can_land_as_a_sibling_under_the_main_chat() {
     assert_eq!(seams, ["New session", "Side quest"]);
     // An empty parent falls back to the source, like an omitted one.
     let nested = client
-        .call_as::<zeron_proto::Chat>(
+        .call_as::<zeren_proto::Chat>(
             methods::FORK_SIDE_CHAT,
             serde_json::json!({
                 "chatId": "side-3",
@@ -449,7 +449,7 @@ async fn a_fork_settles_the_running_subagent_chips_it_copies() {
                 MessagePart::Input {
                     id: "a1-input".into(),
                     request_id: "q-1".into(),
-                    questions: vec![zeron_proto::UserInputQuestion {
+                    questions: vec![zeren_proto::UserInputQuestion {
                         id: "q1".into(),
                         header: "Pick".into(),
                         question: "Which one?".into(),
@@ -465,7 +465,7 @@ async fn a_fork_settles_the_running_subagent_chips_it_copies() {
             ..message("a1", MessageRole::Assistant, "", MessageStatus::Complete)
         })
         .unwrap();
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     client
         .call(
             methods::FORK_SIDE_CHAT,
@@ -576,7 +576,7 @@ async fn side_turn(
             || core
                 .sessions
                 .session_status(chat)
-                .is_some_and(|s| s.status != zeron_proto::SessionStatus::Idle)
+                .is_some_and(|s| s.status != zeren_proto::SessionStatus::Idle)
         {
             tokio::time::sleep(std::time::Duration::from_millis(5)).await;
         }
@@ -630,7 +630,7 @@ async fn native_commands_and_empty_side_chats_skip_the_history_wrapper() {
             .push_message(&message(id, role, text, MessageStatus::Complete))
             .unwrap();
     }
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     client
         .call(
             methods::FORK_SIDE_CHAT,
@@ -753,7 +753,7 @@ async fn warm_side_chat_sends_owed_fork_history_once() {
             .push_message(&message(id, role, text, MessageStatus::Complete))
             .unwrap();
     }
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     client
         .call(
             methods::FORK_SIDE_CHAT,
@@ -788,7 +788,7 @@ async fn warm_side_chat_sends_owed_fork_history_once() {
                     || core
                         .sessions
                         .session_status("fork")
-                        .is_some_and(|s| s.status != zeron_proto::SessionStatus::Idle)
+                        .is_some_and(|s| s.status != zeren_proto::SessionStatus::Idle)
                 {
                     tokio::time::sleep(std::time::Duration::from_millis(5)).await;
                 }
@@ -942,7 +942,7 @@ async fn orphaned_history_steer_still_owes_the_history() {
             .push_message(&message(id, role, text, MessageStatus::Complete))
             .unwrap();
     }
-    let client = zeron_rpc::memory_client(core.rpc_service());
+    let client = zeren_rpc::memory_client(core.rpc_service());
     client
         .call(
             methods::FORK_SIDE_CHAT,
@@ -980,7 +980,7 @@ async fn orphaned_history_steer_still_owes_the_history() {
     let idle = || {
         core.sessions
             .session_status("fork")
-            .is_some_and(|s| s.status == zeron_proto::SessionStatus::Idle)
+            .is_some_and(|s| s.status == zeren_proto::SessionStatus::Idle)
     };
     for _ in 0..500 {
         if idle() {
@@ -1026,7 +1026,7 @@ async fn orphaned_history_steer_still_owes_the_history() {
 
 /// Native subagents off (Settings → Providers) is for top-level chats:
 /// delegation is one level deep, so a side chat, which can't create chats,
-/// launches with its provider's subagent tools, and its Zeron server never
+/// launches with its provider's subagent tools, and its Zeren server never
 /// tells it to delegate through side chats. So does a chat whose run reached
 /// its host before its row: the claimed row can't say it has no parent.
 #[tokio::test]
@@ -1034,20 +1034,20 @@ async fn a_side_chat_keeps_its_subagent_tools_when_native_subagents_are_off() {
     let dir = tempfile::tempdir().unwrap();
     let registry = Arc::new(HarnessRegistry::new());
     registry.register(Arc::new(
-        zeron_harness::ClaudeHarness::new().with_executable(
+        zeren_harness::ClaudeHarness::new().with_executable(
             std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
                 .join("../harness/tests/fixtures/fake-claude.sh"),
         ),
     ));
     let core =
         EngineCore::assemble(dir.path(), registry.clone(), HarnessId::ClaudeCode, None).unwrap();
-    // A served IPC port: runs carry Zeron's own MCP server.
+    // A served IPC port: runs carry Zeren's own MCP server.
     core.sessions.set_ipc_port(27699);
     registry
         .set_native_subagents(HarnessId::ClaudeCode, false)
         .unwrap();
     // Per chat: the init frame's tools, then the fake CLI's reply naming
-    // its Zeron server's mode.
+    // its Zeren server's mode.
     let mut launched = Vec::new();
     // `None`: no createChat yet, the run claims the row.
     for (chat, parent) in [

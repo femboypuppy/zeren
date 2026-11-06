@@ -10,7 +10,7 @@
 --            the colour;
 --   Image    a picture of yours (chosen, or dropped on the dialog), placed
 --            in the tile's square by dragging and zooming, as Account's
---            photo is, cut here and kept by Zeron's edge.
+--            photo is, cut here and kept by Zeren's edge.
 -- What's chosen is the project's on every device (sessions.set_project_icon).
 --
 --   editor.open(id, start?)  asks about that project
@@ -255,7 +255,7 @@ local function head(): Node
 				relative = true,
 				overflow = "hidden",
 				rounded = "$radius.xl",
-				bg = "$zeron.secondary.bg",
+				bg = "$zeren.secondary.bg",
 				placed_picture(PREVIEW),
 			},
 			tile = ds.Tile {
@@ -554,7 +554,7 @@ local function image_panel(): Node
 		end,
 		border = 1,
 		border_color = function(): string
-			return if dropping:get() then "$accent" else "$zeron.well.edge"
+			return if dropping:get() then "$accent" else "$zeren.well.edge"
 		end,
 		items = "center",
 		justify = "center",

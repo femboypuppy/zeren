@@ -1,6 +1,6 @@
 //! `tests/fixtures/fake-acp-tool.py`: a fake ACP agent whose turn starts the
 //! MCP servers it was handed in `session/new` and calls one tool. Checked
-//! here against a tiny stub MCP server, with Zeron's own server in `mcp` and
+//! here against a tiny stub MCP server, with Zeren's own server in `mcp` and
 //! a plugin's in `extra_mcp`.
 
 #![cfg(unix)]
@@ -11,8 +11,8 @@ use std::time::Duration;
 use futures::StreamExt;
 use tokio::sync::{mpsc, oneshot};
 
-use zeron_harness::{AcpHarness, CancellationToken, Harness, RunControls, SteerMessage};
-use zeron_proto::{AgentEvent, DoneStatus, McpServer, RunRequest, SandboxLevel};
+use zeren_harness::{AcpHarness, CancellationToken, Harness, RunControls, SteerMessage};
+use zeren_proto::{AgentEvent, DoneStatus, McpServer, RunRequest, SandboxLevel};
 
 /// A stdio MCP server offering the one tool named by `$STUB_TOOL`. Its call
 /// result echoes the arguments and the server's `$STUB_LABEL`; a call with
@@ -153,8 +153,8 @@ async fn calls_the_named_tool_on_the_server_that_lists_it() {
             ("FAKE_ACP_CALL_ARGS", r#"{"text":"a b c"}"#),
         ],
     );
-    // Zeron's own server does not list it; the plugin's does.
-    req.mcp = Some(server("zeron", &stub, "whoami"));
+    // Zeren's own server does not list it; the plugin's does.
+    req.mcp = Some(server("zeren", &stub, "whoami"));
     req.extra_mcp = vec![server("plugin-focus", &stub, "focus__count_words")];
     let text = reply(req).await;
     let result: serde_json::Value = serde_json::from_str(&text).expect(&text);
@@ -173,16 +173,16 @@ async fn a_prompt_can_name_the_tool_and_a_pinned_server() {
     let mut req = request(
         r#"call-tool whoami {"fail": true}"#,
         dir.path(),
-        &[("FAKE_ACP_MCP_SERVER", "zeron")],
+        &[("FAKE_ACP_MCP_SERVER", "zeren")],
     );
-    req.mcp = Some(server("zeron", &stub, "whoami"));
+    req.mcp = Some(server("zeren", &stub, "whoami"));
     let text = reply(req).await;
     let result: serde_json::Value = serde_json::from_str(&text).expect(&text);
     assert_eq!(result["isError"], true);
-    assert_eq!(result["structuredContent"]["label"], "zeron");
+    assert_eq!(result["structuredContent"]["label"], "zeren");
 
     let mut missing = request("call-tool nope", dir.path(), &[]);
-    missing.mcp = Some(server("zeron", &stub, "whoami"));
+    missing.mcp = Some(server("zeren", &stub, "whoami"));
     assert_eq!(
         reply(missing).await,
         "fake-acp-tool: no MCP server lists nope"

@@ -14,7 +14,7 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 
 use tokio::sync::{Notify, watch};
-use zeron_proto::{BackgroundTask, BackgroundTaskOutput};
+use zeren_proto::{BackgroundTask, BackgroundTaskOutput};
 
 /// Output kept per process the driver buffers itself (Codex output deltas),
 /// and read from the end of an output file at most.

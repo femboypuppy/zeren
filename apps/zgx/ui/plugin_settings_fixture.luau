@@ -47,21 +47,21 @@ local function declared(words_default: string, every_default: number): { any }
 end
 
 -- (Greeter's manifest also declares a Screen Recording row: it isn't one
--- of Zeron's own, so the host leaves it out, as here.)
+-- of Zeren's own, so the host leaves it out, as here.)
 local model = {
 	on = false,
-	-- Greeter as someone else's, signed by no one Zeron knows.
+	-- Greeter as someone else's, signed by no one Zeren knows.
 	unverified = false,
 	settings = declared("Hello", 30),
 	-- What's been set (only that): kept while the plugin is off.
 	stored = {} :: { [string]: any },
 	-- What it reports of its settings (held while it's on).
 	status = {} :: { [string]: any },
-	-- Snapper: one of Zeron's own, with permission rows.
+	-- Snapper: one of Zeren's own, with permission rows.
 	snapper = false,
-	-- Parallax scenes: Zeron's own plugin that draws a new chat's
+	-- Parallax scenes: Zeren's own plugin that draws a new chat's
 	-- background (it replaces #new-chat-background), with settings of its
-	-- own. (Load the real one too, ZERON_ZGX_DEV_PLUGINS=plugins-builtin/
+	-- own. (Load the real one too, ZEREN_ZGX_DEV_PLUGINS=plugins-builtin/
 	-- parallax-scenes, and its scene draws in the new chat.)
 	scenes = false,
 	scenes_stored = {} :: { [string]: any },
@@ -69,7 +69,7 @@ local model = {
 	backdrops = false,
 }
 
--- Parallax scenes' settings (plugins-builtin/parallax-scenes/zeron-plugin.json's).
+-- Parallax scenes' settings (plugins-builtin/parallax-scenes/zeren-plugin.json's).
 local SCENES_SETTINGS = {
 	{ id = "wallpaper", kind = "wallpaper", section = "Wallpaper" },
 	{ id = "scene", kind = "choice", style = "select", section = "Scene", label = "Scene", description = "What a new chat opens on.", default = "violet-dusk", options = { { value = "shuffle", label = "Shuffle", description = "Another scene each time a new chat opens." }, { value = "violet-dusk", label = "Dusk" }, { value = "aurora", label = "Aurora" }, { value = "blossom", label = "Blossom" }, { value = "lighthouse", label = "Lighthouse" }, { value = "canyon", label = "Canyon" }, { value = "lotus", label = "Lotus" }, { value = "icebergs", label = "Icebergs" }, { value = "wheat", label = "Wheat" }, { value = "volcano", label = "Volcano" }, { value = "terraces", label = "Terraces" }, { value = "surf", label = "Surf" }, { value = "saturnine", label = "Saturnine" }, { value = "rooftops", label = "Rooftops" }, { value = "station", label = "Station" } } },
@@ -121,8 +121,8 @@ local function publish()
 					id = "parallax-scenes",
 					name = "Parallax scenes",
 					version = "1.0.0",
-					description = "Zeron's member-card scenes behind a new chat, each layer moving with the pointer.",
-					author = { kind = "zeron" },
+					description = "Zeren's member-card scenes behind a new chat, each layer moving with the pointer.",
+					author = { kind = "zeren" },
 					status = "on",
 					permissions = { "ui.change" },
 					allowed = { "ui.change" },
@@ -176,7 +176,7 @@ local function publish()
 		table.insert(list, {
 			plugin = "parallax-scenes",
 			name = "Parallax scenes",
-			description = "Zeron's member-card scenes behind a new chat. Use it as the wallpaper here; Zeron's effect is drawn over the scene.",
+			description = "Zeren's member-card scenes behind a new chat. Use it as the wallpaper here; Zeren's effect is drawn over the scene.",
 			settings = SCENES_SETTINGS,
 			values = scene_values,
 			status = {},
@@ -284,7 +284,7 @@ ui.command {
 }
 ui.command {
 	id = "snapper_on",
-	title = "Zeron's own Snapper is on",
+	title = "Zeren's own Snapper is on",
 	run = function()
 		model.snapper = true
 		publish()
@@ -316,7 +316,7 @@ ui.command {
 }
 ui.command {
 	id = "grant_capture",
-	title = "Screen Recording granted in System Settings (Zeron hasn't looked yet)",
+	title = "Screen Recording granted in System Settings (Zeren hasn't looked yet)",
 	run = function()
 		granted.capture = true
 	end,

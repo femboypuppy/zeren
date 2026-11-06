@@ -17,9 +17,9 @@ type Attachment = {
 };
 
 /** Set by the Worker for runner bearers (stripped from every request first). */
-export const PREVIEW_PUBLISHER_HEADER = "x-zeron-preview-publisher";
+export const PREVIEW_PUBLISHER_HEADER = "x-zeren-preview-publisher";
 /** Set by the Worker when a user's device joins to finish a provider sign-in. */
-export const PREVIEW_SIGN_IN_HEADER = "x-zeron-preview-sign-in";
+export const PREVIEW_SIGN_IN_HEADER = "x-zeren-preview-sign-in";
 /** Devices one user keeps in the room at once. */
 const DEVICE_LIMIT = 16;
 /** A sign-in's callback rides this room, so it gets in past
@@ -44,11 +44,11 @@ export function previewCatalog(value: unknown, device: string): Service[] | unde
     const strings = ["id", "projectId", "projectName", "projectCwd", "deviceId", "deviceName", "hostname", "name", "cwd"];
     if (!strings.every(k => typeof s[k] === "string" && (s[k] as string).length <= (k === "cwd" || k === "projectCwd" ? 4096 : 128))) return;
     if (s.deviceId !== device || !ID.test(s.id as string) || ids.has(s.id as string) || !HOST.test(s.hostname as string)) return;
-    if (!Number.isInteger(s.port) || (s.port as number) < 1 || (s.port as number) > 65535 || !Number.isSafeInteger(s.pid) || (s.pid as number) < 1 || !Number.isSafeInteger(s.startedAt) || (s.startedAt as number) < 0 || typeof s.zeronOwned !== "boolean") return;
+    if (!Number.isInteger(s.port) || (s.port as number) < 1 || (s.port as number) > 65535 || !Number.isSafeInteger(s.pid) || (s.pid as number) < 1 || !Number.isSafeInteger(s.startedAt) || (s.startedAt as number) < 0 || typeof s.zerenOwned !== "boolean") return;
     if (s.chatId !== undefined && (typeof s.chatId !== "string" || s.chatId.length > 128)) return;
     ids.add(s.id as string);
     const clean: Service = {};
-    for (const key of [...strings, "port", "pid", "startedAt", "zeronOwned"]) clean[key] = s[key] as string | number | boolean;
+    for (const key of [...strings, "port", "pid", "startedAt", "zerenOwned"]) clean[key] = s[key] as string | number | boolean;
     if (s.chatId !== undefined) clean.chatId = s.chatId as string;
     output.push(clean);
   }

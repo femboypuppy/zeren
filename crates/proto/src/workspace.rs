@@ -35,7 +35,7 @@ pub mod capabilities {
     /// rows and answers `StopBackgroundTask` / `ReadBackgroundTaskOutput`
     /// (forwarding them, for a chat another device hosts).
     pub const BACKGROUND_TASKS_V1: &str = "background-tasks-v1";
-    /// The host serves the zgx interface (Zeron.app's beta): `AccessToken`,
+    /// The host serves the zgx interface (Zeren.app's beta): `AccessToken`,
     /// plugins and templates, the ACP registry, `setSpaceIcon`,
     /// `PostNotification`, `TerminalStatus` and change-request threads. The
     /// interface asks for it on connect and offers Stable on an engine
@@ -93,7 +93,7 @@ pub struct EngineInfo {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub capabilities: Vec<String>,
     /// Which build of the engine this is: its git commit and when its
-    /// executable was built (`zeron-engine --build-id` says the same of a
+    /// executable was built (`zeren-engine --build-id` says the same of a
     /// binary on disk), so a client that started it can tell it's older than
     /// the one it would start now. Absent on older engines: unknown, stale.
     #[serde(default, skip_serializing_if = "Option::is_none")]

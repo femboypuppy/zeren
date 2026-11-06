@@ -29,7 +29,7 @@ A tool chip whose call or output names an image file (PNG, JPEG, GIF, WebP, BMP,
 
 Right-clicking a tool preview, a user attachment thumbnail, a generated image or an image a reply names in Markdown opens **Copy path** / **Copy image**. Copy image fetches the original file from its owning device, not the preview (a Markdown image through `ReadChatImageChunk`, under its chat's jail); SVG is copied as the sanitized, re-serialized tree.
 
-`cargo run --locked -p zeron-ui --example tool-images-fixture --features appshots-fixture` opens an isolated session with mock images. `-- --capture <dir>` runs the automated expand / toggle-spam / collapse / copy check instead.
+`cargo run --locked -p zeren-ui --example tool-images-fixture --features appshots-fixture` opens an isolated session with mock images. `-- --capture <dir>` runs the automated expand / toggle-spam / collapse / copy check instead.
 
 ## Images in agent replies
 
@@ -37,11 +37,11 @@ An image part (a harness's generated image, or one an agent showed with `show_im
 
 - Only agent replies, and only the primary transcript: user messages keep their text and a subagent tab draws none. The streaming tail draws its images once the reply moves past that block.
 - Only a path on the chat's host, absolute or relative to the chat's folder, of a PNG, JPEG, WebP or GIF by name. Nothing is ever fetched: a URL (`http:`, `file:`, `data:` …), `~`, network and device paths and drive-relative paths keep the ordinary rendering, a link. So does a relative path in a projectless chat, whose folder the UI can't expand.
-- Bytes arrive through `ReadChatImageChunk {chatId, path, offset}`, answered only by the chat's host (relay-forwarded with `targetDeviceId`). Its jail is that one chat's folder, strictly inside, never the folder itself: the scratch folder of a projectless chat, the project folder otherwise. A chat working in the home folder or above it, at `/`, or around Zeron's data, uploads or scratch folders has no folder to read from, and another chat's folder is out. The path is jailed lexically before any filesystem call (it may name the folder as configured or canonically, `/tmp` or `/private/tmp`). Then each component below the folder is examined without being followed, and any symlink or junction refuses the image, even one that stays inside: a link a repository planted never sends the read anywhere, not even to look (a junction to `\\host\share` would reach that host with the user's credentials). Windows device names (`NUL.png`, `COM1.jpg`) are refused too. The host also requires a regular file (a FIFO is never opened) of at most 10 MB whose first bytes match its extension's format.
+- Bytes arrive through `ReadChatImageChunk {chatId, path, offset}`, answered only by the chat's host (relay-forwarded with `targetDeviceId`). Its jail is that one chat's folder, strictly inside, never the folder itself: the scratch folder of a projectless chat, the project folder otherwise. A chat working in the home folder or above it, at `/`, or around Zeren's data, uploads or scratch folders has no folder to read from, and another chat's folder is out. The path is jailed lexically before any filesystem call (it may name the folder as configured or canonically, `/tmp` or `/private/tmp`). Then each component below the folder is examined without being followed, and any symlink or junction refuses the image, even one that stays inside: a link a repository planted never sends the read anywhere, not even to look (a junction to `\\host\share` would reach that host with the user's credentials). Windows device names (`NUL.png`, `COM1.jpg`) are refused too. The host also requires a regular file (a FIFO is never opened) of at most 10 MB whose first bytes match its extension's format.
 - The UI decodes within the shared raster limits (4096 pixels per side, 64 MiB decoder allocation, first frame), at most four reads at a time per transcript, cached by host, chat, path and type.
 - Anything refused or unreadable keeps the link. A failed image retries on the shared 2 s → 15 s backoff behind the link, without flashing a placeholder.
 
-`cargo run --locked -p zeron-ui --example reply-images-fixture --features appshots-fixture,resource-profile` renders one reply naming two images in its chat's folder and nine paths that stay links, after printing the engine's verdict for each; `-- 20 zeron-fixture-chat show-image` shows the image parts `show_image` publishes instead. Captures: `docs/screenshots/agent-images/`.
+`cargo run --locked -p zeren-ui --example reply-images-fixture --features appshots-fixture,resource-profile` renders one reply naming two images in its chat's folder and nine paths that stay links, after printing the engine's verdict for each; `-- 20 zeren-fixture-chat show-image` shows the image parts `show_image` publishes instead. Captures: `docs/screenshots/agent-images/`.
 
 ## Verification
 
@@ -52,8 +52,8 @@ The `workspace_file_surface_proxies_over_the_relay` integration test runs two en
 Validation commands:
 
 ```sh
-cargo test --release --locked -p zeron-ui --lib -- --test-threads=1
-cargo test --release --locked -p zeron-engine --lib --test workspace_files --test device_routing
+cargo test --release --locked -p zeren-ui --lib -- --test-threads=1
+cargo test --release --locked -p zeren-engine --lib --test workspace_files --test device_routing
 ```
 
 Automated results recorded on 2026-09-12 (Linux):
@@ -73,4 +73,4 @@ Physical-device validation is separate from these automated tests. This implemen
 - Physical mouse: Ctrl + wheel zooms; unmodified wheel pans; releasing a drag outside the image does not close the lightbox.
 - A second physical remote device: open images, switch files during loading, modify/rename/delete them, and switch workspace/device while requests are pending.
 
-No zui dependency changes are required. Zeron uses `on_pinch` and `on_scroll_wheel` from its existing pinned revision.
+No zui dependency changes are required. Zeren uses `on_pinch` and `on_scroll_wheel` from its existing pinned revision.

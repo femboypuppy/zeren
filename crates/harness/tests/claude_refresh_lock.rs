@@ -4,9 +4,9 @@
 //! Its own test binary — it points the process at a temp config dir.
 use std::os::unix::fs::PermissionsExt;
 use std::time::Duration;
-use zeron_harness::claude::refresh_lock;
-use zeron_harness::{CancellationToken, ClaudeHarness, Harness, RunControls};
-use zeron_proto::{RunRequest, SandboxLevel};
+use zeren_harness::claude::refresh_lock;
+use zeren_harness::{CancellationToken, ClaudeHarness, Harness, RunControls};
+use zeren_proto::{RunRequest, SandboxLevel};
 
 const FAKE_CLAUDE: &str = r#"#!/bin/sh
 dir="$(dirname "$0")"
@@ -17,7 +17,7 @@ esac
 trap 'echo term >> "$dir/events"; exit 0' TERM
 : > "$dir/ready"
 read line
-echo '{"type":"control_response","response":{"subtype":"success","request_id":"zeron-command-probe","response":{"commands":[{"name":"review","description":"Review"}]}}}'
+echo '{"type":"control_response","response":{"subtype":"success","request_id":"zeren-command-probe","response":{"commands":[{"name":"review","description":"Review"}]}}}'
 while read line; do :; done
 echo eof >> "$dir/events"
 "#;

@@ -1,4 +1,4 @@
-//! Zeron's words (ui/locales) stay whole: every key a script names with a
+//! Zeren's words (ui/locales) stay whole: every key a script names with a
 //! literal `ui.t("…")` (or the design system's `locale.t`/`locale.s`) is in English (the source) and in every translation,
 //! each translation names the same arguments as its English (`{n}`, a
 //! plural's `n`), and every message parses. `zgx lint` checks the same for

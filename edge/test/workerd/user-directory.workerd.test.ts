@@ -381,7 +381,7 @@ describe("user directory", () => {
     await webhook("organization_membership.created", membership("om_csv2", "org_csv", "user_csv_no_profile"));
     await webhook("organization_membership.created", membership("om_csv3", "org_csv", "user_csv_pending", { status: "pending" }));
     const res = await SELF.fetch("https://edge.test/admin/organizations?format=csv", { headers: { authorization: "Bearer test-admin-token" } });
-    expect(res.headers.get("content-disposition")).toContain("zeron-organizations.csv");
+    expect(res.headers.get("content-disposition")).toContain("zeren-organizations.csv");
     const csv = await res.text();
     expect(csv.split("\n")[0]).toBe("org_id,name,external_id,domains,member_count,members,created_at,updated_at,deleted_at,created_by");
     expect(csv).toContain(

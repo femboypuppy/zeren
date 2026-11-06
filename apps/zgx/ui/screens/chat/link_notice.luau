@@ -1,4 +1,4 @@
--- What the composer says of the chat's connection, as Zeron's does
+-- What the composer says of the chat's connection, as Zeren's does
 -- (crates/ui composer.rs `link_notice`): this device's own link first
 -- (offline, reconnecting), then whether the chat's host can be reached.
 -- Only something to send (`intent`: a draft, a send in flight, queued

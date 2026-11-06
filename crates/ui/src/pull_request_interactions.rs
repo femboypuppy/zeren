@@ -123,7 +123,7 @@ impl PullRequestDetailPage {
                     )
                 })
                 .and_then(|value| {
-                    serde_json::from_value::<zeron_proto::ChangeRequestComment>(value).map_err(
+                    serde_json::from_value::<zeren_proto::ChangeRequestComment>(value).map_err(
                         |_| {
                             "Your comment was posted, but its reply couldn’t be read. Refresh to see it."
                                 .to_owned()
@@ -546,11 +546,11 @@ mod tests {
                 assert_eq!(params["targetDeviceId"], "device");
                 let attempt = calls.fetch_add(1, Ordering::SeqCst);
                 if attempt % 2 == 1 {
-                    return Err(zeron_rpc::RpcError::Failed("offline".into()));
+                    return Err(zeren_rpc::RpcError::Failed("offline".into()));
                 }
-                zeron_rpc::RpcReply::value(&zeron_proto::ChangeRequestComment {
+                zeren_rpc::RpcReply::value(&zeren_proto::ChangeRequestComment {
                     body: params["body"].as_str().unwrap().into(),
-                    author: zeron_proto::ChangeRequestActor {
+                    author: zeren_proto::ChangeRequestActor {
                         login: "writer".into(),
                     },
                     ..Default::default()
@@ -636,7 +636,7 @@ mod tests {
                 state.set_test_engine(crate::state::EngineHandle::from_test_client(rpc.client()))
             });
             page.detail = Some(ChangeRequestDetail {
-                author: zeron_proto::ChangeRequestActor {
+                author: zeren_proto::ChangeRequestActor {
                     login: "octocat".into(),
                 },
                 ..Default::default()
@@ -713,9 +713,9 @@ mod tests {
                         calls.fetch_add(1, Ordering::SeqCst);
                         release.notified().await;
                         if !succeeds {
-                            return Err(zeron_rpc::RpcError::Failed("offline".into()));
+                            return Err(zeren_rpc::RpcError::Failed("offline".into()));
                         }
-                        zeron_rpc::RpcReply::value(&zeron_proto::ChangeRequestComment {
+                        zeren_rpc::RpcReply::value(&zeren_proto::ChangeRequestComment {
                             body: "Submitted A".into(),
                             ..Default::default()
                         })

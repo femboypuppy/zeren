@@ -8,7 +8,7 @@ use crate::{
     theme::Theme,
 };
 use gpui::{AnyElement, Context, div, prelude::*, px};
-use zeron_proto::HarnessId;
+use zeren_proto::HarnessId;
 
 impl HarnessesPage {
     fn toggle_completion(&mut self, harness: HarnessId, dollar: bool, cx: &mut Context<Self>) {

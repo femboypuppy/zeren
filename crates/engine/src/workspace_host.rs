@@ -26,10 +26,10 @@ use std::sync::{Arc, Mutex, MutexGuard, PoisonError, Weak};
 use chrono::Utc;
 use tokio::sync::watch;
 
-use zeron_doc::{DeletedSpace, REGISTRY_DOC_ID, RegistryDoc, WorkspaceDoc};
-use zeron_proto::projectless;
-use zeron_proto::{Chat, ChatConfig, Device, HarnessId, Session, SidebarPreferencesState, Space};
-use zeron_sync::{DocsStore, RegistryClient, RegistryTuning};
+use zeren_doc::{DeletedSpace, REGISTRY_DOC_ID, RegistryDoc, WorkspaceDoc};
+use zeren_proto::projectless;
+use zeren_proto::{Chat, ChatConfig, Device, HarnessId, Session, SidebarPreferencesState, Space};
+use zeren_sync::{DocsStore, RegistryClient, RegistryTuning};
 
 use crate::doc_host::EdgeConfig;
 use crate::http_error::describe_http_error;
@@ -92,9 +92,9 @@ pub(crate) async fn token_changed(changes: &mut Option<tokio::sync::watch::Recei
     }
 }
 
-async fn token_revoked(token: &Option<Arc<dyn zeron_rpc::TokenSource>>) -> bool {
+async fn token_revoked(token: &Option<Arc<dyn zeren_rpc::TokenSource>>) -> bool {
     match token {
-        Some(token) => matches!(token.token().await, Err(zeron_rpc::TokenError::SignedOut)),
+        Some(token) => matches!(token.token().await, Err(zeren_rpc::TokenError::SignedOut)),
         // Fixed test/dev URLs have no revocable credential source.
         None => false,
     }
@@ -156,9 +156,9 @@ fn new_projectless_cwd(
 /// `cloud-session` on a Cloud session machine (device lists hide those and
 /// show the account's one Cloud device instead).
 fn device_capabilities() -> Vec<String> {
-    let mut capabilities = zeron_proto::capabilities::current();
+    let mut capabilities = zeren_proto::capabilities::current();
     if crate::runner::session().is_some() {
-        capabilities.push(zeron_proto::CLOUD_SESSION_CAPABILITY.to_string());
+        capabilities.push(zeren_proto::CLOUD_SESSION_CAPABILITY.to_string());
     }
     capabilities
 }
@@ -326,7 +326,7 @@ impl WorkspaceHost {
             // Every boot restamps the running binary's version (fleet staleness
             // on the Devices page; workspace version — same for every crate).
             version: Some(env!("CARGO_PKG_VERSION").to_string()),
-            cursor_sdk_version: Some(zeron_harness::CursorHarness::sdk_version().into()),
+            cursor_sdk_version: Some(zeren_harness::CursorHarness::sdk_version().into()),
             capabilities: device_capabilities(),
         })?;
 
@@ -404,14 +404,14 @@ impl WorkspaceHost {
     /// server through this. Production always goes through [`Self::join_room`].
     #[doc(hidden)]
     pub fn connect_registry_url(&self, url: &str) {
-        self.spawn_join(Arc::new(zeron_sync::StaticUrl(url.to_string())), None, None);
+        self.spawn_join(Arc::new(zeren_sync::StaticUrl(url.to_string())), None, None);
     }
 
     fn spawn_join(
         &self,
-        url: Arc<dyn zeron_sync::UrlProvider>,
+        url: Arc<dyn zeren_sync::UrlProvider>,
         mut token_changes: Option<tokio::sync::watch::Receiver<u64>>,
-        token: Option<Arc<dyn zeron_rpc::TokenSource>>,
+        token: Option<Arc<dyn zeren_rpc::TokenSource>>,
     ) {
         // A room will ack from here on (the test seam joins edge-less
         // hosts): queue writes again, re-seeding any folded local-only ones.
@@ -421,8 +421,8 @@ impl WorkspaceHost {
         let device_id = self.inner.config.device_id.clone();
         let weak = Arc::downgrade(&self.inner);
         tokio::spawn(async move {
-            let mut wake = zeron_sync::wake::subscribe();
-            let mut online = zeron_sync::wake::subscribe_online();
+            let mut wake = zeren_sync::wake::subscribe();
+            let mut online = zeren_sync::wake::subscribe_online();
             // `RegistryClient` only self-reconnects AFTER a first successful
             // join; an INITIAL failure (a 500 from an overloaded DO, a token
             // racing a refresh, an edge deploy) must not end this task and
@@ -479,7 +479,7 @@ impl WorkspaceHost {
                         loop {
                             tokio::select! {
                                 event = events.recv() => match event {
-                                    Ok(zeron_sync::RegistryEvent::Connected) => {
+                                    Ok(zeren_sync::RegistryEvent::Connected) => {
                                         let Some(inner) = weak.upgrade() else { return };
                                         // Re-join: restart the dial gate's
                                         // warm-up clock (presence map is empty
@@ -489,15 +489,15 @@ impl WorkspaceHost {
                                             .store(now_ms(), std::sync::atomic::Ordering::Relaxed);
                                         inner.bump_changed();
                                     }
-                                    Ok(zeron_sync::RegistryEvent::Applied) => {
+                                    Ok(zeren_sync::RegistryEvent::Applied) => {
                                         let Some(inner) = weak.upgrade() else { return };
                                         inner.bump_changed();
                                     }
-                                    Ok(zeron_sync::RegistryEvent::Presence) => {
+                                    Ok(zeren_sync::RegistryEvent::Presence) => {
                                         let Some(inner) = weak.upgrade() else { return };
                                         inner.publish();
                                     }
-                                    Ok(zeron_sync::RegistryEvent::Disconnected) => {}
+                                    Ok(zeren_sync::RegistryEvent::Disconnected) => {}
                                     Err(tokio::sync::broadcast::error::RecvError::Lagged(_)) => {}
                                     Err(tokio::sync::broadcast::error::RecvError::Closed) => break,
                                 },
@@ -575,8 +575,8 @@ impl WorkspaceHost {
     /// A deleted device row is positive evidence too: nothing answers there
     /// (a deleted Cloud session's machine was still dialed every few seconds
     /// by everything that targets its chat).
-    pub fn peer_liveness(&self, device_id: &str) -> zeron_rpc::PeerLiveness {
-        use zeron_rpc::PeerLiveness::{Dark, Live, Unknown};
+    pub fn peer_liveness(&self, device_id: &str) -> zeren_rpc::PeerLiveness {
+        use zeren_rpc::PeerLiveness::{Dark, Live, Unknown};
         if device_id == self.inner.config.device_id {
             return Live;
         }
@@ -666,15 +666,15 @@ impl WorkspaceHost {
         }
     }
 
-    /// Registry room introspection for SyncStatus / `zeron sync`.
+    /// Registry room introspection for SyncStatus / `zeren sync`.
     /// `None` = no room yet (edge-less, or the initial join is still retrying).
-    pub fn sync_status(&self) -> Option<zeron_sync::RoomStatsSnapshot> {
+    pub fn sync_status(&self) -> Option<zeren_sync::RoomStatsSnapshot> {
         lock(&self.inner.room).as_ref().map(|room| room.stats())
     }
 
     /// The registry room's reconnect posture (next-dial deadline + sticky
     /// last failure) for the connectivity stream. `None` = no room yet.
-    pub fn reconnect_state(&self) -> Option<zeron_sync::ReconnectState> {
+    pub fn reconnect_state(&self) -> Option<zeren_sync::ReconnectState> {
         lock(&self.inner.room)
             .as_ref()
             .map(|room| room.reconnect_state())
@@ -746,7 +746,7 @@ impl WorkspaceHost {
 
     pub fn change_sidebar_pin(
         &self,
-        change: &zeron_proto::SidebarPinChange,
+        change: &zeren_proto::SidebarPinChange,
     ) -> Result<(), EngineError> {
         let synced = self.sync_status().is_some_and(|status| status.synced);
         self.mutate(|doc| {
@@ -757,8 +757,8 @@ impl WorkspaceHost {
         })?;
         if matches!(
             change,
-            zeron_proto::SidebarPinChange::Section {
-                change: zeron_proto::SidebarSectionChange::Import { .. }
+            zeren_proto::SidebarPinChange::Section {
+                change: zeren_proto::SidebarSectionChange::Import { .. }
             }
         ) {
             // The UI removes its legacy copy only after this acknowledgement.
@@ -931,7 +931,7 @@ impl WorkspaceHost {
     /// message's text. Claims the row first so a pre-workspace chat gains one.
     pub fn note_message(&self, chat_id: &str, text: &str) {
         // Annotation tokens carry their element as hex; previews read the label.
-        let text = zeron_proto::annotation::annotation_display(text);
+        let text = zeren_proto::annotation::annotation_display(text);
         let preview: String = text.chars().take(120).collect();
         let result = self.claim_chat(chat_id, None).and_then(|_| {
             self.mutate(|doc| doc.set_chat_last_message(chat_id, &preview, Utc::now()))
@@ -1016,7 +1016,7 @@ impl WorkspaceHost {
     }
 
     /// [`create_chat`](Self::create_chat) recording the creating chat
-    /// (`parentChatId`) — the Zeron MCP's orchestration link.
+    /// (`parentChatId`) — the Zeren MCP's orchestration link.
     pub fn create_chat_with_parent(
         &self,
         chat_id: &str,
@@ -1053,7 +1053,7 @@ impl WorkspaceHost {
         config: Option<ChatConfig>,
         cwd: Option<String>,
         parent_chat_id: Option<String>,
-        child_kind: Option<zeron_proto::ChildKind>,
+        child_kind: Option<zeren_proto::ChildKind>,
     ) -> Result<(), EngineError> {
         if self.read(|doc| doc.chat(chat_id))?.is_some() {
             return Ok(()); // idempotent: optimistic client retries never duplicate
@@ -1132,7 +1132,7 @@ impl WorkspaceHost {
                 && device
                     .capabilities
                     .iter()
-                    .any(|c| c == zeron_proto::capabilities::PROJECTLESS_SCRATCH_V1)
+                    .any(|c| c == zeren_proto::capabilities::PROJECTLESS_SCRATCH_V1)
         }))
     }
 
@@ -1188,7 +1188,7 @@ impl WorkspaceHost {
         name: Option<String>,
         github_repo: &str,
     ) -> Result<(), EngineError> {
-        if !device_id.starts_with(zeron_proto::CLOUD_DEVICE_PREFIX) {
+        if !device_id.starts_with(zeren_proto::CLOUD_DEVICE_PREFIX) {
             return Err(EngineError::Other(
                 "Only Cloud projects name their repository.".into(),
             ));
@@ -1214,7 +1214,7 @@ impl WorkspaceHost {
                 git_checked_at: Some(Utc::now()),
                 checkout_id: None,
                 // Groups with the clones of the repository on other devices.
-                repository_id: Some(zeron_proto::view::cloud_repository_id(&spaces, github_repo)),
+                repository_id: Some(zeren_proto::view::cloud_repository_id(&spaces, github_repo)),
                 github_repo: Some(github_repo.to_string()),
                 icon: None,
                 created_at: Utc::now(),
@@ -1227,7 +1227,7 @@ impl WorkspaceHost {
         Ok(self.mutate(|doc| doc.rename_space(space_id, name))?)
     }
 
-    pub fn set_space_icon(&self, space_id: &str, icon: Option<&zeron_proto::SpaceIcon>) -> Result<bool, EngineError> {
+    pub fn set_space_icon(&self, space_id: &str, icon: Option<&zeren_proto::SpaceIcon>) -> Result<bool, EngineError> {
         Ok(self.mutate(|doc| doc.set_space_icon(space_id, icon))?)
     }
 
@@ -1296,7 +1296,7 @@ impl WorkspaceHost {
         let stale: Vec<Space> = self
             .read(|doc| doc.read_spaces())?
             .into_iter()
-            .filter(|s| s.device_id.starts_with(zeron_proto::CLOUD_DEVICE_PREFIX))
+            .filter(|s| s.device_id.starts_with(zeren_proto::CLOUD_DEVICE_PREFIX))
             .filter(|s| {
                 s.github_repo
                     .as_deref()
@@ -1324,7 +1324,7 @@ impl WorkspaceHost {
                     space.git_checked_at.unwrap_or_else(Utc::now),
                 )?;
             }
-            Ok::<_, zeron_doc::DocError>(true)
+            Ok::<_, zeren_doc::DocError>(true)
         })?;
         Ok(stale.len())
     }
@@ -1395,7 +1395,7 @@ impl WorkspaceHost {
         Ok(self.mutate(|doc| doc.set_chat_archived(chat_id, archived))?)
     }
 
-    /// LWW full-config replace on the chat row (zeron `SetChatConfig` — the
+    /// LWW full-config replace on the chat row (zeren `SetChatConfig` — the
     /// composer's mid-session model/reasoning/options changes). Returns false
     /// when the chat doesn't exist.
     pub fn set_chat_config(&self, chat_id: &str, config: &ChatConfig) -> Result<bool, EngineError> {
@@ -1422,7 +1422,7 @@ impl WorkspaceHost {
     pub fn set_chat_source_context(
         &self,
         chat_id: &str,
-        context: &zeron_proto::ConversationSourceContext,
+        context: &zeren_proto::ConversationSourceContext,
     ) -> Result<bool, EngineError> {
         Ok(self.mutate(|doc| doc.set_chat_source_context(chat_id, context))?)
     }
@@ -1473,7 +1473,7 @@ impl WorkspaceHostInner {
         // Sidebar pins are viewport state. A Cloud device has no viewport, and
         // the edge refuses its writes to rows it doesn't own: reconciling here
         // would rewrite the missing preferences row after every refused push.
-        let owns_sidebar = self.config.platform != zeron_proto::CLOUD_PLATFORM;
+        let owns_sidebar = self.config.platform != zeren_proto::CLOUD_PLATFORM;
         let snapshot = {
             let mut doc = lock(&self.reg);
             match doc.reconcile_sidebar_pins(registry_synced && owns_sidebar) {
@@ -1874,12 +1874,12 @@ fn device_name_on_boot(existing_name: Option<&str>, detected_name: &str) -> Stri
 /// auth path to maintain, and the `?beat=1` keeps presence alive for a
 /// device that can only reach the edge over HTTPS.
 struct WsDerivedRegistryTransport {
-    url: Arc<dyn zeron_sync::UrlProvider>,
+    url: Arc<dyn zeren_sync::UrlProvider>,
     client: reqwest::Client,
 }
 
 impl WsDerivedRegistryTransport {
-    fn new(url: Arc<dyn zeron_sync::UrlProvider>) -> Self {
+    fn new(url: Arc<dyn zeren_sync::UrlProvider>) -> Self {
         Self {
             url,
             client: reqwest::Client::new(),
@@ -1887,17 +1887,17 @@ impl WsDerivedRegistryTransport {
     }
 
     async fn leaf_url(
-        provider: &Arc<dyn zeron_sync::UrlProvider>,
+        provider: &Arc<dyn zeren_sync::UrlProvider>,
         leaf: &str,
-    ) -> Result<(reqwest::Url, Option<String>), zeron_sync::SyncError> {
+    ) -> Result<(reqwest::Url, Option<String>), zeren_sync::SyncError> {
         let ws = provider.url().await?;
         let mut u = reqwest::Url::parse(&ws)
-            .map_err(|e| zeron_sync::SyncError::Protocol(format!("bad ws url: {e}")))?;
+            .map_err(|e| zeren_sync::SyncError::Protocol(format!("bad ws url: {e}")))?;
         let scheme = if u.scheme() == "wss" { "https" } else { "http" };
         let _ = u.set_scheme(scheme);
         let path = u.path().to_string();
         let Some(base) = path.strip_suffix("/ws") else {
-            return Err(zeron_sync::SyncError::Protocol(
+            return Err(zeren_sync::SyncError::Protocol(
                 "ws url without /ws leaf".into(),
             ));
         };
@@ -1923,11 +1923,11 @@ impl WsDerivedRegistryTransport {
     }
 }
 
-impl zeron_sync::RegistryTransport for WsDerivedRegistryTransport {
+impl zeren_sync::RegistryTransport for WsDerivedRegistryTransport {
     fn fetch(
         &self,
         since: u64,
-    ) -> futures::future::BoxFuture<'static, Result<String, zeron_sync::SyncError>> {
+    ) -> futures::future::BoxFuture<'static, Result<String, zeren_sync::SyncError>> {
         let provider = self.url.clone();
         let client = self.client.clone();
         Box::pin(async move {
@@ -1942,23 +1942,23 @@ impl zeron_sync::RegistryTransport for WsDerivedRegistryTransport {
             let resp = req
                 .send()
                 .await
-                .map_err(|e| zeron_sync::SyncError::WebSocket(describe_http_error(e)))?;
+                .map_err(|e| zeren_sync::SyncError::WebSocket(describe_http_error(e)))?;
             if !resp.status().is_success() {
-                return Err(zeron_sync::SyncError::Protocol(format!(
+                return Err(zeren_sync::SyncError::Protocol(format!(
                     "registry pull http {}",
                     resp.status()
                 )));
             }
             resp.text()
                 .await
-                .map_err(|e| zeron_sync::SyncError::WebSocket(describe_http_error(e)))
+                .map_err(|e| zeren_sync::SyncError::WebSocket(describe_http_error(e)))
         })
     }
 
     fn push(
         &self,
         body: String,
-    ) -> futures::future::BoxFuture<'static, Result<String, zeron_sync::SyncError>> {
+    ) -> futures::future::BoxFuture<'static, Result<String, zeren_sync::SyncError>> {
         let provider = self.url.clone();
         let client = self.client.clone();
         Box::pin(async move {
@@ -1973,16 +1973,16 @@ impl zeron_sync::RegistryTransport for WsDerivedRegistryTransport {
             let resp = req
                 .send()
                 .await
-                .map_err(|e| zeron_sync::SyncError::WebSocket(describe_http_error(e)))?;
+                .map_err(|e| zeren_sync::SyncError::WebSocket(describe_http_error(e)))?;
             if !resp.status().is_success() {
-                return Err(zeron_sync::SyncError::Protocol(format!(
+                return Err(zeren_sync::SyncError::Protocol(format!(
                     "registry push http {}",
                     resp.status()
                 )));
             }
             resp.text()
                 .await
-                .map_err(|e| zeron_sync::SyncError::WebSocket(describe_http_error(e)))
+                .map_err(|e| zeren_sync::SyncError::WebSocket(describe_http_error(e)))
         })
     }
 }
@@ -1995,11 +1995,11 @@ mod tests {
     async fn registry_http_sync_retains_dns_cause() {
         use super::*;
         use crate::http_error::test_support::FailingDns;
-        use zeron_sync::RegistryTransport;
+        use zeren_sync::RegistryTransport;
 
         let dns = Arc::new(FailingDns::default());
         let transport = WsDerivedRegistryTransport {
-            url: Arc::new(zeron_sync::StaticUrl(
+            url: Arc::new(zeren_sync::StaticUrl(
                 "wss://edge.invalid/registry/org/ws?token=token-secret".into(),
             )),
             client: dns.client(),
@@ -2091,14 +2091,14 @@ mod tests {
         // Unknown and room-less: ambiguous, never parked.
         assert_eq!(
             host.peer_liveness("cloud-1"),
-            zeron_rpc::PeerLiveness::Unknown
+            zeren_rpc::PeerLiveness::Unknown
         );
         // The edge tombstones a deleted Cloud session's device: positive
         // evidence that nothing answers, whatever the room's state.
         let _ = lock(&host.inner.reg).apply_rows(
             1,
-            vec![zeron_doc::RegistryRow {
-                kind: zeron_doc::KIND_DEVICES.into(),
+            vec![zeren_doc::RegistryRow {
+                kind: zeren_doc::KIND_DEVICES.into(),
                 id: "cloud-1".into(),
                 seq: 1,
                 deleted: true,
@@ -2107,8 +2107,8 @@ mod tests {
                 clocks: Default::default(),
             }],
         );
-        assert_eq!(host.peer_liveness("cloud-1"), zeron_rpc::PeerLiveness::Dark);
-        assert_eq!(host.peer_liveness("laptop"), zeron_rpc::PeerLiveness::Live);
+        assert_eq!(host.peer_liveness("cloud-1"), zeren_rpc::PeerLiveness::Dark);
+        assert_eq!(host.peer_liveness("laptop"), zeren_rpc::PeerLiveness::Live);
     }
 
     /// A claimed row doesn't know its parent until the chat's `createChat`
@@ -2165,7 +2165,7 @@ mod tests {
         let mut preferences = host.watch_sidebar_preferences();
         assert!(!preferences.borrow().initialized);
 
-        host.change_sidebar_pin(&zeron_proto::SidebarPinChange::Unpin {
+        host.change_sidebar_pin(&zeren_proto::SidebarPinChange::Unpin {
             session_id: "absent".into(),
         })
         .unwrap();
@@ -2185,7 +2185,7 @@ mod tests {
         );
         host.create_chat("cached", None, Some("test-device"), None, None)
             .unwrap();
-        host.change_sidebar_pin(&zeron_proto::SidebarPinChange::Pin {
+        host.change_sidebar_pin(&zeren_proto::SidebarPinChange::Pin {
             session_id: "cached".into(),
             after: None,
             before: None,
@@ -2194,8 +2194,8 @@ mod tests {
         let acknowledgement = host.sidebar_preferences_snapshot();
         assert!(acknowledgement.revision > first_revision);
         assert_eq!(*preferences.borrow(), acknowledgement);
-        host.change_sidebar_pin(&zeron_proto::SidebarPinChange::Section {
-            change: zeron_proto::SidebarSectionChange::Create {
+        host.change_sidebar_pin(&zeren_proto::SidebarPinChange::Section {
+            change: zeren_proto::SidebarSectionChange::Create {
                 id: "focus".into(),
                 name: "Focus".into(),
             },
@@ -2205,8 +2205,8 @@ mod tests {
         assert!(sections.revision > acknowledgement.revision);
         assert_eq!(sections.sections[0].name, "Focus");
         assert_eq!(*preferences.borrow(), sections);
-        host.change_sidebar_pin(&zeron_proto::SidebarPinChange::Section {
-            change: zeron_proto::SidebarSectionChange::Collapse {
+        host.change_sidebar_pin(&zeren_proto::SidebarPinChange::Section {
+            change: zeren_proto::SidebarSectionChange::Collapse {
                 id: "focus".into(),
                 collapsed: true,
             },
@@ -2221,7 +2221,7 @@ mod tests {
     /// A pre-fix `registry1` snapshot: one never-acked batch per session-row
     /// touch. Marking each batch in flight as it is written stops the doc
     /// coalescing; `in_flight` is not persisted, so it reloads all-unsent.
-    fn save_bloated_registry(store: &zeron_sync::DocsStore, touches: usize) -> usize {
+    fn save_bloated_registry(store: &zeren_sync::DocsStore, touches: usize) -> usize {
         use super::*;
 
         let mut doc = RegistryDoc::new("test-device");
@@ -2238,11 +2238,11 @@ mod tests {
         bytes.len()
     }
 
-    fn running_session(at: chrono::DateTime<chrono::Utc>) -> zeron_proto::Session {
-        zeron_proto::Session {
+    fn running_session(at: chrono::DateTime<chrono::Utc>) -> zeren_proto::Session {
+        zeren_proto::Session {
             chat_id: "chat-1".into(),
             device_id: "test-device".into(),
-            status: zeron_proto::SessionStatus::Working,
+            status: zeren_proto::SessionStatus::Working,
             last_completed_turn: None,
             started_at: None,
             updated_at: at,

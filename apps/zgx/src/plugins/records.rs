@@ -1,4 +1,4 @@
-//! What each plugin may read of Zeron, kept for it alone as
+//! What each plugin may read of Zeren, kept for it alone as
 //! `plugin.<id>.records`: the window gives plugins ids (`session = <id>`
 //! where a session is), and a plugin's SDK finds the record by its id here.
 //! A record holds only the fields the plugin was allowed. Those it wasn't

@@ -21,7 +21,7 @@ if ! command -v rsvg-convert >/dev/null; then
   echo "note: rsvg-convert not found — skipped icon rasterization"
   exit 0
 fi
-for svg in "$ROOT"/apps/ios/Zeron/Assets.xcassets/{ToolIcons,FileIcons}/*.imageset/*.svg; do
+for svg in "$ROOT"/apps/ios/Zeren/Assets.xcassets/{ToolIcons,FileIcons}/*.imageset/*.svg; do
   name="$(basename "$(dirname "$svg")" .imageset)"
   png="$OUT/$name.png"
   [[ "$png" -nt "$svg" ]] && continue

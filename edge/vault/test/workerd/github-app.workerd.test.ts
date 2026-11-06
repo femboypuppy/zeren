@@ -150,7 +150,7 @@ describe("github installation grants", () => {
       const result = await grant(repo);
       expect(result).toMatchObject({ ok: false, error: "not_found", status: 404 });
       expect(!result.ok && result.message).toContain("github_app_not_installed");
-      expect(!result.ok && result.message).toContain("https://github.com/apps/zeron-test/installations/new");
+      expect(!result.ok && result.message).toContain("https://github.com/apps/zeren-test/installations/new");
     }
     expect(upstream.calls.some((call) => call.url.includes("/access_tokens"))).toBe(false);
   });
@@ -207,7 +207,7 @@ describe("github installation grants", () => {
   it("status carries the App's install link", async () => {
     const { caller } = await setup();
     expect(value(await vault().status(caller)).githubInstallUrl).toBe(
-      "https://github.com/apps/zeron-test/installations/new"
+      "https://github.com/apps/zeren-test/installations/new"
     );
   });
 });

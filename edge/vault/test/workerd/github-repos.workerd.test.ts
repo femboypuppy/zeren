@@ -53,7 +53,7 @@ describe("githubRepos", () => {
             total_count: 3,
             repositories: [
               repo("octo/alpha", "2026-09-01T00:00:00Z"),
-              repo("octo/Zeron-private", "2026-09-20T00:00:00Z", { private: true, default_branch: "trunk" })
+              repo("octo/Zeren-private", "2026-09-20T00:00:00Z", { private: true, default_branch: "trunk" })
             ]
           },
           installationRepos(11, 2)
@@ -63,21 +63,21 @@ describe("githubRepos", () => {
         paged({
           total_count: 2,
           repositories: [
-            repo("octo/Zeron-private", "2026-09-20T00:00:00Z", { private: true, default_branch: "trunk" }),
-            repo("zeron-org/desktop", "2026-09-25T00:00:00Z", { description: "Zeron desktop" })
+            repo("octo/Zeren-private", "2026-09-20T00:00:00Z", { private: true, default_branch: "trunk" }),
+            repo("zeren-org/desktop", "2026-09-25T00:00:00Z", { description: "Zeren desktop" })
           ]
         })
     });
     await connect(caller, device.deviceId);
 
     const repos = value(await vault().githubRepos(caller));
-    expect(repos.map((r) => r.fullName)).toEqual(["zeron-org/desktop", "octo/Zeron-private", "octo/alpha", "octo/gamma"]);
+    expect(repos.map((r) => r.fullName)).toEqual(["zeren-org/desktop", "octo/Zeren-private", "octo/alpha", "octo/gamma"]);
     expect(repos[0]).toEqual({
-      fullName: "zeron-org/desktop",
-      cloneUrl: "https://github.com/zeron-org/desktop.git",
+      fullName: "zeren-org/desktop",
+      cloneUrl: "https://github.com/zeren-org/desktop.git",
       defaultBranch: "main",
       private: false,
-      description: "Zeron desktop",
+      description: "Zeren desktop",
       pushedAt: Date.parse("2026-09-25T00:00:00Z")
     });
     expect(repos[1]).toMatchObject({ private: true, defaultBranch: "trunk" });
@@ -92,7 +92,7 @@ describe("githubRepos", () => {
     expect(JSON.stringify(repos)).not.toContain(TOKEN);
 
     const filtered = value(await vault().githubRepos(caller, "ZER"));
-    expect(filtered.map((r) => r.fullName)).toEqual(["zeron-org/desktop", "octo/Zeron-private"]);
+    expect(filtered.map((r) => r.fullName)).toEqual(["zeren-org/desktop", "octo/Zeren-private"]);
   });
 
   it("lists nothing without an installation: never /user/repos, whose repos sessions can't reach", async () => {

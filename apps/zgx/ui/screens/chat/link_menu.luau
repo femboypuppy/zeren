@@ -1,6 +1,6 @@
 -- A chat's links' context menus where they aren't the web's (ds/markdown's
 -- `link_menu`; ds/links makes the entries):
---   a chat mentioned   Open, Copy link (its Zeron link, `zeron://open/…`)
+--   a chat mentioned   Open, Copy link (its Zeren link, `zeren://open/…`)
 --   a file in its folder   Open, Reveal in Finder (the chat on this Mac),
 --                          Copy path (its whole path, on the chat's device)
 --   a file outside it      Copy path
@@ -21,7 +21,7 @@ end
 
 return function(open: (target: string) -> (), session: () -> any?): (target: string) -> { Links.Entry }?
 	return function(target: string): { Links.Entry }?
-		local chat = string.match(target, "^zeron%-chat:([%w%-_]+)$")
+		local chat = string.match(target, "^zeren%-chat:([%w%-_]+)$")
 		if chat then
 			return Links.chat {
 				open = function()

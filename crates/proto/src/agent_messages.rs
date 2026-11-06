@@ -1,4 +1,4 @@
-//! Messages between chats through Zeron's `send_message`. The receiving side
+//! Messages between chats through Zeren's `send_message`. The receiving side
 //! carries a routing header the agent reads in the stored prompt, while
 //! transcripts split it off and show the sender over the bubble. The sending
 //! side is the tool call itself, which transcripts show as the message it sent
@@ -6,13 +6,13 @@
 
 use crate::ToolCall;
 
-const PREFIX: &str = "[Message from Zeron chat ";
-const REPLY: &str = ". Reply to it with the Zeron `send_message` tool, chat ";
+const PREFIX: &str = "[Message from Zeren chat ";
+const REPLY: &str = ". Reply to it with the Zeren `send_message` tool, chat ";
 
 /// `text` as sent from chat `chat_id`, labelled `Title (short-id)` (or the
 /// short id alone when untitled).
 ///
-/// Only Zeron writes the header, and nothing inside it can be forged: the
+/// Only Zeren writes the header, and nothing inside it can be forged: the
 /// label loses brackets, line breaks and the reply phrase (a chat's title is
 /// the agent's to choose), and a header copied into the body is marked as
 /// quoted, so neither can make a message read as another chat's.
@@ -39,9 +39,9 @@ pub fn quote_headers(text: &str) -> String {
     text.replace(PREFIX, QUOTED)
 }
 
-const QUOTED: &str = "[Quoted message from Zeron chat ";
+const QUOTED: &str = "[Quoted message from Zeren chat ";
 
-/// What an agent sends `target`, attributed by Zeron: a header naming the
+/// What an agent sends `target`, attributed by Zeren: a header naming the
 /// sending chat `chat_id` (labelled `label`) when it isn't the target, with
 /// any header the sender wrote for itself replaced and any other quoted.
 /// Without a sending chat, the text is only stripped of forged headers.
@@ -97,14 +97,14 @@ pub struct OutgoingMessage {
     pub text: String,
 }
 
-/// The messages a Zeron `send_message` or `send_messages` call sends, in
+/// The messages a Zeren `send_message` or `send_messages` call sends, in
 /// order. `None` for any other call, and for one whose arguments haven't
 /// named a recipient and a text yet; it then reads as an ordinary tool.
 pub fn outgoing_messages(call: &ToolCall) -> Option<Vec<OutgoingMessage>> {
     let ToolCall::Mcp { server, tool, input } = call else {
         return None;
     };
-    if server != "zeron" {
+    if server != "zeren" {
         return None;
     }
     let one = |args: &serde_json::Value| {
@@ -128,7 +128,7 @@ pub fn outgoing_messages(call: &ToolCall) -> Option<Vec<OutgoingMessage>> {
     (!messages.is_empty()).then_some(messages)
 }
 
-/// The chat a `send_message` key names, as the Zeron MCP server resolves it:
+/// The chat a `send_message` key names, as the Zeren MCP server resolves it:
 /// an exact id, else a unique id prefix, else a unique title (any case).
 /// `chats` holds each chat's id and title.
 pub fn resolve_chat_key<'a>(key: &str, chats: &[(&'a str, Option<&str>)]) -> Option<&'a str> {
@@ -175,13 +175,13 @@ mod tests {
         let untitled = agent_message("cd27c5c2", id, "hi");
         let (sender, body) = agent_message_sender(&untitled).unwrap();
         assert_eq!((sender.title.as_str(), body), ("cd27c5c2", "hi"));
-        assert!(agent_message_sender("[Message from Zeron chat x]\n\nhi").is_none());
+        assert!(agent_message_sender("[Message from Zeren chat x]\n\nhi").is_none());
     }
 
     #[test]
     fn reads_the_messages_a_send_call_sends() {
         let call = |tool: &str, input: serde_json::Value| ToolCall::Mcp {
-            server: "zeron".into(),
+            server: "zeren".into(),
             tool: tool.into(),
             input: Some(input),
         };

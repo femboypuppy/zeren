@@ -3,7 +3,7 @@
 //!
 //! Each connection asks the engine which build it is (`EngineInfo.build`,
 //! absent on engines from before build ids: unknown, so stale) and the
-//! engine binary on disk which build it is (`zeron-engine --build-id`).
+//! engine binary on disk which build it is (`zeren-engine --build-id`).
 //! They differ: the engine is stale. It's this app's own when it reports the
 //! build this app last started in that data dir (manager.rs keeps it); only
 //! then may this app start it again. An engine anyone else started
@@ -15,7 +15,7 @@
 //!   engine.restart     stop the engine this app started; the supervisor
 //!                      starts the one on disk in its place
 //!
-//! Zeron.app's beta manages Zeron.app's own engine, which restarts into its
+//! Zeren.app's beta manages Zeren.app's own engine, which restarts into its
 //! bundle's by itself (src/engine/manager.rs): no staleness of this app's to
 //! judge there, and `engine.restart` stops it at once. Instead each
 //! connection asks whether the engine serves this interface (its
@@ -127,7 +127,7 @@ fn tell_interface(supported: bool) {
         return;
     }
     if !supported {
-        eprintln!("zeron-zgx: engine: doesn't serve this interface ({INTERFACE}): an older engine");
+        eprintln!("zeren-zgx: engine: doesn't serve this interface ({INTERFACE}): an older engine");
     }
     INTERFACES.with(|w| {
         for shared in w.borrow().iter() {
@@ -170,7 +170,7 @@ pub fn install(cx: &mut WindowContext, host: &ScriptHost) {
                 return;
             };
             tell_interface(serves_interface(&info["capabilities"]));
-            // Zeron.app's engine follows its bundle by itself.
+            // Zeren.app's engine follows its bundle by itself.
             if config.follows_bundle() {
                 return;
             }
@@ -188,7 +188,7 @@ pub fn install(cx: &mut WindowContext, host: &ScriptHost) {
                     let (stale, ours) = judged;
                     if stale {
                         eprintln!(
-                            "zeron-zgx: engine: older than the one on disk ({} vs {}){}",
+                            "zeren-zgx: engine: older than the one on disk ({} vs {}){}",
                             running.as_deref().unwrap_or("unknown"),
                             on_disk.as_deref().unwrap_or("?"),
                             if ours { "" } else { "; not this app's to restart" }
@@ -207,15 +207,15 @@ fn install_restart(host: &ScriptHost) {
     host.async_action("engine.restart", |_| async move { crate::plugins::preview::refuse("engine.restart")?;
         let engine = engine::get();
         let Some(config) = engine.config() else {
-            return Err("Zeron isn't available here".into());
+            return Err("Zeren isn't available here".into());
         };
         // (Only one this app started, and only while it can start another;
-        // in the beta, Zeron.app's own, which its bundle's replaces.)
+        // in the beta, Zeren.app's own, which its bundle's replaces.)
         let Some(rpc) = engine.current() else {
             return Err("offline".into());
         };
         if config.follows_bundle() {
-            eprintln!("zeron-zgx: engine: restarting Zeron's engine");
+            eprintln!("zeren-zgx: engine: restarting Zeren's engine");
             engine.stop().await?;
             return Ok(Value::Nil);
         }
@@ -224,7 +224,7 @@ fn install_restart(host: &ScriptHost) {
         if config.startable().is_none() || running.is_none() || running != manager::started_build(config) {
             return Err("This engine wasn't started by this app.".into());
         }
-        eprintln!("zeron-zgx: engine: starting the engine on disk in place of an older one");
+        eprintln!("zeren-zgx: engine: starting the engine on disk in place of an older one");
         engine.stop().await?;
         Ok(Value::Nil)
     });
@@ -258,7 +258,7 @@ mod tests {
         let dir = std::env::temp_dir().join(format!("zgx-engine-stamp-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
-        let bin = dir.join("zeron-engine");
+        let bin = dir.join("zeren-engine");
         std::fs::write(&bin, b"one").unwrap();
         let first = super::stamp_of(&bin).expect("a stamp");
         assert_eq!(super::stamp_of(&bin), Some(first.clone()), "unchanged: the same stamp");

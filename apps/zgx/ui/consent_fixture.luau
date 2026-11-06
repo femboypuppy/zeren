@@ -97,7 +97,7 @@ local PLUGINS: { [string]: any } = {
 	wide = {
 		id = "wide",
 		name = "Composer kit",
-		version = "✓ Zeron",
+		version = "✓ Zeren",
 		hash = "wide-1",
 		status = "pending",
 		author = { kind = "verified", username = "ada" },
@@ -211,7 +211,7 @@ ui.command {
 show("focus")
 
 -- Light, for pictures of it.
-ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeron-light") end }
+ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeren-light") end }
 
 return ui.column {
 	w = 460,

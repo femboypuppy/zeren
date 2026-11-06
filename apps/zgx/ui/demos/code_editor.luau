@@ -187,10 +187,10 @@ if __name__ == "__main__":
 
 local JSON = [[
 {
-  "name": "zeron-zgx",
+  "name": "zeren-zgx",
   "version": "0.2.129",
   "window": { "width": 1140, "height": 800, "frosted": true },
-  "themes": ["zeron-dark", "zeron-light"],
+  "themes": ["zeren-dark", "zeren-light"],
   "fonts": {
     "sans": "Geist",
     "mono": "Geist Mono",

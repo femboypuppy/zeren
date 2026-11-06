@@ -1,8 +1,8 @@
-//! Settings → About & updates (ui/screens/settings/about.luau): which Zeron
+//! Settings → About & updates (ui/screens/settings/about.luau): which Zeren
 //! this is, and its updates.
 //!
-//! **The Zeron app** (this interface in Zeron.app's bundle: the beta) updates
-//! itself, as Zeron.app does (crates/update `desktop`, shared with the GPUI
+//! **The Zeren app** (this interface in Zeren.app's bundle: the beta) updates
+//! itself, as Zeren.app does (crates/update `desktop`, shared with the GPUI
 //! app's `app_update.rs`): its own checker follows the release channel this
 //! Mac chose (`update-channel.json`), a found release downloads in the
 //! background, "Restart to update" installs it and relaunches, and one
@@ -37,14 +37,14 @@ use std::{
 };
 
 use serde_json::{Value as Json, json};
-use zeron_update::{Channel, InstallKind, UpdateBlocker, UpdateStatus, Updater};
+use zeren_update::{Channel, InstallKind, UpdateBlocker, UpdateStatus, Updater};
 use zgx_desktop::{WindowContext, WindowFactory};
 use zgx_script::{ScriptHost, Shared, Value};
 
 use crate::engine::{self, rpc::Watch};
 
-/// This app's version: a beta build's own (`0.2.136-beta.1`), else Zeron's.
-pub const APP_VERSION: &str = env!("ZERON_APP_VERSION");
+/// This app's version: a beta build's own (`0.2.136-beta.1`), else Zeren's.
+pub const APP_VERSION: &str = env!("ZEREN_APP_VERSION");
 
 #[derive(Default)]
 struct About {
@@ -76,7 +76,7 @@ fn tokio() -> &'static tokio::runtime::Runtime {
     RUNTIME.get_or_init(|| {
         tokio::runtime::Builder::new_multi_thread()
             .worker_threads(1)
-            .thread_name("zeron-update")
+            .thread_name("zeren-update")
             .enable_all()
             .build()
             .expect("the update runtime")
@@ -93,7 +93,7 @@ async fn on_tokio<T: Send + 'static>(work: impl std::future::Future<Output = T> 
     rx.recv().await
 }
 
-/// The app's download and install, as Zeron.app's (crates/ui app_update.rs).
+/// The app's download and install, as Zeren.app's (crates/ui app_update.rs).
 #[derive(Debug, Clone, PartialEq)]
 enum Flow {
     Idle,
@@ -106,7 +106,7 @@ enum Flow {
 struct Desktop {
     install: InstallKind,
     blocker: Option<UpdateBlocker>,
-    /// Background download and install on quit (`ZERON_AUTO_UPDATE` unset or on).
+    /// Background download and install on quit (`ZEREN_AUTO_UPDATE` unset or on).
     automatic: bool,
     edge: String,
     data_dir: PathBuf,
@@ -121,20 +121,20 @@ impl Desktop {
     /// The app's own updater, in an install that updates itself (a macOS
     /// app bundle); none in a development build.
     fn start() -> Option<Rc<Self>> {
-        let install = zeron_update::detect_install();
+        let install = zeren_update::detect_install();
         if !install.supports_desktop_update() {
             return None;
         }
         let data_dir = engine::data_dir()?;
-        zeron_update::set_app_version(APP_VERSION);
-        zeron_update::channel::set_data_dir(&data_dir);
+        zeren_update::set_app_version(APP_VERSION);
+        zeren_update::channel::set_data_dir(&data_dir);
         // A beta's first launch puts this computer on the beta channel (once per
         // build: a later choice of Stable in it sticks).
-        if zeron_update::Channel::of_version(APP_VERSION) == Channel::Beta {
-            match zeron_update::channel::claim_for_beta_build(&data_dir, APP_VERSION) {
-                Ok(true) => eprintln!("zeron-zgx: updates: this computer now gets beta updates"),
+        if zeren_update::Channel::of_version(APP_VERSION) == Channel::Beta {
+            match zeren_update::channel::claim_for_beta_build(&data_dir, APP_VERSION) {
+                Ok(true) => eprintln!("zeren-zgx: updates: this computer now gets beta updates"),
                 Ok(false) => {}
-                Err(error) => eprintln!("zeron-zgx: updates: couldn't claim the beta channel: {error}"),
+                Err(error) => eprintln!("zeren-zgx: updates: couldn't claim the beta channel: {error}"),
             }
         }
         let edge = crate::auth::endpoint().edge;
@@ -146,7 +146,7 @@ impl Desktop {
         Some(Rc::new(Self {
             install,
             blocker,
-            automatic: zeron_update::desktop_auto_update_enabled(),
+            automatic: zeren_update::desktop_auto_update_enabled(),
             edge,
             data_dir,
             checker,
@@ -168,7 +168,7 @@ impl Desktop {
         // Another device updated this Mac under this window: what's on offer
         // is on disk already, and only wants reopening on (`moved_on_to`).
         if let InstallKind::MacApp { bundle } = &self.install
-            && let Some(on_disk) = zeron_update::bundle_app_version(bundle)
+            && let Some(on_disk) = zeren_update::bundle_app_version(bundle)
             && already_there(&on_disk, &latest, APP_VERSION)
         {
             return None;
@@ -211,7 +211,7 @@ impl Desktop {
         let me = self.clone();
         engine::get().spawn(async move {
             let staged = on_tokio(async move {
-                zeron_update::desktop::stage_offer(&edge, &data_dir, &install)
+                zeren_update::desktop::stage_offer(&edge, &data_dir, &install)
                     .await
                     .map_err(|err| format!("{err:#}"))
             })
@@ -219,11 +219,11 @@ impl Desktop {
             .unwrap_or_else(|| Err("the download stopped".into()));
             *me.flow.borrow_mut() = match staged {
                 Ok((version, staged)) => {
-                    eprintln!("zeron-zgx: updates: {version} staged at {}", staged.display());
+                    eprintln!("zeren-zgx: updates: {version} staged at {}", staged.display());
                     Flow::Ready { version, staged }
                 }
                 Err(message) => {
-                    eprintln!("zeron-zgx: updates: the download failed: {message}");
+                    eprintln!("zeren-zgx: updates: the download failed: {message}");
                     Flow::Failed { version, message }
                 }
             };
@@ -256,21 +256,21 @@ impl Desktop {
         let Flow::Ready { version, staged } = self.flow.borrow().clone() else { return };
         match self.install.apply_desktop(&staged, false) {
             Ok(()) => {
-                eprintln!("zeron-zgx: updates: installed {version} on quit");
+                eprintln!("zeren-zgx: updates: installed {version} on quit");
                 *self.flow.borrow_mut() = Flow::Installed;
             }
-            Err(error) => eprintln!("zeron-zgx: updates: installing {version} on quit failed: {error:#}"),
+            Err(error) => eprintln!("zeren-zgx: updates: installing {version} on quit failed: {error:#}"),
         }
     }
 
     fn fields(&self, fields: &mut Vec<(&'static str, Value)>) {
         let status = self.status.borrow();
         let status = status.as_ref();
-        let channel = zeron_update::channel::read(&self.data_dir).channel;
+        let channel = zeren_update::channel::read(&self.data_dir).channel;
         fields.push(("self_updating", Value::Bool(self.self_updating())));
         fields.push(("channels", Value::Bool(matches!(self.install, InstallKind::MacApp { .. }))));
         fields.push(("channel", Value::from(channel.as_str())));
-        fields.push(("beta_minimum", Value::from(zeron_update::channel::BETA_MINIMUM_MACOS)));
+        fields.push(("beta_minimum", Value::from(zeren_update::channel::BETA_MINIMUM_MACOS)));
         if let Some(note) = self.note.borrow().as_deref() {
             fields.push(("channel_note", Value::from(note)));
         }
@@ -338,7 +338,7 @@ pub fn install(cx: &mut WindowContext, host: &ScriptHost) {
             }
             // A development build: the public stable feed, beside the
             // engine's own report.
-            let manifest = on_tokio(async { zeron_update::fetch_latest_on(zeron_cli::DEFAULT_EDGE_URL, Channel::Stable).await })
+            let manifest = on_tokio(async { zeren_update::fetch_latest_on(zeren_cli::DEFAULT_EDGE_URL, Channel::Stable).await })
                 .await
                 .ok_or("failed")?
                 .map_err(|err| feed_outcome(&format!("{err:#}")))?;
@@ -355,7 +355,7 @@ pub fn install(cx: &mut WindowContext, host: &ScriptHost) {
             let desktop = a.desktop.borrow().clone();
             if let Some(desktop) = desktop {
                 if let Some(why) = desktop.status.borrow().as_ref().and_then(|s| s.held.clone()) {
-                    eprintln!("zeron-zgx: updates: held: {why}");
+                    eprintln!("zeren-zgx: updates: held: {why}");
                     return Err("held".to_string());
                 }
                 // Its engine already updated this Mac, from another device: the
@@ -363,7 +363,7 @@ pub fn install(cx: &mut WindowContext, host: &ScriptHost) {
                 // (The engine is new already, and stays up.)
                 let moved_on = moved_on_to(&a.status.borrow(), APP_VERSION);
                 if let (Some(version), InstallKind::MacApp { bundle }) = (moved_on, &desktop.install) {
-                    zeron_update::relaunch_after_exit(std::path::Path::new("/usr/bin/open"), bundle);
+                    zeren_update::relaunch_after_exit(std::path::Path::new("/usr/bin/open"), bundle);
                     if let Some(windows) = a.windows.borrow().as_ref() {
                         windows.quit();
                     }
@@ -371,7 +371,7 @@ pub fn install(cx: &mut WindowContext, host: &ScriptHost) {
                 }
                 if matches!(*desktop.flow.borrow(), Flow::Ready { .. }) {
                     let version = desktop.install_for_restart().map_err(|message| {
-                        eprintln!("zeron-zgx: updates: install failed: {message}");
+                        eprintln!("zeren-zgx: updates: install failed: {message}");
                         publish();
                         "failed".to_string()
                     })?;
@@ -387,7 +387,7 @@ pub fn install(cx: &mut WindowContext, host: &ScriptHost) {
                         let done = stopped.clone();
                         engine.spawn(async move {
                             if let Err(error) = engine::get().stop().await {
-                                eprintln!("zeron-zgx: updates: the engine didn't stop: {error}");
+                                eprintln!("zeren-zgx: updates: the engine didn't stop: {error}");
                             }
                             done.set(true);
                         });
@@ -418,7 +418,7 @@ pub fn install(cx: &mut WindowContext, host: &ScriptHost) {
     host.action("about.channel", move |beta| {
         let Some(desktop) = a.desktop.borrow().clone() else { return };
         *desktop.note.borrow_mut() = None;
-        match zeron_update::desktop::choose_channel(&desktop.data_dir, beta.truthy()) {
+        match zeren_update::desktop::choose_channel(&desktop.data_dir, beta.truthy()) {
             Ok(_) => {
                 // What's staged was the other channel's offer.
                 if matches!(*desktop.flow.borrow(), Flow::Ready { .. } | Flow::Failed { .. }) {
@@ -480,7 +480,7 @@ fn start(about: &Rc<About>) {
 /// on offer or past it. (Not when it's the app that's open: going back to
 /// stable from a beta offers an older version on purpose.)
 fn already_there(on_disk: &str, offered: &str, open: &str) -> bool {
-    on_disk != open && !zeron_update::version_newer(offered, on_disk)
+    on_disk != open && !zeren_update::version_newer(offered, on_disk)
 }
 
 /// The version this device's engine updated it to, past the app that's open:
@@ -489,7 +489,7 @@ fn already_there(on_disk: &str, offered: &str, open: &str) -> bool {
 fn moved_on_to(status: &Json, app_version: &str) -> Option<String> {
     let update = &status["update"];
     let target = update["targetVersion"].as_str()?;
-    (update["state"].as_str() == Some("updated") && zeron_update::version_newer(target, app_version))
+    (update["state"].as_str() == Some("updated") && zeren_update::version_newer(target, app_version))
         .then(|| target.to_owned())
 }
 
@@ -507,7 +507,7 @@ impl About {
         let theirs = self.status.borrow()["latestVersion"].as_str().map(String::from);
         let ours = self.checked.borrow().as_ref().map(|(v, _)| v.clone());
         match (theirs, ours) {
-            (Some(a), Some(b)) => Some(if zeron_update::version_newer(&b, &a) { b } else { a }),
+            (Some(a), Some(b)) => Some(if zeren_update::version_newer(&b, &a) { b } else { a }),
             (a, b) => a.or(b),
         }
     }
@@ -517,7 +517,7 @@ impl About {
             return desktop.available().is_some();
         }
         match (self.latest(), self.engine_version()) {
-            (Some(latest), Some(current)) => zeron_update::version_newer(&latest, &current),
+            (Some(latest), Some(current)) => zeren_update::version_newer(&latest, &current),
             _ => self.status.borrow()["updateAvailable"].as_bool().unwrap_or(false),
         }
     }

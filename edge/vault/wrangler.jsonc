@@ -1,11 +1,11 @@
 {
-  // zeron-vault: the credential vault (docs/design/cloud-device.md, "Credential
+  // zeren-vault: the credential vault (docs/design/cloud-device.md, "Credential
   // vault"). It has NO HTTP surface: no routes, no workers.dev, no preview
   // URLs. The only way in is the main edge Worker's `VAULT` service binding
   // (`entrypoint: "VaultApi"`), which passes an identity it already verified.
   // Deployed by its own job, separately from edge/.
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "zeron-vault",
+  "name": "zeren-vault",
   "main": "src/index.ts",
   "compatibility_date": "2026-07-01",
   "account_id": "b57dde68ee5964dccc025437b5478a5b",
@@ -35,7 +35,7 @@
   // Staging (beside production; see edge/wrangler.jsonc `env.staging`).
   "env": {
     "staging": {
-      "name": "zeron-vault-staging",
+      "name": "zeren-vault-staging",
       "workers_dev": false,
       "preview_urls": false,
       "durable_objects": {

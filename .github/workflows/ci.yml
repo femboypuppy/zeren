@@ -83,7 +83,7 @@ jobs:
             scripts/tests
             .github
             crates
-            apps/zeron
+            apps/zeren
       - name: Planner and admission tests
         run: python3 -m unittest discover -s scripts/tests -p 'test_ci_*.py'
       - id: plan

@@ -1,4 +1,4 @@
--- A ```mermaid fence drawn as its diagram, as Zeron's transcript draws it
+-- A ```mermaid fence drawn as its diagram, as Zeren's transcript draws it
 -- (crates/ui markdown/render.rs `render_code_block`, transcript.rs
 -- `diagram_media`): the host draws it (src/mermaid.rs, `mermaid.render`,
 -- the shipping app's renderer in its style) in the theme's colours, off the
@@ -78,7 +78,7 @@ local function style(): ({ [string]: any }, string)
 	local text = color("text.primary") or "#ededefff"
 	local colors = {
 		background = color("background"),
-		code = color("zeron.prose.code.bg"),
+		code = color("zeren.prose.code.bg"),
 		text = text,
 		secondary = color("text.secondary"),
 		tertiary = color("text.tertiary"),
@@ -250,9 +250,9 @@ M.Diagram = ui.component(function(props: Props): Node
 			w_full = true,
 			min_w = 0,
 			rounded = "$radius.xl",
-			bg = "$zeron.prose.code.bg",
+			bg = "$zeren.prose.code.bg",
 			border = 1,
-			border_color = "$zeron.prose.code.edge",
+			border_color = "$zeren.prose.code.edge",
 			overflow = "hidden",
 			ui.row {
 				h = 34,
@@ -311,8 +311,8 @@ M.Diagram = ui.component(function(props: Props): Node
 					ui.text {
 						text,
 						font = "$font.mono",
-						text_size = "$zeron.prose.code.size",
-						line_height = "$zeron.prose.code.line",
+						text_size = "$zeren.prose.code.size",
+						line_height = "$zeren.prose.code.line",
 						color = "$text.primary",
 						literal = true,
 						pl = "$space.4",

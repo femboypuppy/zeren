@@ -65,7 +65,7 @@ local function cards(): Node
 	return ui.column { w_full = true, gap = "$space.4", table.unpack(list) }
 end
 
--- Nothing on this Mac: Zeron's own agents, a click each; Claude Code's
+-- Nothing on this Mac: Zeren's own agents, a click each; Claude Code's
 -- install runs through the Installing state.
 local function install(): Node
 	local rows: { Node } = {}
@@ -144,7 +144,7 @@ return {
 						if s == "looking" then
 							return "Looking for coding agents on this Mac…"
 						elseif s == "unavailable" then
-							return "Zeron runs the coding agents you already use."
+							return "Zeren runs the coding agents you already use."
 						elseif none_installed() then
 							return "None are on this Mac yet. Install one to continue."
 						end

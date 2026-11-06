@@ -1,13 +1,13 @@
 [package]
-name = "zeron-preview"
+name = "zeren-preview"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 publish.workspace = true
 
 [dependencies]
-zeron-proto.workspace = true
-zeron-preview-label.workspace = true
+zeren-proto.workspace = true
+zeren-preview-label.workspace = true
 tokio.workspace = true
 tokio-util = { workspace = true, features = ["rt"] }
 futures.workspace = true

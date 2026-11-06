@@ -58,7 +58,7 @@ local Terminal = ui.component(function(props: { who: Who, key: string, on_termin
 		h = 320,
 		rounded = "$radius.md",
 		overflow = "hidden",
-		bg = "$zeron.secondary.bg",
+		bg = "$zeren.secondary.bg",
 		ui.presence(kind, function(k: string): Node
 			if k == "failed" then
 				return ds.EmptyState {

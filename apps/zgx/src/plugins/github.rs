@@ -1,10 +1,10 @@
-//! A plugin's GitHub, lent by proxy ("github"): Zeron's own sign-in does the
+//! A plugin's GitHub, lent by proxy ("github"): Zeren's own sign-in does the
 //! asking, through the engine's GitHub calls (which resolve on the device
 //! where a session's checkout lives), and the plugin hears only what comes
 //! back. No token ever reaches a plugin's scripts, so none can be kept or
 //! sent elsewhere.
 //!
-//! A plugin names the sessions it shows (`zeron.github.watch_pr`); the host
+//! A plugin names the sessions it shows (`zeren.github.watch_pr`); the host
 //! keeps one watch of each one's pull request (`WatchCheckoutChangeRequest`,
 //! pushed by the engine as it changes, never polled by the plugin) and
 //! writes what it hears to `plugin.<id>.github`: `{ [session] = pr | false }`.
@@ -78,7 +78,7 @@ impl Default for Retry {
     }
 }
 
-/// What a plugin asked of GitHub (`zeron.github.pr(url)`, `.diff(url)`), as
+/// What a plugin asked of GitHub (`zeren.github.pr(url)`, `.diff(url)`), as
 /// the engine's call that answers it, or why it may not: reading needs
 /// "github"; and only a pull request's own address on GitHub is asked about.
 pub fn call(asked: &Json, may: impl Fn(&str) -> bool) -> Result<(&'static str, Json), String> {
@@ -162,7 +162,7 @@ pub fn call(asked: &Json, may: impl Fn(&str) -> bool) -> Result<(&'static str, J
     if asked["refresh"].as_bool() == Some(true) {
         params["refresh"] = json!(true);
     }
-    // The diff at the revisions the plugin shows (Zeron's viewer asks so),
+    // The diff at the revisions the plugin shows (Zeren's viewer asks so),
     // when both are commit ids.
     let oid = |v: &Json| v.as_str().filter(|s| s.len() == 40 && s.bytes().all(|b| b.is_ascii_hexdigit())).map(str::to_string);
     if method == "GetChangeRequestDiff"
@@ -249,8 +249,8 @@ mod tests {
     fn the_branch_its_latest_run_started_on_wins_over_the_one_it_was_made_on() {
         // Made on main; the agent branched off and its next run was stamped
         // on the new branch: that branch's pull request is the chat's.
-        let s = json!({ "cwd": "/w/atlas", "branch": "main", "source_branch": "zeron/readme-pr", "device": "mac" });
-        assert_eq!(watch_params(&s).unwrap()["branch"], json!("zeron/readme-pr"));
+        let s = json!({ "cwd": "/w/atlas", "branch": "main", "source_branch": "zeren/readme-pr", "device": "mac" });
+        assert_eq!(watch_params(&s).unwrap()["branch"], json!("zeren/readme-pr"));
         // Not stamped yet: the one it was made on.
         let s = json!({ "cwd": "/w/atlas", "branch": "main", "device": "mac" });
         assert_eq!(watch_params(&s).unwrap()["branch"], json!("main"));
@@ -270,11 +270,11 @@ mod tests {
     #[test]
     fn only_a_pull_request_on_github_is_asked_about_and_only_when_allowed() {
         let ok = |_: &str| true;
-        let url = "https://github.com/zeronsh/zeron/pull/1264";
+        let url = "https://github.com/femboypuppy/zeren/pull/1264";
         assert_eq!(call(&json!({ "op": "pr", "url": url }), ok).unwrap(), ("GetChangeRequest", json!({ "url": url })));
         assert_eq!(call(&json!({ "op": "diff", "url": url, "refresh": true }), ok).unwrap().1, json!({ "url": url, "refresh": true }));
         assert!(call(&json!({ "op": "pr", "url": url }), |_| false).unwrap_err().contains("wasn't allowed"));
-        for bad in ["https://evil.example/zeronsh/zeron/pull/1", "https://github.com/zeronsh/zeron/issues/1", "https://github.com/o/r/pull/1/../../x", "https://github.com/o/r/pull/"] {
+        for bad in ["https://evil.example/zeronsh/zeren/pull/1", "https://github.com/femboypuppy/zeren/issues/1", "https://github.com/o/r/pull/1/../../x", "https://github.com/o/r/pull/"] {
             assert!(call(&json!({ "op": "pr", "url": bad }), ok).is_err(), "{bad}");
         }
         assert!(call(&json!({ "op": "merge", "url": url }), ok).is_err(), "only what's listed");

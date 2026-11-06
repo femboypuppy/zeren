@@ -4,7 +4,7 @@
 -- setting switches every address at once. On ui/private_fixture.luau, and
 -- the settings pages on ui/shell_fixture.luau.
 
-local EMAILS = { "mara@halcyon.dev", "theo.lindqvist@halcyon.dev", "ines_duarte+zeron@north-wind.io" }
+local EMAILS = { "mara@halcyon.dev", "theo.lindqvist@halcyon.dev", "ines_duarte+zeren@north-wind.io" }
 
 local function shows(app: any, text: string): boolean
 	return app:tree():find(text, 1, true) ~= nil

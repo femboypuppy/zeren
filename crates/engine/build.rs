@@ -1,5 +1,5 @@
 //! The git commit this engine is built from, for its build id
-//! (`zeron_engine::build_id`): `ZERON_GIT_COMMIT`, or "unknown" outside a
+//! (`zeren_engine::build_id`): `ZEREN_GIT_COMMIT`, or "unknown" outside a
 //! checkout.
 fn main() {
     let commit = std::process::Command::new("git")
@@ -11,7 +11,7 @@ fn main() {
         .map(|s| s.trim().to_owned())
         .filter(|s| !s.is_empty())
         .unwrap_or_else(|| "unknown".into());
-    println!("cargo:rustc-env=ZERON_GIT_COMMIT={commit}");
+    println!("cargo:rustc-env=ZEREN_GIT_COMMIT={commit}");
     // (Run again only when this script changes: the build's own time is
     // the executable's, read as it runs, so a rebuild changes the id without
     // running this again.)

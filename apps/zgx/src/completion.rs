@@ -2,7 +2,7 @@
 //! skills for a chat's (or project's) folder on its device, as the shipping
 //! composer finds them (crates/ui/src/composer.rs: `ListCommands` and
 //! `ListSkills`, merged by `invocation_candidates`), each with the canonical
-//! reference a pick puts in the prompt (`zeron_proto::invocation`'s
+//! reference a pick puts in the prompt (`zeren_proto::invocation`'s
 //! `Invocation::link`), which the engine reads at send.
 //!
 //!   chat.invocations { harness, target = { chat? | space?, device?, path? } }
@@ -143,7 +143,7 @@ fn merge(commands: Result<Json, String>, skills: Result<Json, String>) -> Result
     }
 }
 
-/// `zeron_proto::invocation`'s name and path rules: what the canonical
+/// `zeren_proto::invocation`'s name and path rules: what the canonical
 /// reference carries unchanged.
 fn valid_name(name: &str) -> bool {
     !name.is_empty() && !name.chars().any(|c| c.is_control() || c.is_whitespace())
@@ -175,12 +175,12 @@ fn display_name(name: &str) -> String {
         .join(" ")
 }
 
-/// `Invocation::link`: `[/name](zeron-invoke:<hex of its JSON>)`.
+/// `Invocation::link`: `[/name](zeren-invoke:<hex of its JSON>)`.
 fn link(prefix: char, name: &str, invocation: &Json) -> String {
     let bytes = serde_json::to_vec(invocation).unwrap_or_default();
     let payload: String = bytes.iter().map(|b| format!("{b:02x}")).collect();
     let label = name.replace('\\', "\\\\").replace('[', "\\[").replace(']', "\\]").replace('`', "\\`");
-    format!("[{prefix}{label}](zeron-invoke:{payload})")
+    format!("[{prefix}{label}](zeren-invoke:{payload})")
 }
 
 /// The shipping composer's `invocation_candidates`.
@@ -244,7 +244,7 @@ mod tests {
     use super::*;
 
     fn decode(link: &str) -> Json {
-        let hex = link.split("zeron-invoke:").nth(1).unwrap().trim_end_matches(')');
+        let hex = link.split("zeren-invoke:").nth(1).unwrap().trim_end_matches(')');
         let bytes: Vec<u8> = (0..hex.len()).step_by(2).map(|i| u8::from_str_radix(&hex[i..i + 2], 16).unwrap()).collect();
         serde_json::from_slice(&bytes).unwrap()
     }
@@ -275,9 +275,9 @@ mod tests {
             &[json!({ "name": "review" })],
             &[json!({ "name": "a[b]", "path": "/s/x.md", "description": "", "enabled": true })],
         );
-        assert!(rows[0].link.starts_with("[/review](zeron-invoke:"));
+        assert!(rows[0].link.starts_with("[/review](zeren-invoke:"));
         assert_eq!(decode(&rows[0].link), json!({ "kind": "command", "name": "review" }));
-        assert!(rows[1].link.starts_with("[$a\\[b\\]](zeron-invoke:"));
+        assert!(rows[1].link.starts_with("[$a\\[b\\]](zeren-invoke:"));
         assert_eq!(decode(&rows[1].link), json!({ "kind": "skill", "name": "a[b]", "path": "/s/x.md" }));
     }
 

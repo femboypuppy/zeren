@@ -102,7 +102,7 @@ function M.chip(q: Quote, id: string): { [string]: any }
 end
 
 -- What attached passages add to a prompt: a block after the words, as
--- Zeron's review comments go (crates/ui comments.rs `with_comments`): a
+-- Zeren's review comments go (crates/ui comments.rs `with_comments`): a
 -- header, then a line a passage, who said it and when, its words after,
 -- each further line set in two. The agent reads whose words and where;
 -- the sent message shows them as chips again (`split` on the host's copy).

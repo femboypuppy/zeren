@@ -6,8 +6,8 @@ local recipe = ui.variants {
 	variants = {
 		style = {
 			display = {
-				text_size = "$zeron.display.size",
-				line_height = "$zeron.display.line",
+				text_size = "$zeren.display.size",
+				line_height = "$zeren.display.line",
 				weight = "$font.weight.semibold",
 				letter_spacing = -1,
 			},

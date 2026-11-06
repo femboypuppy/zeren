@@ -43,13 +43,13 @@ export type Props = {
 	top: number?,
 }
 
--- What the sidebar and its rail share: the view options (Zeron's Organize,
+-- What the sidebar and its rail share: the view options (Zeren's Organize,
 -- Sort and Show), its width, where sessions are put, and the session open.
 -- Kept across launches, but the session open (the route's) and the places
 -- (the engine's).
 local shared = {
 	compact = ui.persist("shell_sidebar_compact", true),
-	-- (One list, "Sessions", as Zeron's; by project is a view option.)
+	-- (One list, "Sessions", as Zeren's; by project is a view option.)
 	-- How it groups, as levels in order (`{ "project", "device" }`: by
 	-- project, then device; none, one list). Kept as one choice before
 	-- ("project"): read and kept as its levels from now (below).
@@ -65,9 +65,9 @@ local shared = {
 		harness = ui.persist("shell_sidebar_show_harness", true),
 		project_icon = ui.persist("shell_sidebar_show_project_icon", true),
 		location = ui.persist("shell_sidebar_show_location", true),
-		-- (Zeron's "Show archived": off until asked for.)
+		-- (Zeren's "Show archived": off until asked for.)
 		archived = ui.persist("shell_sidebar_show_archived", false),
-		-- (Zeron's project filter over the list: off until asked for.)
+		-- (Zeren's project filter over the list: off until asked for.)
 		project_filter = ui.persist("shell_sidebar_show_project_filter", false),
 		-- The projects with none but archived sessions, folded into one row
 		-- at the projects' end: listed there (closed until it's opened), or
@@ -377,7 +377,7 @@ local function only_project(): string?
 	end
 	return nil
 end
--- (The filter put away: it shows everything again, as Zeron's clears it.)
+-- (The filter put away: it shows everything again, as Zeren's clears it.)
 ui.effect(function()
 	if not shared.details.project_filter:get() and shared.project:peek() ~= nil then
 		shared.project:set(nil)
@@ -543,7 +543,7 @@ local projects = ui.computed(function(): { ds.SidebarProject }
 	return out
 end)
 
--- The project filter (Zeron's, its view options' "Project filter"): all
+-- The project filter (Zeren's, its view options' "Project filter"): all
 -- projects, or one, searched for, the list narrowed to it.
 local ALL = "::all"
 local function project_filter(): Node
@@ -575,7 +575,7 @@ local function project_filter(): Node
 				search = function(): string
 					return locale.s("shell.sidebar.project_filter.search")
 				end,
-				-- (Zeron's, pinned under the projects.)
+				-- (Zeren's, pinned under the projects.)
 				actions = {
 					{
 						label = ui.t("shell.sidebar.project_filter.new_project") :: any,
@@ -655,7 +655,7 @@ local function filter_notice(): Node
 end
 
 -- You, at the foot: your name, else your email; signed out, the
--- workspace's ("Local", as Zeron's: kept on this device).
+-- workspace's ("Local", as Zeren's: kept on this device).
 type User = { id: string?, name: string }
 local function user(): User
 	local u = auth.user:get()
@@ -746,7 +746,7 @@ local function foot_notes(): Node
 		ui.div {
 			w_full = true,
 			mt = function(): any
-				return if notice_h:get() > 0 then "$zeron.list.gap" else 0
+				return if notice_h:get() > 0 then "$zeren.list.gap" else 0
 			end,
 			star(),
 		},
@@ -754,7 +754,7 @@ local function foot_notes(): Node
 end
 
 -- "Star on GitHub", over you at the foot, until it's put away (its × or
--- following it), and then never again on this Mac: Zeron's, to where its
+-- following it), and then never again on this Mac: Zeren's, to where its
 -- landing page links.
 local REPO = "https://github.com/zeronsh/comet"
 local starred = ui.persist("shell_star_banner_dismissed", false)
@@ -779,12 +779,12 @@ function star(): Node
 			pl = "$space.2",
 			-- (Its × as far in from the end as from the top: (30 − 22) / 2.)
 			pr = "$space.1",
-			gap = "$zeron.space.tight",
+			gap = "$zeren.space.tight",
 			items = "center",
 			rounded = "$radius.lg",
-			bg = "$zeron.tone.accent.wash",
-			hover = { bg = "$zeron.tone.accent.edge" },
-			color = "$zeron.tone.accent.ink",
+			bg = "$zeren.tone.accent.wash",
+			hover = { bg = "$zeren.tone.accent.edge" },
+			color = "$zeren.tone.accent.ink",
 			cursor = "pointer",
 			on_click = function()
 				ui.invoke("open_url", REPO)
@@ -800,7 +800,7 @@ function star(): Node
 			ui.div { shrink = 0, y = 0.5, ds.Icon { name = "star-bold", size = 12 } },
 			ui.text { ui.t("shell.sidebar.star"), grow = 1, min_w = 0, text_size = "$font.size.xs", weight = "$font.weight.medium" },
 			ui.div {
-				theme = { zeron = { icon_button = { radius = control.nest("$radius.lg", "$space.1") } } },
+				theme = { zeren = { icon_button = { radius = control.nest("$radius.lg", "$space.1") } } },
 				ds.IconButton { icon = "close", label = ui.t("common.dismiss"), tooltip = locale.s("common.dismiss"), size = "sm", tone = "quiet", on_click = away },
 			},
 		}
@@ -810,7 +810,7 @@ end
 -- Renaming a session: which, and the name being typed.
 local renaming = ui.state("shell_renaming", nil :: string?)
 local rename_open = ui.state("shell_rename_open", false)
--- The session renamed in its row (Zeron's inline rename), while it is.
+-- The session renamed in its row (Zeren's inline rename), while it is.
 local renaming_row = ui.state("shell_renaming_row", nil :: string?)
 -- The session asked about deleting, and its dialog.
 local deleting = ui.state("shell_deleting", nil :: string?)
@@ -936,8 +936,8 @@ end)
 -- The sessions the list shows, in its order (those folded away, and those
 -- past a group's "Show N more", left out): ⌘1–9 go to its first nine.
 M.order = ui.state("shell_sidebar_order", {} :: { string })
--- ⌘ held alone: those nine wear their keys (Zeron's jump hints): shown at
--- once, as Zeron's are, kept through the ⌘1–9 they offer, and only while
+-- ⌘ held alone: those nine wear their keys (Zeren's jump hints): shown at
+-- once, as Zeren's are, kept through the ⌘1–9 they offer, and only while
 -- this window is the one typed in and no palette has the keys. Any other
 -- key pressed meanwhile is a shortcut (⌘C), not a look at them: they go
 -- until the modifiers held change again (`M.key_pressed`, from the shell's
@@ -997,12 +997,12 @@ function M.archive(id: string)
 	sessions.archive(id)
 end
 
--- A session's menu, as the gallery's (Zeron's sidebar chat menu): rename,
+-- A session's menu, as the gallery's (Zeren's sidebar chat menu): rename,
 -- pin, copy, move into one of your sections, archive (kept: Settings →
 -- Archived lists it), delete (for good, asked once more); then plugins'
 -- items, under their names (screens/plugins/menus: the app's registry of
 -- them, read as the menu opens).
--- (Copied, said so, as Zeron's: "Path copied".)
+-- (Copied, said so, as Zeren's: "Path copied".)
 local function copy(text: string?, what: string)
 	if text then
 		ui.clipboard.write(text)
@@ -1068,11 +1068,11 @@ local function menu(id: string): { any }?
 		},
 	}
 	table.insert(copies, {
-		label = locale.s("shell.sidebar.menu.zeron_link"),
+		label = locale.s("shell.sidebar.menu.zeren_link"),
 		icon = "arrow-up-right",
 		on_select = function()
 			sessions.link(id):after(function(link: any)
-				copy(if type(link) == "string" then link else nil, locale.s("shell.sidebar.menu.zeron_link"))
+				copy(if type(link) == "string" then link else nil, locale.s("shell.sidebar.menu.zeren_link"))
 			end, function()
 				ds.toast.show { title = locale.s("shell.sidebar.menu.link_not_ready"), tone = "danger" }
 			end)
@@ -1142,7 +1142,7 @@ local function menu(id: string): { any }?
 			label = locale.s("shell.sidebar.menu.delete"),
 			icon = "trash-bin-minimalistic",
 			danger = true,
-			-- (Asked once more, as Zeron's: "Delete session?")
+			-- (Asked once more, as Zeren's: "Delete session?")
 			on_select = function()
 				deleting:set(id)
 				delete_open:set(true)
@@ -1244,7 +1244,7 @@ local function project_dialogs(): Node
 		end
 		return n
 	end
-	-- (Its sessions as Zeron counts them: those in it, not archived.)
+	-- (Its sessions as Zeren counts them: those in it, not archived.)
 	local function removing(): string
 		local id = project_acting:get()
 		local p = project_of(id)
@@ -1350,7 +1350,7 @@ local function project_dialogs(): Node
 	}
 end
 
--- Deleting a session, asked once more (Zeron's "Delete session?"): for
+-- Deleting a session, asked once more (Zeren's "Delete session?"): for
 -- good, so its red Delete waits on Cancel.
 local function delete_dialog(): Node
 	local function says(): string
@@ -1459,7 +1459,7 @@ M.Sidebar = ui.component(function(props: Props): Node
 		end,
 		notice = if props.island
 			then nil
-			else ui.column { w_full = true, gap = "$zeron.list.gap", project_filter(), filter_notice() },
+			else ui.column { w_full = true, gap = "$zeren.list.gap", project_filter(), filter_notice() },
 		tip = if props.island then nil else foot_notes(),
 		-- (The rail has no list to scroll, and its own folds.)
 		offset = if props.island then nil else shared.offset,
@@ -1506,7 +1506,7 @@ end)
 -- `Sidebar { … }` builds it; `sidebar.pin(id)`, `sidebar.archive(id)` and
 -- `sidebar.rename(id)` act on a session as its menu does.
 function M.rename(id: string)
-	-- In its row, where the list shows it (as Zeron's); else (folded away,
+	-- In its row, where the list shows it (as Zeren's); else (folded away,
 	-- filtered out) the dialog.
 	if table.find(M.order:peek(), id) then
 		renaming_row:set(id)

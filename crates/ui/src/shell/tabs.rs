@@ -414,7 +414,7 @@ impl Shell {
         // header over the empty canvas was noise); the bar keeps its height,
         // drag region, and buttons. Where a session runs, and its side-chat
         // and project actions, live in the session card.
-        let (title, harness, on_canvas): (SharedString, Option<zeron_proto::HarnessId>, bool) = {
+        let (title, harness, on_canvas): (SharedString, Option<zeren_proto::HarnessId>, bool) = {
             let state = self.state.read(cx);
             match state.selected_chat_row() {
                 Some(chat) => (
@@ -455,7 +455,7 @@ impl Shell {
                         !side.archived
                             && side.parent_chat_id.as_deref() == Some(chat)
                             && state.display_status_for(side, now)
-                                == zeron_proto::ChatIndicator::Working
+                                == zeren_proto::ChatIndicator::Working
                     })
                     .count() as u32;
                 state.running_subagents_for(chat, now) + side_chats

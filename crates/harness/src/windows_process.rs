@@ -171,7 +171,7 @@ const MACHINE_ENVIRONMENT: &str = r"SYSTEM\CurrentControlSet\Control\Session Man
 
 /// The persisted PATH a new login session would get (machine entries, then
 /// the user's), read now rather than inherited at our start: a Node or CLI
-/// installed while zeron runs updates the registry, not our environment.
+/// installed while zeren runs updates the registry, not our environment.
 /// `%VAR%` references resolve against our environment first, then the
 /// persisted user and machine variables (nvm-windows' `%NVM_SYMLINK%` is
 /// defined by the same install that adds it to PATH).

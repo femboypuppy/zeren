@@ -5,7 +5,7 @@
 Captured from the fixture (production Shell over an isolated in-process engine, synthetic transcript, no agent runs), cropped to the transcript:
 
 ```bash
-cargo run -p zeron-ui --features appshots-fixture,resource-profile --example subagent-fold-fixture -- [hold-secs] [app-id]
+cargo run -p zeren-ui --features appshots-fixture,resource-profile --example subagent-fold-fixture -- [hold-secs] [app-id]
 ```
 
 It prints `READY` once the fold is open and keeps the window up for capture (`grim -T` here).

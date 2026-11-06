@@ -1,6 +1,6 @@
 --!strict
 -- What a plugin asks for, in plain words: each permission's line on the
--- consent sheet and the Plugins page, and where in Zeron a selector or a
+-- consent sheet and the Plugins page, and where in Zeren a selector or a
 -- screen is. One place, so the sheet and the page always say the same thing.
 --
 --   words.permission(item, "ui.change")  { title, detail?, risky?, icon }
@@ -24,7 +24,7 @@ local function s(key: string, args: { [string]: any }?): string
 	return ui.t(key, args):get()
 end
 
--- Where each of Zeron's named elements is, as a person would say it (the
+-- Where each of Zeren's named elements is, as a person would say it (the
 -- host's map, src/plugins/elements.rs, says the same): its message's key.
 local ELEMENTS: { [string]: string } = {
 	["#shell"] = "plugins.words.place.window",
@@ -103,7 +103,7 @@ function M.place(target: string): string
 	if screen and AREAS[screen] then
 		return s(AREAS[screen])
 	end
-	return s("plugins.words.place.zeron")
+	return s("plugins.words.place.zeren")
 end
 
 -- "the sidebar and the title bar": each place once, in order.
@@ -118,7 +118,7 @@ function M.places(targets: { string }?): string
 		end
 	end
 	if #out == 0 then
-		return s("plugins.words.place.zeron_parts")
+		return s("plugins.words.place.zeren_parts")
 	elseif #out == 1 then
 		return out[1]
 	end
@@ -186,7 +186,7 @@ local function hosts_said(hosts: { any }?, near: any): { list: { string }, near:
 	return { list = list, near = any_near }
 end
 
--- What of Zeron's interface it reaches, exactly as it names it: a detail
+-- What of Zeren's interface it reaches, exactly as it names it: a detail
 -- under its asks, never an ask of its own. `{ { title, list } }`, empty
 -- when it reaches none.
 function M.details(item: any): { { title: string, list: { string } } }
@@ -246,7 +246,7 @@ function M.permission(item: any, permission: string): Line
 	if permission == "ui.add" then
 		return line(false, "widget", "plugins.words.permission.ui_add.title")
 	elseif permission == "ui.change" then
-		-- (Where, exactly, is a detail: `M.details`. No part of Zeron's
+		-- (Where, exactly, is a detail: `M.details`. No part of Zeren's
 		-- interface is an ask of its own.)
 		return line(false, "pen", "plugins.words.permission.ui_change.title", "plugins.words.permission.ui_change.detail", function()
 			return { places = M.places(ui_lists.change) }
@@ -397,8 +397,8 @@ function M.diff(item: any): { Line }
 		end
 		table.insert(out, line(true, "danger-triangle", if after == nil then "plugins.words.diff.mcp_gone" else "plugins.words.diff.mcp", nil, nil, { literal = said }))
 	end
-	-- (What of Zeron's interface it changes is never an ask: `M.details`.
-	-- A screen it replaces runs as Zeron's own code: an ask, as running
+	-- (What of Zeren's interface it changes is never an ask: `M.details`.
+	-- A screen it replaces runs as Zeren's own code: an ask, as running
 	-- a program is.)
 	if some(d.ui_replace_added) then
 		table.insert(out, line(true, "danger-triangle", "plugins.words.diff.ui_replace", "plugins.words.permission.ui_replace.detail", function()
@@ -465,8 +465,8 @@ end
 
 function M.author(item: any): string
 	local a = item.author or {}
-	if a.kind == "zeron" then
-		return s("plugins.words.author.zeron")
+	if a.kind == "zeren" then
+		return s("plugins.words.author.zeren")
 	elseif a.kind == "you" then
 		return s("plugins.words.author.you")
 	elseif a.kind == "verified" and a.username then
@@ -477,8 +477,8 @@ function M.author(item: any): string
 	return M.from(item.source) or s("plugins.words.author.unknown")
 end
 
--- Whether Zeron can't vouch for who made it: someone else's, signed by no
--- one Zeron knows (Zeron's own and yours never). A template's item is its
+-- Whether Zeren can't vouch for who made it: someone else's, signed by no
+-- one Zeren knows (Zeren's own and yours never). A template's item is its
 -- `imported`'s author, as a plugin's is its own.
 function M.unverified(item: any): boolean
 	if type(item) ~= "table" or item.builtin or item.own then
@@ -528,7 +528,7 @@ function M.about(item: any): string
 	return if item.description and item.description ~= "" then item.description else s("plugins.words.about.no_description")
 end
 
--- What one of Zeron's own is allowed, said under its description: they're
+-- What one of Zeren's own is allowed, said under its description: they're
 -- allowed what they ask without asking you, so it's never out of sight.
 -- Nil for any other, or one that isn't working.
 function M.grants(item: any): string?

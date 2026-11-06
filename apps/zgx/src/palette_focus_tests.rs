@@ -104,7 +104,7 @@ enum Close {
     /// ⌘K again: the shell's command shuts it.
     Toggle,
     /// Escape, the scripts having reloaded meanwhile (a save while it's
-    /// open, as other chats save Zeron's files).
+    /// open, as other chats save Zeren's files).
     Reloaded,
     /// Escape, the sessions having changed meanwhile (one starts working,
     /// one finishes, one renamed elsewhere), as the engine's do.

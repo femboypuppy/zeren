@@ -154,7 +154,7 @@ function M.AvatarStack(props: StackProps): Node
 				w = size,
 				h = size,
 				rounded = "$radius.full",
-				bg = "$zeron.secondary.hover",
+				bg = "$zeren.secondary.hover",
 				items = "center",
 				justify = "center",
 				ui.text {

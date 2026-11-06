@@ -168,7 +168,7 @@ const repoTokenAad = (userId: string, key: string): string => `${userId}|github|
 
 /** Why a session can't reach `owner`, in words the engine shows the user. */
 const notInstalled = (owner: string, slug: string | undefined): string =>
-  `github_app_not_installed: The Zeron GitHub App isn't installed on ${owner}` +
+  `github_app_not_installed: The Zeren GitHub App isn't installed on ${owner}` +
   (slug ? ` — install it at ${installUrl(slug)}` : "");
 
 const hardExpired = (row: AccountRow, now: number): boolean =>
@@ -630,7 +630,7 @@ export class VaultAccount extends DurableObject<Env> {
       case "failed":
         return fail("upstream", `GitHub repository lookup failed: ${access.reason}`);
       case "none":
-        return fail("not_found", `Your GitHub account can't reach ${repo} through the Zeron app.`);
+        return fail("not_found", `Your GitHub account can't reach ${repo} through the Zeren app.`);
       case "ok":
         break;
     }

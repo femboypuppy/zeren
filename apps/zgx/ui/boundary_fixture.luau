@@ -7,7 +7,7 @@ local ds = require("@ds")
 ds.setup()
 local boundary = require("@app/screens/shell/boundary")
 
--- What the plugin system does for a template that fails: Zeron's own in
+-- What the plugin system does for a template that fails: Zeren's own in
 -- its place at once (here, a stand-in), and nothing for anything else.
 boundary.on_fail(function(module: string, _why: string): Node?
 	if module == "@app/screens/shell/templated" then
@@ -16,7 +16,7 @@ boundary.on_fail(function(module: string, _why: string): Node?
 	return nil
 end)
 
--- What the plugin system does once it has swapped a module for Zeron's
+-- What the plugin system does once it has swapped a module for Zeren's
 -- own: that screen made again, alone.
 ui.command {
 	id = "rebuild",

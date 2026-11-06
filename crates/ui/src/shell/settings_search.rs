@@ -379,7 +379,7 @@ impl Shell {
 #[cfg(test)]
 mod tests {
     use gpui::{TestAppContext, VisualTestContext};
-    use zeron_theme::{AccentSelection, SurfacePreference, ThemeSelection};
+    use zeren_theme::{AccentSelection, SurfacePreference, ThemeSelection};
 
     use super::*;
     use crate::settings::search::{
@@ -424,7 +424,7 @@ mod tests {
                     edge_token: None,
                     org_id: None,
                     workos_client_id: None,
-                    default_harness: zeron_proto::HarnessId::Mock,
+                    default_harness: zeren_proto::HarnessId::Mock,
                 },
                 cx,
             )
@@ -671,7 +671,7 @@ mod tests {
         // A provider's details draw only once it is expanded, with its data
         // loaded: draw every section they can show, and hold those rows to
         // the same agreement. The provider's own name is not a setting.
-        let harness = zeron_proto::HarnessId::ClaudeCode;
+        let harness = zeren_proto::HarnessId::ClaudeCode;
         shell.update(cx, |shell, cx| {
             shell.open_settings(SettingsSection::Harnesses, cx)
         });

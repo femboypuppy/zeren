@@ -59,7 +59,7 @@ end
 -- stands the nonce check in: see `test.web_message`.)
 local function pick(app: any, nonce: number, element: string, marker: number)
 	app:set_state("test_web_message", {
-		kind = "zeron.annotation",
+		kind = "zeren.annotation",
 		nonce = nonce,
 		event = "pick",
 		pick = {
@@ -83,7 +83,7 @@ local function pick(app: any, nonce: number, element: string, marker: number)
 end
 
 local function ended(app: any, nonce: number, how: string)
-	app:set_state("test_web_message", { kind = "zeron.annotation", nonce = nonce, event = "state", state = how })
+	app:set_state("test_web_message", { kind = "zeren.annotation", nonce = nonce, event = "state", state = how })
 	app:command("test.web_message")
 	app:frames(3)
 end

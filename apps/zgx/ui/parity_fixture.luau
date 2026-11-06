@@ -128,7 +128,7 @@ route.open_session("chat-1")
 return ui.row {
 	w_full = true,
 	h_full = true,
-	bg = "$zeron.window",
+	bg = "$zeren.window",
 	-- The chat page: its session, and the window's composer over it.
 	ui.overlay {
 		id = "parity-page",

@@ -1,6 +1,6 @@
-//! What agents are told of Zeron's interface, to make a template of it: the
+//! What agents are told of Zeren's interface, to make a template of it: the
 //! catalog of screens (each module, its file, what it draws and the elements
-//! it names: `#id`s and `.class`es), written into Zeron's own copy as
+//! it names: `#id`s and `.class`es), written into Zeren's own copy as
 //! `.catalog.json` (`live`). The engine reads it for `describe_app` and
 //! `create_template`.
 //!

@@ -1,4 +1,4 @@
--- A reply's markdown, set for reading, from what Zeron's transcript draws
+-- A reply's markdown, set for reading, from what Zeren's transcript draws
 -- (crates/ui/src/markdown/render.rs) and a step past it.
 --
 -- `Markdown { text }`: `text` a string, or a function of the text as it
@@ -97,7 +97,7 @@ export type Props = {
 	-- wholly above it changes.)
 	window: { key: string, view: Ref, offset: State<number>, live: (() -> boolean)?, at_end: State<boolean>?, row: Ref? }?,
 	-- A reply's own pictures (screens/chat/reply_images): each drawn as
-	-- Zeron's reply image row (ds/reply_picture), read as it is asked for;
+	-- Zeren's reply image row (ds/reply_picture), read as it is asked for;
 	-- `group` names the reply, whose pictures open together in the
 	-- lightbox (← →).
 	pictures: ReplyPicture.Pictures?,
@@ -124,7 +124,7 @@ export type Find = {
 
 -- What a document's links and pictures resolve by (Props' `image`, `open`).
 -- The streaming veil: text arriving is laid out at once and fades in, colour only, so
--- nothing moves or wraps for it (as Zeron's crates/veil). Each paragraph remembers what
+-- nothing moves or wraps for it (as Zeren's crates/veil). Each paragraph remembers what
 -- it has shown; what's new is a chunk, fading exactly once, its time following how fast
 -- text is coming. Kept by the reply's key, so a row made again doesn't fade again.
 local VEIL_MIN, VEIL_MAX, VEIL_EMA_SEED, VEIL_GAP_MAX = 120, 400, 160, 1000
@@ -349,11 +349,11 @@ local function number_tasks(list: { MarkdownBlock }, into: { [any]: number })
 end
 
 
-local SIZE = "$zeron.prose.size"
-local LINE = "$zeron.prose.line"
+local SIZE = "$zeren.prose.size"
+local LINE = "$zeren.prose.line"
 -- The small setting's (`small`).
-local SMALL_SIZE = "$zeron.prose.small.size"
-local SMALL_LINE = "$zeron.prose.small.line"
+local SMALL_SIZE = "$zeren.prose.small.size"
+local SMALL_LINE = "$zeren.prose.small.line"
 
 -- The text's size and line as the context sets them.
 local function size_of(ctx: Ctx?): (string, string)
@@ -369,13 +369,13 @@ local function opens(a: string): boolean
 	return string.match(a, "^https?://") ~= nil or string.match(a, "^mailto:") ~= nil
 end
 
--- A mention in a prompt (Zeron's `[name](zeron-file:path)`, a chat's
--- `zeron-chat:`): a chip in the line, as Zeron's sent bubble draws it
+-- A mention in a prompt (Zeren's `[name](zeren-file:path)`, a chat's
+-- `zeren-chat:`): a chip in the line, as Zeren's sent bubble draws it
 -- (transcript.rs `user_bubble_text`, composer/chip.rs `paint_chip`): its
 -- name in the body's ink on the composer chip's wash, corner 5, its file's
 -- icon (or a chat's) before it. Its click is the document's `open`.
 local function mention_chip(span: { [any]: any }, target: string, name: string)
-	local chat = string.match(target, "^zeron%-chat:") ~= nil
+	local chat = string.match(target, "^zeren%-chat:") ~= nil
 	local dir = string.sub(target, -1) == "/"
 	local set = if string.find(ui.theme.kind(), "dark", 1, true) then "dark" else "light"
 	-- (One pill, zgx d6582b32: icon, gap, name and padding on one wash,
@@ -384,10 +384,10 @@ local function mention_chip(span: { [any]: any }, target: string, name: string)
 	span.underline = false
 	span.underline_offset = nil
 	span.hover = nil
-	span.bg = "$zeron.composer.chip.bg"
+	span.bg = "$zeren.composer.chip.bg"
 	span[1] = name
 	span.padding = { 2, 2 }
-	span.radius = ui.raw(5, "Zeron's inline chip corner (chip.rs)")
+	span.radius = ui.raw(5, "Zeren's inline chip corner (chip.rs)")
 	span.icon = if chat
 		then { src = "assets/icons/ui/chat-round-line.svg", size = 14, gap = 3, tint = "currentColor" }
 		else { src = `assets/icons/files/{set}/{FileIcon.of(name, dir)}.svg`, size = 14, gap = 3 }
@@ -479,7 +479,7 @@ local function runs(list: { MarkdownRun }, style: { [string]: any }?, ctx: Ctx?)
 			props[k] = v
 		end
 	end
-	local inline = ui.theme.get("zeron.prose.code.inline")
+	local inline = ui.theme.get("zeren.prose.code.inline")
 	-- A find's matches in the paragraph's words, numbered on from the
 	-- block's count so far; each span cut where one starts or ends.
 	local f = if ctx then ctx.find else nil
@@ -530,7 +530,7 @@ local function runs(list: { MarkdownRun }, style: { [string]: any }?, ctx: Ctx?)
 				end
 				local hit = table.clone(span)
 				hit[1] = string.sub(text, s - from + 1, e - from + 1)
-				hit.bg = if base + i == cur then "$zeron.editor.match_current" else "$zeron.editor.match"
+				hit.bg = if base + i == cur then "$zeren.editor.match_current" else "$zeren.editor.match"
 				table.insert(props, ui.span(hit))
 				at = e + 1
 			end
@@ -544,7 +544,7 @@ local function runs(list: { MarkdownRun }, style: { [string]: any }?, ctx: Ctx?)
 	for _, run in list do
 		-- A picture among the words, not drawn as one (a reply's that it can
 		-- show are: `block`'s paragraph): the link it is, by its alt or its
-		-- file's name, as Zeron's markdown keeps a picture the host won't
+		-- file's name, as Zeren's markdown keeps a picture the host won't
 		-- draw. (One byte to a find: ds/markdown_find `words`.)
 		local r = run
 		if run.img then
@@ -567,18 +567,18 @@ local function runs(list: { MarkdownRun }, style: { [string]: any }?, ctx: Ctx?)
 			-- In code's font (Settings → Appearance; a span takes a family,
 			-- not a token), as code blocks are.
 			span.font = look.code_family()
-			span.bg = "$zeron.code.wash"
+			span.bg = "$zeren.code.wash"
 			span.padding = { 4, 1 }
-			-- Zeron's inline code corner (markdown/render.rs's 4.5), each
+			-- Zeren's inline code corner (markdown/render.rs's 4.5), each
 			-- line's piece of a wrapped span rounded on its own.
-			span.radius = ui.raw(4.5, "Zeron's inline code corner")
+			span.radius = ui.raw(4.5, "Zeren's inline code corner")
 			span.text_size = inline
 		end
 		if r.a then
 			span.underline = true
 			span.underline_offset = 4
 			span.hover = { underline = true, color = "$accent" }
-			if string.match(r.a, "^zeron%-file:") or string.match(r.a, "^zeron%-chat:") then
+			if string.match(r.a, "^zeren%-file:") or string.match(r.a, "^zeren%-chat:") then
 				mention_chip(span, r.a, r.x)
 			end
 			local target = r.a
@@ -640,8 +640,8 @@ local function code_text(text: string, lang: string, wrap: boolean?, find: CodeF
 	local props: { [any]: any } = {
 		wrap = wrap,
 		font = "$font.mono",
-		text_size = "$zeron.prose.code.size",
-		line_height = "$zeron.prose.code.line",
+		text_size = "$zeren.prose.code.size",
+		line_height = "$zeren.prose.code.line",
 		color = "$text.primary",
 		literal = true,
 		pl = "$space.4",
@@ -672,7 +672,7 @@ local function code_text(text: string, lang: string, wrap: boolean?, find: CodeF
 					string.sub(t, s - from + 1, e - from + 1),
 					color = color,
 					literal = true,
-					bg = if base + i == cur then "$zeron.editor.match_current" else "$zeron.editor.match",
+					bg = if base + i == cur then "$zeren.editor.match_current" else "$zeren.editor.match",
 				})
 				at = e + 1
 			end
@@ -738,9 +738,9 @@ local CodeBlock = ui.component(function(props: { lang: string, text: string, cla
 		w_full = true,
 		min_w = 0,
 		rounded = "$radius.xl",
-		bg = "$zeron.prose.code.bg",
+		bg = "$zeren.prose.code.bg",
 		border = 1,
-		border_color = "$zeron.prose.code.edge",
+		border_color = "$zeren.prose.code.edge",
 		overflow = "hidden",
 		ui.row {
 			h = 34,
@@ -954,7 +954,7 @@ local function block(b: MarkdownBlock, ink: string?, ctx: Ctx?): Node
 	if b.t == "p" then
 		local style = if ink then { color = ink } else nil
 		-- Pictures among a reply's words that it can show: drawn, the words
-		-- around them lines of their own above and below, as Zeron's
+		-- around them lines of their own above and below, as Zeren's
 		-- markdown draws a picture its host takes (render.rs
 		-- `text_element`); those with only spaces between on one tray. One
 		-- it won't show stays its link (`runs`).
@@ -1007,7 +1007,7 @@ local function block(b: MarkdownBlock, ink: string?, ctx: Ctx?): Node
 		return runs(b.s, style, ctx)
 	elseif b.t == "h" then
 		local level = math.min(b.l, 3)
-		local key = `zeron.prose.h{level}`
+		local key = `zeren.prose.h{level}`
 		-- (Set small, a heading keeps the prose's size: a thought's heading
 		-- is a title in the margin, not a chapter's.)
 		local small = ctx ~= nil and ctx.small == true
@@ -1131,7 +1131,7 @@ local function block(b: MarkdownBlock, ink: string?, ctx: Ctx?): Node
 				}
 			)
 		end
-		return ui.column { role = "list", w_full = true, gap = "$zeron.space.tight", items }
+		return ui.column { role = "list", w_full = true, gap = "$zeren.space.tight", items }
 	elseif b.t == "quote" then
 		return ui.row {
 			class = "md-quote",
@@ -1151,7 +1151,7 @@ local function block(b: MarkdownBlock, ink: string?, ctx: Ctx?): Node
 			wrap = false,
 			h = 36,
 			px = "$space.4",
-			text_size = "$zeron.prose.small.size",
+			text_size = "$zeren.prose.small.size",
 			line_height = 36,
 		}
 		local cols: { Node } = {}
@@ -1189,7 +1189,7 @@ local function block(b: MarkdownBlock, ink: string?, ctx: Ctx?): Node
 	elseif (b.t == "img" or b.t == "pics") and ctx and ctx.pictures then
 		-- A reply's pictures (ds/reply_picture): one alone, or several that
 		-- follow one another together on a tray. One it won't draw (a URL, a
-		-- home path, a GIF) is the link the reply wrote, as Zeron keeps it.
+		-- home path, a GIF) is the link the reply wrote, as Zeren keeps it.
 		local pictures = ctx.pictures :: ReplyPicture.Pictures
 		local group = ctx.group or "reply"
 		local function set(): { ReplyPicture.Entry }

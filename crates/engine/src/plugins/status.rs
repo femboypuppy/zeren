@@ -4,7 +4,7 @@
 //! A decision binds what was allowed: the author's key (or, for an Unknown
 //! author, the exact content) and the capability record shown at consent
 //! (`capability.rs`). Anything that grows past that record asks again, for
-//! every author but Zeron: a same-key update, an edit to your own plugin.
+//! every author but Zeren: a same-key update, an edit to your own plugin.
 //! Own plugins get no automatic decision: one asking for nothing is `on` at
 //! once; one asking for anything waits for Review.
 
@@ -70,7 +70,7 @@ impl State {
     }
 
     /// Forget own ids and decisions whose plugin is gone (`present`: the
-    /// ids with a folder, yours and Zeron's). A stale own id would make a
+    /// ids with a folder, yours and Zeren's). A stale own id would make a
     /// stranger's package of that name yours. Whether anything went.
     pub fn prune(&mut self, present: &BTreeSet<String>) -> bool {
         let (own, decisions) = (self.own.len(), self.decisions.len());
@@ -85,8 +85,8 @@ impl State {
 pub enum Author {
     /// This device's own key (or a plugin being made here).
     You,
-    /// One of Zeron's own, shipped inside the app (`SetBuiltinPlugins`).
-    Zeron,
+    /// One of Zeren's own, shipped inside the app (`SetBuiltinPlugins`).
+    Zeren,
     Verified {
         #[serde(skip_serializing_if = "Option::is_none")]
         username: Option<String>,
@@ -231,9 +231,9 @@ pub fn decide(facts: &Facts<'_>, decision: Option<&Decision>) -> Verdict {
     }
 
     match facts.author {
-        // Zeron's own: allowed what it asks as it ships, on unless turned
+        // Zeren's own: allowed what it asks as it ships, on unless turned
         // off (`scan::builtin_entry` settles it; this is its default).
-        Author::Zeron => verdict(
+        Author::Zeren => verdict(
             if decision.is_some_and(|d| d.off) { Status::Off } else { Status::On },
             all(),
             Vec::new(),

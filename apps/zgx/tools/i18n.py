@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Zeron's words (ui/locales): keep the catalog whole while it grows.
+"""Zeren's words (ui/locales): keep the catalog whole while it grows.
 
   tools/i18n.py merge <fragment.json>   add a fragment's keys to en.json (a
                                         lock held: several editors at once);
@@ -47,7 +47,7 @@ PSEUDO = "en-XA"
 # Kept in English in every locale: product and proper names, and what the
 # source spells in another language already.
 SAME_OK = re.compile(
-    r"^(Zeron|Appshots|GitHub|Cloud|Claude|Codex|Claude Code|Gemini|Grok|Cursor|OpenCode|Amp|"
+    r"^(Zeren|Appshots|GitHub|Cloud|Claude|Codex|Claude Code|Gemini|Grok|Cursor|OpenCode|Amp|"
     r"Git|Slack|Linear|macOS|Mac|iOS|Android|Linux|Windows|Geist|English|简体中文|"
     r"OK|URL|API|PR|SSH|MCP|JSON|PNG|PDF)$"
 )
@@ -285,7 +285,7 @@ def scripts():
 
 
 # ui.t in screens, the design system's locale.t / locale.s (ds/locale.luau).
-T_CALL = re.compile(r"""(?:ui\.t|locale\.[ts]|zeron\.[ts])\(\s*(["'`])([^"'`]+)\1""")
+T_CALL = re.compile(r"""(?:ui\.t|locale\.[ts]|zeren\.[ts])\(\s*(["'`])([^"'`]+)\1""")
 
 
 def used_keys():
@@ -294,10 +294,10 @@ def used_keys():
         with open(path, encoding="utf-8") as f:
             for i, line in enumerate(f, 1):
                 # (Not what a comment shows as an example.)
-                line = re.sub(r"--.*$", "", line) if "--" in line and re.search(r"(ui\.t|locale\.[ts]|zeron\.[ts])\(", line.split("--", 1)[1]) else line
+                line = re.sub(r"--.*$", "", line) if "--" in line and re.search(r"(ui\.t|locale\.[ts]|zeren\.[ts])\(", line.split("--", 1)[1]) else line
                 for m in T_CALL.finditer(line):
-                    if SCRIPTS != UI and not m.group(0).startswith("zeron."):
-                        continue  # (a plugin's own keys are zeron.t's)
+                    if SCRIPTS != UI and not m.group(0).startswith("zeren."):
+                        continue  # (a plugin's own keys are zeren.t's)
                     keys.setdefault(m.group(2), f"{os.path.relpath(path, ROOT)}:{i}")
     return keys
 
@@ -470,7 +470,7 @@ def cmd_keys(prefix):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    # Another catalog than Zeron's: a plugin's (`--locales
+    # Another catalog than Zeren's: a plugin's (`--locales
     # plugins-builtin/github/locales`), for check, apply and keys.
     if "--locales" in args:
         at = args.index("--locales")

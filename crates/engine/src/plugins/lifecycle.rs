@@ -16,7 +16,7 @@ use std::time::Duration;
 
 use serde::Deserialize;
 use serde_json::{Value, json};
-use zeron_rpc::{RpcError, RpcReply, methods, parse_params};
+use zeren_rpc::{RpcError, RpcReply, methods, parse_params};
 
 use super::capability;
 use super::install::{self, Package, Source};
@@ -183,7 +183,7 @@ impl Plugins {
         }
         source.version = package.manifest.version.clone();
         source.installed_at = now_secs();
-        let local = zeron_rpc::caller().is_local();
+        let local = zeren_rpc::caller().is_local();
         let author = self.resolve_now(&package.key).await;
         let plugins_dir = self.inner.plugins_dir.clone();
         let staged = package.clone();
@@ -375,7 +375,7 @@ impl Plugins {
         self.rescan().await;
         let entry = self.entry(id).ok_or_else(|| failed(format!("There's no plugin {id}")))?;
         if entry.item.builtin {
-            return Err(failed("Built-in plugins update when Zeron does"));
+            return Err(failed("Built-in plugins update when Zeren does"));
         }
         let mut found = install::found(&self.inner.plugins_dir, id, &entry.item.hash);
         if found.is_none() {

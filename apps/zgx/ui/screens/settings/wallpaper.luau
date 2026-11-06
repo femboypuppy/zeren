@@ -9,7 +9,7 @@
 --   wallpaper.missing()      whether the kept copy has gone
 --   wallpaper.adjusting      the Adjust dialog's state (open, its draft)
 --   wallpaper.problem_text() what went wrong, in the locale shown ("" nothing)
---   wallpaper.EffectSelect(state)  Zeron's effects, as a select
+--   wallpaper.EffectSelect(state)  Zeren's effects, as a select
 
 local ds = require("@ds")
 local appearance = require("@app/screens/shell/appearance")
@@ -17,7 +17,7 @@ local host = require("@app/screens/settings/host")
 
 local M = {}
 
--- Zeron's effects as a select (Appearance's over your picture, and on a
+-- Zeren's effects as a select (Appearance's over your picture, and on a
 -- plugin's settings page over its wallpaper).
 function M.EffectSelect(value: State<string>): Node
 	return ds.Select {

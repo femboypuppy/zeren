@@ -1,5 +1,5 @@
 -- The gallery's Command palette page: ⌘K (while this page shows) or the
--- button opens it over hundreds of sessions, Zeron's actions, places and
+-- button opens it over hundreds of sessions, Zeren's actions, places and
 -- settings. What it did shows under the button. A page is
 -- { id, title, about, demo }: `demo` builds what the page shows.
 
@@ -42,7 +42,7 @@ local PROJECTS = {
 	{ name = "zui", hue = "teal" },
 	{ name = "tidepool", hue = "orange" },
 	{ name = "landing", hue = "pink" },
-	{ name = "zeron-edge", hue = "emerald" },
+	{ name = "zeren-edge", hue = "emerald" },
 }
 local DEVICES = { "MacBook Pro", "devbox", "studio", "Cloud" }
 local AGENTS = { "claude", "openai", "claude", "cursor", "grok", "claude", "openai" }
@@ -96,7 +96,7 @@ end
 
 local now = os.time()
 local SESSIONS: { Item } = {
-	session("s-onboarding", "Onboarding in zgx", 1, { status = "working", time = now, branch = "zeron/zgx-onboarding", pinned = true, pr = { number = 1094, state = "draft" } }),
+	session("s-onboarding", "Onboarding in zgx", 1, { status = "working", time = now, branch = "zeren/zgx-onboarding", pinned = true, pr = { number = 1094, state = "draft" } }),
 	session("s-release", "Release v0.2.130", 1, { status = "approval", time = now - 120, branch = "release/v0.2.130", pinned = true, pr = { number = 1092, state = "open" } }),
 	session("s-rebase", "Which branch should this rebase onto?", 2, { status = "input", time = now - 240, agent = "openai", device = "devbox", branch = "main" }),
 	session("s-presence", "Rename the presence room", 1, { status = "done", time = now - 720, branch = "presence-rename" }),
@@ -225,7 +225,7 @@ local function branches_page(): CommandPalette.Page
 		load = function(done)
 			ui.after(1100, function()
 				local items: { Item } = {}
-				for i, b in { "main", "zeron/zgx-onboarding", "release/v0.2.130", "fix/local-first", "presence-rename", "ios/duo-fold", "ws3/pong", "site/pricing" } do
+				for i, b in { "main", "zeren/zgx-onboarding", "release/v0.2.130", "fix/local-first", "presence-rename", "ios/duo-fold", "ws3/pong", "site/pricing" } do
 					local item: Item = {
 						id = `branch-{i}`,
 						label = b,
@@ -281,7 +281,7 @@ local COMMANDS: { Item } = {
 		page = effort_page,
 	},
 	{ id = "a-move", label = "Move session to project", section = "Actions", icon = "map-arrow-right", page = projects_page },
-	{ id = "a-branch", label = "Switch branch", section = "Actions", icon = "git-branch", keywords = "checkout git", hint = "zeron/zgx-onboarding", page = branches_page },
+	{ id = "a-branch", label = "Switch branch", section = "Actions", icon = "git-branch", keywords = "checkout git", hint = "zeren/zgx-onboarding", page = branches_page },
 	{ id = "a-reviews", label = "Review requests", section = "Actions", icon = "pull-request-draft", keywords = "github pr", page = reviews_page },
 	{ id = "a-pr", label = "Open pull request", section = "Actions", icon = "pull-request", keywords = "github review", run = say("Opened #1094 on GitHub"), alt = { label = "Copy link", run = say("Copied the pull request's link") } },
 	{ id = "a-copy", label = "Copy session link", section = "Actions", icon = "copy", shortcut = "cmd+shift+c", run = say("Copied the session's link") },
@@ -306,7 +306,7 @@ end
 for _, item in SESSIONS do
 	table.insert(ITEMS, item)
 end
-local ROOT: CommandPalette.Page = { id = "root", title = "Zeron", items = ITEMS }
+local ROOT: CommandPalette.Page = { id = "root", title = "Zeren", items = ITEMS }
 
 -- The app's command, for a host that lists commands in its menus. Its key
 -- is the page's own (below), so ⌘K stays free on every other page.
@@ -344,7 +344,7 @@ local function tries(): { Node }
 					px = "$space.2",
 					items = "center",
 					rounded = "$radius.sm",
-					bg = "$zeron.secondary.bg",
+					bg = "$zeren.secondary.bg",
 					ui.text { t[1], literal = true, font = "$font.mono", text_size = "$font.size.sm", color = "$text.primary" },
 				},
 				Text { t[2], style = "caption", tone = "secondary" },

@@ -1,9 +1,9 @@
 //! Cloud over FFI: the account's status and credits, GitHub, the vault's
 //! agent logins (signed in from the phone itself), billing, and Cloud
-//! projects and sessions (`zeron_client::cloud`, `zeron_client::provider_login`).
+//! projects and sessions (`zeren_client::cloud`, `zeren_client::provider_login`).
 
-use zeron_client as zc;
-use zeron_proto::VaultProvider;
+use zeren_client as zc;
+use zeren_proto::VaultProvider;
 
 use super::{ChatConfig, CoreClient, CoreError, CoreResult, on_runtime};
 
@@ -21,8 +21,8 @@ pub struct CloudInfo {
     pub error: Option<String>,
 }
 
-impl From<zeron_proto::CloudStatus> for CloudInfo {
-    fn from(s: zeron_proto::CloudStatus) -> Self {
+impl From<zeren_proto::CloudStatus> for CloudInfo {
+    fn from(s: zeren_proto::CloudStatus) -> Self {
         Self {
             available: s.available,
             state: cloud_state(s.state),
@@ -35,7 +35,7 @@ impl From<zeron_proto::CloudStatus> for CloudInfo {
     }
 }
 
-fn cloud_state(state: zeron_proto::CloudState) -> String {
+fn cloud_state(state: zeren_proto::CloudState) -> String {
     serde_json::to_value(state)
         .ok()
         .and_then(|v| v.as_str().map(str::to_owned))
@@ -51,8 +51,8 @@ pub struct CloudSessionInfo {
     pub error: Option<String>,
 }
 
-impl From<zeron_proto::CloudSession> for CloudSessionInfo {
-    fn from(s: zeron_proto::CloudSession) -> Self {
+impl From<zeren_proto::CloudSession> for CloudSessionInfo {
+    fn from(s: zeren_proto::CloudSession) -> Self {
         Self {
             chat_id: s.chat_id,
             device_id: s.device_id,
@@ -73,8 +73,8 @@ pub struct GithubRepoInfo {
     pub pushed_at_ms: i64,
 }
 
-impl From<zeron_proto::GithubRepo> for GithubRepoInfo {
-    fn from(r: zeron_proto::GithubRepo) -> Self {
+impl From<zeren_proto::GithubRepo> for GithubRepoInfo {
+    fn from(r: zeren_proto::GithubRepo) -> Self {
         Self {
             full_name: r.full_name,
             default_branch: r.default_branch,
@@ -118,12 +118,12 @@ pub struct VaultConnectionInfo {
 pub struct VaultInfo {
     pub available: bool,
     pub connections: Vec<VaultConnectionInfo>,
-    /// Where to install the Zeron GitHub App on more repositories.
+    /// Where to install the Zeren GitHub App on more repositories.
     pub github_install_url: Option<String>,
 }
 
-impl From<zeron_proto::VaultStatus> for VaultInfo {
-    fn from(s: zeron_proto::VaultStatus) -> Self {
+impl From<zeren_proto::VaultStatus> for VaultInfo {
+    fn from(s: zeren_proto::VaultStatus) -> Self {
         Self {
             available: s.available,
             connections: s
@@ -132,7 +132,7 @@ impl From<zeron_proto::VaultStatus> for VaultInfo {
                 .map(|c| VaultConnectionInfo {
                     provider: c.provider.as_str().to_owned(),
                     account: c.account,
-                    needs_reconnect: c.status == zeron_proto::VaultConnectionStatus::NeedsReconnect,
+                    needs_reconnect: c.status == zeren_proto::VaultConnectionStatus::NeedsReconnect,
                     accounts: c.accounts,
                     has_active: c.has_active,
                 })
@@ -156,8 +156,8 @@ pub struct CloudAccountInfo {
     pub needs_reconnect: bool,
 }
 
-impl From<zeron_proto::VaultAccount> for CloudAccountInfo {
-    fn from(a: zeron_proto::VaultAccount) -> Self {
+impl From<zeren_proto::VaultAccount> for CloudAccountInfo {
+    fn from(a: zeren_proto::VaultAccount) -> Self {
         Self {
             slot: a.slot,
             active: a.active,
@@ -166,7 +166,7 @@ impl From<zeron_proto::VaultAccount> for CloudAccountInfo {
             display_name: a.display_name,
             organization: a.organization,
             plan: a.plan,
-            needs_reconnect: a.status == zeron_proto::VaultConnectionStatus::NeedsReconnect,
+            needs_reconnect: a.status == zeren_proto::VaultConnectionStatus::NeedsReconnect,
         }
     }
 }
@@ -200,7 +200,7 @@ pub struct BillingInfo {
     pub has_customer: bool,
 }
 
-fn plan_info(p: zeron_proto::BillingPlan) -> BillingPlanInfo {
+fn plan_info(p: zeren_proto::BillingPlan) -> BillingPlanInfo {
     BillingPlanInfo {
         id: p.id,
         name: p.name,
@@ -209,8 +209,8 @@ fn plan_info(p: zeron_proto::BillingPlan) -> BillingPlanInfo {
     }
 }
 
-impl From<zeron_proto::BillingStatus> for BillingInfo {
-    fn from(b: zeron_proto::BillingStatus) -> Self {
+impl From<zeren_proto::BillingStatus> for BillingInfo {
+    fn from(b: zeren_proto::BillingStatus) -> Self {
         let (plan, plan_status, period_end_ms, cancel_at_period_end) = match b.plan {
             Some(sub) => (
                 Some(plan_info(sub.plan)),
@@ -332,9 +332,9 @@ impl CoreClient {
             .await
             .map(|p| GithubConnectInfo {
                 state: match p.state {
-                    zeron_proto::GithubConnectState::Pending => "pending",
-                    zeron_proto::GithubConnectState::Connected => "connected",
-                    zeron_proto::GithubConnectState::Failed => "failed",
+                    zeren_proto::GithubConnectState::Pending => "pending",
+                    zeren_proto::GithubConnectState::Connected => "connected",
+                    zeren_proto::GithubConnectState::Failed => "failed",
                 }
                 .to_owned(),
                 account: p.account,

@@ -1,4 +1,4 @@
--- The lightbox: a picture looked at whole, over the window. Zeron's viewer
+-- The lightbox: a picture looked at whole, over the window. Zeren's viewer
 -- (crates/ui image_viewer.rs, attachments.rs `lightbox`): the picture fitted,
 -- never past its own size, over a scrim; a pinch or ⌘-scroll zooms about
 -- the pointer, a drag pans, its edges never come inside the window's; a
@@ -294,8 +294,8 @@ local StageView = ui.component(function(st: Stage): Node
 	-- kept for the controls.
 	local function room(): (number, number, number, number)
 		local size = window_size(true)
-		local inset = n("zeron.lightbox.inset", 40)
-		local foot = n("zeron.lightbox.foot", 72)
+		local inset = n("zeren.lightbox.inset", 40)
+		local foot = n("zeren.lightbox.foot", 72)
 		return inset, inset, math.max(1, size.width - inset * 2), math.max(1, size.height - inset - foot)
 	end
 	local function fit_scale(): number
@@ -819,11 +819,11 @@ local StageView = ui.component(function(st: Stage): Node
 
 	local island_props: ContainerProps = {
 		absolute = true,
-		bottom = n("zeron.lightbox.island_inset", 16),
+		bottom = n("zeren.lightbox.island_inset", 16),
 		self = "center",
-		h = n("zeron.island.control", 24) + n("zeron.island.pad", 4) * 2,
-		px = "$zeron.island.pad",
-		gap = "$zeron.island.gap",
+		h = n("zeren.island.control", 24) + n("zeren.island.pad", 4) * 2,
+		px = "$zeren.island.pad",
+		gap = "$zeren.island.gap",
 		items = "center",
 		role = "toolbar",
 		label = locale.t("ds.lightbox.image"),
@@ -839,7 +839,7 @@ local StageView = ui.component(function(st: Stage): Node
 	}
 	glass.style(island_props, "island")
 	local function divider(): Node
-		return ui.div { w = 1, h = 14, mx = "$zeron.space.hair", bg = "$border.subtle", shrink = 0 }
+		return ui.div { w = 1, h = 14, mx = "$zeren.space.hair", bg = "$border.subtle", shrink = 0 }
 	end
 	-- (`key`: the name's message; a tooltip is a string, read as it's built.)
 	local function button(icon: Icon.Name, key: string, keys: string?, on_click: () -> (), disabled: (() -> boolean)?): Node
@@ -881,7 +881,7 @@ local StageView = ui.component(function(st: Stage): Node
 				return shown_count() > 1
 			end,
 			ui.row {
-				gap = "$zeron.island.gap",
+				gap = "$zeren.island.gap",
 				items = "center",
 				divider(),
 				button("alt-arrow-left", "ds.lightbox.previous", "left", function()
@@ -917,11 +917,11 @@ local StageView = ui.component(function(st: Stage): Node
 		label = locale.t("ds.lightbox.fit_or_own"),
 		tooltip = locale.s("ds.lightbox.fit_tip", { fit = ui.shortcut_text("cmd+0"), actual = ui.shortcut_text("cmd+1") }),
 		tooltip_placement = { side = "top", offset = 6 },
-		h = "$zeron.island.control",
+		h = "$zeren.island.control",
 		min_w = 48,
 		px = "$space.1",
 		justify = "center",
-		rounded = "$zeron.icon_button.radius",
+		rounded = "$zeren.icon_button.radius",
 		bg = "#00000000",
 		color = "$text.secondary",
 		hover = { bg = "$hover", color = "$text.primary" },
@@ -1026,8 +1026,8 @@ local StageView = ui.component(function(st: Stage): Node
 			top = 0,
 			right = 0,
 			bottom = 0,
-			bg = "$zeron.lightbox.scrim",
-			backdrop_blur = "$zeron.lightbox.blur",
+			bg = "$zeren.lightbox.scrim",
+			backdrop_blur = "$zeren.lightbox.blur",
 			-- (Escape and Close do what a click here does.)
 			aria_hidden = true,
 			opacity = function(): number
@@ -1132,7 +1132,7 @@ local StageView = ui.component(function(st: Stage): Node
 			rounded = function(): any
 				return ui.raw(geo().r, "the thumbnail's corner squaring as the picture grows from it")
 			end,
-			shadow = "$zeron.lightbox.shadow",
+			shadow = "$zeren.lightbox.shadow",
 			pointer_events = "none",
 			opacity = function(): number
 				return math.clamp(st.alpha:get(), 0, 1)
@@ -1435,7 +1435,7 @@ local HostBody = ui.component(function(): Node
 		end
 		return { x = r.x, y = r.y, w = r.width, h = r.height }, corners[key :: string] or 0
 	end
-	-- (Reduce motion, the system's or Zeron's own: ds/motion's one switch.)
+	-- (Reduce motion, the system's or Zeren's own: ds/motion's one switch.)
 	local function reduced(): boolean
 		return Motion.reduced_now()
 	end
@@ -1641,7 +1641,7 @@ local HostBody = ui.component(function(): Node
 			rounded = 0,
 			bg = "#00000000",
 			border = 0,
-			shadow = "$zeron.dialog.stage",
+			shadow = "$zeren.dialog.stage",
 			build = function()
 				return StageView(stage)
 			end,

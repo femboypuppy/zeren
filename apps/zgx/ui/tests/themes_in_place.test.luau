@@ -1,4 +1,4 @@
--- Settings → Themes (screens/themes): every theme Zeron can wear, apart
+-- Settings → Themes (screens/themes): every theme Zeren can wear, apart
 -- from the template it runs. Built in, a template's own and yours, each
 -- under its tab with its swatch; Use wears a theme for each scheme it has
 -- (one with only dark fills dark alone), and the menu wears one for a
@@ -51,12 +51,12 @@ local function read(app: any, what: string): string
 	return tostring(app:state(what))
 end
 
-test("every theme is listed, Zeron's first, each with its swatch, what it has and where it's from", function()
+test("every theme is listed, Zeren's first, each with its swatch, what it has and where it's from", function()
 	local app = open()
 	local rows = order(app)
-	expect(rows[1]).to_be("zeron")
-	expect(table.concat(rows, ",")).to_be("zeron,gruvbox,github,dracula,ayu-mirage,template-ledger")
-	expect(app:has('#theme-zeron >> ~"The default, light and dark"')).to_be(true)
+	expect(rows[1]).to_be("zeren")
+	expect(table.concat(rows, ",")).to_be("zeren,gruvbox,github,dracula,ayu-mirage,template-ledger")
+	expect(app:has('#theme-zeren >> ~"The default, light and dark"')).to_be(true)
 	expect(app:has('#theme-gruvbox >> ~"Light and dark"')).to_be(true)
 	expect(app:has('#theme-dracula >> ~"Dark only"')).to_be(true)
 	expect(app:has('#theme-gruvbox >> ~"Built in"')).to_be(true)
@@ -67,8 +67,8 @@ test("every theme is listed, Zeron's first, each with its swatch, what it has an
 	-- Each half wears its scheme's palette: Gruvbox both, Dracula dark alone.
 	expect(app:count("#theme-gruvbox >> .theme-swatch-half")).to_be(2)
 	expect(app:count("#theme-dracula >> .theme-swatch-half")).to_be(1)
-	-- Nothing chosen, the default template: Zeron's is in use.
-	expect(app:has('#theme-zeron >> .theme-in-use >> "In use"')).to_be(true)
+	-- Nothing chosen, the default template: Zeren's is in use.
+	expect(app:has('#theme-zeren >> .theme-in-use >> "In use"')).to_be(true)
 	expect(app:has('#theme-gruvbox >> role:button "Use"')).to_be(true)
 end)
 
@@ -97,7 +97,7 @@ test("Use wears a theme for each scheme it has; one with only dark fills dark al
 	expect(calls(app)).to_be("choose:light:gruvbox-light,choose:dark:gruvbox-dark")
 	expect(app:has('#theme-gruvbox >> .theme-in-use >> "In use"')).to_be(true)
 	expect(app:has('#theme-gruvbox >> role:button "Use"')).to_be(false)
-	expect(app:has('#theme-zeron >> role:button "Use"')).to_be(true)
+	expect(app:has('#theme-zeren >> role:button "Use"')).to_be(true)
 	app:click('#theme-dracula >> role:button "Use"')
 	app:frames(20)
 	expect(calls(app)).to_contain("choose:dark:dracula")
@@ -114,7 +114,7 @@ test("the menu wears a theme for one scheme alone", function()
 	menu(app, "GitHub", "Use only for dark")
 	expect(calls(app)).to_be("choose:dark:github-dark")
 	expect(app:has('#theme-github >> .theme-in-use >> "Dark"')).to_be(true)
-	expect(app:has('#theme-zeron >> .theme-in-use >> "Light"')).to_be(true)
+	expect(app:has('#theme-zeren >> .theme-in-use >> "Light"')).to_be(true)
 	-- Only a theme with both has those; built in, none of yours' items.
 	app:click('role:button "More for GitHub"')
 	expect(app:wait('role:menuitem "Use only for light"', { timeout_ms = 15000 })).to_be(true)
@@ -144,7 +144,7 @@ test("the window wears what's chosen, scheme by scheme", function()
 	local app = open()
 	app:command("scheme_light")
 	app:frames(20)
-	-- (Zeron's own colours, whatever the glass makes them.)
+	-- (Zeren's own colours, whatever the glass makes them.)
 	local own_light = read(app, "worn")
 	expect(own_light).to_contain("theme-light ")
 	app:command("scheme_dark")
@@ -158,8 +158,8 @@ test("the window wears what's chosen, scheme by scheme", function()
 	app:command("scheme_dark")
 	app:frames(20)
 	expect(read(app, "worn")).to_contain("theme-dark #282828")
-	-- Back to Zeron's: its own colours again.
-	app:click('#theme-zeron >> role:button "Use"')
+	-- Back to Zeren's: its own colours again.
+	app:click('#theme-zeren >> role:button "Use"')
 	app:frames(20)
 	expect(read(app, "worn")).to_be(own_dark)
 	app:command("scheme_light")
@@ -172,9 +172,9 @@ test("a template's own theme is worn where nothing is chosen, and a chosen theme
 	-- Ledger runs, bringing a dark theme: nothing chosen, dark wears it.
 	app:command("use_ledger")
 	app:frames(20)
-	expect(read(app, "slots")).to_be("zeron ledger")
+	expect(read(app, "slots")).to_be("zeren ledger")
 	expect(app:has('#theme-template-ledger >> .theme-in-use >> "Dark"')).to_be(true)
-	expect(app:has('#theme-zeron >> .theme-in-use >> "Light"')).to_be(true)
+	expect(app:has('#theme-zeren >> .theme-in-use >> "Light"')).to_be(true)
 	-- Gruvbox chosen: the template stays, its theme gives way for both.
 	app:click('#theme-gruvbox >> role:button "Use"')
 	app:frames(20)
@@ -238,7 +238,7 @@ test("yours can be renamed, and removing the one in use gives its scheme back", 
 	expect(app:has("#theme-custom-harbor-night")).to_be(false)
 	expect(app:has('~"None of yours yet"')).to_be(true)
 	tab(app, "All")
-	expect(app:has('#theme-zeron >> .theme-in-use >> "In use"')).to_be(true)
+	expect(app:has('#theme-zeren >> .theme-in-use >> "In use"')).to_be(true)
 end)
 
 test("a change made outside the window shows on the page and restyles the theme in use", function()

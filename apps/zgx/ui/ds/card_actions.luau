@@ -70,7 +70,7 @@ return function(props: Props): Node
 	local compact = form == "glyphs"
 	-- A segment's width: the pill's, less its edges and inset, and the two
 	-- hairlines with their room (zgx's buttons don't grow into a row).
-	local hair = (ui.theme.get("zeron.space.hair") :: number?) or 2
+	local hair = (ui.theme.get("zeren.space.hair") :: number?) or 2
 	local segment = ((props.w or 180) - 2 - hair * 2 - (1 + hair * 2) * 2) / 3
 	-- A segment's height, when the pill's is set: inside its edge and inset.
 	local segment_h = if props.h then props.h - 2 - hair * 2 else nil
@@ -140,8 +140,8 @@ return function(props: Props): Node
 				w = if vertical then nil else 1,
 				h = if vertical then 1 elseif segment_h then segment_h - 12 else 20,
 				w_full = vertical,
-				mx = if vertical then nil else "$zeron.space.hair",
-				my = if vertical then "$zeron.space.hair" else nil,
+				mx = if vertical then nil else "$zeren.space.hair",
+				my = if vertical then "$zeren.space.hair" else nil,
 				bg = "$border.subtle",
 				shrink = 0,
 				aria_hidden = true,
@@ -162,6 +162,6 @@ return function(props: Props): Node
 	}
 	-- Its pills take their corner from the box: pills in the pill, and in
 	-- the column's rounded box, that corner less the inset.
-	control.contain(box, { radius = if vertical then "$radius.lg" else "$radius.full", inset = "$zeron.space.hair", border = 1 })
+	control.contain(box, { radius = if vertical then "$radius.lg" else "$radius.full", inset = "$zeren.space.hair", border = 1 })
 	return if vertical then ui.column(box) else ui.row(box)
 end

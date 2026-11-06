@@ -1,4 +1,4 @@
--- Zeron's sidebar glyph (icons.zeron.sh "Sidebar", as the shipping app draws
+-- Zeren's sidebar glyph (icons.zeron.sh "Sidebar", as the shipping app draws
 -- it in crates/ui/src/icons.rs): a rounded frame holding a panel that
 -- narrows as the sidebar closes. `SidebarIcon { open = state, size = 16 }`.
 -- `side = "right"`: the same glyph mirrored, its panel at the right, for a
@@ -30,7 +30,7 @@ return function(props: Props): Node
 			w = (18 + stroke) * s,
 			h = (16 + stroke) * s,
 			rounded = raw((4 + stroke / 2) * s),
-			border = "$zeron.glyph.stroke",
+			border = "$zeren.glyph.stroke",
 			border_color = "$text.secondary",
 		},
 		-- The panel: as wide as the frame's line closed (so it weighs the
@@ -44,7 +44,7 @@ return function(props: Props): Node
 			h = 9 * s,
 			rounded = raw(0.875 * s),
 			bg = "$text.secondary",
-			ui.div { w = "$zeron.glyph.stroke", shrink = 0 },
+			ui.div { w = "$zeren.glyph.stroke", shrink = 0 },
 			ui.div { w = ui.tween(props.open, { from = 0, to = (5.5 - 1.75) * s, duration = 200 }), shrink = 0 },
 		},
 	}

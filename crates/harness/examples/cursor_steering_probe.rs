@@ -1,10 +1,10 @@
 //! Real-model conversational steering check (no tools or additive jobs).
-//! cargo run -p zeron-harness --example cursor_steering_probe -- gemini-3-flash
+//! cargo run -p zeren-harness --example cursor_steering_probe -- gemini-3-flash
 use futures::StreamExt;
 use std::time::Duration;
 use tokio::sync::{mpsc, oneshot};
-use zeron_harness::{CancellationToken, CursorHarness, Harness, RunControls, SteerMessage};
-use zeron_proto::{AgentEvent, DoneStatus, RunRequest, SandboxLevel};
+use zeren_harness::{CancellationToken, CursorHarness, Harness, RunControls, SteerMessage};
+use zeren_proto::{AgentEvent, DoneStatus, RunRequest, SandboxLevel};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

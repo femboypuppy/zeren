@@ -73,28 +73,28 @@ jobs:
           mkdir -p "$bin"
           tar -xzf "$RUNNER_TEMP/nextest.tar.gz" -C "$bin" cargo-nextest
           echo "$bin" >> "$GITHUB_PATH"
-      # The app (`-p zeron --bins`) is compiled with the tests, sharing their zeron-ui
-      # build: a separate `cargo build -p zeron` rebuilt zeron-ui without the fixture
+      # The app (`-p zeren --bins`) is compiled with the tests, sharing their zeren-ui
+      # build: a separate `cargo build -p zeren` rebuilt zeren-ui without the fixture
       # feature (and a `cargo check` before that recompiled every dependency).
       - name: Build tests and the application
         run: |
           cargo nextest run --config-file scripts/ci/nextest.toml --no-run --locked \
-            -p zeron-update -p zeron-preview -p zeron-ui -p zeron-text -p zeron \
-            --features zeron-ui/browser-fixture --lib --bins --tests
+            -p zeren-update -p zeren-preview -p zeren-ui -p zeren-text -p zeren \
+            --features zeren-ui/browser-fixture --lib --bins --tests
       - name: Build fixtures
         if: inputs.fixtures
         run: |
-          cargo build --locked -p zeron-update -p zeron-preview -p zeron-ui \
-            --features zeron-ui/browser-fixture --example browser-fixture --example preview-fixture
+          cargo build --locked -p zeren-update -p zeren-preview -p zeren-ui \
+            --features zeren-ui/browser-fixture --example browser-fixture --example preview-fixture
       - name: Updater, preview, CoreText and native UI regressions
         run: |
-          # zeron-text's coretext tests are macOS-only (#![cfg(target_os = "macos")]); its other
+          # zeren-text's coretext tests are macOS-only (#![cfg(target_os = "macos")]); its other
           # tests run on Linux in ios-core. The attachment filters cover file staging, chips and
           # external Finder drops, whose paths and file metadata are platform-specific.
           cargo nextest run --config-file scripts/ci/nextest.toml --no-fail-fast --locked \
-            -p zeron-update -p zeron-preview -p zeron-ui -p zeron-text -p zeron \
-            --features zeron-ui/browser-fixture --lib --bins --tests \
-            -E 'package(zeron-update) | package(zeron-preview) | binary_id(zeron-text::coretext) | binary_id(zeron::cli) | (binary_id(zeron-ui) & (test(native_diff_font_geometry) | test(/notify::tests::/) | test(/^attachments::tests::/) | test(/composer::attachment_chip_tests::/) | test(/shell::chat_dropzone_tests::/) | test(=queue::tests::queue_rows_label_attachment_chips_and_file_only_sends) | test(=transcript::tests::user_bubbles_project_attachment_chips_in_place_of_the_strip) | test(=transcript::tests::sent_chips_show_upload_progress_until_their_bytes_land)))'
+            -p zeren-update -p zeren-preview -p zeren-ui -p zeren-text -p zeren \
+            --features zeren-ui/browser-fixture --lib --bins --tests \
+            -E 'package(zeren-update) | package(zeren-preview) | binary_id(zeren-text::coretext) | binary_id(zeren::cli) | (binary_id(zeren-ui) & (test(native_diff_font_geometry) | test(/notify::tests::/) | test(/^attachments::tests::/) | test(/composer::attachment_chip_tests::/) | test(/shell::chat_dropzone_tests::/) | test(=queue::tests::queue_rows_label_attachment_chips_and_file_only_sends) | test(=transcript::tests::user_bubbles_project_attachment_chips_in_place_of_the_strip) | test(=transcript::tests::sent_chips_show_upload_progress_until_their_bytes_land)))'
       - name: Native browser regression and screenshots
         if: inputs.fixtures
         timeout-minutes: 7
@@ -126,7 +126,7 @@ jobs:
         if: inputs.fixtures
         timeout-minutes: 5
         env:
-          ZERON_PREVIEW_AUTO_OPEN: 1
+          ZEREN_PREVIEW_AUTO_OPEN: 1
         run: |
           VITE_BINARY="$GITHUB_WORKSPACE/edge/node_modules/vite/bin/vite.js" scripts/ci/run-macos-fixture.sh target/debug/examples/preview-fixture "$RUNNER_TEMP/preview-captures"
           test -f "$RUNNER_TEMP/preview-captures/result.txt"
@@ -194,7 +194,7 @@ jobs:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           cache-on-failure: true
       - name: Rust mobile core tests
-        run: cargo test --locked -p zeron-text -p zeron-markdown -p zeron-client -p zeron-mobile
+        run: cargo test --locked -p zeren-text -p zeren-markdown -p zeren-client -p zeren-mobile
       # Only for the simulator tests, which link these bindings (they run when the app,
       # the FFI crate or the client changes, see scripts/ci/plan.py).
       # The committed bindings: the Swift file the app compiles, and the C header and
@@ -204,13 +204,13 @@ jobs:
       - name: Generated bindings are current
         if: ${{ !contains(fromJSON(inputs.skip), 'ios-tests') }}
         run: |
-          cargo build --locked -p zeron-mobile --lib
-          cargo build --locked -p zeron-mobile --bin uniffi-bindgen --features bindgen
-          target/debug/uniffi-bindgen generate --library target/debug/libzeron_mobile.so \
+          cargo build --locked -p zeren-mobile --lib
+          cargo build --locked -p zeren-mobile --bin uniffi-bindgen --features bindgen
+          target/debug/uniffi-bindgen generate --library target/debug/libzeren_mobile.so \
             --language swift --out-dir "$RUNNER_TEMP/gen" >/dev/null
-          diff -u apps/ios/Zeron/Core/Generated/zeron_core.swift "$RUNNER_TEMP/gen/zeron_core.swift"
-          diff -u apps/ios/CoreFFI/zeron_coreFFI.h "$RUNNER_TEMP/gen/zeron_coreFFI.h"
-          diff -u apps/ios/CoreFFI/module.modulemap "$RUNNER_TEMP/gen/zeron_coreFFI.modulemap"
+          diff -u apps/ios/Zeren/Core/Generated/zeren_core.swift "$RUNNER_TEMP/gen/zeren_core.swift"
+          diff -u apps/ios/CoreFFI/zeren_coreFFI.h "$RUNNER_TEMP/gen/zeren_coreFFI.h"
+          diff -u apps/ios/CoreFFI/module.modulemap "$RUNNER_TEMP/gen/zeren_coreFFI.modulemap"
       - name: Record the pass (CI skips this job while its inputs stay the same)
         if: inputs.pass-key != ''
         uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -259,21 +259,21 @@ jobs:
       # unit tests don't need the optimized core the app ships, and it builds in about half the time.
       - name: Build the Rust core for the simulator
         run: |
-          IPHONEOS_DEPLOYMENT_TARGET=26.0 cargo build --locked -p zeron-mobile --lib --target aarch64-apple-ios-sim
+          IPHONEOS_DEPLOYMENT_TARGET=26.0 cargo build --locked -p zeren-mobile --lib --target aarch64-apple-ios-sim
           mkdir -p target/ios-core/iphonesimulator/include
-          cp target/aarch64-apple-ios-sim/debug/libzeron_mobile.a target/ios-core/iphonesimulator/
-          cp apps/ios/CoreFFI/zeron_coreFFI.h target/ios-core/iphonesimulator/include/zeron_coreFFI.h
+          cp target/aarch64-apple-ios-sim/debug/libzeren_mobile.a target/ios-core/iphonesimulator/
+          cp apps/ios/CoreFFI/zeren_coreFFI.h target/ios-core/iphonesimulator/include/zeren_coreFFI.h
           cp apps/ios/CoreFFI/module.modulemap target/ios-core/iphonesimulator/include/module.modulemap
       - name: Run iOS unit tests
         working-directory: apps/ios
         env:
           # Reuse the core built above instead of rebuilding it in the Xcode build phase.
-          ZERON_SKIP_CORE: 1
+          ZEREN_SKIP_CORE: 1
         run: |
-          xcodebuild -project Zeron.xcodeproj -scheme Zeron \
+          xcodebuild -project Zeren.xcodeproj -scheme Zeren \
             -destination "platform=iOS Simulator,id=$IOS_SIMULATOR_ID" \
             -resultBundlePath "$RUNNER_TEMP/ios-tests.xcresult" \
-            -only-testing:ZeronTests CODE_SIGNING_ALLOWED=NO test
+            -only-testing:ZerenTests CODE_SIGNING_ALLOWED=NO test
       - name: Upload iOS test results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

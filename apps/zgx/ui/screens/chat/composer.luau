@@ -1,7 +1,7 @@
 -- The window's one composer, wired: it travels between a new chat (lifted
 -- to a little over the page's middle, opened out, its menus below) and a
 -- session (docked at the foot, its menus above), on one critically damped
--- spring, as the gallery's App shell has it (Zeron's composer_dock.rs). It
+-- spring, as the gallery's App shell has it (Zeren's composer_dock.rs). It
 -- is made once and follows where the shell is: the draft and what it
 -- carries are each chat's own (screens/chat/shared), its model, effort
 -- and access the session's (changed there, they change the session) or,
@@ -29,18 +29,18 @@ local Where = require("@app/screens/chat/where")
 local DropOverlay = require("@ds/drop_overlay")
 local Asks = require("@app/screens/chat/asks")
 local Invocations = require("@app/screens/chat/invocations")
-local ZeronCommands = require("@app/screens/chat/zeron_commands")
+local ZerenCommands = require("@app/screens/chat/zeren_commands")
 -- (Loaded with the chat page: captures land on its composer.)
 local Appshots = require("@app/screens/chat/appshots")
 local Carried = require("@app/screens/chat/carried")
 local Completions = require("@app/screens/chat/completions")
 
--- The title bar's height (Zeron's): a new chat centres under it.
+-- The title bar's height (Zeren's): a new chat centres under it.
 local TITLE_H = 38
--- Zeron's dock spring (ω ≈ 27).
+-- Zeren's dock spring (ω ≈ 27).
 local DOCK: SpringOptions = { stiffness = 730, damping = 54 }
 -- Its gap to the window's foot, docked. Its width, rising and docked: the
--- transcript's column (Settings' "Conversation width"), as Zeron's
+-- transcript's column (Settings' "Conversation width"), as Zeren's
 -- composer lines up with the conversation over it (its edges on the
 -- column's).
 local FOOT = require("@app/screens/chat/dock").GAP
@@ -466,7 +466,7 @@ local function Composer(): Node
 	end
 	-- What each trigger lists, as the agent's settings have it: with
 	-- "Separate / commands" off, `/` lists the skills after the commands
-	-- (Zeron's composer.rs `completion_trigger`).
+	-- (Zeren's composer.rs `completion_trigger`).
 	-- Where the agent works, for its commands and skills: the session's
 	-- folder (on its device), or a new chat's project.
 	local function invocation_target(): Invocations.Target?
@@ -496,7 +496,7 @@ local function Composer(): Node
 			return session_id:get() ~= nil
 		end,
 		run = function(name: string)
-			ZeronCommands.run(name, session_id:peek())
+			ZerenCommands.run(name, session_id:peek())
 		end,
 	}
 
@@ -520,7 +520,7 @@ local function Composer(): Node
 	-- Moving to another chat: an edit under way is left as it was (its
 	-- displaced draft back in place), then the draft shown is put away
 	-- under the chat left and the next chat's own comes out (shared.show),
-	-- as Zeron's composer swaps drafts on navigation.
+	-- as Zeren's composer swaps drafts on navigation.
 	-- (Only a real move: a reload, the same chat shown, keeps the edit.)
 	ui.effect(function()
 		local key = session_id:get() or ""
@@ -539,12 +539,12 @@ local function Composer(): Node
 			end_edit("commit")
 			return
 		end
-		-- A draft that is only one of Zeron's own commands runs it (its
+		-- A draft that is only one of Zeren's own commands runs it (its
 		-- token goes; anything carried stays).
-		local zeron = completions.command_of(shared.text:peek())
-		if zeron then
+		local zeren = completions.command_of(shared.text:peek())
+		if zeren then
 			shared.text:set("")
-			ZeronCommands.run(zeron, session_id:peek())
+			ZerenCommands.run(zeren, session_id:peek())
 			return
 		end
 		local typed, carried = shared.take()
@@ -856,7 +856,7 @@ local function Composer(): Node
 				shared.attach_files(files)
 			end,
 			-- A picture pasted (a screenshot): written out by the host, then
-			-- carried as an image, as one dropped is, named as Zeron names
+			-- carried as an image, as one dropped is, named as Zeren names
 			-- it (attachments.rs `stage_clipboard_image`).
 			on_paste_image = function(): boolean
 				store.paste_image():after(function(path: string?)
@@ -1193,7 +1193,7 @@ local function Composer(): Node
 				on_hover = composer_zone.on_hover,
 				on_drop = composer_zone.on_drop,
 				-- (A new chat with nowhere to work: its page asks for a project in
-				-- its place, as Zeron's first launch does. Hidden here, inside
+				-- its place, as Zeren's first launch does. Hidden here, inside
 				-- the pill's own box: a `hidden` on the row above, which spans
 				-- the pane, left a box over the transcript taking its wheel.)
 				-- (And not over a plugin's page: the chat's page is kept unseen
@@ -1204,7 +1204,7 @@ local function Composer(): Node
 			},
 		},
 		-- Files carried over the chat (the page or the composer): all of it
-		-- dimmed under "Drop to attach", as Zeron's conversation shows it
+		-- dimmed under "Drop to attach", as Zeren's conversation shows it
 		-- (shell.rs `attachment_drop_overlay`: the scrim, the words in the
 		-- text's ink, at once and gone at once; no accent).
 		DropOverlay { shown = shared.carrying, id = "chat-drop" },

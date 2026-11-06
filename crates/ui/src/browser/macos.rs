@@ -84,7 +84,7 @@ impl BrowserData {
                     _ => objc2_web_kit::WKWebsiteDataStore::nonPersistentDataStore(mtm),
                 }
             });
-            let port = data.preview_port.unwrap_or(zeron_proto::PREVIEW_PROXY_PORT);
+            let port = data.preview_port.unwrap_or(zeren_proto::PREVIEW_PROXY_PORT);
             if let Err(error) =
                 configure_preview_proxy(data.store.as_ref().unwrap(), &data.preview_hosts, port)
             {
@@ -227,7 +227,7 @@ struct ObserverState {
 define_class!(
     #[unsafe(super(NSObject))]
     #[thread_kind = MainThreadOnly]
-    #[name = "ZeronBrowserObserver"]
+    #[name = "ZerenBrowserObserver"]
     #[ivars = ObserverState]
     struct Observer;
     unsafe impl NSObjectProtocol for Observer {}
@@ -319,7 +319,7 @@ struct ClipState {
 define_class!(
     #[unsafe(super(NSView))]
     #[thread_kind = MainThreadOnly]
-    #[name = "ZeronBrowserClipView"]
+    #[name = "ZerenBrowserClipView"]
     #[ivars = ClipState]
     struct BrowserClipView;
     impl BrowserClipView {

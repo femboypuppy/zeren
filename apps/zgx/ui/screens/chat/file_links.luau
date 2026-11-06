@@ -1,5 +1,5 @@
--- A project's file or folder as Zeron mentions it in a prompt
--- (crates/proto file_mentions.rs `local_file_link`): `[name](zeron-file:path)`,
+-- A project's file or folder as Zeren mentions it in a prompt
+-- (crates/proto file_mentions.rs `local_file_link`): `[name](zeren-file:path)`,
 -- the name's brackets escaped, the path's other characters encoded, a
 -- folder's ending in `/`. The engine rewrites it for the agent as a plain
 -- relative link; the transcript shows its name.
@@ -14,13 +14,13 @@ function M.link(path: string, dir: boolean?): string
 	local target = string.gsub(bare .. (if dir then "/" else ""), "[^%w%-%._~/]", function(c: string): string
 		return string.format("%%%02X", string.byte(c))
 	end)
-	return `[{label}](zeron-file:{target})`
+	return `[{label}](zeren-file:{target})`
 end
 
 -- The project path a mention link stands for (a folder's with its `/`), or
 -- nil for any other link (or one going outside the project).
 function M.path_of(link: string): string?
-	local target = string.match(link, "^zeron%-file:(.+)$")
+	local target = string.match(link, "^zeren%-file:(.+)$")
 	if not target then
 		return nil
 	end
@@ -44,8 +44,8 @@ function M.path_of(link: string): string?
 end
 
 -- A link's target as a file of the project at `root` (its absolute
--- folder), as Zeron opens a transcript's links (crates/ui
--- workspace_links.rs `resolve_workspace_file_link`): a `zeron-file:`
+-- folder), as Zeren opens a transcript's links (crates/ui
+-- workspace_links.rs `resolve_workspace_file_link`): a `zeren-file:`
 -- mention; a relative path (its file name with a `.`); an absolute one
 -- (`file://` too), inside `root` or not (`outside`, its whole path); each
 -- with a line from `#L12`, `#L12C5`, `#L12-L20`, `:12`, `:12:5` or
@@ -211,7 +211,7 @@ function M.resolve(target: string, root: string?): Resolved?
 	if target == "" then
 		return nil
 	end
-	local mention = string.match(target, "^zeron%-file:(.*)$")
+	local mention = string.match(target, "^zeren%-file:(.*)$")
 	if mention then
 		local path = decode(mention)
 		if not path or encode(path) ~= mention or string.sub(path, -1) == "/" or string.find(path, ":", 1, true) or not clean(path) or string.sub(path, 1, 1) == "/" then

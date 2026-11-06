@@ -1,6 +1,6 @@
 --!strict
 -- A session's pull request in its panel home's details, under its branch
--- (core's `slot:zeron.panel.details`, which gives `panel_details`: { session,
+-- (core's `slot:zeren.panel.details`, which gives `panel_details`: { session,
 -- device, cwd, branch }): the panel home's own row (ds/panel_home), led by
 -- the pull request glyph in the quiet ink the device, project and branch
 -- rows lead with, its title, then the pull request's badge, the sidebar's
@@ -22,14 +22,14 @@ local CHECK_ICON: { [string]: string } = { passing = "check-circle", failing = "
 local BADGE_H = 20
 local NESTED = control.nest(PanelHome.ROW_RADIUS, (PanelHome.ROW_H - BADGE_H) / 2)
 
-return function(zeron: any, watch: any)
+return function(zeren: any, watch: any)
 	return function(): Node
-		local details = zeron.context("panel_details")
+		local details = zeren.context("panel_details")
 		local session = details and details.session
 		if type(session) ~= "string" then
 			return ui.div {}
 		end
-		local panel = zeron.context("panel")
+		local panel = zeren.context("panel")
 		local pr = watch.pr(session)
 		local function state(): string
 			local now = pr()
@@ -52,7 +52,7 @@ return function(zeron: any, watch: any)
 		end, ui.column {
 			w_full = true,
 			-- (The rows' own gap over it: the details take no room without it.)
-			pt = "$zeron.list.gap",
+			pt = "$zeren.list.gap",
 			PanelHome.Row {
 				id = "github-panel-pr",
 				-- (The row's kind, in the quiet ink the device, project and
@@ -64,7 +64,7 @@ return function(zeron: any, watch: any)
 				end,
 				name = function(): string
 					local now = pr()
-					return if now then zeron.s("panel_row.label", { number = now.number, title = now.title or "", state = zeron.s(`panel_row.state.{state()}`) }) else ""
+					return if now then zeren.s("panel_row.label", { number = now.number, title = now.title or "", state = zeren.s(`panel_row.state.{state()}`) }) else ""
 				end,
 				on_click = open,
 				trail = ui.row {
@@ -83,11 +83,11 @@ return function(zeron: any, watch: any)
 						-- (The checks badge's look, its word the short one: the
 						-- row's title needs the room.)
 						return Badge.Badge {
-							zeron.t(`panel_row.checks.{ci}`),
+							zeren.t(`panel_row.checks.{ci}`),
 							icon = CHECK_ICON[ci] :: any,
-							color = `$zeron.checks.{ci}`,
+							color = `$zeren.checks.{ci}`,
 							size = "md",
-							label = zeron.t(`panel_row.checks_said.{ci}`),
+							label = zeren.t(`panel_row.checks_said.{ci}`),
 						}
 					end),
 					ui.presence(function(): string

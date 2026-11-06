@@ -1,11 +1,11 @@
 --!strict
 -- Pull requests: a page of the GitHub plugin's own, in the sidebar
--- ("pages.add"), as Zeron's pull request board (crates/ui/src/
--- pull_requests.rs), drawn from Zeron's design system as it is lent to
+-- ("pages.add"), as Zeren's pull request board (crates/ui/src/
+-- pull_requests.rs), drawn from Zeren's design system as it is lent to
 -- plugins (`@ds`): a project's repository on GitHub, its open pull
 -- requests under three filters (Authored, Reviewing, All), searched as you
 -- type, newest updates first, a page at a time; a row opens the pull
--- request in the page's own panel (Zeron's right pane: resized, expanded,
+-- request in the page's own panel (Zeren's right pane: resized, expanded,
 -- tabbed as a chat's), the viewer drawing it (viewer.luau). GitHub is asked
 -- through gh on this Mac (pulls.luau).
 --
@@ -20,7 +20,7 @@
 -- so it holds at a pane's width; there the gutters tighten.
 --
 -- What it was looking at (the project, the filter) is kept between runs
--- (`zeron.store`), so a reload or a relaunch finds it as it was.
+-- (`zeren.store`), so a reload or a relaunch finds it as it was.
 
 local git = require("@ds/git")
 local Badge = require("@ds/badge")
@@ -57,13 +57,13 @@ local FILTER_KEYS = { "authored", "reviewing", "all" }
 -- The plugin's words (the SDK's `s`), set as the board is made.
 local T: any = nil
 
--- What the board says when a filter has nothing (Zeron's words).
+-- What the board says when a filter has nothing (Zeren's words).
 local function empty_words(filter: string): { string }
 	return { T.s(`board.empty.{filter}_title`), T.s(`board.empty.{filter}_body`) }
 end
 
 -- A kept first page younger than this is shown as is; an older one is
--- shown and asked again behind it (Zeron's five minutes: GitHub's rate
+-- shown and asked again behind it (Zeren's five minutes: GitHub's rate
 -- limits are tight).
 local FRESH_SECONDS = 5 * 60
 
@@ -181,7 +181,7 @@ end
 local Row = function(props: { item: Item, chosen: () -> boolean, on_click: () -> () }): Node
 	local item = props.item
 	-- (The design system's list row, ds/list_row: the one way a list's
-	-- rows answer the pointer, here as in Zeron's own lists.)
+	-- rows answer the pointer, here as in Zeren's own lists.)
 	return ListRow {
 		class = "github-board-row",
 		label = `#{item.number} {item.title}`,
@@ -191,15 +191,15 @@ local Row = function(props: { item: Item, chosen: () -> boolean, on_click: () ->
 	}
 end
 
-return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, panel: any? }) -> Node
-	T = zeron
+return function(zeren: any, pulls: any, _Viewer: any): (props: { page: any, panel: any? }) -> Node
+	T = zeren
 	local FILTERS = {}
 	for _, f in FILTER_KEYS do
-		table.insert(FILTERS, { value = f, label = zeron.s(`board.filters.{f}`) })
+		table.insert(FILTERS, { value = f, label = zeren.s(`board.filters.{f}`) })
 	end
-	T = zeron
+	T = zeren
 	return ui.component(function(props: { page: any, panel: any? }): Node
-		local kept = zeron.store("board", { project = nil :: string?, filter = "authored" })
+		local kept = zeren.store("board", { project = nil :: string?, filter = "authored" })
 		local query = ui.use_state("")
 		local repo = ui.use_state(nil :: string?)
 		local items = ui.use_state({} :: { Item })
@@ -224,7 +224,7 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 				return a.id < b.id
 			end
 			local by: { [string]: { any } } = {}
-			for id, p in zeron.projects() do
+			for id, p in zeren.projects() do
 				local key = p.repository or `project:{id}`
 				by[key] = by[key] or {}
 				table.insert(by[key], { id = id, p = p })
@@ -318,7 +318,7 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 			end
 			state:set("loading")
 			-- (Its folder on this Mac: gh says which repository it is.)
-			local folder = (zeron.context_of("project", p) or {}).path
+			local folder = (zeren.context_of("project", p) or {}).path
 			pulls.repository(folder):after(function(r: any)
 				if chosen.project ~= p then
 					return
@@ -392,10 +392,10 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 				w_full = true,
 				gap = "$space.3",
 				items = "center",
-				Text { zeron.t("board.title"), style = "title", heading = 1, grow = 1, min_w = 0 },
+				Text { zeren.t("board.title"), style = "title", heading = 1, grow = 1, min_w = 0 },
 				IconButton {
 					icon = "refresh",
-					label = zeron.s("board.refresh"),
+					label = zeren.s("board.refresh"),
 					tone = "quiet",
 					disabled = function(): boolean
 						return repo:get() == nil
@@ -412,18 +412,18 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 				Dropdown {
 					value = project_value,
 					items = project_options,
-					label = zeron.s("board.project"),
+					label = zeren.s("board.project"),
 					icon = "folder",
 					tone = "ghost",
-					placeholder = zeron.s("board.choose_project"),
-					search = zeron.s("board.search_projects"),
+					placeholder = zeren.s("board.choose_project"),
+					search = zeren.s("board.search_projects"),
 					on_choose = function(id: string)
 						choose(id)
 					end,
 				},
 				Text {
 					function(): string
-						return repo:get() or zeron.s("board.hint")
+						return repo:get() or zeren.s("board.hint")
 					end,
 					style = "caption",
 					tone = "tertiary",
@@ -439,7 +439,7 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 		local function filters(): Node
 			local options = {}
 			for _, f in FILTER_KEYS do
-				table.insert(options, { value = f, label = zeron.s(`board.filters.{f}`) })
+				table.insert(options, { value = f, label = zeren.s(`board.filters.{f}`) })
 			end
 			return ui.div {
 			id = "github-board-filters",
@@ -447,7 +447,7 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 			Tabs {
 				value = filter_value,
 				options = options,
-				label = zeron.s("board.filter"),
+				label = zeren.s("board.filter"),
 				on_change = function(f: any)
 					set_filter(f)
 				end,
@@ -464,7 +464,7 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 			shrink = 0,
 			p = "$space.1",
 			theme = { radius = { md = control.nest(git.RADIUS, git.EDGE, "$space.1") } },
-			SearchField { value = query, placeholder = zeron.s("board.search"), name = zeron.s("board.search"), size = "sm", quiet = true, w_full = true },
+			SearchField { value = query, placeholder = zeren.s("board.search"), name = zeren.s("board.search"), size = "sm", quiet = true, w_full = true },
 		}
 		end
 
@@ -515,7 +515,7 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 					end
 				end
 				if #list == 0 then
-					local said = if q ~= "" then { zeron.s("board.empty.nomatch_title", { q = q }), zeron.s("board.empty.nomatch_body") } else empty_words(chosen.filter)
+					local said = if q ~= "" then { zeren.s("board.empty.nomatch_title", { q = q }), zeren.s("board.empty.nomatch_body") } else empty_words(chosen.filter)
 					-- (In from the card's sides, as Settings.Catalog's empty states
 					-- are: its words wrap inside the card, never against its edge.)
 					return ui.column {
@@ -536,8 +536,8 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 				if key == "idle" then
 					return EmptyState {
 						icon = "pull-request",
-						title = zeron.s("board.empty.choose_title"),
-						body = zeron.s("board.empty.choose_body"),
+						title = zeren.s("board.empty.choose_title"),
+						body = zeren.s("board.empty.choose_body"),
 						fill = true,
 					}
 				elseif key == "loading" then
@@ -549,17 +549,17 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 				elseif key == "norepo" then
 					return EmptyState {
 						icon = "git-branch",
-						title = zeron.s("board.empty.norepo_title"),
-						body = zeron.s("board.empty.norepo_body"),
+						title = zeren.s("board.empty.norepo_title"),
+						body = zeren.s("board.empty.norepo_body"),
 						fill = true,
 					}
 				elseif key == "failed" then
 					return banner.Callout {
 						tone = "danger",
-						title = zeron.s("board.failed_title"),
+						title = zeren.s("board.failed_title"),
 						body = failed:peek() or "",
 						action = {
-							label = zeron.s("board.try_again"),
+							label = zeren.s("board.try_again"),
 							on_click = function()
 								load({ refresh = true })
 							end,
@@ -578,7 +578,7 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 						Text {
 							function(): string
 								local total = paging:get().total
-								return if total then zeron.s("board.count", { shown = #items:get(), total = total }) else ""
+								return if total then zeren.s("board.count", { shown = #items:get(), total = total }) else ""
 							end,
 							style = "caption",
 							tone = "tertiary",
@@ -589,7 +589,7 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 								return paging:get().next ~= nil
 							end,
 							Button {
-								zeron.t("board.load_more"),
+								zeren.t("board.load_more"),
 								tone = "ghost",
 								size = "sm",
 								on_click = function()
@@ -651,7 +651,7 @@ return function(zeron: any, pulls: any, _Viewer: any): (props: { page: any, pane
 
 		-- (The language shown: tabs and placeholders take words, not
 		-- functions, so the page is built again as it changes.)
-		local locale = ui.shared("zeron.locale", "en")
+		local locale = ui.shared("zeren.locale", "en")
 		return ui.presence(function(): string
 			local l = locale:get()
 			return if type(l) == "string" then l else "en"

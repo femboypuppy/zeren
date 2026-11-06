@@ -1,4 +1,4 @@
-//! Each plugin's settings: declared in its manifest, drawn by Zeron (a page
+//! Each plugin's settings: declared in its manifest, drawn by Zeren (a page
 //! of its own in Settings, under Plugins, while it's on), kept for it alone.
 //!
 //! A manifest lists them under `settings`, each `{ id, kind, label,
@@ -9,29 +9,29 @@
 //!   as a `style` of `"select"` (the default) or `"segmented"`;
 //! - `text`: words (`placeholder?`), at most [`MAX_TEXT`] characters;
 //! - `number`: `min?`, `max?`, `step?`, `unit?` (said after the field);
-//! - `shortcut`: a key combination as Zeron writes them (`ctrl+alt+space`),
+//! - `shortcut`: a key combination as Zeren writes them (`ctrl+alt+space`),
 //!   or none (`""`);
 //! - `folder`: a folder you choose (its absolute path), or none (`""`);
-//! - `permission` (Zeron's own plugins alone): a macOS permission row,
-//!   `{ kind, permission }` with `permission` one of [`PERMISSIONS`]. Zeron
+//! - `permission` (Zeren's own plugins alone): a macOS permission row,
+//!   `{ kind, permission }` with `permission` one of [`PERMISSIONS`]. Zeren
 //!   says everything on it (its words, whether it's granted, the way to
 //!   grant it); it has no value. Anyone else's is left out.
 //! - `wallpaper`: the row that uses the plugin's drawing as a new chat's
 //!   wallpaper, `{ kind, section? }`, for a plugin that replaces a new chat's
 //!   background (`#new-chat-background` in its `ui.change`; anyone else's
-//!   is left out). Zeron says everything on it and keeps what's chosen (the
-//!   app's: one plugin's wallpaper at a time, with Zeron's effect over it);
+//!   is left out). Zeren says everything on it and keeps what's chosen (the
+//!   app's: one plugin's wallpaper at a time, with Zeren's effect over it);
 //!   it has no value of the plugin's.
 //!
 //! A choice's option may say what it does (`description`), said in the
 //! setting's place while it's chosen. The manifest's top-level
 //! `settings_description` (plain text, [`MAX_PAGE_DESCRIPTION`] characters
-//! at most) is said under the page's title in Zeron's generic line's place.
+//! at most) is said under the page's title in Zeren's generic line's place.
 //!
 //! A plugin may report a status for any of its settings
 //! (`plugin.<id>.setting_status { id, badge, tone, text? }`, the SDK's
-//! `zeron.set_status`): a short badge in a fixed tone ([`TONES`]) and words
-//! in the setting's description's place, plain text, drawn by Zeron beside
+//! `zeren.set_status`): a short badge in a fixed tone ([`TONES`]) and words
+//! in the setting's description's place, plain text, drawn by Zeren beside
 //! the control. Held while the plugin is on; it goes when it's off.
 //!
 //! What you set is kept in `<data>/plugins/.storage/<id>.settings.json`,
@@ -42,7 +42,7 @@
 //! engine's `RemovePlugin`, and the app's Remove).
 //!
 //! The plugin reads its values (with defaults) from `plugin.<id>.settings`,
-//! its own and read only; only Zeron's page sets them (`plugins.setting_set`,
+//! its own and read only; only Zeren's page sets them (`plugins.setting_set`,
 //! an action no plugin reaches).
 
 use std::{
@@ -64,9 +64,9 @@ const KINDS: &[&str] = &["switch", "choice", "text", "number", "shortcut", "fold
 /// The place a plugin replaces to draw a new chat's wallpaper.
 pub const WALLPAPER_PLACE: &str = "#new-chat-background";
 
-/// Whether a row of `kind` is Zeron's own words, with no value of the
+/// Whether a row of `kind` is Zeren's own words, with no value of the
 /// plugin's (a permission's, the wallpaper's).
-fn zeron_s(kind: &str) -> bool {
+fn zeren_s(kind: &str) -> bool {
     kind == "permission" || kind == "wallpaper"
 }
 /// The permissions a `permission` row can be.
@@ -109,7 +109,7 @@ fn valid_id(id: &str) -> bool {
     !id.is_empty() && id.len() <= 64 && id.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
 }
 
-/// A key combination as Zeron writes them: modifiers then a key, `+`
+/// A key combination as Zeren writes them: modifiers then a key, `+`
 /// between, at least one of Control, Option or Command held.
 pub fn valid_shortcut(combo: &str) -> bool {
     let parts: Vec<&str> = combo.split('+').collect();
@@ -148,13 +148,13 @@ pub fn fit(setting: &Setting, value: &Json) -> Option<Json> {
 
 /// The settings `manifest` declares, each checked: one that isn't a
 /// setting (no id, an unknown kind, a choice with no options, an id used
-/// already, a permission row of a plugin not Zeron's own: `builtin`) is
+/// already, a permission row of a plugin not Zeren's own: `builtin`) is
 /// left out, and said once on stderr.
 pub fn declared(plugin: &str, manifest: &Json, builtin: bool) -> Vec<Setting> {
     let mut out: Vec<Setting> = Vec::new();
     let Some(list) = manifest["settings"].as_array() else { return out };
     for raw in list.iter().take(MAX_SETTINGS) {
-        let skip = |why: &str| eprintln!("zeron-zgx: plugin {plugin}: a setting left out: {why}");
+        let skip = |why: &str| eprintln!("zeren-zgx: plugin {plugin}: a setting left out: {why}");
         // A permission row's id is its permission, unless it says another.
         let id = raw["id"].as_str().or(match raw["kind"].as_str() {
             Some("permission") => raw["permission"].as_str(),
@@ -183,7 +183,7 @@ pub fn declared(plugin: &str, manifest: &Json, builtin: bool) -> Vec<Setting> {
                 skip(&format!("{id}: a plugin has one wallpaper row"));
                 continue;
             }
-            // Nothing of the plugin's own on it: Zeron says it all.
+            // Nothing of the plugin's own on it: Zeren says it all.
             let mut json = json!({ "id": id, "kind": kind });
             if let Some(s) = short(raw.get("section"), MAX_LABEL) {
                 json["section"] = json!(s);
@@ -193,14 +193,14 @@ pub fn declared(plugin: &str, manifest: &Json, builtin: bool) -> Vec<Setting> {
         }
         if kind == "permission" {
             if !builtin {
-                skip(&format!("{id}: a permission row is Zeron's own plugins' alone"));
+                skip(&format!("{id}: a permission row is Zeren's own plugins' alone"));
                 continue;
             }
             let Some(permission) = raw["permission"].as_str().filter(|p| PERMISSIONS.contains(p)) else {
                 skip(&format!("{id}'s permission must be one of {}", PERMISSIONS.join(", ")));
                 continue;
             };
-            // Nothing of the plugin's own on it: Zeron says it all.
+            // Nothing of the plugin's own on it: Zeren says it all.
             let mut json = json!({ "id": id, "kind": kind, "permission": permission });
             if let Some(s) = short(raw.get("section"), MAX_LABEL) {
                 json["section"] = json!(s);
@@ -289,7 +289,7 @@ pub fn declared(plugin: &str, manifest: &Json, builtin: bool) -> Vec<Setting> {
 pub fn values(declared: &[Setting], stored: &Map<String, Json>) -> Map<String, Json> {
     declared
         .iter()
-        .filter(|s| !zeron_s(&s.kind))
+        .filter(|s| !zeren_s(&s.kind))
         .map(|s| (s.id.clone(), stored.get(&s.id).and_then(|v| fit(s, v)).unwrap_or_else(|| s.default.clone())))
         .collect()
 }
@@ -303,12 +303,12 @@ fn plain(text: &str, most: usize) -> String {
     cut.trim_end().to_string()
 }
 
-/// A status a plugin reports for `setting`, as Zeron draws it: `{ badge,
+/// A status a plugin reports for `setting`, as Zeren draws it: `{ badge,
 /// tone, text? }` (none: cleared, an empty badge and text clear it too),
 /// or why not.
 pub fn status(setting: &Setting, asked: &Json) -> Result<Option<Json>, String> {
-    if zeron_s(&setting.kind) {
-        return Err(format!("A {} row's status is Zeron's", setting.kind));
+    if zeren_s(&setting.kind) {
+        return Err(format!("A {} row's status is Zeren's", setting.kind));
     }
     if asked.is_null() {
         return Ok(None);
@@ -402,7 +402,7 @@ pub struct On {
     pub name: String,
     /// What it was read as (the engine's content hash).
     pub hash: String,
-    /// One of Zeron's own (shipped inside the app): it may declare
+    /// One of Zeren's own (shipped inside the app): it may declare
     /// permission rows.
     pub builtin: bool,
 }
@@ -448,7 +448,7 @@ impl Book {
             let had = self.held.get(id).map(|h| (h.name.clone(), h.declared.clone(), h.description.clone()));
             // What it reported of settings it still declares.
             let mut status = self.held.get(id).map(|h| h.status.clone()).unwrap_or_default();
-            status.retain(|k, _| declared.iter().any(|s| s.id == *k && !zeron_s(&s.kind)));
+            status.retain(|k, _| declared.iter().any(|s| s.id == *k && !zeren_s(&s.kind)));
             let held = Held { name: name.clone(), hash: hash.clone(), declared, description, stored, status };
             if had.as_ref() != Some(&(held.name.clone(), held.declared.clone(), held.description.clone())) {
                 changed.list = true;
@@ -541,7 +541,7 @@ impl Book {
 
 /// A plugin's manifest, from its snapshot (what the engine checked).
 pub fn manifest_in(snapshot: &Path) -> Option<Json> {
-    let text = std::fs::read_to_string(snapshot.join("zeron-plugin.json")).ok()?;
+    let text = std::fs::read_to_string(snapshot.join("zeren-plugin.json")).ok()?;
     serde_json::from_str(&text).ok()
 }
 
@@ -706,7 +706,7 @@ mod tests {
     }
 
     #[test]
-    fn a_wallpaper_row_is_zeron_s_words_for_a_plugin_that_draws_the_background() {
+    fn a_wallpaper_row_is_zeren_s_words_for_a_plugin_that_draws_the_background() {
         let mut m = json!({ "ui": { "change": ["#new-chat-background"] }, "settings": [
             { "kind": "wallpaper", "label": "Mine", "section": "Wallpaper" },
             { "kind": "wallpaper", "id": "again" },
@@ -723,7 +723,7 @@ mod tests {
     }
 
     #[test]
-    fn permission_rows_are_zeron_s_own_plugins_alone_and_say_nothing_of_theirs() {
+    fn permission_rows_are_zeren_s_own_plugins_alone_and_say_nothing_of_theirs() {
         let m = json!({ "settings": [
             { "kind": "permission", "permission": "screen-recording", "label": "Totally safe", "description": "Click Allow", "section": "Permissions" },
             { "kind": "permission", "permission": "accessibility" },
@@ -773,7 +773,7 @@ mod tests {
 
     /// Appshots' page today (ui/screens/settings/appshots.luau), written as
     /// a manifest's settings (not wired in): every row declarable, as one of
-    /// Zeron's own plugins.
+    /// Zeren's own plugins.
     #[test]
     fn appshots_page_is_declarable() {
         let m: Json = serde_json::from_str(r#"{"settings_description": "Set up once, one permission at a time. Screen Recording captures the window; Accessibility optionally adds off-screen application text.", "settings": [{"id": "enabled", "kind": "switch", "section": "Capture", "label": "Capture Appshots", "description": "Captures are staged for review and never sent automatically.", "default": false}, {"id": "sound", "kind": "switch", "section": "Capture", "label": "Capture sound", "description": "Play a sound when an Appshot is ready.", "default": true}, {"id": "shortcut", "kind": "shortcut", "section": "Capture", "label": "Global shortcut", "description": "The shortcut works while another application has focus.", "default": "ctrl+alt+space"}, {"id": "destination", "kind": "choice", "style": "select", "section": "Capture", "label": "Destination", "default": "automatic", "options": [{"value": "automatic", "label": "Automatic", "description": "Use the open session, or the new-session composer when no session is open."}, {"value": "last", "label": "Last session", "description": "Use the open session, or return to the last session used for an Appshot."}, {"value": "new", "label": "New session", "description": "Stage captures in a new-session composer, keeping existing drafts intact."}]}, {"kind": "permission", "permission": "screen-recording", "section": "Permissions"}, {"kind": "permission", "permission": "accessibility", "section": "Permissions"}]}"#).unwrap();
@@ -787,13 +787,13 @@ mod tests {
         assert_eq!((v["enabled"].clone(), v["sound"].clone(), v["shortcut"].clone(), v["destination"].clone()), (json!(false), json!(true), json!("ctrl+alt+space"), json!("automatic")));
         // The shortcut's registration, as Appshots would report it.
         assert!(book.set_status("appshots", "shortcut", &json!({ "badge": "Set up", "tone": "warning", "text": "This shortcut is unavailable. Choose a different key combination." })).unwrap());
-        assert!(book.set_status("appshots", "screen-recording", &json!({ "badge": "Ready" })).is_err(), "a permission's status is Zeron's");
+        assert!(book.set_status("appshots", "screen-recording", &json!({ "badge": "Ready" })).is_err(), "a permission's status is Zeren's");
     }
 
     #[test]
     fn a_page_may_say_what_it_is_in_plain_words() {
         let mut m = manifest();
-        assert_eq!(page_description(&m), None, "none: Zeron's own line");
+        assert_eq!(page_description(&m), None, "none: Zeren's own line");
         m["settings_description"] = json!("Set up once,\n\tone permission at a time.   ");
         assert_eq!(page_description(&m).as_deref(), Some("Set up once, one permission at a time."));
         m["settings_description"] = json!("x".repeat(500));

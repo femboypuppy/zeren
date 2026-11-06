@@ -1,4 +1,4 @@
-//! WPE WebKit engine. Its helper (`wpe.c`) is Zeron's WPEPlatform: pages render
+//! WPE WebKit engine. Its helper (`wpe.c`) is Zeren's WPEPlatform: pages render
 //! into dma-bufs on GPUI's GPU, GPUI copies only their damage into a persistent
 //! atlas tile, and GPUI's frame callbacks are the pages' vblank. Shared-memory
 //! mirrors stand in when the helper cannot render on GPUI's GPU.
@@ -16,9 +16,9 @@ use std::{
     time::Instant,
 };
 
-pub(super) const HELPER: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/zeron-wpe"));
+pub(super) const HELPER: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/zeren-wpe"));
 /// Largest packet either side sends (page script results, copied text, the
-/// clipboard Zeron shares); the helper drops larger ones.
+/// clipboard Zeren shares); the helper drops larger ones.
 const MAX_PACKET: usize = 64 * 1024 * 1024;
 const MAX_DIMENSION: u32 = 8192;
 /// gpui_linux scales Wayland axis values and wheel clicks by three; WebKit

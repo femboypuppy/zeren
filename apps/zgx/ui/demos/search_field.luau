@@ -4,11 +4,11 @@ local SearchField = require("@ds/search_field")
 local kit = require("@demos/kit")
 
 local query = ui.state("sf_query", "")
-local branches = ui.state("sf_branches", "zeron/")
+local branches = ui.state("sf_branches", "zeren/")
 local pill = ui.state("sf_pill", "")
 local small = ui.state("sf_small", "")
 
-local BRANCHES = { "main", "zeron/primitives", "zeron/composer", "zeron/git-pages", "release/0.3" }
+local BRANCHES = { "main", "zeren/primitives", "zeren/composer", "zeren/git-pages", "release/0.3" }
 
 return {
 	id = "search_field",

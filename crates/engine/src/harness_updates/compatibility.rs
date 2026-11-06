@@ -1,32 +1,32 @@
-//! Agent CLI releases this zeron is known not to work with.
+//! Agent CLI releases this zeren is known not to work with.
 //!
-//! A CLI release can break the protocol zeron speaks to it (a renamed
+//! A CLI release can break the protocol zeren speaks to it (a renamed
 //! stream-json frame, a dropped flag). The policy lists those releases per
 //! CLI, so an update never installs one, and an installed one says so with
 //! the release to go back to. Sources, first match wins:
 //!
 //! 1. `{edge}/releases/harness-compatibility.json` — published on its own,
 //!    so a release that broke this morning is held back today, without a
-//!    zeron release. Fetched at most hourly; the last good copy is kept in
+//!    zeren release. Fetched at most hourly; the last good copy is kept in
 //!    `{data_dir}/harness-compatibility.json` for offline starts.
-//! 2. The list built into this zeron (`compatibility.json`).
+//! 2. The list built into this zeren (`compatibility.json`).
 //!
 //! ```json
 //! { "policies": [ {
 //!     "harness": "claude-code",
-//!     "zeron": "<0.3.0",
+//!     "zeren": "<0.3.0",
 //!     "recommended": "2.1.309",
 //!     "ranges": [ { "range": ">=2.1.310, <2.1.312", "status": "broken",
 //!                   "reason": "stream-json results lost their session id" } ]
 //! } ] }
 //! ```
 //!
-//! `zeron` (optional) scopes a policy to the zeron versions it was written
-//! for, so a zeron that adapted is not held back by it. A range is a semver
+//! `zeren` (optional) scopes a policy to the zeren versions it was written
+//! for, so a zeren that adapted is not held back by it. A range is a semver
 //! requirement; `||` separates alternatives.
 
 use serde::{Deserialize, Serialize};
-use zeron_proto::{HarnessCompatibility, HarnessCompatibilityStatus, HarnessId};
+use zeren_proto::{HarnessCompatibility, HarnessCompatibilityStatus, HarnessId};
 
 const BUILT_IN: &str = include_str!("compatibility.json");
 
@@ -40,7 +40,7 @@ pub(super) struct Feed {
 pub(super) struct Policy {
     pub harness: HarnessId,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub zeron: Option<String>,
+    pub zeren: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub recommended: Option<String>,
     #[serde(default)]
@@ -65,8 +65,8 @@ impl Feed {
     pub(super) fn parse(json: &str) -> Result<Self, String> {
         let feed: Feed = serde_json::from_str(json).map_err(|error| error.to_string())?;
         for policy in &feed.policies {
-            if let Some(zeron) = &policy.zeron {
-                requirement(zeron)?;
+            if let Some(zeren) = &policy.zeren {
+                requirement(zeren)?;
             }
             for range in &policy.ranges {
                 requirement(&range.range)?;
@@ -75,7 +75,7 @@ impl Feed {
         Ok(feed)
     }
 
-    /// What the policy says about `harness` at `version`, for this zeron.
+    /// What the policy says about `harness` at `version`, for this zeren.
     /// `None`: nothing (supported, or not listed).
     pub(super) fn verdict(
         &self,
@@ -89,15 +89,15 @@ impl Feed {
         &self,
         harness: HarnessId,
         version: &str,
-        zeron: &str,
+        zeren: &str,
     ) -> Option<HarnessCompatibility> {
-        let zeron = lenient(zeron)?;
+        let zeren = lenient(zeren)?;
         let policy = self.policies.iter().find(|policy| {
             policy.harness == harness
                 && policy
-                    .zeron
+                    .zeren
                     .as_deref()
-                    .is_none_or(|range| matches(range, &zeron))
+                    .is_none_or(|range| matches(range, &zeren))
         })?;
         let parsed = lenient(version)?;
         let range = policy
@@ -108,8 +108,8 @@ impl Feed {
             return None;
         }
         let what = match range.status {
-            HarnessCompatibilityStatus::Broken => "doesn't work with this version of Zeron",
-            _ => "isn't supported by this version of Zeron",
+            HarnessCompatibilityStatus::Broken => "doesn't work with this version of Zeren",
+            _ => "isn't supported by this version of Zeren",
         };
         let mut message = format!("{version} {what}");
         if let Some(reason) = &range.reason {
@@ -165,7 +165,7 @@ mod tests {
     fn feed() -> Feed {
         Feed::parse(
             r#"{ "policies": [
-                { "harness": "claude-code", "zeron": "<0.3.0", "recommended": "2.1.309",
+                { "harness": "claude-code", "zeren": "<0.3.0", "recommended": "2.1.309",
                   "ranges": [
                     { "range": ">=2.1.310, <2.1.312", "status": "broken",
                       "reason": "results lost their session id" },
@@ -187,7 +187,7 @@ mod tests {
         assert_eq!(broken.recommended_version.as_deref(), Some("2.1.309"));
         assert_eq!(
             broken.message,
-            "2.1.311 doesn't work with this version of Zeron (results lost their session id). \
+            "2.1.311 doesn't work with this version of Zeren (results lost their session id). \
              Use 2.1.309"
         );
         assert_eq!(
@@ -217,7 +217,7 @@ mod tests {
             feed.verdict_for(HarnessId::Grok, "1.0.0", "0.2.120")
                 .is_none()
         );
-        // A zeron that adapted is not held back.
+        // A zeren that adapted is not held back.
         assert!(
             feed.verdict_for(HarnessId::ClaudeCode, "2.1.311", "0.3.0")
                 .is_none()

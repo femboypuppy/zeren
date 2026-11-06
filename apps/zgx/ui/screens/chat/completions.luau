@@ -1,23 +1,23 @@
 -- What a chat's composer offers as `@`, `/` and `$` are typed, for whichever
 -- composer shows that chat (the chat page's, a side chat's): the files of where
--- it works, the agent's commands and skills, then Zeron's own.
+-- it works, the agent's commands and skills, then Zeren's own.
 --
 --   local c = Completions.bind { key, text, agent, target, files, in_chat, run }
 --   ds.Composer { mentions = c.lists, on_mention = c.on_mention,
 --     mention_enabled = c.enabled, mention_empty = c.empty }
---   c.command_of(draft)   the Zeron command a whole draft is, if any
+--   c.command_of(draft)   the Zeren command a whole draft is, if any
 --
 -- `key` names what it keeps (so a reload reads nothing again), `text` is the
 -- draft, `agent` the harness its model runs on, `target` where its commands and
 -- skills are read (`{ chat, device }`, or a new chat's `{ space, device }`),
 -- `files` where `@` searches, `in_chat` whether the chat is made yet, and `run`
--- runs one of Zeron's commands.
+-- runs one of Zeren's commands.
 
 local files = require("@app/screens/files/api")
 local mentions = require("@ds/composer_mentions")
 local prefs = require("@app/screens/settings/prefs")
 local Invocations = require("@app/screens/chat/invocations")
-local ZeronCommands = require("@app/screens/chat/zeron_commands")
+local ZerenCommands = require("@app/screens/chat/zeren_commands")
 
 local M = {}
 
@@ -44,7 +44,7 @@ function M.bind(b: Bind): { [string]: any }
 		local catalog = Invocations.catalog(invocation_key())
 		given["/"] = Invocations.items(catalog, "command")
 		given["$"] = Invocations.items(catalog, "skill")
-		-- No agent to ask: Zeron's own alone. Its list still coming: nil.
+		-- No agent to ask: Zeren's own alone. Its list still coming: nil.
 		if b.agent() == nil then
 			given["/"] = {}
 		elseif given["/"] == nil then
@@ -60,8 +60,8 @@ function M.bind(b: Bind): { [string]: any }
 				table.insert(slash, skill)
 			end
 		end
-		-- Then Zeron's own (named clear of the agent's).
-		for _, row in ZeronCommands.rows(taken, b.in_chat()) do
+		-- Then Zeren's own (named clear of the agent's).
+		for _, row in ZerenCommands.rows(taken, b.in_chat()) do
 			table.insert(slash, row)
 		end
 		given["/"] = slash
@@ -120,7 +120,7 @@ function M.bind(b: Bind): { [string]: any }
 						detail = folder,
 						file = not f.dir,
 						dir = f.dir,
-						-- Sent as Zeron's file mention (screens/chat/shared).
+						-- Sent as Zeren's file mention (screens/chat/shared).
 						link = require("@app/screens/chat/shared").file_link(f.path, f.dir),
 					})
 				end
@@ -133,10 +133,10 @@ function M.bind(b: Bind): { [string]: any }
 	return {
 		lists = lists,
 		-- A command, skill or file picked: what its token stands for; one of
-		-- Zeron's own runs (its token gone).
+		-- Zeren's own runs (its token gone).
 		on_mention = function(item: any, trigger: string, token: string)
-			if item.zeron then
-				b.run(item.zeron)
+			if item.zeren then
+				b.run(item.zeren)
 			elseif trigger == "@" then
 				Invocations.remember(item, trigger, token)
 			else
@@ -160,10 +160,10 @@ function M.bind(b: Bind): { [string]: any }
 				return nil
 			end,
 		}) :: any,
-		-- A draft that is only one of Zeron's own commands (its token goes;
+		-- A draft that is only one of Zeren's own commands (its token goes;
 		-- anything carried stays).
 		command_of = function(draft: string): string?
-			return ZeronCommands.of_text(draft, (lists:peek() or {})["/"] or {})
+			return ZerenCommands.of_text(draft, (lists:peek() or {})["/"] or {})
 		end,
 	}
 end

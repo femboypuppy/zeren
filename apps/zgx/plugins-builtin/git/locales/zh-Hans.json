@@ -169,7 +169,7 @@
     },
     "not_installed": {
       "title": "{device} 上没有 Git",
-      "body": "请在那台设备上更新 Zeron：Git 随之附带。"
+      "body": "请在那台设备上更新 Zeren：Git 随之附带。"
     },
     "off": {
       "title": "Git 在 {device} 上已关闭",
@@ -181,23 +181,23 @@
     },
     "version_mismatch": {
       "title": "{device} 上的 Git 版本不同",
-      "body": "请在两台设备上都更新 Zeron，使版本一致。"
+      "body": "请在两台设备上都更新 Zeren，使版本一致。"
     },
     "other_author": {
       "title": "{device} 上有另一个 Git 插件",
-      "body": "那里有一个同名的他人插件。移除它即可使用 Zeron 的。"
+      "body": "那里有一个同名的他人插件。移除它即可使用 Zeren 的。"
     },
     "no_service": {
       "title": "{device} 上的 Git 无法运行",
-      "body": "它的版本没有服务。请在那里更新 Zeron。"
+      "body": "它的版本没有服务。请在那里更新 Zeren。"
     },
     "not_loaded": {
       "title": "Git 在 {device} 上没有启动",
       "body": "它的服务加载失败。那台设备的 设置 → 插件 中有原因。"
     },
     "old_engine": {
-      "title": "{device} 需要更新的 Zeron",
-      "body": "请在那里更新 Zeron，才能在这个对话中使用 Git。"
+      "title": "{device} 需要更新的 Zeren",
+      "body": "请在那里更新 Zeren，才能在这个对话中使用 Git。"
     },
     "interrupted": {
       "title": "Git 在 {device} 上中断了",

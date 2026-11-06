@@ -15,10 +15,10 @@ use futures::StreamExt;
 use futures::stream::BoxStream;
 use tokio::sync::{Mutex, mpsc};
 
-use zeron_doc::{MessagePart, SessionMessageEntry, SubagentStatus};
-use zeron_engine::{EngineCore, HarnessRegistry};
-use zeron_harness::{Harness, HarnessError, RunControls};
-use zeron_proto::{
+use zeren_doc::{MessagePart, SessionMessageEntry, SubagentStatus};
+use zeren_engine::{EngineCore, HarnessRegistry};
+use zeren_harness::{Harness, HarnessError, RunControls};
+use zeren_proto::{
     AgentEvent, DoneStatus, HarnessId, Model, ReasoningLevel, RunRequest, SandboxLevel,
     SessionStatus, SteeringMode, ToolCall,
 };
@@ -34,7 +34,7 @@ fn init_env() {
     ONCE.call_once(|| {
         // SAFETY: called before any engine (and thus any reader of the var)
         // exists in this test process; all tests share the one value.
-        unsafe { std::env::set_var("ZERON_SESSION_IDLE_MS", IDLE_MS.to_string()) };
+        unsafe { std::env::set_var("ZEREN_SESSION_IDLE_MS", IDLE_MS.to_string()) };
     });
 }
 

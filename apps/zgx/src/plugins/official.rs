@@ -1,28 +1,28 @@
-//! The templates that ship with Zeron beside the default: Zeron v2, the
-//! single-page layout from before Zeron v3 (the default's id stays
-//! `zeron`, whatever its name).
+//! The templates that ship with Zeren beside the default: Zeren v2, the
+//! single-page layout from before Zeren v3 (the default's id stays
+//! `zeren`, whatever its name).
 //!
 //! An official template is like anyone's: a folder of files laid over the
 //! default (`live::compose`). Its files are in the app's own `ui/`, under
 //! `templates/<id>/` (never part of the default's copy: `live::not_the_app`),
 //! with its `.base.json`, the hash of each default file it replaces as it was
 //! when the two were last brought in step (the staleness guard's record:
-//! `tests::zeron_v2_is_in_step_with_the_default`, and `template_status`'s, as
+//! `tests::zeren_v2_is_in_step_with_the_default`, and `template_status`'s, as
 //! for any template).
 //!
 //! Each sync of the default's copy writes each one into
 //! `<data>/templates/<id>/` (`install`), rewriting only what changed, so it
-//! comes and updates with Zeron:
+//! comes and updates with Zeren:
 //!
-//! - A folder is Zeron's to write (`ours`) only if it's a real folder whose
+//! - A folder is Zeren's to write (`ours`) only if it's a real folder whose
 //!   manifest is marked with the template's id (`MARK`), holding nothing but
-//!   what Zeron writes there now or wrote before (its `.base.json` names
+//!   what Zeren writes there now or wrote before (its `.base.json` names
 //!   those): one with anything more (an agent's screen, an imported
 //!   package's record) or not marked is someone's, and never touched. The
 //!   official one then takes the next free id (`<id>-2`…).
-//! - One exactly as this build writes it (`verified`) is Zeron's: listed as
-//!   built in (no Delete, no Export, "By Zeron"), and run with the app's
-//!   powers without asking, as the default is, its files being Zeron's own.
+//! - One exactly as this build writes it (`verified`) is Zeren's: listed as
+//!   built in (no Delete, no Export, "By Zeren"), and run with the app's
+//!   powers without asking, as the default is, its files being Zeren's own.
 //!   Anything else is an ordinary template: a preview until you keep it.
 
 use std::{
@@ -39,10 +39,10 @@ use super::live;
 pub const MARK: &str = "builtin_template";
 /// Where in `ui/` the official templates' files are.
 pub const SOURCE: &str = "templates";
-const MANIFEST: &str = "zeron-template.json";
+const MANIFEST: &str = "zeren-template.json";
 const BASE: &str = ".base.json";
 
-/// An official template, as Zeron ships it.
+/// An official template, as Zeren ships it.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Official {
     pub id: &'static str,
@@ -53,10 +53,10 @@ pub struct Official {
 /// Every official template, in the order the Templates page lists them
 /// (after the default).
 pub const OFFICIAL: &[Official] =
-    &[Official { id: "zeron-v2", name: "Zeron v2", description: "The single-page layout from before Zeron v3." }];
+    &[Official { id: "zeren-v2", name: "Zeren v2", description: "The single-page layout from before Zeren v3." }];
 
 /// The default template's name and description (its id is `live::BUILTIN`).
-pub const DEFAULT_NAME: &str = "Zeron v3";
+pub const DEFAULT_NAME: &str = "Zeren v3";
 pub const DEFAULT_DESCRIPTION: &str = "The default interface. Chats can sit side by side.";
 
 pub fn find(id: &str) -> Option<Official> {
@@ -81,9 +81,9 @@ pub fn manifest(o: &Official, id: &str) -> serde_json::Value {
         "id": id,
         "name": o.name,
         "description": o.description,
-        "author": "Zeron",
-        "version": live::ZERON_VERSION,
-        "zeron_version": live::ZERON_VERSION,
+        "author": "Zeren",
+        "version": live::ZEREN_VERSION,
+        "zeren_version": live::ZEREN_VERSION,
         MARK: o.id,
     })
 }
@@ -133,7 +133,7 @@ fn contents(dir: &Path) -> Option<BTreeMap<String, PathBuf>> {
 }
 
 /// Whether `dir` is `o`'s to write: free, or a real folder marked as `o`'s
-/// holding only what Zeron writes there (`want`) or wrote there before (its
+/// holding only what Zeren writes there (`want`) or wrote there before (its
 /// `.base.json`'s files).
 fn ours(dir: &Path, o: &Official, want: &BTreeMap<String, Vec<u8>>) -> bool {
     let Ok(meta) = std::fs::symlink_metadata(dir) else { return true };
@@ -165,7 +165,7 @@ fn place(ui: &Path, templates: &Path, o: &Official) -> (String, PathBuf) {
 
 /// `o` written into `templates` from `ui` (or brought up to date there):
 /// its id. Its manifest goes last (a folder with a manifest is a
-/// template), and files an earlier Zeron wrote that this one doesn't, go.
+/// template), and files an earlier Zeren wrote that this one doesn't, go.
 pub fn install_one(ui: &Path, templates: &Path, o: &Official) -> Result<String, String> {
     let (id, dir) = place(ui, templates, o);
     let want = wanted(ui, o, &id);
@@ -195,7 +195,7 @@ pub fn install(ui: &Path, templates: &Path) -> Vec<String> {
     for o in OFFICIAL {
         match install_one(ui, templates, o) {
             Ok(id) => ids.push(id),
-            Err(error) => eprintln!("zeron-zgx: the {} template wasn't installed: {error}", o.name),
+            Err(error) => eprintln!("zeren-zgx: the {} template wasn't installed: {error}", o.name),
         }
     }
     ids
@@ -280,7 +280,7 @@ pub fn verified(dir: &Path) -> Option<Official> {
 }
 
 /// A template's place in the Templates page's list: the default first,
-/// then the official ones in Zeron's order, then the rest (by name).
+/// then the official ones in Zeren's order, then the rest (by name).
 pub fn order(id: &str, official: Option<Official>) -> usize {
     match official {
         _ if id == live::BUILTIN => 0,
@@ -312,23 +312,23 @@ mod tests {
 
     const V2: Official = OFFICIAL[0];
 
-    /// The files Zeron v2 lays over the default, as `ui/templates/zeron-v2`
+    /// The files Zeren v2 lays over the default, as `ui/templates/zeren-v2`
     /// has them.
     fn overlay() -> Vec<String> {
         live::files(&source(&ui(), &V2), |_| true).into_keys().collect()
     }
 
-    /// The staleness guard. Zeron v2 is the default's single-page layout
-    /// as it stood before Zeron v3: each file it replaces is its own copy,
+    /// The staleness guard. Zeren v2 is the default's single-page layout
+    /// as it stood before Zeren v3: each file it replaces is its own copy,
     /// which goes stale as the default moves on. Its `.base.json` records
     /// the hash of each of those default files as it was when v2 was last
     /// brought in step with it. Change one, and this fails until whoever
     /// changed it has looked at v2's copy: brought the fix over if it
     /// applies to the single-page layout (a bug fixed, a renamed ds prop),
     /// or not (a v3-only change), then recorded it with
-    /// `ZERON_V2_BLESS=1 cargo test --bin zeron-zgx zeron_v2_is_in_step`.
+    /// `ZEREN_V2_BLESS=1 cargo test --bin zeren-zgx zeren_v2_is_in_step`.
     #[test]
-    fn zeron_v2_is_in_step_with_the_default() {
+    fn zeren_v2_is_in_step_with_the_default() {
         let src = source(&ui(), &V2);
         let base_path = src.join(BASE);
         let base: BTreeMap<String, String> = serde_json::from_slice(&std::fs::read(&base_path).unwrap_or_default()).unwrap_or_default();
@@ -339,7 +339,7 @@ mod tests {
                 (rel, live::hash(&bytes))
             })
             .collect();
-        if std::env::var_os("ZERON_V2_BLESS").is_some() {
+        if std::env::var_os("ZEREN_V2_BLESS").is_some() {
             let mut json = serde_json::to_vec_pretty(&now).unwrap();
             json.push(b'\n');
             std::fs::write(&base_path, json).unwrap();
@@ -349,9 +349,9 @@ mod tests {
         let gone: Vec<&String> = base.keys().filter(|rel| !now.contains_key(*rel)).collect();
         assert!(
             moved.is_empty() && gone.is_empty(),
-            "The default's {moved:?} changed since Zeron v2 was last brought in step with it (and {gone:?} left v2). \
-             v2 keeps its own copy of each (ui/templates/zeron-v2/). Bring your change over to v2's copy if it \
-             applies to the single-page layout, then record it: ZERON_V2_BLESS=1 cargo test --bin zeron-zgx zeron_v2_is_in_step"
+            "The default's {moved:?} changed since Zeren v2 was last brought in step with it (and {gone:?} left v2). \
+             v2 keeps its own copy of each (ui/templates/zeren-v2/). Bring your change over to v2's copy if it \
+             applies to the single-page layout, then record it: ZEREN_V2_BLESS=1 cargo test --bin zeren-zgx zeren_v2_is_in_step"
         );
     }
 
@@ -359,7 +359,7 @@ mod tests {
     /// something of its own (never the default's bytes again), and none
     /// that are never a template's.
     #[test]
-    fn zeron_v2_differs_from_v3_where_the_layouts_part() {
+    fn zeren_v2_differs_from_v3_where_the_layouts_part() {
         let files = overlay();
         assert_eq!(
             files,
@@ -373,7 +373,7 @@ mod tests {
                 "screens/shell/page.luau",
                 "screens/shell/view.luau",
             ],
-            "Zeron v2's files"
+            "Zeren v2's files"
         );
         for rel in &files {
             let v2 = std::fs::read_to_string(source(&ui(), &V2).join(rel)).unwrap();
@@ -381,7 +381,7 @@ mod tests {
             assert_ne!(v2, v3, "{rel}: v2's copy is the default's own; leave it out of v2");
             assert!(!live::never_templated(rel), "{rel}");
             // v2 is one page: none of v3's split chats or inset cards.
-            assert!(!v2.contains("screens/shell/split") && !v2.contains("zeron.inset"), "{rel}: v2 has v3's split or inset");
+            assert!(!v2.contains("screens/shell/split") && !v2.contains("zeren.inset"), "{rel}: v2 has v3's split or inset");
         }
         let page = std::fs::read_to_string(ui().join("screens/shell/page.luau")).unwrap();
         assert!(page.contains("@app/screens/shell/split"), "v3's page lays out split chats");
@@ -389,16 +389,16 @@ mod tests {
     }
 
     #[test]
-    fn zeron_v2_installs_as_zeron_s_and_never_over_yours() {
+    fn zeren_v2_installs_as_zeren_s_and_never_over_yours() {
         let t = dir("install");
         // Yours, under v2's id.
-        write(&t, "zeron-v2/zeron-template.json", r#"{"name":"My v2","author":"you"}"#);
-        write(&t, "zeron-v2/screens/shell/page.luau", "-- mine");
+        write(&t, "zeren-v2/zeren-template.json", r#"{"name":"My v2","author":"you"}"#);
+        write(&t, "zeren-v2/screens/shell/page.luau", "-- mine");
         let ids = install(&ui(), &t);
-        assert_eq!(ids, ["zeron-v2-2"]);
-        assert_eq!(std::fs::read_to_string(t.join("zeron-v2/screens/shell/page.luau")).unwrap(), "-- mine", "yours, untouched");
-        assert!(verified_at(&ui(), &t.join("zeron-v2")).is_none());
-        let at = t.join("zeron-v2-2");
+        assert_eq!(ids, ["zeren-v2-2"]);
+        assert_eq!(std::fs::read_to_string(t.join("zeren-v2/screens/shell/page.luau")).unwrap(), "-- mine", "yours, untouched");
+        assert!(verified_at(&ui(), &t.join("zeren-v2")).is_none());
+        let at = t.join("zeren-v2-2");
         assert_eq!(verified_at(&ui(), &at), Some(V2));
         let held: Vec<String> = contents(&at).unwrap().into_keys().collect();
         let mut want: Vec<String> = overlay();
@@ -406,27 +406,27 @@ mod tests {
         want.sort();
         assert_eq!(held, want, "its interface, its .base.json and its manifest: nothing else");
         let m = read_json(&at.join(MANIFEST));
-        assert_eq!((m["name"].as_str(), m["author"].as_str(), m[MARK].as_str()), (Some("Zeron v2"), Some("Zeron"), Some("zeron-v2")));
-        assert_eq!(m["zeron_version"], live::ZERON_VERSION);
+        assert_eq!((m["name"].as_str(), m["author"].as_str(), m[MARK].as_str()), (Some("Zeren v2"), Some("Zeren"), Some("zeren-v2")));
+        assert_eq!(m["zeren_version"], live::ZEREN_VERSION);
         // Again: the same place, nothing rewritten.
         let stamp = live::template_stamp(&at);
         assert_eq!(install(&ui(), &t), ids);
         assert_eq!(live::template_stamp(&at), stamp);
-        // Edited in place: not Zeron's (a preview, deletable) until the next
-        // install puts Zeron's back.
-        write(&t, "zeron-v2-2/screens/shell/page.luau", "ui.call('terminal.start', {})");
+        // Edited in place: not Zeren's (a preview, deletable) until the next
+        // install puts Zeren's back.
+        write(&t, "zeren-v2-2/screens/shell/page.luau", "ui.call('terminal.start', {})");
         assert!(verified_at(&ui(), &at).is_none());
         install(&ui(), &t);
         assert_eq!(verified_at(&ui(), &at), Some(V2));
-        // A file an earlier Zeron wrote and this one doesn't: gone. One
-        // added by someone: the folder isn't Zeron's any more.
-        write(&t, "zeron-v2-2/.base.json", r#"{"screens/old.luau":"x"}"#);
-        write(&t, "zeron-v2-2/screens/old.luau", "-- an earlier v2's");
+        // A file an earlier Zeren wrote and this one doesn't: gone. One
+        // added by someone: the folder isn't Zeren's any more.
+        write(&t, "zeren-v2-2/.base.json", r#"{"screens/old.luau":"x"}"#);
+        write(&t, "zeren-v2-2/screens/old.luau", "-- an earlier v2's");
         install(&ui(), &t);
         assert!(!at.join("screens/old.luau").exists());
         assert_eq!(verified_at(&ui(), &at), Some(V2));
-        write(&t, "zeron-v2-2/screens/extra.luau", "-- an agent's");
-        assert!(!ours(&at, &V2, &wanted(&ui(), &V2, "zeron-v2-2")));
+        write(&t, "zeren-v2-2/screens/extra.luau", "-- an agent's");
+        assert!(!ours(&at, &V2, &wanted(&ui(), &V2, "zeren-v2-2")));
         // Set aside (an agent's delete, by hand): a look puts it back.
         assert!(!missing(&ui(), &t));
         let gone = dir("missing");
@@ -434,23 +434,23 @@ mod tests {
         assert!(!missing(&gone.join("no-ui"), &gone), "only what this build ships");
         install(&ui(), &gone);
         assert!(!missing(&ui(), &gone));
-        std::fs::remove_dir_all(gone.join("zeron-v2")).unwrap();
+        std::fs::remove_dir_all(gone.join("zeren-v2")).unwrap();
         assert!(missing(&ui(), &gone));
-        assert_eq!(install(&ui(), &t), ["zeron-v2-3"]);
+        assert_eq!(install(&ui(), &t), ["zeren-v2-3"]);
         assert_eq!(std::fs::read_to_string(at.join("screens/extra.luau")).unwrap(), "-- an agent's");
     }
 
     /// R18, as for the retired theme templates: a folder that says it's
-    /// Zeron's (an imported package's, one written by hand) is never
-    /// listed or trusted as Zeron's unless it's this build's, byte for byte.
+    /// Zeren's (an imported package's, one written by hand) is never
+    /// listed or trusted as Zeren's unless it's this build's, byte for byte.
     #[test]
-    fn a_folder_posing_as_zeron_v2_is_never_zeron_s() {
+    fn a_folder_posing_as_zeren_v2_is_never_zeren_s() {
         let t = dir("posing");
         install(&ui(), &t);
-        let at = t.join("zeron-v2");
+        let at = t.join("zeren-v2");
         assert!(verified_at(&ui(), &at).is_some());
         // An imported package's record beside it.
-        write(&t, "zeron-v2/.imported.json", r#"{"key":"k","author":{"kind":"unknown"}}"#);
+        write(&t, "zeren-v2/.imported.json", r#"{"key":"k","author":{"kind":"unknown"}}"#);
         assert!(verified_at(&ui(), &at).is_none());
         // Marked, at another id.
         let elsewhere = t.join("my-v2");
@@ -466,18 +466,18 @@ mod tests {
         {
             let linked = dir("linked");
             install(&ui(), &linked);
-            let page = linked.join("zeron-v2/screens/shell/page.luau");
+            let page = linked.join("zeren-v2/screens/shell/page.luau");
             std::fs::remove_file(&page).unwrap();
-            std::os::unix::fs::symlink(ui().join("templates/zeron-v2/screens/shell/page.luau"), &page).unwrap();
-            assert!(verified_at(&ui(), &linked.join("zeron-v2")).is_none());
+            std::os::unix::fs::symlink(ui().join("templates/zeren-v2/screens/shell/page.luau"), &page).unwrap();
+            assert!(verified_at(&ui(), &linked.join("zeren-v2")).is_none());
         }
         // The page and the trust follow `verified`.
         let listed = live::installed(&t);
-        assert!(listed.iter().find(|i| i.id == "zeron-v2").unwrap().official.is_none());
-        std::fs::remove_file(t.join("zeron-v2/.imported.json")).unwrap();
-        write(&t, ".zeron/zeron-template.json", r#"{"name":"Zeron v3","author":"Zeron"}"#);
+        assert!(listed.iter().find(|i| i.id == "zeren-v2").unwrap().official.is_none());
+        std::fs::remove_file(t.join("zeren-v2/.imported.json")).unwrap();
+        write(&t, ".zeren/zeren-template.json", r#"{"name":"Zeren v3","author":"Zeren"}"#);
         let listed = live::installed(&t);
-        assert_eq!(listed.iter().map(|i| i.id.as_str()).collect::<Vec<_>>(), [live::BUILTIN, "zeron-v2", "my-v2"], "the default, Zeron's, then the rest");
+        assert_eq!(listed.iter().map(|i| i.id.as_str()).collect::<Vec<_>>(), [live::BUILTIN, "zeren-v2", "my-v2"], "the default, Zeren's, then the rest");
         assert_eq!(listed[1].official, Some(V2));
     }
 }

@@ -17,19 +17,19 @@ use async_trait::async_trait;
 use futures::StreamExt;
 use futures::stream::BoxStream;
 
-use zeron_doc::{
+use zeren_doc::{
     MessagePart, MessageRole, MessageStatus, SessionCommandPayload, SessionDoc, SessionMessageEntry,
 };
-use zeron_engine::{
+use zeren_engine::{
     Auth, AuthConfig, AuthState, EngineCore, EngineProfile, HarnessRegistry, RunJournal,
     WorkspaceScope,
 };
-use zeron_harness::{Harness, HarnessError, RunControls};
-use zeron_proto::{
+use zeren_harness::{Harness, HarnessError, RunControls};
+use zeren_proto::{
     AgentEvent, DoneStatus, HarnessId, Model, ReasoningLevel, RunRequest, SandboxLevel,
     SessionStatus, SteeringMode,
 };
-use zeron_sync::DocsStore;
+use zeren_sync::DocsStore;
 
 const CHAT: &str = "chat-recovery";
 const DEVICE: &str = "dev-recovery";

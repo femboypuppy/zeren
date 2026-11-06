@@ -1,4 +1,4 @@
--- Zeron's words in the language chosen: zgx's catalog (`ui.i18n`,
+-- Zeren's words in the language chosen: zgx's catalog (`ui.i18n`,
 -- `ui.t`), ui/locales/<locale>.json with English (en.json) the source, so
 -- every key is there. Screens use `ui.t` directly; the design system goes
 -- through this module, because it's lent to plugins:
@@ -11,7 +11,7 @@
 -- plain string.)
 --
 -- The catalog is one per host, and zgx runs plugins' scripts before the
--- app's: Zeron's windows load ui/locales from the host itself (src/plugins
+-- app's: Zeren's windows load ui/locales from the host itself (src/plugins
 -- `lend_design_system`, zgx's `ScriptHost::i18n`), so a plugin's VM finds
 -- it from its first load. A host without it (a bare test host), until the
 -- app has loaded it, gives the English (locale_en.luau, made from en.json by
@@ -169,7 +169,7 @@ local function english_of(key: string, args: { [string]: any }?): string
 end
 
 -- An ICU message formatted with `args` by English's plural rules (a
--- plugin's own words, plugins-sdk/zeron.luau `zeron.s`): `{name}`, plural
+-- plugin's own words, plugins-sdk/zeren.luau `zeren.s`): `{name}`, plural
 -- (`one`, `other`, `=N`), select, number.
 function M.format(msg: string, args: { [string]: any }?): string
 	return format(msg, args or {}, nil)

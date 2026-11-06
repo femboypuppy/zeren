@@ -9,16 +9,16 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-DIR=/tmp/zeron-onboarding-demo
+DIR=/tmp/zeren-onboarding-demo
 IPC=27931
 
 echo "▸ building…"
-cargo build -p zeron -q
+cargo build -p zeren -q
 
 rm -rf "$DIR"
 mkdir -p "$DIR"
 echo "▸ opening a fresh install (data in $DIR)"
 # Embedded: the throwaway install's engine ends with the window.
-exec env ZERON_DATA_DIR="$DIR/data" ZERON_IPC_PORT=$IPC ZERON_EMBED_ENGINE=1 \
-  ${1:+ZERON_ONBOARDING=$1} RUST_LOG=warn \
-  ./target/debug/zeron
+exec env ZEREN_DATA_DIR="$DIR/data" ZEREN_IPC_PORT=$IPC ZEREN_EMBED_ENGINE=1 \
+  ${1:+ZEREN_ONBOARDING=$1} RUST_LOG=warn \
+  ./target/debug/zeren

@@ -38,7 +38,7 @@ import { jsonError, readJsonBody } from "./http";
 import { stepUpHash, stepUpRequired } from "./step-up";
 import { userDirectoryStub } from "./user-directory";
 
-export const PLUGIN_KEY_PROOF_PREFIX = "zeron-plugin-key:v1:";
+export const PLUGIN_KEY_PROOF_PREFIX = "zeren-plugin-key:v1:";
 
 const DEVICE_ID_RE = /^[A-Za-z0-9_-]{1,128}$/;
 const MAX_BODY = 1024;

@@ -153,7 +153,7 @@ ui.command {
 		local p = open_install
 		open_install = nil
 		if p then
-			p.err({ message = "That release has no .zeron-plugin file" })
+			p.err({ message = "That release has no .zeren-plugin file" })
 		end
 	end,
 }
@@ -209,7 +209,7 @@ ui.command {
 	run = function()
 		local n = find("notes-tool")
 		n.status = "broken"
-		n.error = "Its manifest asks for a permission Zeron doesn't know: teleport"
+		n.error = "Its manifest asks for a permission Zeren doesn't know: teleport"
 		publish()
 	end,
 }
@@ -279,9 +279,9 @@ ui.command {
 }
 ui.command {
 	id = "builtin",
-	title = "Zeron's own GitHub arrives",
+	title = "Zeren's own GitHub arrives",
 	run = function()
-		local p = plugin("github", "GitHub", "zeron", "on", { permissions = { "ui.add", "github" } })
+		local p = plugin("github", "GitHub", "zeren", "on", { permissions = { "ui.add", "github" } })
 		local any: any = p
 		any.builtin = true
 		any.allowed = { "github", "ui.add" }
@@ -310,7 +310,7 @@ ui.command {
 publish()
 
 -- Light, for pictures of it (src/audit_shots.rs: `!theme_light`).
-ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeron-light") end }
+ui.command { id = "theme_light", title = "Light theme", run = function() ui.theme.follow_system(false); ui.theme.current:set("zeren-light") end }
 
 return ui.scroll {
 	w_full = true,

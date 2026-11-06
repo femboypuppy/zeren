@@ -13,7 +13,7 @@ local HOLOS = { "aurora", "reverse", "secret", "starlight", "glyph" }
 local HASHES = {
 	{ input = "", hash = 2872998923 },
 	{ input = "a", hash = 444641715 },
-	{ input = "zeron", hash = 3920131753 },
+	{ input = "zeren", hash = 3920131753 },
 	{ input = "user_test_0001:scene", hash = 62640894 },
 	{ input = "user_test_0001:holo", hash = 1378625095 },
 	{ input = "user_test_0001:sky", hash = 1678271501 },

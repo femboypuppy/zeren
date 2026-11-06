@@ -1,22 +1,22 @@
 //! Ad-hoc RPC probe: call or subscribe against a running engine's IPC socket.
 //!
 //! Usage:
-//!   cargo run -p zeron-rpc --example rpc_probe -- ws://127.0.0.1:27801 LocalDevice '{}'
-//!   cargo run -p zeron-rpc --example rpc_probe -- ws://127.0.0.1:27801 WatchSessions '{}' --stream 3
+//!   cargo run -p zeren-rpc --example rpc_probe -- ws://127.0.0.1:27801 LocalDevice '{}'
+//!   cargo run -p zeren-rpc --example rpc_probe -- ws://127.0.0.1:27801 WatchSessions '{}' --stream 3
 //!
 //! A stream gives up after 30 s without an item (`RPC_PROBE_TIMEOUT_SECS`
 //! overrides — a watcher meant to keep a chat viewed needs longer).
 //!
-//! The engine's IPC bearer comes from `$ZERON_IPC_TOKEN`, `$ZERON_IPC_TOKEN_FILE`,
-//! or `$ZERON_DATA_DIR/ipc-token` (default `~/.zeron/ipc-token`) — point
-//! `ZERON_DATA_DIR` at the probed engine's data dir.
+//! The engine's IPC bearer comes from `$ZEREN_IPC_TOKEN`, `$ZEREN_IPC_TOKEN_FILE`,
+//! or `$ZEREN_DATA_DIR/ipc-token` (default `~/.zeren/ipc-token`) — point
+//! `ZEREN_DATA_DIR` at the probed engine's data dir.
 
-use zeron_rpc::{connect_ws, ipc_auth};
+use zeren_rpc::{connect_ws, ipc_auth};
 
 fn data_dir() -> Option<std::path::PathBuf> {
-    std::env::var_os("ZERON_DATA_DIR")
+    std::env::var_os("ZEREN_DATA_DIR")
         .map(std::path::PathBuf::from)
-        .or_else(|| std::env::var_os("HOME").map(|home| std::path::Path::new(&home).join(".zeron")))
+        .or_else(|| std::env::var_os("HOME").map(|home| std::path::Path::new(&home).join(".zeren")))
 }
 
 #[tokio::main]

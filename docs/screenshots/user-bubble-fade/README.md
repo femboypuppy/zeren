@@ -2,14 +2,14 @@
 
 Captured on 2026-10-27 on Linux (X11, Mesa software Vulkan) from `message-markdown-fixture`. The `before-*` captures run the fixture against `main` `31d26eeb`; `before-*`/`after-*` share the fixture before its long report was added, and the `*-report*` captures come from the final build.
 
-Build and run: `cargo run -p zeron-ui --features appshots-fixture --example message-markdown-fixture` (ZERON_PALETTE_LIGHT=1 for the light theme). `ZERON_FIXTURE_REPEAT=N` repeats the conversation N times; `ZERON_FIXTURE_PLAIN=1` strips the prompts' Markdown.
+Build and run: `cargo run -p zeren-ui --features appshots-fixture --example message-markdown-fixture` (ZEREN_PALETTE_LIGHT=1 for the light theme). `ZEREN_FIXTURE_REPEAT=N` repeats the conversation N times; `ZEREN_FIXTURE_PLAIN=1` strips the prompts' Markdown.
 
 - A folded bubble's bottom fades out over its last line and a half instead of cutting a line in half above a `...` line; the `...` is gone (`before-*` vs `after-*`). Opening it shows the whole prompt with no fade (`after-dark-open.png`). The fade composes with the transcript's own fade, so a folded bubble still fades under the titlebar and composer.
 - A folded prompt too long to fit lays out only the leading Markdown that fills the fold (`*-report.png`: a 240-item report shows its heading and first items); opening it lays out the rest (`after-dark-report-open.png`).
 
 ## Scroll cost
 
-Main-thread CPU per rendered frame while wheel-scrolling the same ~28 s script over `ZERON_FIXTURE_REPEAT=100` (600 prompts, 100 of them 240-item reports), optimized builds with frame pointers, two runs each:
+Main-thread CPU per rendered frame while wheel-scrolling the same ~28 s script over `ZEREN_FIXTURE_REPEAT=100` (600 prompts, 100 of them 240-item reports), optimized builds with frame pointers, two runs each:
 
 | | Markdown prompts | Plain prompts |
 |---|---|---|

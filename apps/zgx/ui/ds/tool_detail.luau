@@ -1,4 +1,4 @@
--- What a tool row opens to under its call, as Zeron's transcript does
+-- What a tool row opens to under its call, as Zeren's transcript does
 -- (crates/ui transcript.rs `tool_detail`, `blob_detail` and the chip's
 -- affordance): an edit's diff, or each file's lines added and removed; a
 -- command's output, a read's or a search's result.
@@ -403,10 +403,10 @@ local function output_view(id: string, source: () -> Source, tool: () -> Tool): 
 			py = "$space.2",
 			gap = "$space.1",
 			rounded = "$radius.md",
-			bg = "$zeron.code.wash",
+			bg = "$zeren.code.wash",
 			border = 1,
 			border_color = function(): string
-				return if failed() then "$zeron.tone.danger.edge" else "#00000000"
+				return if failed() then "$zeren.tone.danger.edge" else "#00000000"
 			end,
 			overflow = "hidden",
 			ui.show(function(): boolean
@@ -462,7 +462,7 @@ local function output_view(id: string, source: () -> Source, tool: () -> Tool): 
 					px = "$space.3",
 					text_size = "$font.size.xs",
 					line_height = "$font.line.xs",
-					color = "$zeron.tone.danger.ink",
+					color = "$zeren.tone.danger.ink",
 				}
 			),
 		},
@@ -540,8 +540,8 @@ local function diff_line(l: Line): Node
 			color = "$text.tertiary",
 		}
 	end
-	local wash = if l.kind == "+" then "$zeron.tone.success.wash" elseif l.kind == "-" then "$zeron.tone.danger.wash" else nil
-	local ink = if l.kind == "+" then "$zeron.diff.added" elseif l.kind == "-" then "$zeron.diff.removed" else "$text.tertiary"
+	local wash = if l.kind == "+" then "$zeren.tone.success.wash" elseif l.kind == "-" then "$zeren.tone.danger.wash" else nil
+	local ink = if l.kind == "+" then "$zeren.diff.added" elseif l.kind == "-" then "$zeren.diff.removed" else "$text.tertiary"
 	local function num(n: number?): Node
 		return ui.text {
 			if n then tostring(n) else "",
@@ -582,7 +582,7 @@ local function diff_view(d: Diff): Node
 	return ui.column {
 		w_full = true,
 		rounded = "$radius.md",
-		bg = "$zeron.code.wash",
+		bg = "$zeren.code.wash",
 		overflow = "hidden",
 		py = "$space.1",
 		class = "tool-diff",
@@ -610,7 +610,7 @@ local function stats_view(stats: { Stat }): Node
 		px = "$space.3",
 		py = "$space.1",
 		rounded = "$radius.md",
-		bg = "$zeron.code.wash",
+		bg = "$zeren.code.wash",
 		class = "tool-stats",
 		table.unpack(rows),
 	}

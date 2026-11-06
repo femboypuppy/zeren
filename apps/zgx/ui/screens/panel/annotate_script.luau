@@ -10,19 +10,19 @@
 -- labels them as untrusted. Only real (trusted) input picks; secrets the
 -- page shows in attributes or the URL are scrubbed before they leave.
 --
---   window.__zeronAnnotator.start(nonce, theme)   begin (ends any pick before)
+--   window.__zerenAnnotator.start(nonce, theme)   begin (ends any pick before)
 --   .stop()                                        end, posting "cancelled"
 --   .label(marker, n)                              number a pick's mark as its chip
 --   .keep([n, …])                                  marks whose chips remain
 --   .focus(n)                                      the mark of the chip under the pointer
 --
--- Posted (kind "zeron.annotation", the nonce with each): `{ event = "pick",
+-- Posted (kind "zeren.annotation", the nonce with each): `{ event = "pick",
 -- pick = { …capture, marker } }` per pick, and `{ event = "state", state =
 -- "done" | "cancelled" }` as the pick ends.
 
 return [==[
 (() => {
-  if (window.__zeronAnnotator) return;
+  if (window.__zerenAnnotator) return;
   const MAX_HTML = 2000, MAX_ATTRS = 12, MAX_VALUE = 120, MAX_TEXT = 200;
   const VOID = new Set(['area','base','br','col','embed','hr','img','input','link','meta','source','track','wbr']);
   const SECRET = /pass|secret|token|api[-_]?key|auth|session|csrf|nonce|signature|credential/i;
@@ -41,7 +41,7 @@ return [==[
   let down = null, drag = null, skipClick = false;
 
   const post = (message) => {
-    if (window.zgx && window.zgx.postMessage) window.zgx.postMessage({ kind: 'zeron.annotation', nonce, ...message });
+    if (window.zgx && window.zgx.postMessage) window.zgx.postMessage({ kind: 'zeren.annotation', nonce, ...message });
   };
   const clip = (s, n) => (s.length > n ? s.slice(0, n - 1) + '…' : s);
   const squash = (s) => (s || '').replace(/\s+/g, ' ').trim();
@@ -233,7 +233,7 @@ return [==[
 
   const mount = () => {
     let root;
-    [host, root] = shadowHost('zeron-annotator', 2147483647, `
+    [host, root] = shadowHost('zeren-annotator', 2147483647, `
       .box{position:fixed;display:none;border:${BORDER}px solid var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent);
         transition:left 80ms ease-out,top 80ms ease-out,width 80ms ease-out,height 80ms ease-out,border-radius 80ms ease-out}
       .box.region{border-style:dashed;transition:none}
@@ -257,7 +257,7 @@ return [==[
     count();
     requestAnimationFrame(() => ui && ui.hint.classList.remove('enter'));
     const cursor = document.createElement('style');
-    cursor.id = 'zeron-annotator-cursor';
+    cursor.id = 'zeren-annotator-cursor';
     cursor.textContent = '*{cursor:crosshair!important}';
     document.documentElement.appendChild(cursor);
   };
@@ -339,7 +339,7 @@ return [==[
   const watchMarks = (on) => {
     if (on && !layer) {
       let root;
-      [layer, root] = shadowHost('zeron-annotations', 2147483646, `
+      [layer, root] = shadowHost('zeren-annotations', 2147483646, `
         .mark{position:fixed;display:none;border:${BORDER}px solid var(--accent);background:color-mix(in srgb,var(--accent) 4%,transparent);
           transition:background-color 120ms ease-out}
         .mark.region{border-style:dashed}
@@ -465,7 +465,7 @@ return [==[
     for (const [type, fn] of LISTEN) window.removeEventListener(type, fn, true);
     if (frame) cancelAnimationFrame(frame);
     host?.remove();
-    document.getElementById('zeron-annotator-cursor')?.remove();
+    document.getElementById('zeren-annotator-cursor')?.remove();
     host = ui = target = null; down = drag = null;
     post({ event: 'state', state: next });
   };
@@ -544,6 +544,6 @@ return [==[
       }
     },
   };
-  Object.defineProperty(window, '__zeronAnnotator', { value: Object.freeze(api), configurable: false, writable: false });
+  Object.defineProperty(window, '__zerenAnnotator', { value: Object.freeze(api), configurable: false, writable: false });
 })();
 ]==]

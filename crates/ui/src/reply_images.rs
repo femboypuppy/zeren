@@ -7,7 +7,7 @@
 //! a PNG, JPEG, WebP, or GIF by name. No URL is ever fetched (`http:`,
 //! `file:`, `data:` …), and `~`, network and device paths are refused. The
 //! host reads it with `ReadChatImageChunk`, from strictly inside that one
-//! chat's folder (never home or above it, Zeron's data, or another chat's
+//! chat's folder (never home or above it, Zeren's data, or another chat's
 //! folder) and never through a link, checks its first bytes, and the UI
 //! decodes it within the shared raster limits. Anything refused or
 //! unreadable keeps the reply's ordinary rendering — a link — as before.
@@ -261,7 +261,7 @@ mod tests {
         }
         // Relative paths need the chat's folder, and one the UI can expand.
         assert_eq!(markdown_image("a.png", None), None);
-        assert_eq!(markdown_image("a.png", Some("~/.zeron/scratch/x")), None);
+        assert_eq!(markdown_image("a.png", Some("~/.zeren/scratch/x")), None);
     }
 
     #[test]

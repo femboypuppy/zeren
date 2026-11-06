@@ -22,8 +22,8 @@ use gpui::{
     StatefulInteractiveElement as _, Styled, Window, div, prelude::*, px,
 };
 
-use zeron_proto::{BackgroundTask, BackgroundTaskOutput};
-use zeron_rpc::methods;
+use zeren_proto::{BackgroundTask, BackgroundTaskOutput};
+use zeren_rpc::methods;
 
 use crate::composer::{Composer, QUEUE_COMPOSER_OVERLAP};
 use crate::icons::{self, icon};
@@ -143,12 +143,12 @@ impl Composer {
         let state = self.state.read(cx);
         let chat_id = state.selected_chat.clone()?;
         let tasks =
-            zeron_proto::view::background_tasks(state.session_for(&chat_id), chrono::Utc::now());
+            zeren_proto::view::background_tasks(state.session_for(&chat_id), chrono::Utc::now());
         if tasks.is_empty() {
             return None;
         }
         let host = state.selected_chat_row()?.device_id.clone();
-        let capability = zeron_proto::capabilities::BACKGROUND_TASKS_V1;
+        let capability = zeren_proto::capabilities::BACKGROUND_TASKS_V1;
         // A remote host's requests go through this viewport's own engine,
         // which forwards only the methods it knows.
         let actions = state.device_supports(&host, capability)
@@ -808,8 +808,8 @@ mod tests {
         (dir, state, handle)
     }
 
-    fn chat(id: &str) -> zeron_proto::Chat {
-        zeron_proto::Chat {
+    fn chat(id: &str) -> zeren_proto::Chat {
+        zeren_proto::Chat {
             id: id.into(),
             device_id: "host".into(),
             title: None,
@@ -845,7 +845,7 @@ mod tests {
     ) {
         state.update(cx, |state, _| {
             state.chats = vec![chat(chat_id)];
-            state.devices = vec![zeron_proto::Device {
+            state.devices = vec![zeren_proto::Device {
                 id: "host".into(),
                 name: "Host".into(),
                 platform: "linux".into(),
@@ -854,16 +854,16 @@ mod tests {
                 version: None,
                 cursor_sdk_version: None,
                 capabilities: if capable {
-                    vec![zeron_proto::capabilities::BACKGROUND_TASKS_V1.into()]
+                    vec![zeren_proto::capabilities::BACKGROUND_TASKS_V1.into()]
                 } else {
                     Vec::new()
                 },
             }];
-            state.sessions = vec![zeron_proto::Session {
+            state.sessions = vec![zeren_proto::Session {
                 last_completed_turn: None,
                 chat_id: chat_id.into(),
                 device_id: "host".into(),
-                status: zeron_proto::SessionStatus::Idle,
+                status: zeren_proto::SessionStatus::Idle,
                 started_at: None,
                 updated_at: chrono::Utc::now() - chrono::Duration::seconds(age),
                 last_turn_outcome: None,
@@ -898,7 +898,7 @@ mod tests {
         assert_eq!(listed(&handle, cx), Some((1, true)));
         // A row nobody has refreshed belongs to an engine that took its
         // processes with it.
-        let stale = zeron_proto::view::SESSION_STALE_MS / 1000 + 5;
+        let stale = zeren_proto::view::SESSION_STALE_MS / 1000 + 5;
         show(
             &state,
             "a",

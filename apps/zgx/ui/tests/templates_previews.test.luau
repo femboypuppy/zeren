@@ -19,15 +19,15 @@ end
 test("every template's preview is drawn from its colours: the default's, both, only dark, none", function()
 	local app = open()
 	-- The default: its two themes.
-	expect(previews(app, "zeron")).to_be("zeron-light,zeron-dark")
+	expect(previews(app, "zeren")).to_be("zeren-light,zeren-dark")
 	-- A template of yours with both appearances: each its own.
 	expect(previews(app, "hot-pink")).to_be("preview-hot-pink-light,preview-hot-pink-dark")
 	-- Only dark: that half alone, across the whole card.
 	expect(previews(app, "night")).to_be("preview-night-dark")
 	-- No colour changed: the default's.
-	expect(previews(app, "airy")).to_be("zeron-light,zeron-dark")
+	expect(previews(app, "airy")).to_be("zeren-light,zeren-dark")
 	-- Each row draws one, the same way.
-	for _, id in { "zeron", "hot-pink", "night", "airy" } do
+	for _, id in { "zeren", "hot-pink", "night", "airy" } do
 		expect(app:has(`#template-{id} >> .template-swatch`)).to_be(true)
 	end
 	-- The previews' themes are registered for real.

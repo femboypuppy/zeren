@@ -19,7 +19,7 @@ local compare = ui.state("ex_gp_compare", git.PR.branch)
 local BRANCHES = {
 	{ value = "main", label = "main" },
 	{ value = git.PR.branch, label = git.PR.branch },
-	{ value = "zeron/composer", label = "zeron/composer" },
+	{ value = "zeren/composer", label = "zeren/composer" },
 }
 
 return {
@@ -111,7 +111,7 @@ return {
 				return ui.column {
 					w_full = true,
 					-- (A theme number, read as it is built: max_w takes points.)
-					max_w = if narrow then nil else ui.theme.get("zeron.settings.measure") :: number?,
+					max_w = if narrow then nil else ui.theme.get("zeren.settings.measure") :: number?,
 					gap = "$space.5",
 					ui.column {
 						gap = "$space.1",

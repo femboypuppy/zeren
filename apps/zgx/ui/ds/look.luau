@@ -1,5 +1,5 @@
--- The accent Zeron is drawn in: the theme's own, or one of Zeron's presets
--- (crates/theme AccentPreset), each the theme's (`zeron.accents`, lighter
+-- The accent Zeren is drawn in: the theme's own, or one of Zeren's presets
+-- (crates/theme AccentPreset), each the theme's (`zeren.accents`, lighter
 -- on dark, deeper on light, as AccentPreset::color has them). One setting
 -- for the whole app, kept across launches, as the material is
 -- (ds/material); a window takes it through `theme` (`look.theme()`).
@@ -13,22 +13,22 @@ export type Accent = { value: string, label: string, preset: boolean? }
 
 -- An accent, its name read as a string in the locale shown (`a.label`,
 -- through its message as it's asked for: read in a function, it follows).
--- Zeron's own is its name in every language.
+-- Zeren's own is its name in every language.
 local function accent(value: string, preset: boolean?): Accent
 	return setmetatable({ value = value, preset = preset }, {
 		__index = function(_, field: string): string?
 			if field == "label" then
-				return if value == "zeron" then "Zeron" else locale.s(`ds.look.accent.{value}`)
+				return if value == "zeren" then "Zeren" else locale.s(`ds.look.accent.{value}`)
 			end
 			return nil
 		end,
 	}) :: any
 end
 
--- In Zeron's order: the theme's own, then the presets.
+-- In Zeren's order: the theme's own, then the presets.
 M.ACCENTS = {
 	accent("default"),
-	accent("zeron", true),
+	accent("zeren", true),
 	accent("orange", true),
 	accent("amber", true),
 	accent("green", true),
@@ -49,10 +49,10 @@ function M.find(value: string): Accent
 end
 
 -- An accent's ink, in whichever scheme draws it. The theme's own is its
--- own token (`zeron.accents.default`, the theme's `accent` as written), so
+-- own token (`zeren.accents.default`, the theme's `accent` as written), so
 -- it keeps its colour inside a window that wears another.
 function M.ink(a: Accent): string
-	return `$zeron.accents.{a.value}`
+	return `$zeren.accents.{a.value}`
 end
 
 -- The tokens a window overrides to wear `value` (the chosen accent by
@@ -63,12 +63,12 @@ function M.theme(value: string?): { [string]: any }?
 	if not a.preset then
 		return nil
 	end
-	return { accent = `$zeron.accents.{a.value}` }
+	return { accent = `$zeren.accents.{a.value}` }
 end
 
 -- The interface's text size: its body size in points (the theme's
 -- `font.size.md`, 13, by default), every other text size and line height
--- scaled with it, the conversation's too (`zeron.prose.*`). Code has its
+-- scaled with it, the conversation's too (`zeren.prose.*`). Code has its
 -- own (Settings → Appearance). Kept across launches, for the main window.
 M.TEXT_SIZES = { 12, 13, 14, 15, 16 }
 M.text_size = ui.persist("text_size", 13)
@@ -77,11 +77,11 @@ M.text_size = ui.persist("text_size", 13)
 local SIZED = {
 	"font.size.xs", "font.size.sm", "font.size.md", "font.size.lg", "font.size.xl", "font.size.xxl",
 	"font.line.xs", "font.line.sm", "font.line.md", "font.line.lg", "font.line.xl", "font.line.xxl",
-	"zeron.prose.size", "zeron.prose.line",
-	"zeron.prose.h1.size", "zeron.prose.h1.line",
-	"zeron.prose.h2.size", "zeron.prose.h2.line",
-	"zeron.prose.h3.size", "zeron.prose.h3.line",
-	"zeron.prose.small.size", "zeron.prose.small.line",
+	"zeren.prose.size", "zeren.prose.line",
+	"zeren.prose.h1.size", "zeren.prose.h1.line",
+	"zeren.prose.h2.size", "zeren.prose.h2.line",
+	"zeren.prose.h3.size", "zeren.prose.h3.line",
+	"zeren.prose.small.size", "zeren.prose.small.line",
 }
 
 -- The text tokens a window overrides for `size` (the chosen one by

@@ -163,13 +163,13 @@ rejoin rewinds as in the incident:
 
 ```text
 cursor repairs on B: 1
-INFO zeron_sync::chat_client: chat2: one-time legacy cursor repair from=1 to=0
+INFO zeren_sync::chat_client: chat2: one-time legacy cursor repair from=1 to=0
 ```
 
 With the fix, in two runs, the smoke passes and the rejoin repairs nothing
 (`cursor repairs on B: 0`). The extra step was a scratch script and example
 outside the repository; the harness itself is unchanged. A shell started from
-inside Zeron inherits its `ZERON_*` environment, and `ZERON_WORKOS_CLIENT_ID`
+inside Zeren inherits its `ZEREN_*` environment, and `ZEREN_WORKOS_CLIENT_ID`
 alone turns the harness's dev-mode engines into local profiles that never
 sync, so the run cleared the environment (`env -i`).
 
@@ -245,11 +245,11 @@ before the acked cursor is saved. Each costs a download, never data.
 ## Reproduce
 
 ```sh
-cargo +1.99.0 test --locked -p zeron-engine --lib
-cargo +1.99.0 test --locked -p zeron-engine --lib -- slow_hello_reads_as_connecting rejoin_after_idle_retirement
-cargo +1.99.0 test --locked -p zeron-ui --lib -- --skip a_queued_file_reads_back_with_its_bytes_and_display_name --skip generated_image_chunk_reader_targets_owner_and_bounds_decode
-cargo +1.99.0 test --locked -p zeron-ui --lib -- --test-threads=1 a_queued_file_reads_back_with_its_bytes_and_display_name generated_image_chunk_reader_targets_owner_and_bounds_decode
-cargo +1.99.0 run --locked -p zeron-ui --features appshots-fixture --example remote-sync-fixture -- <dir> cold-open
+cargo +1.99.0 test --locked -p zeren-engine --lib
+cargo +1.99.0 test --locked -p zeren-engine --lib -- slow_hello_reads_as_connecting rejoin_after_idle_retirement
+cargo +1.99.0 test --locked -p zeren-ui --lib -- --skip a_queued_file_reads_back_with_its_bytes_and_display_name --skip generated_image_chunk_reader_targets_owner_and_bounds_decode
+cargo +1.99.0 test --locked -p zeren-ui --lib -- --test-threads=1 a_queued_file_reads_back_with_its_bytes_and_display_name generated_image_chunk_reader_targets_owner_and_bounds_decode
+cargo +1.99.0 run --locked -p zeren-ui --features appshots-fixture --example remote-sync-fixture -- <dir> cold-open
 ```
 
 The fixture's scenes are `cold-open`, `revisit`, `outage`, `outage-draft`,

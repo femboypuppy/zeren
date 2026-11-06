@@ -25,7 +25,7 @@ local M = {}
 
 -- The collapsed sidebar's rail (ds/rail and the sidebar's flyouts: its
 -- actions and group tiles in a column at the window's bottom left). Off:
--- collapsed, the sidebar folds away entirely, as Zeron's does, and the
+-- collapsed, the sidebar folds away entirely, as Zeren's does, and the
 -- title bar's toggle (⌘B) brings it back. `true` mounts it again.
 M.rail = false
 

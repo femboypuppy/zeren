@@ -1,4 +1,4 @@
--- Zeron in zgx: the windows' entry. The design lint first (before anything
+-- Zeren in zgx: the windows' entry. The design lint first (before anything
 -- builds), then the design system's themes, then the window's screen: the
 -- host says which (`window`): setup ("onboarding", the default), or the
 -- main window ("main": the shell, screens/shell). Each screen is required
@@ -11,7 +11,7 @@ ds.setup()
 require("@app/screens/language")
 
 if ui.shared("window", "onboarding"):peek() == "main" then
-	-- Plugins: their page in Settings, and what they're shown of Zeron.
+	-- Plugins: their page in Settings, and what they're shown of Zeren.
 	require("@app/screens/plugins")
 	local shell = require("@app/screens/shell")
 	return shell()

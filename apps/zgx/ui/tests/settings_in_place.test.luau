@@ -60,7 +60,7 @@ test("the pages list under Personal, Devices and Organization", function()
 	expect(app:has(`{NAV} >> "Profile"`)).to_be(false)
 	expect(app:state("shell_route_path")).to_be("/settings/general")
 	expect(shows(app, PAGE, "Send messages with")).to_be(true)
-	expect(shows(app, PAGE, "Credit Zeron in commits")).to_be(true)
+	expect(shows(app, PAGE, "Credit Zeren in commits")).to_be(true)
 end)
 
 test("the search finds a page and a setting, and opens the setting's page at it", function()
@@ -181,7 +181,7 @@ end)
 
 test("an engine switch flips at once, and back if refused", function()
 	local app = open()
-	local credit = `{PAGE} >> role:switch "Credit Zeron in commits"`
+	local credit = `{PAGE} >> role:switch "Credit Zeren in commits"`
 	expect(app:tree(credit)).to_contain("unchecked")
 	-- (Under General's other rows: brought into view.)
 	app:scroll(PAGE, 600)
@@ -218,7 +218,7 @@ test("signing out asks first, then ends at setup", function()
 	app:frames(4)
 	app:click(`{PAGE} >> role:button "Sign out"`)
 	app:frames(20)
-	app:click('role:dialog "Sign out of Zeron?" >> role:button "Sign out"')
+	app:click('role:dialog "Sign out of Zeren?" >> role:button "Sign out"')
 	app:frames(20)
 	expect(asked(app, "account.sign_out")).to_be(true)
 	expect(asked(app, "app.onboard")).to_be(true)
@@ -458,8 +458,8 @@ test("a new chat's picture: chosen, kept, named, removed; its effect said, and g
 	app:click(`{PAGE} >> role:button "Choose Image"`)
 	app:frames(10)
 	-- Kept by the host (its copy), then shown by its name.
-	expect(asked(app, "wallpaper.keep:assets/favicons/zeron.png")).to_be(true)
-	expect(shows(app, PAGE, "zeron.png")).to_be(true)
+	expect(asked(app, "wallpaper.keep:assets/favicons/zeren.png")).to_be(true)
+	expect(shows(app, PAGE, "zeren.png")).to_be(true)
 	expect(shows(app, PAGE, "colored print dots")).to_be(true)
 	expect(app:has(`{PAGE} >> role:button "Adjust"`)).to_be(true)
 	expect(app:has(`{PAGE} >> role:button "Replace"`)).to_be(true)
@@ -469,7 +469,7 @@ test("a new chat's picture: chosen, kept, named, removed; its effect said, and g
 	app:frames(10)
 	expect(app:state("shell_wallpaper")).to_be("none")
 	expect(app:state("shell_wallpaper_image")).to_be_nil()
-	expect(asked(app, "wallpaper.forget:assets/favicons/zeron.png")).to_be(true)
+	expect(asked(app, "wallpaper.forget:assets/favicons/zeren.png")).to_be(true)
 	expect(shows(app, PAGE, "colored print dots")).to_be(false)
 end)
 
@@ -484,7 +484,7 @@ local function about(app: any, fields: { [string]: any })
 	app:frames(6)
 end
 
-test("About says which Zeron this is, and that this app isn't what updates", function()
+test("About says which Zeren this is, and that this app isn't what updates", function()
 	local app = open(ABOUT)
 	about(app, {})
 	expect(shows(app, PAGE, "Not connected to the engine")).to_be(true)
@@ -508,7 +508,7 @@ end)
 test("an engine up to date says so and when it was checked; a check finds a newer one", function()
 	local app = open(ABOUT)
 	about(app, { engine_version = "0.2.131", latest = "0.2.131", checked_at = os.time() * 1000 })
-	expect(shows(app, PAGE, "Zeron is up to date")).to_be(true)
+	expect(shows(app, PAGE, "Zeren is up to date")).to_be(true)
 	expect(shows(app, PAGE, "checked just now")).to_be(true)
 	-- Checking: said while the feed is asked.
 	app:set_state("settings_stub_about_next", "pending")
@@ -528,7 +528,7 @@ test("an engine up to date says so and when it was checked; a check finds a newe
 	expect(asked(app, "about.check")).to_be(true)
 	-- What the host then says: a newer release.
 	about(app, { engine_version = "0.2.131", latest = "0.2.140", available = true, checked_at = os.time() * 1000 })
-	expect(shows(app, PAGE, "Zeron 0.2.140 is available")).to_be(true)
+	expect(shows(app, PAGE, "Zeren 0.2.140 is available")).to_be(true)
 	expect(shows(app, PAGE, "You have 0.2.131")).to_be(true)
 end)
 
@@ -546,17 +546,17 @@ test("updating the engine says so, then that it runs the new version; the app's 
 	app:click(`{PAGE} >> role:button "Update engine"`)
 	app:frames(6)
 	expect(asked(app, "about.apply")).to_be(true)
-	expect(shows(app, PAGE, "Updated to Zeron 0.2.140")).to_be(true)
+	expect(shows(app, PAGE, "Updated to Zeren 0.2.140")).to_be(true)
 	expect(shows(app, PAGE, "The engine is starting again on it")).to_be(true)
 	about(app, { engine_version = "0.2.140", latest = "0.2.140", available = false })
 	expect(shows(app, PAGE, "The engine is running the new version")).to_be(true)
-	-- The Zeron app's own engine: updated from the app.
+	-- The Zeren app's own engine: updated from the app.
 	app:set_state("about_doing", "")
 	about(app, { engine_version = "0.2.131", latest = "0.2.140", available = true })
 	app:set_state("settings_stub_about_next", "unmanaged")
 	app:click(`{PAGE} >> role:button "Update engine"`)
 	app:frames(6)
-	expect(shows(app, PAGE, "Update from the Zeron app")).to_be(true)
+	expect(shows(app, PAGE, "Update from the Zeren app")).to_be(true)
 	-- The engine's own check failing, with none here since.
 	app:set_state("about_doing", "")
 	about(app, { engine_version = "0.2.131", error = "feed unreachable" })
@@ -648,7 +648,7 @@ test("signed out, Account shows no forms: what an account gives, and the way to 
 	app:click(`{NAV} >> role:tab "Account"`)
 	app:frames(30)
 	expect(app:has(`{PAGE} >> role:heading "Account"`)).to_be(true)
-	expect(shows(app, PAGE, "Sign in to show up as yourself across Zeron.")).to_be(true)
+	expect(shows(app, PAGE, "Sign in to show up as yourself across Zeren.")).to_be(true)
 	-- What an account gives, and the card yours will be.
 	expect(shows(app, PAGE, "Your member card")).to_be(true)
 	expect(shows(app, PAGE, "Yours when you sign in")).to_be(true)
@@ -713,7 +713,7 @@ test("a photo is placed in a circle, cut from the middle at first, and can be re
 	-- (Closed: it eases out.)
 	expect(app:state("settings_photo_cropping")).to_be(false)
 	-- Yours now: said, removable, and the sidebar's too.
-	expect(shows(app, PAGE, "Shows beside your name across Zeron")).to_be(true)
+	expect(shows(app, PAGE, "Shows beside your name across Zeren")).to_be(true)
 	-- Its buttons at the row's end, beside the words, not wrapped under them.
 	local rx, ry = box(app, `{PAGE} >> role:button "Remove"`)
 	local _, py, _, ph = box(app, "#setting-photo")
@@ -823,7 +823,7 @@ test("a delete that didn't go through says so plainly and can be tried again", f
 	local app = open("Account")
 	-- Offline: said as what happened, no mechanism; still signed in.
 	try_delete(app, "ada@example.net", "offline")
-	expect(app:has('"Zeron can\'t be reached right now."')).to_be(true)
+	expect(app:has('"Zeren can\'t be reached right now."')).to_be(true)
 	expect(asked(app, "account.sign_out")).to_be(false)
 	-- The edge failed: said plainly.
 	try_delete(app, "ada@example.net", "failed")
@@ -997,7 +997,7 @@ test("your photo shows at both sidebars' feet once chosen, and goes when removed
 	-- The file shown is the photo's (the stub's: the app's own PNG).
 	local photo = app:state("account_photo") :: any
 	expect(string.find(photo.avatar, "/auth/avatars/", 1, true)).never.to_be_nil()
-	expect((app:state("account_photo_files") :: any)[photo.avatar]).to_be("assets/favicons/zeron.png")
+	expect((app:state("account_photo_files") :: any)[photo.avatar]).to_be("assets/favicons/zeren.png")
 	expect(app:tree(foot)).to_contain("img")
 	-- The chats' sidebar too.
 	app:click(`{NAV} >> role:button "Back to chats"`)
@@ -1124,12 +1124,12 @@ test("the wallpaper's rows stand inline in one card, a hairline only between the
 	inline(app, "No image chosen", `button "Choose Image"`)
 	-- A picture, plain and under an effect: three rows, two hairlines.
 	for _, effect in { "none", "dither" } do
-		app:set_state("shell_wallpaper_image", { path = "assets/favicons/zeron.png", name = "zeron.png", w = 512, h = 512, x = 0.5, y = 0.5, zoom = 1 })
+		app:set_state("shell_wallpaper_image", { path = "assets/favicons/zeren.png", name = "zeren.png", w = 512, h = 512, x = 0.5, y = 0.5, zoom = 1 })
 		app:set_state("shell_wallpaper_effect", effect)
 		app:frames(10)
 		expect(app:count(`{NEW_CHAT} >> .settings-rule`)).to_be(2)
 		inline(app, "Wallpaper", `button "Wallpaper"`)
-		inline(app, "zeron.png", `button "Replace"`)
+		inline(app, "zeren.png", `button "Replace"`)
 		inline(app, "Effect", `button "Effect"`)
 	end
 	expect(shows(app, NEW_CHAT, "Rebuilds the artwork with a dithered")).to_be(true)

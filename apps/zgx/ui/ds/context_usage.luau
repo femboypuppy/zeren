@@ -1,11 +1,11 @@
 -- How full a model's context is, as the composer's ring shows it and its
--- card says it (Zeron's crates/ui/src/context_usage.rs): what the agent
+-- card says it (Zeren's crates/ui/src/context_usage.rs): what the agent
 -- reports (tokens in it, the window's size, either missing), how full that
 -- is, the ink it reads in (the text's own, amber from three quarters, red
 -- from nine tenths), and the card itself.
 --
 --   context_usage.fraction(u)  0 to 1, or nil while it can't be said
---   context_usage.lines(u)     the card's two lines, as Zeron writes them
+--   context_usage.lines(u)     the card's two lines, as Zeren writes them
 --   context_usage.ink(f)       the ring's and the bar's ink at `f`
 --   Card { usage = fn }        the card (ds/hover_card's), "Context window"
 --                              and how full at its head, a slim bar, the
@@ -72,7 +72,7 @@ function M.Ring(props: { fraction: () -> number, ink: ((f: number) -> string)? }
 	}
 end
 
--- A plan's usage, as Zeron's account ring reads it: the accent, so it reads
+-- A plan's usage, as Zeren's account ring reads it: the accent, so it reads
 -- apart from the context ring; amber from four fifths, red from 95%.
 function M.usage_ink(f: number): string
 	return if f >= 0.95 then "$danger" elseif f >= 0.8 then "$warning" else "$accent"
@@ -101,7 +101,7 @@ function M.Card(props: { usage: () -> Usage? }): Node
 		p = "$space.1",
 		gap = 0,
 		ui.row {
-			h = "$zeron.menu.heading",
+			h = "$zeren.menu.heading",
 			px = "$space.2",
 			gap = "$space.2",
 			items = "center",
@@ -139,7 +139,7 @@ function M.Card(props: { usage: () -> Usage? }): Node
 				end,
 			}),
 			ui.column {
-				gap = "$zeron.space.hair",
+				gap = "$zeren.space.hair",
 				ui.text {
 					function(): string
 						return (M.lines(usage()))

@@ -46,7 +46,7 @@ test("the review's three tabs show the header, the diff and the activity", funct
 	expect(app:has('#diff-content >> ~"local ink = ink_of(props)"')).to_be(true)
 	app:set_state("ex_gr_tab", "activity")
 	settle(app)
-	expect(app:has('~"pushed 3 commits to zeron/primitives"')).to_be(true)
+	expect(app:has('~"pushed 3 commits to zeren/primitives"')).to_be(true)
 	-- Narrow: the files open their diffs in place, in the virtualized list.
 	app:set_state("ex_git_width", "narrow")
 	app:set_state("ex_gr_tab", "code")

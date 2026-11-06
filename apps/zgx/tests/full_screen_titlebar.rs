@@ -1,6 +1,6 @@
 //! In macOS full screen the title bar's controls (the sidebar's toggle, back,
 //! forward) slide over to where the hidden traffic lights were, and back as
-//! the window comes out, as Zeron's do (crates/ui shell.rs
+//! the window comes out, as Zeren's do (crates/ui shell.rs
 //! `titlebar_cluster_start`: 88 in, 12 in full screen, a 200 ms ease out).
 //! The window draws no frames while macOS animates it in or out, so they
 //! hold still through the system's animation and slide once it's done.
@@ -21,7 +21,7 @@ use zgx::scene::Rect;
 use zgx_script::{ScriptHost, testing::TestApp};
 
 fn ui_dir() -> PathBuf {
-    std::env::var_os("ZERON_ZGX_TEST_UI")
+    std::env::var_os("ZEREN_ZGX_TEST_UI")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ui"))
 }
@@ -97,7 +97,7 @@ fn the_controls_slide_to_the_lights_place_in_full_screen_and_back() {
     assert_eq!(
         toggle_x(&mut app),
         88.,
-        "out of full screen: 16 past the lights, Zeron's 88"
+        "out of full screen: 16 past the lights, Zeren's 88"
     );
 
     // Going in: the transition begins, then the window turns full screen;

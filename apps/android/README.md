@@ -1,6 +1,6 @@
-# Zeron for Android
+# Zeren for Android
 
-A Jetpack Compose viewport onto the zeron mesh, built on the same Rust mobile
+A Jetpack Compose viewport onto the zeren mesh, built on the same Rust mobile
 core as the iOS app (`crates/mobile`). **Rust decides what to paint and
 where; Kotlin paints, scrolls and handles gestures.** The transcript's text
 measurement, markdown layout, prefix-sum virtualization and display lists are
@@ -8,7 +8,7 @@ the exact code iOS runs — see [`docs/mobile-rewrite.md`](../../docs/mobile-rew
 
 The UI is Material 3 Expressive (`MaterialExpressiveTheme`, expressive motion,
 flexible app bars, shape-morphing loading indicators, connected button groups,
-segmented lists) themed with Zeron's own palette and Geist type.
+segmented lists) themed with Zeren's own palette and Geist type.
 
 ## Build & run
 
@@ -23,8 +23,8 @@ cd apps/android
 
 The `buildCore` task runs `scripts/android/build-core.sh`, which builds
 `crates/mobile` for Android (`jniLibs`) and generates its Kotlin bindings into
-`target/android-core/`. `-PzeronSkipCore` reuses the last build while
-iterating on Kotlin; `ZERON_ANDROID_ABIS=arm64-v8a` builds one ABI.
+`target/android-core/`. `-PzerenSkipCore` reuses the last build while
+iterating on Kotlin; `ZEREN_ANDROID_ABIS=arm64-v8a` builds one ABI.
 `scripts/android/gen-icons.sh` rasterizes the shared tool/file SVG icons
 (needs `rsvg-convert`). The Geist fonts are read straight from the iOS app's
 `Fonts/` folder, so both platforms measure and draw the same bytes.
@@ -36,14 +36,14 @@ Google Play App Bundle (`.aab`, arm64, the core at the `mobile-dist` profile)
 whenever the app or the Rust core changes: pull requests that touch the app or
 the mobile core (or carry the `ci:full` label) get it as workflow artifacts,
 and pushes to `main` publish the APK to
-`zeron.sh/releases/zeron-android-arm64.apk` — the website's Android download —
-with a copy per build (`zeron-<version>-<build>-android-arm64.apk`) and `.sha256`s.
+`zeron.sh/releases/zeren-android-arm64.apk` — the website's Android download —
+with a copy per build (`zeren-<version>-<build>-android-arm64.apk`) and `.sha256`s.
 
 The version is the workspace's (`Cargo.toml`); the build number grows with each
 run. Publishing needs the upload key in repository secrets
 (`ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`,
 `ANDROID_KEY_PASSWORD`) so each build installs over the last; without them the
-APK is debug-signed and not published. Locally, `ZERON_ANDROID_KEYSTORE` (and
+APK is debug-signed and not published. Locally, `ZEREN_ANDROID_KEYSTORE` (and
 the three variables beside it) signs `assembleRelease` the same way.
 
 ### Google Play testing
@@ -61,7 +61,7 @@ required declarations, signing setup, and review before opening the test.
 To enable subsequent automatic uploads:
 
 1. Enable the Google Play Android Developer API in a Google Cloud project.
-2. Create a service account and grant it access to **Zeron only** in Play Console
+2. Create a service account and grant it access to **Zeren only** in Play Console
    → Users and permissions, with app read access and permission to release to
    testing tracks. It does not need production, financial, or account admin access.
 3. Store its JSON key in the repository secret `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`.
@@ -88,7 +88,7 @@ debug-signed Play upload.
 core/        AppModel (owns CoreClient, republishes snapshots as flows),
              CredentialStore, Fonts + AndroidMeasurer (Minikin fallback
              measurement for glyphs Geist lacks)
-design/      ZeronTheme (Material 3 Expressive), transcript palette
+design/      ZerenTheme (Material 3 Expressive), transcript palette
 transcript/  TranscriptState (layout engine + viewport: anchoring, follow the
              tail), Transcript (virtualized rows over LayoutFrame), RowModel
              (canvas painter for Rust display lists, streaming veil, fades),

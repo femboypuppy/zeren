@@ -1,7 +1,7 @@
 --!strict
 -- GitHub's words are markdown with HTML in them (a bot's comment is mostly
 -- HTML: linked buttons, `<picture>`s for dark and light, `<sub>` lines,
--- `<details>`). Zeron's markdown drops raw HTML, so this reads the HTML
+-- `<details>`). Zeren's markdown drops raw HTML, so this reads the HTML
 -- GitHub renders and says it as what the viewer can draw, in order:
 --
 --   { kind = "md", text }            markdown (links, code, emphasis, line

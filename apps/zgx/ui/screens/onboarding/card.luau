@@ -3,7 +3,7 @@
 -- centred on a glow of its own sky, a line above it, its address and the
 -- ways to share it under it, and Continue alone at the bottom right.
 --
--- The card is the real one, from Zeron (`/cards/:username`): its scene,
+-- The card is the real one, from Zeren (`/cards/:username`): its scene,
 -- foil and sky as the server made them, your number, first name, the day
 -- you joined and any badges. Handed the card the claim returned, it shows
 -- it at once; opened without one (a relaunch here), it asks for yours, and
@@ -50,7 +50,7 @@ local function glow(sky: string): Node
 			w_full = true,
 			h_full = true,
 			blur = GLOW_BLUR,
-			opacity = "$zeron.card.glow",
+			opacity = "$zeren.card.glow",
 			ui.image { src = sky, w_full = true, h_full = true, fit = "cover" },
 		},
 	}
@@ -198,7 +198,7 @@ return function(props: Props): Node
 	return Onboarding.Step {
 		step = props.step,
 		count = props.count,
-		-- (Welcoming someone who already had Zeron, it's the first step: nothing behind it.)
+		-- (Welcoming someone who already had Zeren, it's the first step: nothing behind it.)
 		back = if state.welcome then nil else Onboarding.Back { on_click = props.on_back },
 		middle = share,
 		continue = {

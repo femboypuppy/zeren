@@ -39,7 +39,7 @@ end
 
 local function pick(app: any, nonce: number, n: number)
 	app:set_state("test_web_message", {
-		kind = "zeron.annotation",
+		kind = "zeren.annotation",
 		nonce = nonce,
 		event = "pick",
 		pick = {
@@ -97,7 +97,7 @@ end)
 test("annotation flow: Escape before any pick leaves the keyboard where it was", function()
 	local app, nonce = annotating()
 	local before = app:state("chat_focus") or 0
-	app:set_state("test_web_message", { kind = "zeron.annotation", nonce = nonce, event = "state", state = "cancelled" })
+	app:set_state("test_web_message", { kind = "zeren.annotation", nonce = nonce, event = "state", state = "cancelled" })
 	app:command("test.web_message")
 	app:frames(3)
 	expect(on(app)).to_be(false)

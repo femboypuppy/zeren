@@ -12,19 +12,19 @@ use crate::{
     theme::Theme,
 };
 use gpui::{AnyElement, Context, div, prelude::*, px};
-use zeron_engine::registry::NativeSubagentSettings;
-use zeron_proto::HarnessId;
-use zeron_rpc::methods;
+use zeren_engine::registry::NativeSubagentSettings;
+use zeren_proto::HarnessId;
+use zeren_rpc::methods;
 
 /// The Delegation row's line while the device can switch it.
 const NATIVE_SUBAGENTS_HINT: &str = "Off: delegate through side chats, from each chat's next turn.";
 
 /// The Delegation row's line when the device can't answer; an engine that
 /// predates the setting gets commit credit's wording.
-fn native_subagents_error(error: zeron_rpc::RpcError) -> String {
+fn native_subagents_error(error: zeren_rpc::RpcError) -> String {
     match error {
-        zeron_rpc::RpcError::UnknownMethod(_) => {
-            "Update Zeron on the selected device to change this.".to_string()
+        zeren_rpc::RpcError::UnknownMethod(_) => {
+            "Update Zeren on the selected device to change this.".to_string()
         }
         error => error.to_string(),
     }
@@ -122,7 +122,7 @@ impl HarnessesPage {
     /// What `harness`'s Delegation row shows: whether the switch reads on,
     /// whether it can be flipped, and its line. `None` hides the section:
     /// not loaded yet, Cloud, or an agent whose native subagents can't be
-    /// switched ([`zeron_harness::switches_native_subagents`]).
+    /// switched ([`zeren_harness::switches_native_subagents`]).
     fn native_subagents_row(&self, harness: HarnessId) -> Option<(bool, bool, String)> {
         match &self.native_subagents {
             Loadable::Ready(settings) if settings.switchable.contains(&harness) => Some((
@@ -132,7 +132,7 @@ impl HarnessesPage {
             )),
             // The device didn't answer: the row says why, its switch inert
             // at the default.
-            Loadable::Error(error) if zeron_harness::switches_native_subagents(harness) => {
+            Loadable::Error(error) if zeren_harness::switches_native_subagents(harness) => {
                 Some((true, false, error.clone()))
             }
             _ => None,
@@ -268,15 +268,15 @@ mod delegation_tests {
     /// switch stays put.
     #[gpui::test]
     fn native_subagents_say_why_a_device_cannot_switch(cx: &mut gpui::TestAppContext) {
-        let update = "Update Zeron on the selected device to change this.";
+        let update = "Update Zeren on the selected device to change this.";
         assert_eq!(
-            native_subagents_error(zeron_rpc::RpcError::UnknownMethod(
+            native_subagents_error(zeren_rpc::RpcError::UnknownMethod(
                 methods::GET_NATIVE_SUBAGENTS.into()
             )),
             update
         );
         assert_eq!(
-            native_subagents_error(zeron_rpc::RpcError::Failed("device offline".into())),
+            native_subagents_error(zeren_rpc::RpcError::Failed("device offline".into())),
             "device offline"
         );
         let dir = tempfile::tempdir().unwrap();

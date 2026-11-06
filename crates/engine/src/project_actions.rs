@@ -1,4 +1,4 @@
-//! Host-local project Actions and explicit `zeron.json` imports.
+//! Host-local project Actions and explicit `zeren.json` imports.
 //!
 //! Commands are intentionally stored outside the synced workspace registry. The
 //! owning engine is the only authority that can persist or execute them.
@@ -11,7 +11,7 @@ use std::time::{Duration, Instant};
 
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use zeron_proto::{
+use zeren_proto::{
     ProjectAction, ProjectActionDraft, ProjectActionIcon, ProjectActionRun, ProjectActionsSnapshot,
 };
 
@@ -24,7 +24,7 @@ pub const MAX_PROJECT_ACTION_ID_BYTES: usize = 96;
 
 const STORE_FILE: &str = "project-actions.json";
 const STORE_VERSION: u32 = 1;
-const PROJECT_FILE: &str = "zeron.json";
+const PROJECT_FILE: &str = "zeren.json";
 const MAX_PROJECT_FILE_BYTES: u64 = 256 * 1024;
 const SETUP_HANDOFF_TTL: Duration = Duration::from_secs(10 * 60);
 
@@ -335,9 +335,9 @@ fn launch_project_action_with_environment(
     always_include_worktree: bool,
 ) -> Result<ProjectActionRun, EngineError> {
     let mut environment =
-        HashMap::from([("ZERON_PROJECT_ROOT".to_string(), root_string(project_root))]);
+        HashMap::from([("ZEREN_PROJECT_ROOT".to_string(), root_string(project_root))]);
     if always_include_worktree || cwd != project_root {
-        environment.insert("ZERON_WORKTREE_PATH".to_string(), root_string(cwd));
+        environment.insert("ZEREN_WORKTREE_PATH".to_string(), root_string(cwd));
     }
     let session = terminals.open_with_command(
         &root_string(cwd),
@@ -618,7 +618,7 @@ fn read_project_file_bytes(reader: impl Read) -> Result<Vec<u8>, String> {
 }
 
 fn project_file_issue(message: String) -> (Vec<ProjectActionDraft>, Option<String>) {
-    (Vec::new(), Some(format!("Invalid zeron.json: {message}")))
+    (Vec::new(), Some(format!("Invalid zeren.json: {message}")))
 }
 
 #[cfg(test)]
@@ -900,12 +900,12 @@ mod tests {
 
     #[tokio::test(flavor = "current_thread")]
     async fn project_actions_rpc_does_not_block_async_worker() {
-        use zeron_rpc::{RpcService, methods};
+        use zeren_rpc::{RpcService, methods};
         let temp = tempfile::tempdir().unwrap();
         let core = crate::EngineCore::assemble(
             temp.path(),
             Arc::new(crate::HarnessRegistry::new()),
-            zeron_proto::HarnessId::Mock,
+            zeren_proto::HarnessId::Mock,
             None,
         )
         .unwrap();
@@ -999,7 +999,7 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn project_file_special_files_do_not_block() {
-        const CHILD_ENV: &str = "ZERON_TEST_PROJECT_FILE_SPECIAL_FILES";
+        const CHILD_ENV: &str = "ZEREN_TEST_PROJECT_FILE_SPECIAL_FILES";
         if std::env::var_os(CHILD_ENV).is_some() {
             use std::os::unix::{ffi::OsStrExt, fs::symlink, net::UnixListener};
             let (_temp, store_root, project_root) = roots();

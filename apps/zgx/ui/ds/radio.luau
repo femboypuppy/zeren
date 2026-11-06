@@ -34,7 +34,7 @@ local Radio = ui.component(function(props: { option: Option, value: State<any>, 
 		label = option.label,
 		focusable = not option.disabled,
 		disabled = option.disabled,
-		opacity = if option.disabled then "$zeron.disabled" else nil,
+		opacity = if option.disabled then "$zeren.disabled" else nil,
 		cursor = if option.disabled then nil else "pointer",
 		gap = "$space.2",
 		items = "start",
@@ -63,19 +63,19 @@ local Radio = ui.component(function(props: { option: Option, value: State<any>, 
 				items = "center",
 				justify = "center",
 				bg = function()
-					return if chosen() then "$zeron.check.on" else "$zeron.check.bg"
+					return if chosen() then "$zeren.check.on" else "$zeren.check.bg"
 				end,
 				border_color = function()
 					if chosen() then
-						return "$zeron.check.on"
+						return "$zeren.check.on"
 					end
-					return if hovered:get() then "$text.tertiary" else "$zeron.check.edge"
+					return if hovered:get() then "$text.tertiary" else "$zeren.check.edge"
 				end,
 				ui.div {
 					w = 6,
 					h = 6,
 					rounded = "$radius.full",
-					bg = "$zeron.check.mark",
+					bg = "$zeren.check.mark",
 					scale = ui.spring(ui.computed(function(): number
 						return if chosen() then 1 else 0
 					end), { stiffness = 520, damping = 26 }),
@@ -83,7 +83,7 @@ local Radio = ui.component(function(props: { option: Option, value: State<any>, 
 			},
 		},
 		ui.column {
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			min_w = 0,
 			grow = 1,
 			ui.text {
@@ -128,7 +128,7 @@ return function(props: Props): Node
 		direction = if row then "row" else "column",
 		gap = if row then "$space.5" else "$space.3",
 		disabled = props.disabled,
-		opacity = if props.disabled then "$zeron.disabled" else nil,
+		opacity = if props.disabled then "$zeren.disabled" else nil,
 		table.unpack(items),
 	}
 end

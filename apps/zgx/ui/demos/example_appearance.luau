@@ -1,7 +1,7 @@
--- Setup, this device's first step: how Zeron looks. Three choices, each
+-- Setup, this device's first step: how Zeren looks. Three choices, each
 -- seen as it's made: the colour scheme (System, Light, Dark), each a small
 -- window drawn in that scheme; the window's material (Frosted, the desktop
--- showing through it softly, or Opaque); and the accent, Zeron's presets
+-- showing through it softly, or Opaque); and the accent, Zeren's presets
 -- (crates/theme AccentPreset) after the theme's own. The window the step
 -- stands in takes every choice at once, as the real setup does
 -- (onboarding.rs render_appearance applies each on the click), so the step
@@ -44,7 +44,7 @@ local function window(content: () -> Node): Node
 		-- theme function's name, not its nil.)
 		theme = (function(): string?
 			local s = scheme:get()
-			return if s == "system" then nil else `zeron-{s}`
+			return if s == "system" then nil else `zeren-{s}`
 		end) :: any,
 		ui.show(function()
 			return frosted:get()
@@ -66,7 +66,7 @@ local function window(content: () -> Node): Node
 			bottom = 0,
 			pointer_events = "none",
 			bg = function()
-				return if frosted:get() then "$background" else "$zeron.window"
+				return if frosted:get() then "$background" else "$zeren.window"
 			end,
 		},
 		content(),

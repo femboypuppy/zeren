@@ -5,7 +5,7 @@
 -- folds them back. A thought that fits shows no button. Being written, the
 -- fold shows the latest lines, rising through the window.
 
--- The small prose line (zeron.prose.small.line) and the fold's height.
+-- The small prose line (zeren.prose.small.line) and the fold's height.
 local LINE = 20
 local FOLD = 4 * LINE
 -- The button's height, and its room under the words (ds/activity).

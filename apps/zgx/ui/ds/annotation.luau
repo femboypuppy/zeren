@@ -1,6 +1,6 @@
 -- A browser annotation: an element (or a region) picked on a page in the
 -- panel's browser, carried with a message. It rides the prompt as the
--- shipping app's token, `[Annotation N](zeron-annotation:<hex JSON>)`
+-- shipping app's token, `[Annotation N](zeren-annotation:<hex JSON>)`
 -- (crates/proto/src/annotation.rs): the engine swaps each for
 -- `[Annotation N]` and appends one text block per element (page, selector,
 -- path, box, styles, a fenced HTML excerpt) for every harness, so nothing
@@ -40,7 +40,7 @@ export type Annotation = {
 	styles: { { string } },
 }
 
-M.SCHEME = "zeron-annotation:"
+M.SCHEME = "zeren-annotation:"
 
 -- The field limits, the engine's (applied on capture and again on parse).
 local MAX_HTML, MAX_TEXT, MAX_SHORT, MAX_URL, MAX_PATH, MAX_STYLES = 2400, 240, 240, 2048, 8, 24

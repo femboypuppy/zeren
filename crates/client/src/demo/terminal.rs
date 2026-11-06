@@ -15,7 +15,7 @@ use crate::error::{ClientError, Result};
 use crate::live::b64;
 use crate::lock;
 
-const PROMPT_DIR: &str = "\x1b[1;38;5;141m~/zeron\x1b[0m";
+const PROMPT_DIR: &str = "\x1b[1;38;5;141m~/zeren\x1b[0m";
 const PROMPT_BRANCH: &str = " \x1b[2mon\x1b[0m \x1b[38;5;212m veil-fade\x1b[0m";
 
 fn prompt() -> String {
@@ -94,7 +94,7 @@ impl DemoTerminals {
             replay: Vec::new(),
             viewers: Vec::new(),
             line: String::new(),
-            history: vec!["git status".into(), "cargo test -p zeron-veil".into()],
+            history: vec!["git status".into(), "cargo test -p zeren-veil".into()],
             history_at: None,
             pending_escape: Vec::new(),
             exited: false,
@@ -256,7 +256,7 @@ async fn run_command(shell: Arc<Mutex<Shell>>, line: String) {
     match program {
         "" => {}
         "clear" => say("\x1b[H\x1b[2J"),
-        "pwd" => say("/Users/dev/zeron\r\n"),
+        "pwd" => say("/Users/dev/zeren\r\n"),
         "whoami" => say("dev\r\n"),
         "echo" => say(&format!("{rest}\r\n")),
         "exit" | "logout" => {
@@ -267,7 +267,7 @@ async fn run_command(shell: Arc<Mutex<Shell>>, line: String) {
             "\x1b[1;34mapps\x1b[0m     \x1b[1;34mcrates\x1b[0m   \x1b[1;34mdocs\x1b[0m     \x1b[1;34medge\x1b[0m     \x1b[1;34mscripts\x1b[0m\nCargo.lock  Cargo.toml  README.md  rust-toolchain.toml\n",
         )),
         "git" if rest.starts_with("status") => say(&lines(
-            "On branch \x1b[1mveil-fade\x1b[0m\nYour branch is ahead of 'origin/veil-fade' by 2 commits.\n\nChanges not staged for commit:\n\t\x1b[31mmodified:   apps/ios/Zeron/Transcript/Veil.swift\x1b[0m\n\t\x1b[31mmodified:   crates/ui/src/markdown/veil.rs\x1b[0m\n\nUntracked files:\n\t\x1b[31mcrates/ui/src/markdown/veil/graphemes.rs\x1b[0m\n",
+            "On branch \x1b[1mveil-fade\x1b[0m\nYour branch is ahead of 'origin/veil-fade' by 2 commits.\n\nChanges not staged for commit:\n\t\x1b[31mmodified:   apps/ios/Zeren/Transcript/Veil.swift\x1b[0m\n\t\x1b[31mmodified:   crates/ui/src/markdown/veil.rs\x1b[0m\n\nUntracked files:\n\t\x1b[31mcrates/ui/src/markdown/veil/graphemes.rs\x1b[0m\n",
         )),
         "git" if rest.starts_with("log") => say(&lines(
             "\x1b[33m4f1c9a2\x1b[0m \x1b[2m(\x1b[0m\x1b[1;36mHEAD -> \x1b[1;32mveil-fade\x1b[0m\x1b[2m)\x1b[0m Snap veil chunk splits to grapheme clusters\n\x1b[33m7d03b6e\x1b[0m Fade duration tracks the append cadence\n\x1b[33m2d6895c\x1b[0m \x1b[2m(\x1b[0m\x1b[1;31morigin/main\x1b[0m\x1b[2m)\x1b[0m Keep the session through fold and unfold\n\x1b[33ma2c68b0\x1b[0m Find cargo where the caller's PATH does\n\x1b[33m6f2721f\x1b[0m Stream pull request status on every client\n",
@@ -276,15 +276,15 @@ async fn run_command(shell: Arc<Mutex<Shell>>, line: String) {
             let testing = rest.starts_with("test");
             let steps: &[(&str, u64)] = &[
                 (
-                    "\x1b[1;32m   Compiling\x1b[0m zeron-text v0.2.121 (/Users/dev/zeron/crates/text)",
+                    "\x1b[1;32m   Compiling\x1b[0m zeren-text v0.2.121 (/Users/dev/zeren/crates/text)",
                     260,
                 ),
                 (
-                    "\x1b[1;32m   Compiling\x1b[0m zeron-markdown v0.2.121 (/Users/dev/zeron/crates/markdown)",
+                    "\x1b[1;32m   Compiling\x1b[0m zeren-markdown v0.2.121 (/Users/dev/zeren/crates/markdown)",
                     320,
                 ),
                 (
-                    "\x1b[1;32m   Compiling\x1b[0m zeron-veil v0.2.121 (/Users/dev/zeron/crates/veil)",
+                    "\x1b[1;32m   Compiling\x1b[0m zeren-veil v0.2.121 (/Users/dev/zeren/crates/veil)",
                     480,
                 ),
                 (
@@ -298,7 +298,7 @@ async fn run_command(shell: Arc<Mutex<Shell>>, line: String) {
             }
             if testing {
                 say(
-                    "\x1b[1;32m     Running\x1b[0m unittests src/lib.rs (target/debug/deps/zeron_veil-8f3a)\r\n\r\nrunning 14 tests\r\n",
+                    "\x1b[1;32m     Running\x1b[0m unittests src/lib.rs (target/debug/deps/zeren_veil-8f3a)\r\n\r\nrunning 14 tests\r\n",
                 );
                 for name in [
                     "alpha_bounds",
@@ -350,7 +350,7 @@ mod tests {
     #[test]
     fn echoes_edits_and_replays_after_a_sequence() {
         let terminals = DemoTerminals::default();
-        let id = terminals.open("/Users/dev/zeron")["id"]
+        let id = terminals.open("/Users/dev/zeren")["id"]
             .as_str()
             .unwrap()
             .to_owned();
@@ -363,7 +363,7 @@ mod tests {
         assert!(!text(&mut late).contains("Last login"));
         // History recall replaces the line.
         terminals.write(&id, b"\x1b[A").unwrap();
-        assert!(text(&mut rx).ends_with("cargo test -p zeron-veil"));
+        assert!(text(&mut rx).ends_with("cargo test -p zeren-veil"));
     }
 
     #[test]

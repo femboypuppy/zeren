@@ -6,7 +6,7 @@
  * Reserved names (`isReservedUsername`) keep routes, staff words and brands a
  * member could pass themselves off as out of circulation for new claims. A
  * plugin's "Made by @name" reads straight from the name, so a name that looks
- * like Zeron, its staff or a vendor's must not be claimable. Operators set
+ * like Zeren, its staff or a vendor's must not be claimable. Operators set
  * names past this check (`POST /admin/usernames/set`).
  */
 
@@ -40,8 +40,8 @@ const RESERVED = new Set([
   "ollama", "huggingface", "twitter", "x", "posthog", "sentry", "railway", "supabase", "paypal", "visa", "mastercard"
 ]);
 
-/** Taken wherever they appear in a name: `github-team`, `the-openai`, `zeronhq`. */
-const RESERVED_ANYWHERE = ["zeron", "anthropic", "openai", "github", "gitlab", "microsoft", "claude", "cloudflare"];
+/** Taken wherever they appear in a name: `github-team`, `the-openai`, `zerenhq`. */
+const RESERVED_ANYWHERE = ["zeren", "anthropic", "openai", "github", "gitlab", "microsoft", "claude", "cloudflare"];
 
 /** Taken at the start of a name: `google-dev`, `apple1`, `admin-bob`,
  * `support2`, `security-team`. Short or common words stay prefix-only so
@@ -50,7 +50,7 @@ const RESERVED_PREFIX = ["google", "apple", "anthropic", "workos", "stripe", "ad
 
 /** Taken as a whole part between `-` or `_`: `support-bob`, `acme_security`
  * (but `supporter` and `staffing` are anyone's). */
-const RESERVED_PART = new Set(["admin", "support", "security", "staff", "official", "verified", "moderator", "team", "help", "zeron"]);
+const RESERVED_PART = new Set(["admin", "support", "security", "staff", "official", "verified", "moderator", "team", "help", "zeren"]);
 
 /** Taken at the end: `bob-admin`, `teamsupport`, `acme-official`. */
 const RESERVED_SUFFIX = ["admin", "support", "official", "staff", "security", "verified"];
@@ -88,7 +88,7 @@ export const impersonatedWord = (name: string): string | undefined => {
   return undefined;
 };
 
-/** `zeron` and anything that looks like it, staff and brand words stay ours. */
+/** `zeren` and anything that looks like it, staff and brand words stay ours. */
 export const isReservedUsername = (username: string): boolean =>
   readings(username).some(
     (r) =>

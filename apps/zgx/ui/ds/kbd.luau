@@ -23,7 +23,7 @@ local recipe = ui.variants {
 	},
 	variants = {
 		look = {
-			cap = { px = "$space.1", rounded = "$radius.sm", bg = "$zeron.secondary.bg" },
+			cap = { px = "$space.1", rounded = "$radius.sm", bg = "$zeren.secondary.bg" },
 			plain = {},
 		},
 		size = {
@@ -172,7 +172,7 @@ return function(props: Props): Node
 			},
 		}
 	end
-	local row: { [any]: any } = { gap = "$zeron.space.hair", items = "center", shrink = 0, role = "img", label = said }
+	local row: { [any]: any } = { gap = "$zeren.space.hair", items = "center", shrink = 0, role = "img", label = said }
 	for _, key in parts do
 		local text: any = if key == "Space" then locale.t("ds.kbd.space") else key
 		table.insert(row, ui.row { variants = recipe(style), aria_hidden = true, ui.text { text, literal = true } })

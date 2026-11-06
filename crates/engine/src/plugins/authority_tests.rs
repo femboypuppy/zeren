@@ -6,11 +6,11 @@ use std::path::Path;
 use std::sync::Arc;
 
 use serde_json::{Value, json};
-use zeron_rpc::{Caller, RpcError, RpcReply, methods, with_caller};
+use zeren_rpc::{Caller, RpcError, RpcReply, methods, with_caller};
 
 use super::*;
 
-/// `params` as Zeron's consent window sends them: an allowing
+/// `params` as Zeren's consent window sends them: an allowing
 /// `DecidePlugin` or a `SignPlugin` without a review gets one minted for
 /// the plugin as listed now (what consent.rs does before every decision).
 /// Everything else passes as is.
@@ -267,11 +267,11 @@ async fn an_ipc_token_holder_cannot_allow_a_template_without_the_consent_window(
 async fn an_agents_use_template_is_a_preview_with_who_asked() {
     let f = fixture();
     let dir = f._dir.path().join(TEMPLATES_DIR);
-    let zeron = dir.join(templates::ZERON_DIR);
-    std::fs::create_dir_all(&zeron).unwrap();
-    std::fs::write(zeron.join("app.luau"), "return nil").unwrap();
-    std::fs::write(zeron.join(templates::MANIFEST), r#"{"name":"Zeron"}"#).unwrap();
-    std::fs::write(zeron.join(templates::HASHES), "{}").unwrap();
+    let zeren = dir.join(templates::ZEREN_DIR);
+    std::fs::create_dir_all(&zeren).unwrap();
+    std::fs::write(zeren.join("app.luau"), "return nil").unwrap();
+    std::fs::write(zeren.join(templates::MANIFEST), r#"{"name":"Zeren"}"#).unwrap();
+    std::fs::write(zeren.join(templates::HASHES), "{}").unwrap();
     let mine = dir.join("agent-made");
     std::fs::create_dir_all(&mine).unwrap();
     std::fs::write(mine.join(templates::MANIFEST), r#"{"name":"Agent made"}"#).unwrap();
@@ -288,20 +288,20 @@ async fn an_agents_use_template_is_a_preview_with_who_asked() {
     assert_eq!((record["id"].as_str(), record["by"]["chat"].as_str()), (Some("agent-made"), Some("chat-7")));
 
     // The app's own switch back clears the record.
-    let back = call(&f.plugins, methods::USE_TEMPLATE, json!({ "id": "zeron" })).await.unwrap();
+    let back = call(&f.plugins, methods::USE_TEMPLATE, json!({ "id": "zeren" })).await.unwrap();
     assert_eq!(back["preview"], false, "{back}");
     assert!(back.get("by").is_none());
     assert!(!dir.join(templates::ACTIVE_BY).exists());
 }
 
 /// R6 end to end over the engine's IPC: the agent-scoped token (what
-/// `zeron mcp` holds) can't review, allow, sign or take the bearer; the
+/// `zeren mcp` holds) can't review, allow, sign or take the bearer; the
 /// app's token can review and allow.
 #[tokio::test]
 async fn the_agent_token_cannot_allow_over_ipc() {
     struct Service(Plugins);
     #[async_trait::async_trait]
-    impl zeron_rpc::RpcService for Service {
+    impl zeren_rpc::RpcService for Service {
         async fn handle(&self, method: &str, params: Value) -> Result<RpcReply, RpcError> {
             self.0.dispatch(method, params).await
         }
@@ -309,16 +309,16 @@ async fn the_agent_token_cannot_allow_over_ipc() {
 
     let f = fixture();
     let hash = waiting(&f.plugins, "evil").await;
-    let tokens = zeron_rpc::ipc_auth::IpcTokens::generate().unwrap();
+    let tokens = zeren_rpc::ipc_auth::IpcTokens::generate().unwrap();
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
     let url = format!("ws://127.0.0.1:{}", listener.local_addr().unwrap().port());
-    tokio::spawn(zeron_rpc::serve_ws_listener_scoped(
+    tokio::spawn(zeren_rpc::serve_ws_listener_scoped(
         listener,
         Arc::new(Service(f.plugins.clone())),
         tokens.clone(),
     ));
 
-    let agent = zeron_rpc::connect_ws(&url, Some(&tokens.agent)).await.unwrap();
+    let agent = zeren_rpc::connect_ws(&url, Some(&tokens.agent)).await.unwrap();
     for (method, params) in [
         (methods::REVIEW_PLUGIN, json!({ "id": "evil", "hash": hash })),
         (methods::DECIDE_PLUGIN, json!({ "id": "evil", "allow": true, "hash": hash })),
@@ -333,7 +333,7 @@ async fn the_agent_token_cannot_allow_over_ipc() {
     // What its tools need still works.
     agent.call(methods::LIST_PLUGINS, json!({})).await.unwrap();
 
-    let app = zeron_rpc::connect_ws(&url, Some(&tokens.full)).await.unwrap();
+    let app = zeren_rpc::connect_ws(&url, Some(&tokens.full)).await.unwrap();
     let review = app
         .call(methods::REVIEW_PLUGIN, json!({ "id": "evil", "hash": hash }))
         .await
@@ -347,12 +347,12 @@ async fn the_agent_token_cannot_allow_over_ipc() {
 }
 
 /// R29: an agent can't name where an export goes (anywhere it could write a
-/// file the person runs); it exports to Zeron's exports folder only.
+/// file the person runs); it exports to Zeren's exports folder only.
 #[tokio::test]
 async fn an_agent_cannot_choose_where_a_template_is_exported() {
     let f = fixture();
     let outside = tempfile::tempdir().unwrap();
-    let path = outside.path().join("x.zeron-template");
+    let path = outside.path().join("x.zeren-template");
     for caller in [Caller::Agent { chat: None }, Caller::Peer { device: None }] {
         let refused = with_caller(
             caller,
@@ -380,7 +380,7 @@ fn a_dial_proof_is_the_device_key_over_the_link_message() {
     assert_eq!(public, key.public());
     let b64 = base64::engine::general_purpose::URL_SAFE_NO_PAD;
     let verifier = ring::signature::UnparsedPublicKey::new(&ring::signature::ED25519, b64.decode(&public).unwrap());
-    let message = zeron_rpc::caller_proof_message("dev-b", "c1", 5);
+    let message = zeren_rpc::caller_proof_message("dev-b", "c1", 5);
     verifier.verify(message.as_bytes(), &b64.decode(&signature).unwrap()).unwrap();
-    assert!(verifier.verify(b"zeron-device-link:v1:dev-c:c1:5", &b64.decode(&signature).unwrap()).is_err());
+    assert!(verifier.verify(b"zeren-device-link:v1:dev-c:c1:5", &b64.decode(&signature).unwrap()).is_err());
 }

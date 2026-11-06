@@ -12,7 +12,7 @@
 use std::time::Duration;
 
 use chrono::{DateTime, Utc};
-use zeron_proto::{
+use zeren_proto::{
     CloudSession, CloudSessions, CloudState, CloudStatus, Device, GithubRepo, VaultConnection,
     VaultConnectionStatus, VaultDevice, VaultProvider, VaultStatus,
 };
@@ -29,7 +29,7 @@ pub const SESSION_POLL: Duration = Duration::from_secs(5);
 
 /// A Cloud device of either kind (logical or session): the cloud glyph.
 pub fn is_cloud(device: &Device) -> bool {
-    zeron_proto::is_cloud_device(&device.id, &device.platform)
+    zeren_proto::is_cloud_device(&device.id, &device.platform)
 }
 
 /// The logical Cloud device: owns projects and providers, has no engine.
@@ -37,7 +37,7 @@ pub fn is_cloud_account(device: &Device) -> bool {
     device
         .capabilities
         .iter()
-        .any(|c| c == zeron_proto::CLOUD_ACCOUNT_CAPABILITY)
+        .any(|c| c == zeren_proto::CLOUD_ACCOUNT_CAPABILITY)
 }
 
 /// One session's machine. Hidden from device lists.
@@ -45,7 +45,7 @@ pub fn is_cloud_session_device(device: &Device) -> bool {
     device
         .capabilities
         .iter()
-        .any(|c| c == zeron_proto::CLOUD_SESSION_CAPABILITY)
+        .any(|c| c == zeren_proto::CLOUD_SESSION_CAPABILITY)
 }
 
 /// Whether a device belongs in device lists and pickers: everything but the
@@ -56,7 +56,7 @@ pub fn is_listed(device: &Device) -> bool {
 
 /// The glyph for a device row, chip or crumb.
 pub fn device_glyph(device_id: &str, platform: &str) -> &'static str {
-    if zeron_proto::is_cloud_device(device_id, platform) {
+    if zeren_proto::is_cloud_device(device_id, platform) {
         return icons::CLOUD;
     }
     match platform {
@@ -199,7 +199,7 @@ pub enum CloudAction {
 
 impl CloudAction {
     pub fn method(self) -> &'static str {
-        use zeron_rpc::methods;
+        use zeren_rpc::methods;
         match self {
             CloudAction::Enable => methods::CLOUD_ENABLE,
             CloudAction::Delete => methods::CLOUD_DELETE,
@@ -297,8 +297,8 @@ pub fn sort_repos(repos: &mut [GithubRepo]) {
 }
 
 /// Client-side narrowing while the debounced server query is in flight.
-/// Ranks a repository-name prefix first (people type `zeron`, not
-/// `acme/zeron`), then an owner/full-name prefix, then any substring of the
+/// Ranks a repository-name prefix first (people type `zeren`, not
+/// `acme/zeren`), then an owner/full-name prefix, then any substring of the
 /// name or description; keeps the incoming order within a rank.
 pub fn filter_repos(repos: &[GithubRepo], query: &str) -> Vec<GithubRepo> {
     let query = query.trim().to_lowercase();
@@ -441,7 +441,7 @@ pub fn format_credits(credits: f64) -> String {
 
 /// Each day's bar height as a fraction of the busiest day's (0 when nothing
 /// ran in the whole range).
-pub fn bar_fractions(days: &[zeron_proto::CloudUsageDay]) -> Vec<f32> {
+pub fn bar_fractions(days: &[zeren_proto::CloudUsageDay]) -> Vec<f32> {
     let peak = days.iter().map(|d| d.credits).fold(0.0_f64, f64::max);
     days.iter()
         .map(|d| {
@@ -487,7 +487,7 @@ pub fn show_out_of_credits(message: &'static str, cx: &mut gpui::App) {
 pub async fn fetch_status(engine: EngineHandle) -> Result<CloudStatus, String> {
     engine
         .client()
-        .call_as::<CloudStatus>(zeron_rpc::methods::CLOUD_STATUS, serde_json::json!({}))
+        .call_as::<CloudStatus>(zeren_rpc::methods::CLOUD_STATUS, serde_json::json!({}))
         .await
         .map_err(|error| error.to_string())
 }
@@ -496,7 +496,7 @@ pub async fn fetch_status(engine: EngineHandle) -> Result<CloudStatus, String> {
 pub async fn fetch_sessions(engine: EngineHandle) -> Result<CloudSessions, String> {
     engine
         .client()
-        .call_as::<CloudSessions>(zeron_rpc::methods::CLOUD_SESSIONS, serde_json::json!({}))
+        .call_as::<CloudSessions>(zeren_rpc::methods::CLOUD_SESSIONS, serde_json::json!({}))
         .await
         .map_err(|error| error.to_string())
 }
@@ -542,12 +542,12 @@ mod tests {
         let account = device(
             "cloud-a",
             "cloud",
-            Some(zeron_proto::CLOUD_ACCOUNT_CAPABILITY),
+            Some(zeren_proto::CLOUD_ACCOUNT_CAPABILITY),
         );
         let machine = device(
             "cloud-s",
             "cloud",
-            Some(zeron_proto::CLOUD_SESSION_CAPABILITY),
+            Some(zeren_proto::CLOUD_SESSION_CAPABILITY),
         );
         let laptop = device("mac", "macos", None);
         assert!(is_listed(&account) && is_cloud_account(&account));
@@ -746,7 +746,7 @@ mod tests {
         assert_eq!(format_credits(1240.4), "1,240 credits");
         assert_eq!(format_credits(1_234_567.0), "1,234,567 credits");
         assert_eq!(format_credits(-12.0), "-12 credits");
-        let usage_day = |credits| zeron_proto::CloudUsageDay {
+        let usage_day = |credits| zeren_proto::CloudUsageDay {
             day: "2026-10-05".into(),
             credits,
         };

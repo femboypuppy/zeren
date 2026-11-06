@@ -43,14 +43,14 @@ function M.load(module: string): (any, string?)
 		return found, nil
 	end
 	local why = tostring(found)
-	print(`zeron-zgx: {module} didn't load: {why}`)
+	print(`zeren-zgx: {module} didn't load: {why}`)
 	failed(module, why)
 	return nil, why
 end
 
 -- Who decides what shows in place of a failed module, asked in order
 -- before `Failed` shows (the plugin system: a templated screen falls back
--- to Zeron's own at once). The first node one returns shows instead.
+-- to Zeren's own at once). The first node one returns shows instead.
 M.fallbacks = {} :: { (module: string, why: string) -> Node? }
 function M.on_fail(f: (module: string, why: string) -> Node?)
 	table.insert(M.fallbacks, f)
@@ -99,7 +99,7 @@ end
 -- Each screen's build, by module: `rebuild` moves one on, and that screen
 -- (each place it shows) is made again from what its module now is, the
 -- rest of the window as it was. (The plugin system's: a template that
--- failed, after mount too, swapped for Zeron's own and shown in place.)
+-- failed, after mount too, swapped for Zeren's own and shown in place.)
 local generations = ui.state("shell_boundary_generations", {} :: { [string]: number })
 function M.rebuild(module: string)
 	local now = table.clone(generations:peek())
@@ -133,7 +133,7 @@ local Screen = ui.component(function(props: ScreenProps): Node
 		return node
 	end
 	local reason = tostring(node)
-	print(`zeron-zgx: {module} didn't build: {reason}`)
+	print(`zeren-zgx: {module} didn't build: {reason}`)
 	failed(module, reason)
 	return instead(name, module, reason)
 end)

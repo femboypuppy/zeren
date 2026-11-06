@@ -1,7 +1,7 @@
--- Make it yours: how Zeron looks, chosen in three rows, each seen as it's
+-- Make it yours: how Zeren looks, chosen in three rows, each seen as it's
 -- made. The colour scheme (System, Light, Dark), each a small window drawn
 -- in that scheme; the window's material (Frosted, the desktop showing
--- through it softly, or Opaque); and the accent, Zeron's presets after the
+-- through it softly, or Opaque); and the accent, Zeren's presets after the
 -- theme's own (ds/look). Setup's first step after sign-in is this, and the
 -- gallery's Make it yours draws it too.
 --
@@ -52,26 +52,26 @@ local function miniature(on_dark: boolean, chosen_ink: () -> string): Node
 			w_full = true,
 			h = SIDE_ROW,
 			shrink = 0,
-			px = "$zeron.space.hair",
+			px = "$zeren.space.hair",
 			items = "center",
 			rounded = "$radius.sm",
-			bg = if selected then "$zeron.selected.flat.bg" else nil,
+			bg = if selected then "$zeren.selected.flat.bg" else nil,
 			line(w),
 		}
 	end
 	return ui.row {
-		-- (The scheme as worn now: a template's colours, or Zeron's.)
+		-- (The scheme as worn now: a template's colours, or Zeren's.)
 		theme = if on_dark then palettes.scheme.dark else palettes.scheme.light,
 		w = PREVIEW_W,
 		h = PREVIEW_H,
 		shrink = 0,
-		bg = "$zeron.window",
+		bg = "$zeren.window",
 		ui.column {
 			w = SIDE_W,
 			h_full = true,
 			shrink = 0,
 			p = "$space.1",
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			bg = "$hover",
 			side_row(true, "70%"),
 			side_row(false, "55%"),
@@ -90,7 +90,7 @@ local function miniature(on_dark: boolean, chosen_ink: () -> string): Node
 				w_full = true,
 				h = COMPOSER,
 				shrink = 0,
-				p = "$zeron.space.hair",
+				p = "$zeren.space.hair",
 				justify = "end",
 				rounded = "$radius.full",
 				border = 1,
@@ -144,8 +144,8 @@ local function scheme_card(scheme: State<string>, chosen_ink: () -> string, valu
 		gap = "$space.1",
 		rounded = "$radius.xl",
 		border = 1,
-		bg = "$zeron.option.bg",
-		border_color = "$zeron.option.edge",
+		bg = "$zeren.option.bg",
+		border_color = "$zeren.option.edge",
 		hover = { bg = "$hover" },
 		focus = control.ring,
 		on_click = pick,

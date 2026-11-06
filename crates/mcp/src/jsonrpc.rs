@@ -23,8 +23,8 @@ const PROTOCOL_VERSIONS: [&str; 3] = ["2025-06-18", "2025-03-26", "2024-11-05"];
 const LATEST_PROTOCOL: &str = "2025-06-18";
 
 const INSTRUCTIONS: &str = "\
-Zeron runs coding agents in chats, each hosted on a device, optionally in a project \
-(a folder on that specific device). These tools operate the local Zeron engine: \
+Zeren runs coding agents in chats, each hosted on a device, optionally in a project \
+(a folder on that specific device). These tools operate the local Zeren engine: \
 discover devices/projects/chats, create chats with a chosen harness and \
 model, read transcripts, and send messages between chats.\n\
 \n\
@@ -58,7 +58,7 @@ from a Cloud chat it clones the same repository, and without `cloud` it shares y
 \n\
 When a chart, table, diagram, dashboard, or 3D view would say more than prose and \
 `show_visual` is available, write a Luau visual script and show it with `show_visual` before \
-your final reply. Zeron renders it with its own native interface and enforces its style: \
+your final reply. Zeren renders it with its own native interface and enforces its style: \
 content sits directly on the chat with no cards or boxed panels, text uses the interface font \
 and type scale, and colors are theme tokens that work on frosted glass or opaque, light or dark. \
 The reader sees the visual above that reply, so don't announce or restate it. To show the \
@@ -66,10 +66,10 @@ reader an image file (a screenshot, a rendered PNG), call `show_image` with its 
 draw images through `show_visual`.";
 
 /// Appended to [`INSTRUCTIONS`] when the host launched the agent without its
-/// own subagent tools ([`zeron_proto::McpServer::SIDE_CHATS_ONLY_ENV`]).
+/// own subagent tools ([`zeren_proto::McpServer::SIDE_CHATS_ONLY_ENV`]).
 const SIDE_CHATS_ONLY: &str = "\n\n\
-Your own subagent tools are turned off in Zeron's settings: where you would start a \
-subagent, delegate through Zeron chats instead, with `create_chats` (or `create_chat`).";
+Your own subagent tools are turned off in Zeren's settings: where you would start a \
+subagent, delegate through Zeren chats instead, with `create_chats` (or `create_chat`).";
 
 /// What `initialize` tells the agent, with the side-chat rule when its host
 /// turned the agent's own subagents off.
@@ -222,7 +222,7 @@ pub async fn handle_request(tools: &Tools, id: Value, method: &str, params: Valu
                     "protocolVersion": version,
                     "capabilities": { "tools": { "listChanged": true } },
                     "serverInfo": {
-                        "name": "zeron",
+                        "name": "zeren",
                         "version": env!("CARGO_PKG_VERSION"),
                     },
                     "instructions": instructions(tools.side_chats_only()),
@@ -300,11 +300,11 @@ fn error_response(id: Value, code: i64, message: &str) -> Value {
 mod tests {
     use super::*;
 
-    use crate::zeron::{Origin, Zeron};
+    use crate::zeren::{Origin, Zeren};
     use async_trait::async_trait;
     use futures::StreamExt;
     use std::time::Duration;
-    use zeron_rpc::{RpcError, RpcReply, RpcService, memory_client, methods};
+    use zeren_rpc::{RpcError, RpcReply, RpcService, memory_client, methods};
 
     /// An engine whose plugin tools go from one to two, then stay.
     struct Watching;
@@ -334,7 +334,7 @@ mod tests {
     }
 
     fn watching_tools() -> Arc<Tools> {
-        Arc::new(Tools::new(Arc::new(Zeron::with_client(
+        Arc::new(Tools::new(Arc::new(Zeren::with_client(
             memory_client(Arc::new(Watching)),
             Origin::default(),
         ))))

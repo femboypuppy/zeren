@@ -14,9 +14,9 @@ return ui.column {
 	w_full = true,
 	h_full = true,
 	theme = function(): string
-		return if light:get() then "zeron-light" else "zeron-dark"
+		return if light:get() then "zeren-light" else "zeren-dark"
 	end,
-	bg = "$zeron.window",
+	bg = "$zeren.window",
 	ui.column {
 		w_full = true,
 		h_full = true,

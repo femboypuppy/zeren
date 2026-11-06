@@ -1,5 +1,5 @@
 [package]
-name = "zeron-term"
+name = "zeren-term"
 version.workspace = true
 edition.workspace = true
 license.workspace = true

@@ -1,10 +1,10 @@
-//! Zeron's shortcuts as plugins come and go (src/menu_bar.rs): the shell
-//! with Zeron's own plugins (git, GitHub, Parallax scenes, as the bridge
-//! loads them) and test plugins with shortcuts of their own, some Zeron's,
+//! Zeren's shortcuts as plugins come and go (src/menu_bar.rs): the shell
+//! with Zeren's own plugins (git, GitHub, Parallax scenes, as the bridge
+//! loads them) and test plugins with shortcuts of their own, some Zeren's,
 //! some each other's, some no menu can show, turned on and off, reloaded,
 //! rewritten, broken and mended, reordered, with a consent sheet and
 //! another window opening over the main window, in a fixed random order.
-//! After each step every Zeron shortcut reaches its command, every live
+//! After each step every Zeren shortcut reaches its command, every live
 //! plugin's shortcut that's its own reaches its command, and every item in
 //! the menu bar runs in a live VM.
 
@@ -12,11 +12,11 @@ use serde_json::json;
 
 use super::examples_tests::{builtin, shell_with, world};
 use crate::menu_bar::{Role, accelerator};
-use crate::menu_bar_tests::{Desktop, Window, items, plugin, scratch, unreached, zerons};
+use crate::menu_bar_tests::{Desktop, Window, items, plugin, scratch, unreached, zerens};
 
 /// A test plugin's versions: each command's id and key.
 const KEYS: [&[(&str, &str)]; 3] = [
-    // One free, one Zeron's ⌘K, one Zeron's ⌘N by another name.
+    // One free, one Zeren's ⌘K, one Zeren's ⌘N by another name.
     &[("free", "cmd+shift+y"), ("palette", "cmd+k"), ("new", "ALIAS+n")],
     // One free, one no menu can show, one in a menu with no name.
     &[("other", "cmd+alt+y"), ("odd", "cmd+shift+?"), ("nameless", "cmd+shift+u")],
@@ -57,19 +57,19 @@ impl Steps {
 }
 
 #[test]
-fn zeron_s_shortcuts_survive_plugins_coming_and_going() {
+fn zeren_s_shortcuts_survive_plugins_coming_and_going() {
     let dir = scratch("soak");
     let builtins = ["git", "github", "parallax-scenes"];
     let builtin_items: Vec<super::Item> = builtins.iter().map(|id| builtin(id)).collect();
     let (app, _heard) = shell_with(builtin_items.clone(), world(json!({ "viewer": "ada" })));
-    assert_eq!(app.error(), None, "the shell with Zeron's plugins failed");
+    assert_eq!(app.error(), None, "the shell with Zeren's plugins failed");
     let desktop = Desktop::new();
     let bar = desktop.bar();
     let mut w = Window::serve(&bar, app, Role::Bar);
-    let expected = zerons(&w);
+    let expected = zerens(&w);
     assert!(expected.len() > 20, "{expected:?}");
-    // Zeron's shortcuts as the platform names them.
-    let zeron_names: Vec<String> = expected.iter().filter_map(|(_, k)| accelerator(k)).map(|a| a.label()).collect();
+    // Zeren's shortcuts as the platform names them.
+    let zeren_names: Vec<String> = expected.iter().filter_map(|(_, k)| accelerator(k)).map(|a| a.label()).collect();
 
     let write = |name: &str, commands: &[(&str, &str)], broken: bool| plugin(&dir, name, &body(commands, broken));
     let mut version = 0;
@@ -176,12 +176,12 @@ fn zeron_s_shortcuts_survive_plugins_coming_and_going() {
 
         assert!(desktop.refusals.borrow().is_empty(), "step {step}: a bar refused: {:?} ({})", desktop.refusals.borrow(), at());
         let wrong = unreached(&mut w, &desktop, &expected);
-        assert!(wrong.is_empty(), "step {step}, Zeron's:\n{}\n({})", wrong.join("\n"), at());
-        assert!(w.app.host.run_command("shell.toggle_sidebar") && w.app.host.run_command("shell.toggle_sidebar"), "step {step}: Zeron's commands run");
+        assert!(wrong.is_empty(), "step {step}, Zeren's:\n{}\n({})", wrong.join("\n"), at());
+        assert!(w.app.host.run_command("shell.toggle_sidebar") && w.app.host.run_command("shell.toggle_sidebar"), "step {step}: Zeren's commands run");
 
         // The live test plugins' own keys: the first to ask has each, and
-        // never one of Zeron's or one no menu can name.
-        let mut taken = zeron_names.clone();
+        // never one of Zeren's or one no menu can name.
+        let mut taken = zeren_names.clone();
         let mut theirs: Vec<(String, String)> = Vec::new();
         let loaded = live(&on, held);
         for id in &loaded {

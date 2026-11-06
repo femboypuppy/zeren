@@ -5,8 +5,8 @@
 
 use std::sync::Arc;
 
-use zeron_engine::{EngineCore, HarnessId, default_registry};
-use zeron_rpc::{memory_client, methods};
+use zeren_engine::{EngineCore, HarnessId, default_registry};
+use zeren_rpc::{memory_client, methods};
 
 #[tokio::test]
 async fn a_side_chat_of_a_cloud_chat_runs_on_its_machine_without_a_project() {

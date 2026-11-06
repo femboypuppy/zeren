@@ -1,4 +1,4 @@
-//! Zeron's Git plugin (apps/zgx/plugins-builtin/git): its service, run by
+//! Zeren's Git plugin (apps/zgx/plugins-builtin/git): its service, run by
 //! this engine as any plugin's is, doing its git work in scratch
 //! repositories: what changed (the work tree, a branch, a turn, a commit),
 //! staging, discarding, committing, pushing and pulling, branches and
@@ -17,7 +17,7 @@ struct Fixture {
 }
 
 async fn call(plugins: &Plugins, method: &str, params: Value) -> Value {
-    // Allowing and signing as Zeron's consent window does: with a review.
+    // Allowing and signing as Zeren's consent window does: with a review.
     let params = super::authority_tests::as_consent_window(plugins, method, params).await;
     match plugins.dispatch(method, params).await {
         Ok(RpcReply::Value(value)) => value,
@@ -33,7 +33,7 @@ async fn fixture() -> Fixture {
     let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../apps/zgx/plugins-builtin/git");
     let to = plugins.plugins_dir().join("git");
     std::fs::create_dir_all(to.join("locales")).unwrap();
-    for file in ["zeron-plugin.json", "init.luau", "service.luau", "icon.svg"] {
+    for file in ["zeren-plugin.json", "init.luau", "service.luau", "icon.svg"] {
         if src.join(file).exists() {
             std::fs::copy(src.join(file), to.join(file)).unwrap();
         }
@@ -41,7 +41,7 @@ async fn fixture() -> Fixture {
     if !to.join("init.luau").exists() {
         std::fs::write(to.join("init.luau"), "return nil").unwrap();
     }
-    std::fs::write(to.join("zeron.luau"), scaffold::SDK).unwrap();
+    std::fs::write(to.join("zeren.luau"), scaffold::SDK).unwrap();
     let signed = call(&plugins, methods::SIGN_PLUGIN, json!({ "id": "git" })).await;
     assert!(signed.get("rpc_error").is_none(), "{signed}");
     let decided = call(&plugins, methods::DECIDE_PLUGIN, json!({ "id": "git", "allow": true, "hash": signed["hash"] })).await;
@@ -442,7 +442,7 @@ async fn branch_scope_in_worktrees_clones_and_on_the_default_branch() {
     let on_main = f.ok("changes", json!({ "cwd": cwd(&clone), "scope": "branch" })).await;
     assert_eq!((on_main["base"].as_str(), count(&on_main["files"])), (Some("origin/main"), Some(0)), "{on_main}");
     // A linked worktree on a branch of its own, a commit on it.
-    git(&clone, &["worktree", "add", "-q", "-b", "zeron/feature", scratch.join("wt").to_str().unwrap()]);
+    git(&clone, &["worktree", "add", "-q", "-b", "zeren/feature", scratch.join("wt").to_str().unwrap()]);
     let wt = scratch.join("wt");
     write(&wt, "b.txt", "b\n");
     git(&wt, &["add", "-A"]);

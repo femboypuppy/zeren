@@ -1,7 +1,7 @@
 (() => {
   const base = "https://zeron.sh/releases/";
   // Android builds publish on every change under one stable name.
-  const android = `${base}zeron-android-arm64.apk`;
+  const android = `${base}zeren-android-arm64.apk`;
   const releases = {
     macos: ["macos-arm64.dmg", "Download for macOS", "Apple silicon"],
     windows: ["windows-x86_64-setup.exe", "Download for Windows", "Windows x64 · Installer"],
@@ -32,13 +32,13 @@
   const apply = (version) => {
     for (const link of document.querySelectorAll("[data-platform-download]")) {
       const release = releases[link.dataset.platformDownload];
-      if (release) link.href = `${base}zeron-${version}-${release[0]}`;
+      if (release) link.href = `${base}zeren-${version}-${release[0]}`;
     }
     for (const id of ["nav-download", "hero-download", "closing-download"]) {
       const link = document.getElementById(id);
       if (!link || !os) continue;
       const [file, label, detail] = releases[os];
-      link.href = `${base}zeron-${version}-${file}`;
+      link.href = `${base}zeren-${version}-${file}`;
       link.textContent = id === "nav-download" ? "Download" : label;
       link.setAttribute("data-download-os", os);
       link.setAttribute("aria-label", `${label} (${detail})`);

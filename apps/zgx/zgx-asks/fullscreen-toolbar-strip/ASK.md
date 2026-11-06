@@ -36,10 +36,10 @@ fullscreen: its popups close"); `window_chrome::refresh` could set
 `toolbar.isVisible = !fullscreen` there, or observe
 `windowWillEnterFullScreen` and `windowDidExitFullScreen`.
 
-**Seen on:** zgx `dda319ccd` (Zeron's pin), macOS 27.0.1, with the menu bar
+**Seen on:** zgx `dda319ccd` (Zeren's pin), macOS 27.0.1, with the menu bar
 showing in full screen.
 
 **Done upstream (Nov 2):** zgx `465858d8` (#1413) hides the inset toolbar on
 `NSWindowWillEnterFullScreen` and shows it again on `DidExitFullScreen`. That
-covers the green button and `set_fullscreen`. Waiting on Zeron's pin bump
+covers the green button and `set_fullscreen`. Waiting on Zeren's pin bump
 (the adoption chat owns it).

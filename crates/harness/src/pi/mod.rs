@@ -20,7 +20,7 @@ use std::{
     time::Duration,
 };
 use tokio::sync::mpsc;
-use zeron_proto::{AgentEvent, HarnessId, Model, ReasoningLevel, RunRequest, SteeringMode};
+use zeren_proto::{AgentEvent, HarnessId, Model, ReasoningLevel, RunRequest, SteeringMode};
 
 /// Bound on a state query (`get_state`, `get_entries`) a turn's end waits on.
 /// Pi answers them at once even mid-run; silence past this is a wedged
@@ -72,7 +72,7 @@ impl PiHarness {
         self
     }
     /// Pi's settings/credentials directory (`PI_CODING_AGENT_DIR`) for the
-    /// child and for Zeron's own reads of it; defaults to the inherited one.
+    /// child and for Zeren's own reads of it; defaults to the inherited one.
     pub fn with_agent_dir(mut self, path: impl Into<PathBuf>) -> Self {
         self.agent_dir = Some(path.into());
         self
@@ -140,8 +140,8 @@ impl PiHarness {
         &self,
         cwd: &Path,
         args: &[String],
-        mcp: Option<&zeron_proto::McpServer>,
-        extra_mcp: &[zeron_proto::McpServer],
+        mcp: Option<&zeren_proto::McpServer>,
+        extra_mcp: &[zeren_proto::McpServer],
         run_env: &std::collections::BTreeMap<String, String>,
     ) -> Result<Process, HarnessError> {
         let exe = self.resolve_executable()?;
@@ -335,13 +335,13 @@ impl Harness for PiHarness {
             )
             .await
     }
-    async fn commands(&self) -> Result<Vec<zeron_proto::SlashCommand>, HarnessError> {
+    async fn commands(&self) -> Result<Vec<zeren_proto::SlashCommand>, HarnessError> {
         self.commands_for(&std::env::current_dir()?).await
     }
     async fn commands_for(
         &self,
         cwd: &Path,
-    ) -> Result<Vec<zeron_proto::SlashCommand>, HarnessError> {
+    ) -> Result<Vec<zeren_proto::SlashCommand>, HarnessError> {
         self.workspace_commands
             .get(cwd, async {
                 Ok(catalog::commands(&self.probe(cwd, false).await?))
@@ -351,7 +351,7 @@ impl Harness for PiHarness {
     async fn skills(
         &self,
         cwd: &Path,
-    ) -> Result<Option<Vec<zeron_proto::invocation::Skill>>, HarnessError> {
+    ) -> Result<Option<Vec<zeren_proto::invocation::Skill>>, HarnessError> {
         let mut skills = crate::skills::discover(HarnessId::Pi, cwd).await?;
         let commands = self.commands_for(cwd).await?;
         crate::skills::attach_advertised_commands(HarnessId::Pi, &mut skills, &commands);
@@ -547,7 +547,7 @@ impl Runner {
         self.process.dialogs.cancel(&self.process.transport.client);
         self.emit(AgentEvent::Done {
             status: if self.interrupted {
-                zeron_proto::DoneStatus::Interrupted
+                zeren_proto::DoneStatus::Interrupted
             } else {
                 self.norm.status()
             },
@@ -592,7 +592,7 @@ impl Runner {
         self.submit(text, images, false)
     }
     async fn bootstrap(&mut self, backlog: &mut Vec<Value>) -> Result<Value, HarnessError> {
-        // Pi defaults to one-at-a-time. Zeron's pending steers belong together
+        // Pi defaults to one-at-a-time. Zeren's pending steers belong together
         // at the next model step. Pi persists this in its global settings, so
         // select it only while no mode is configured: an explicit choice (the
         // user's, or `/steering` in a chat) is never overwritten.

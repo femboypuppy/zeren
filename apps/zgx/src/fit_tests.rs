@@ -1,16 +1,16 @@
 //! The window's fit in the real shell (ui/shell_fixture.luau, as the shell
-//! lays out at each window width) against Zeron's own policy: which columns
+//! lays out at each window width) against Zeren's own policy: which columns
 //! show, the sidebar's width and the panel's, as a window narrows from wide
 //! to narrow and back.
 
 use zgx_script::{ScriptHost, testing::TestApp};
 
-// Zeron's widths and policy, verbatim (crates/ui settings.rs,
+// Zeren's widths and policy, verbatim (crates/ui settings.rs,
 // shell/panel_layout.rs `horizontal_panel_fit`), the
 // reference this checks against.
 const SIDEBAR_MIN: f32 = 242.0;
 const RIGHT_PANE_MIN: f32 = 360.0;
-// (Files' least: Zeron's is 220; here nothing (screens/shell/fit `TREE`): the
+// (Files' least: Zeren's is 220; here nothing (screens/shell/fit `TREE`): the
 // tree stands beside the file inside the panel, whatever the panel's width.)
 const FILES_PANEL_MIN: f32 = 0.0;
 const CHAT_PANEL_MIN: f32 = 300.0;
@@ -92,11 +92,11 @@ fn mount() -> TestApp {
 
 /// The sidebar (opened first) and a session's panel (opened after), the
 /// window narrowed 10 points at a time from 1800 to 480 and widened back:
-/// at each width the shell shows what Zeron's policy shows, the sidebar at
+/// at each width the shell shows what Zeren's policy shows, the sidebar at
 /// its limit, the panel at its share. Where each column goes and comes back
 /// is printed (`--nocapture`).
 #[test]
-fn a_resize_walk_shows_the_columns_zerons_policy_shows() {
+fn a_resize_walk_shows_the_columns_zerens_policy_shows() {
     let mut app = mount();
     app.click("#shell-sidebar >> role:button \"Fix the build\"");
     app.frames(20);
@@ -113,16 +113,16 @@ fn a_resize_walk_shows_the_columns_zerons_policy_shows() {
         app.frames(30);
         let side = app.bounds("#shell-sidebar").width;
         let panel = app.bounds("#shell-files").width;
-        // (The sidebar opened first, then the panel: the tree, Zeron's Files, is
+        // (The sidebar opened first, then the panel: the tree, Zeren's Files, is
         // open with it and takes no room of its own.)
         let want = horizontal_panel_fit(w, sidebar_width, (true, 1), (true, 3), (true, 0), false);
         let shows = (side > 0.5, panel > 0.5);
         if shows != (want.sidebar, want.right) {
-            faults.push(format!("{w}: shows sidebar {} panel {}, Zeron's {} {}", shows.0, shows.1, want.sidebar, want.right));
+            faults.push(format!("{w}: shows sidebar {} panel {}, Zeren's {} {}", shows.0, shows.1, want.sidebar, want.right));
         }
         let tree = want.right && want.files;
         if want.sidebar && (side - SIDEBAR_EDGE - want.sidebar_limit).abs() > 0.5 {
-            faults.push(format!("{w}: the sidebar is {side}, Zeron's {} and the window's edge", want.sidebar_limit));
+            faults.push(format!("{w}: the sidebar is {side}, Zeren's {} and the window's edge", want.sidebar_limit));
         }
         if want.right {
             // (Its width is the person's call, not the window's: a resize
@@ -138,7 +138,7 @@ fn a_resize_walk_shows_the_columns_zerons_policy_shows() {
             && was != now
         {
             let way = if step < widths.len() / 2 { "narrowing" } else { "widening" };
-            drops.push(format!("{way} to {w}: sidebar {} tree {} panel {} (Zeron's sidebar {} files {} right {})", now.0, now.1, now.2, want.sidebar, want.files, want.right));
+            drops.push(format!("{way} to {w}: sidebar {} tree {} panel {} (Zeren's sidebar {} files {} right {})", now.0, now.1, now.2, want.sidebar, want.files, want.right));
         }
         last = Some(now);
     }
@@ -291,7 +291,7 @@ fn x_of(app: &mut TestApp, selector: &str) -> Option<(f32, f32)> {
 }
 
 /// The most a column's ease moves anything in one 60 Hz frame, past the window's
-/// own step: the sidebar's on Zeron's column motion (CSS ease,
+/// own step: the sidebar's on Zeren's column motion (CSS ease,
 /// cubic-bezier(.25,.1,.25,1), its steepest about 2.25 times its mean), over
 /// its 261 in its ≈191 ms.
 const EASE_STEP: f32 = 57.0;
@@ -300,7 +300,7 @@ const EASE_STEP: f32 = 57.0;
 /// window: the panel's edge, its first tab, the file's header and tree and
 /// text, the chat, the sidebar's width; and what stands at the panel's
 /// right (the file's "…") keeps its distance from the window's right edge.
-/// Slow and fast, narrowing and widening, across where Zeron's fit hides or
+/// Slow and fast, narrowing and widening, across where Zeren's fit hides or
 /// shows a column (those frames alone step, as the column goes or comes).
 #[test]
 fn a_window_resize_moves_everything_one_way() {
@@ -501,7 +501,7 @@ fn the_panel_opening_never_closes_the_sidebar_for_its_tree() {
 }
 
 /// A panel width you chose (its edge dragged) is the width it opens at
-/// again, as Zeron's `right_pane_width` is: closed and opened, it comes back
+/// again, as Zeren's `right_pane_width` is: closed and opened, it comes back
 /// there, not at the split a fresh panel takes.
 #[test]
 fn the_panel_reopens_at_the_width_its_edge_was_dragged_to() {

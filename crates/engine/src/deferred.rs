@@ -20,8 +20,8 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use tokio::sync::{Mutex, OnceCell, watch};
 use tokio::task::JoinHandle;
-use zeron_proto::{EngineInfo, WorkspaceScope};
-use zeron_rpc::{RpcError, RpcReply, RpcService, methods};
+use zeren_proto::{EngineInfo, WorkspaceScope};
+use zeren_rpc::{RpcError, RpcReply, RpcService, methods};
 
 use crate::rpc::AuthRpc;
 use crate::{Auth, Engine, EngineConfig, EngineProfile, EngineRuntime, InstanceLock};
@@ -188,7 +188,7 @@ impl DeferredEngine {
         let runtime_slot = self.runtime.clone();
         let assembled = self.assembled.clone();
         // Agents' MCP servers get the scoped token, never the app's.
-        let ipc_token_file = zeron_rpc::ipc_auth::agent_token_path(&config.data_dir);
+        let ipc_token_file = zeren_rpc::ipc_auth::agent_token_path(&config.data_dir);
         // The instance lock rides into the boot task and is consumed by
         // assembly — held through sign-in onboarding too, because this
         // process owns the data dir from the moment it decided to host it.

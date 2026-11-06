@@ -1,12 +1,12 @@
-# Zeron MCP server
+# Zeren MCP server
 
-`zeron mcp` serves the Model Context Protocol on stdin/stdout and proxies every
-tool into the running engine's localhost IPC (`ws://127.0.0.1:$ZERON_IPC_PORT`,
-default 27654) — the same `zeron_rpc` surface the headed app and `zeron sync`
-dial. It is a subcommand of the one `zeron` binary: no Node runtime, no extra
+`zeren mcp` serves the Model Context Protocol on stdin/stdout and proxies every
+tool into the running engine's localhost IPC (`ws://127.0.0.1:$ZEREN_IPC_PORT`,
+default 27654) — the same `zeren_rpc` surface the headed app and `zeren sync`
+dial. It is a subcommand of the one `zeren` binary: no Node runtime, no extra
 install, a few MB resident.
 
-Crate: `crates/mcp` (`zeron-mcp`). The protocol layer is hand-rolled
+Crate: `crates/mcp` (`zeren-mcp`). The protocol layer is hand-rolled
 (`initialize`, `ping`, `tools/list`, `tools/call`; newline-delimited JSON-RPC
 2.0) — the repo already owns JSON-RPC framing for the Codex and ACP drivers and
 the stdio tool-server subset is tiny, so no SDK dependency was taken.
@@ -18,13 +18,13 @@ originating chat in the environment:
 
 | Variable                | Meaning                                                  |
 | ----------------------- | -------------------------------------------------------- |
-| `ZERON_IPC_PORT`        | Engine to proxy (default 27654).                         |
-| `ZERON_IPC_TOKEN_FILE`  | The engine's IPC bearer file (see below).                |
-| `ZERON_CHAT_ID`         | The chat whose agent spawned this server.                |
-| `ZERON_DEVICE_ID`       | That chat's host device.                                 |
-| `ZERON_SIDE_CHATS_ONLY` | `1`: the agent has no subagent tools of its own (below). |
+| `ZEREN_IPC_PORT`        | Engine to proxy (default 27654).                         |
+| `ZEREN_IPC_TOKEN_FILE`  | The engine's IPC bearer file (see below).                |
+| `ZEREN_CHAT_ID`         | The chat whose agent spawned this server.                |
+| `ZEREN_DEVICE_ID`       | That chat's host device.                                 |
+| `ZEREN_SIDE_CHATS_ONLY` | `1`: the agent has no subagent tools of its own (below). |
 
-`ZERON_SIDE_CHATS_ONLY=1`: the host device turned the provider's native
+`ZEREN_SIDE_CHATS_ONLY=1`: the host device turned the provider's native
 subagents off (Settings → Providers), so `initialize` tells the agent to
 delegate with `create_chats`. Never set for a chat that has a parent, nor
 for one whose host doesn't know its parent yet.
@@ -35,23 +35,23 @@ The IPC port is loopback-only, but loopback is not an identity: any local
 process could otherwise drive the engine (start agents, broker Cloud vault
 grants). Every engine start that binds the port mints a fresh 32-byte token
 and writes it to `{data_dir}/ipc-token` (owner-only `0600`, atomic replace;
-on Windows the file inherits `%LOCALAPPDATA%\Zeron`'s per-user ACL). The
+on Windows the file inherits `%LOCALAPPDATA%\Zeren`'s per-user ACL). The
 WebSocket handshake must carry `Authorization: Bearer <token>` (compared in
 constant time) and is refused with `401` otherwise; the browser `Origin`
 rejection (`403`) still applies on top. In-process (in-memory) transports are
 unaffected.
 
-Clients resolve the token at every dial — `$ZERON_IPC_TOKEN`, then the file
-named by `$ZERON_IPC_TOKEN_FILE`, then `{ZERON_DATA_DIR or ~/.zeron}/ipc-token`
-(`zeron_rpc::connect_ipc`) — so they follow the rotation across engine
+Clients resolve the token at every dial — `$ZEREN_IPC_TOKEN`, then the file
+named by `$ZEREN_IPC_TOKEN_FILE`, then `{ZEREN_DATA_DIR or ~/.zeren}/ipc-token`
+(`zeren_rpc::connect_ipc`) — so they follow the rotation across engine
 restarts. The engine hands injected servers the file PATH
-(`ZERON_IPC_TOKEN_FILE`), never the token itself: Claude receives this env on
+(`ZEREN_IPC_TOKEN_FILE`), never the token itself: Claude receives this env on
 its command line (`--mcp-config <inline json>`), which other local users can
 read with `ps`. A client run against a different data dir (e.g. a viewport on
-a daemon's port) sets `ZERON_IPC_TOKEN_FILE` to the daemon's file.
+a daemon's port) sets `ZEREN_IPC_TOKEN_FILE` to the daemon's file.
 
-When `ZERON_CHAT_ID` is set, every `send_message` is prefixed with a
-`[Message from Zeron chat <title> (<id8>) …]` line so the receiving agent and the
+When `ZEREN_CHAT_ID` is set, every `send_message` is prefixed with a
+`[Message from Zeren chat <title> (<id8>) …]` line so the receiving agent and the
 human reading that transcript can tell an agent-to-agent message from a typed
 one, and the server refuses to message its own chat. The transcript renders
 this routing header as “Message from **chat name**”, keeping the full routing
@@ -85,7 +85,7 @@ repository. Without it, a child of a Cloud chat shares the parent's machine. A
 Cloud machine starts children only for the chat it runs, and sees and manages
 only those children (docs/design/cloud-device.md, "Delegation").
 
-For children, `parent` (id, prefix, or title) overrides the origin (`ZERON_CHAT_ID`).
+For children, `parent` (id, prefix, or title) overrides the origin (`ZEREN_CHAT_ID`).
 `list_chats { parent }` returns children, and chat summaries carry `parentChatId`.
 Rows from older engines read as parentless; a dangling parent id is tolerated.
 
@@ -98,7 +98,7 @@ finds them.
 ### Injection
 
 The host engine stamps this server onto every run it drives
-(`RunRequest.mcp`, additive): the same `zeron` binary with `args: ["mcp"]`
+(`RunRequest.mcp`, additive): the same `zeren` binary with `args: ["mcp"]`
 and the variables above, pointed at the port the engine itself serves
 (never a port it lost the bind race for). Each driver spells it in its own
 dialect and leaves the user's configured servers alone:
@@ -108,9 +108,9 @@ dialect and leaves the user's configured servers alone:
 | Claude  | `--mcp-config <inline json>` (no `--strict-mcp-config`)             |
 | ACP (Devin, Grok, Hermes, Antigravity) | `session/new` and `session/load` → `mcpServers: [{name, command, args, env}]` |
 | Pi | Per-run `--extension` bridges stdio MCP into Pi tools in the native RPC process |
-| OpenCode | Child-only `OPENCODE_CONFIG_CONTENT`: `mcp.zeron` on 1.x, `mcp.servers.zeron` on 2.x |
-| Codex   | `thread/start` config overrides `mcp_servers.zeron.{command,args,env}` |
-| Cursor  | SDK `Agent.create` / `Agent.resume` → inline `mcpServers.zeron`, plus `local.settingSources: ["user", "team", "mdm", "plugins"]` so `~/.cursor/mcp.json` and plugin servers load (not `project`: the SDK skips MCP approvals, so repo-defined servers would run unprompted) |
+| OpenCode | Child-only `OPENCODE_CONFIG_CONTENT`: `mcp.zeren` on 1.x, `mcp.servers.zeren` on 2.x |
+| Codex   | `thread/start` config overrides `mcp_servers.zeren.{command,args,env}` |
+| Cursor  | SDK `Agent.create` / `Agent.resume` → inline `mcpServers.zeren`, plus `local.settingSources: ["user", "team", "mdm", "plugins"]` so `~/.cursor/mcp.json` and plugin servers load (not `project`: the SDK skips MCP approvals, so repo-defined servers would run unprompted) |
 
 OpenCode preserves inherited inline configuration and other servers. Its config
 shape follows the installed binary's major version. Cursor uses the SDK's
@@ -119,11 +119,11 @@ shape follows the installed binary's major version. Cursor uses the SDK's
 [2.x MCP format](https://opencode.ai/v2/docs/mcp-servers) differ.
 Pi's temporary extension lives only for the native RPC process lifetime;
 user settings, extensions, and session arguments remain intact. The bridge
-registers `zeron_<tool>` tools, propagates cancellation and errors, and closes
+registers `zeren_<tool>` tools, propagates cancellation and errors, and closes
 the MCP child when the Pi session shuts down.
 
 Title runs never carry it. A run with no served port (embedded engine that
-lost the bind) gets no Zeron tools rather than a dead server.
+lost the bind) gets no Zeren tools rather than a dead server.
 
 ### Forks and the session card
 
@@ -196,13 +196,13 @@ between turns are labeled **Send next** in the composer.
 The opt-in `steering_live` engine test checks a rapid burst, foreground and
 background process survival, retained context, exactly-once effects, and ordered
 normal queue delivery. For Claude, Cursor and Codex it additionally requires the
-burst to finish within the original turn. Set `ZERON_TEST_BURST=6` to reproduce a
-six-message burst; select an inexpensive model with `ZERON_TEST_MODEL` and the
-harness with `ZERON_TEST_HARNESS`. Codex is checked for child survival during
+burst to finish within the original turn. Set `ZEREN_TEST_BURST=6` to reproduce a
+six-message burst; select an inexpensive model with `ZEREN_TEST_MODEL` and the
+harness with `ZEREN_TEST_HARNESS`. Codex is checked for child survival during
 the active tool: its runtime cleans up background jobs on normal tool completion
 even without steering. Other providers also check a job that outlives that tool.
 
-For conversational redirection, run `cargo run -p zeron-harness --example
+For conversational redirection, run `cargo run -p zeren-harness --example
 cursor_steering_probe -- gemini-3-flash`. It sends six bare digits during streamed
 prose and requires only the latest requested answer. Counting turn completions
 alone cannot distinguish real steering from serial responses inside one run.
@@ -216,16 +216,16 @@ done (this was the one bug the first live run found).
 
 ### Visual replies
 
-`show_visual` is listed only when `ZERON_CHAT_ID` is set: it shows an
+`show_visual` is listed only when `ZEREN_CHAT_ID` is set: it shows an
 interactive visual (chart, table, dashboard, diagram, simulation, 3D view)
 inline in the calling chat, above the agent's final reply. A visual is a Luau
 script, not a web page. The script builds its data and state once and returns a
 view function; the view returns a tree of `ui.*` nodes (rows, columns, grids,
 text, stats, tables, charts, tabs, toggles, sliders, buttons, links, 2D
-canvases, 3D scenes, and GPU shaders). Controls call the script's handlers, and Zeron renders
+canvases, 3D scenes, and GPU shaders). Controls call the script's handlers, and Zeren renders
 the view again.
 
-`crates/visual` (`zeron-visual`) is the runtime. Scripts run in a Luau sandbox
+`crates/visual` (`zeren-visual`) is the runtime. Scripts run in a Luau sandbox
 with only the `string`, `table`, `math`, `utf8` and `bit32` libraries (no I/O,
 network, or `require`), a 64 MB memory cap, and a time budget per call (250 ms
 for setup, renders and handlers, 60 ms per canvas or scene frame), so a runaway
@@ -236,10 +236,10 @@ are theme tokens (`text`, `muted`, `faint`, `accent`, `on-accent`, `success`,
 `warning`, `danger`, `border`, `chart1`…`chart6`), text sizes are steps on the
 transcript's type scale, the font is always the interface font, and layout nodes
 have no fill, border, shadow, padding, or font props; using one is an error that
-names the rule. 3D scenes render on the GPU (`zeron-visual-gpu`: physically
+names the rule. 3D scenes render on the GPU (`zeren-visual-gpu`: physically
 based materials, shadows, glass with dispersion, glTF models, textures,
 environment maps, sprites and bloom), with the runtime's software rasterizer
-(`raster.rs`) as the fallback where there's no GPU: Zeron frames an orbit
+(`raster.rs`) as the fallback where there's no GPU: Zeren frames an orbit
 camera on the geometry and draws it into one transparent image. A visual's
 files (`assets`: at most 16, 8 MB each, 10 MB together) are stored beside its
 script as `{id}-asset-{name}` with an `{id}-assets.json` list, and travel to
@@ -247,13 +247,13 @@ other devices like attachments. `ui.shader` takes Shadertoy-style GLSL
 (`mainImage`, `iResolution`, `iTime`, `iMouse`, plus `iCamera` for an orbit
 camera, named float inputs bound to the script's state, `iNoise`, and up to four
 Shadertoy-style buffer passes read as `iChannel0`-`3`, with feedback from their
-own previous frame); `zeron_visual::shader` wraps each pass in a GLSL 4.50
+own previous frame); `zeren_visual::shader` wraps each pass in a GLSL 4.50
 program and validates it with naga, so a compile error reaches the agent with
 its pass and line. A shader composites onto the chat by `blend` (`alpha`,
 `light` for emitted light where black is clear, or `opaque`) with optional
 bloom, so it never sits in a black box.
 
-The engine runs every script before showing it (`zeron_visual::check`: setup,
+The engine runs every script before showing it (`zeren_visual::check`: setup,
 the first render, every canvas and scene draw, then each tab, toggle, slider
 end, and button once) and returns the first error with its line, so the agent
 fixes it before the reader sees anything. A passing script is stored in uploads
@@ -366,7 +366,7 @@ transcript or missing response at the deadline returns `timedOut`.
 
 ## Delegating across providers
 
-The `zeron` server is injected into every real harness (table above), and
+The `zeren` server is injected into every real harness (table above), and
 `create_chat` takes any `harness`, so every provider agent can hand work to any
 other: Claude Code → Codex and the reverse, or to Cursor, OpenCode, and so on.
 `list_harnesses` marks each provider:
@@ -433,19 +433,19 @@ both the MCP transport and engine support concurrent chat runs.
 ## Smoke recipe
 
 ```sh
-BIN=target/debug/zeron
+BIN=target/debug/zeren
 { echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}'
   echo '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"list_chats","arguments":{"limit":5}}}'
-  sleep 5; } | ZERON_IPC_PORT=27655 ZERON_DATA_DIR=/path/to/that/engine/data $BIN mcp
+  sleep 5; } | ZEREN_IPC_PORT=27655 ZEREN_DATA_DIR=/path/to/that/engine/data $BIN mcp
 ```
 
 `create_chat` with `"prompt": "Reply with exactly the word pong", "wait": true`
 against a live daemon returns the assistant's `pong` in a few seconds; archive
-the chat afterwards with `archive_chat`. Unit tests (`cargo test -p zeron-mcp`)
+the chat afterwards with `archive_chat`. Unit tests (`cargo test -p zeren-mcp`)
 drive the whole tool set against an in-memory stub `RpcService`.
 
 An isolated stdio instance is available with
-`cargo run -p zeron-engine --example mcp_standalone_smoke`. It provides a temporary
+`cargo run -p zeren-engine --example mcp_standalone_smoke`. It provides a temporary
 project, an origin coordinator and a scripted `codex` adapter (`smoke-1`) returning
 `pong`. Discover its ids with the list tools, create `kind: "chat"` with a prompt
 and `wait: true`, then check `read_chat`, `send_message` and a mixed batch. The

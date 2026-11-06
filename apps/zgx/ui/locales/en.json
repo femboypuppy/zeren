@@ -127,7 +127,7 @@
       "sending": "Sending…",
       "word": "{word}…",
       "words": {
-        "zeroning": "Zeroning",
+        "zerening": "Zerening",
         "thinking": "Thinking",
         "pondering": "Pondering",
         "scheming": "Scheming",
@@ -544,7 +544,7 @@
       "disconnect": "Disconnect",
       "copy_code": "Copy GitHub code {code}",
       "enter_code": "Enter this code on GitHub",
-      "approve": "Approve Zeron there. This page moves on by itself.",
+      "approve": "Approve Zeren there. This page moves on by itself.",
       "open_github": "Open GitHub",
       "repositories": "{n, plural, one {1 repository} other {# repositories}}",
       "no_repositories": "No repositories selected yet",
@@ -688,7 +688,7 @@
       "exit_code": "Exit code {code}",
       "loading_all_lines": "Loading all {n} lines…",
       "whole_offline": "The device that ran this command is offline. Try again when it's back.",
-      "whole_update": "Update Zeron on the device that ran this command to see all of its output.",
+      "whole_update": "Update Zeren on the device that ran this command to see all of its output.",
       "whole_unavailable": "The rest of this output wasn't kept.",
       "whole_running": "This command hasn't finished yet.",
       "whole_failed": "Couldn't load the rest of this output. Try again."
@@ -912,7 +912,7 @@
       "install": "Install",
       "manual": "Install {name} yourself to use it.",
       "unavailable": "Couldn't check {where} for agents",
-      "unavailable_hint": "Agents already set up keep working. Zeron will look again when it can.",
+      "unavailable_hint": "Agents already set up keep working. Zeren will look again when it can.",
       "sign_in": "Sign in to {name}",
       "sign_in_hint": "Opens your browser to sign in.",
       "banked_now_soon": "One starts the session and week over now.",
@@ -922,7 +922,7 @@
         "mismatch": "Codex answered for another account. Nothing was used.",
         "signed_out": "Codex couldn't confirm this login. Sign in again first.",
         "missing": "This account is no longer saved on its device.",
-        "offline": "Zeron can't reach the device this account is on.",
+        "offline": "Zeren can't reach the device this account is on.",
         "failed": "Codex didn't confirm it. Trying again won't use two."
       },
       "reset_nothing": "No window needed it, so the reset is still banked.",
@@ -934,7 +934,7 @@
       "resets_label": "Banked resets",
       "reset_option": "{title} · expires {expires}",
       "reset_option_soonest": "{title} · expires {expires} (soonest)",
-      "resets_unlisted": "Zeron couldn't list them just now. Close this and try again in a moment.",
+      "resets_unlisted": "Zeren couldn't list them just now. Close this and try again in a moment.",
       "use_reset_confirm": "Use reset",
       "open_terminal": "Open a terminal",
       "open_page": "Open the page again",
@@ -1049,7 +1049,7 @@
         "label": "Language",
         "terms": "language locale translation chinese english 中文 简体 语言",
         "system": "Follows your computer's preferred language.",
-        "chosen": "The menu bar changes the next time Zeron opens."
+        "chosen": "The menu bar changes the next time Zeren opens."
       },
       "title": "General",
       "terms": "preferences composer conversations behavior",
@@ -1086,7 +1086,7 @@
       },
       "open_links": {
         "label": "Open links in",
-        "terms": "web link url browser tab panel zeron external"
+        "terms": "web link url browser tab panel zeren external"
       },
       "thread_naming": {
         "label": "Thread naming",
@@ -1100,23 +1100,23 @@
       "worktrees": {
         "label": "Custom worktree location",
         "terms": "folder directory path checkout branches",
-        "env": "Set by ZERON_WORKTREES_DIR: {path}",
+        "env": "Set by ZEREN_WORKTREES_DIR: {path}",
         "in": "New worktrees go in {path}.",
-        "in_zeron": "New worktrees go in Zeron's folder.",
+        "in_zeren": "New worktrees go in Zeren's folder.",
         "folder": "Folder",
         "folder_hint": "Press Enter to use it.",
         "folder_name": "Worktree folder"
       },
       "commit_credit": {
-        "label": "Credit Zeron in commits",
+        "label": "Credit Zeren in commits",
         "terms": "co-author coauthor attribution bot commit message",
         "cloud": "Always on for Cloud",
         "on": "Agents' commits add zeronsh[bot] as a co-author"
       }
     },
     "engine": {
-      "outdated": "Update Zeron on this computer to change this.",
-      "offline": "Zeron isn't running on this computer.",
+      "outdated": "Update Zeren on this computer to change this.",
+      "offline": "Zeren isn't running on this computer.",
       "couldnt_save": "Couldn't save that"
     },
     "prefs": {
@@ -1136,7 +1136,7 @@
     "appearance": {
       "title": "Appearance",
       "terms": "theme look colors",
-      "description": "How Zeron looks on this computer.",
+      "description": "How Zeren looks on this computer.",
       "motion": "Motion",
       "fonts": "Fonts and layout",
       "new_chat": "New chat",
@@ -1225,7 +1225,7 @@
         "choose_title": "Choose a Background Image",
         "images": "Images",
         "unsupported": "That picture can't be shown. Choose a PNG or JPEG.",
-        "couldnt_keep": "Zeron couldn't keep that picture. Try again.",
+        "couldnt_keep": "Zeren couldn't keep that picture. Try again.",
         "image": {
           "label": "Image",
           "terms": "background picture photo choose replace remove adjust zoom",
@@ -1289,7 +1289,7 @@
       "background_only": {
         "label": "Only when in the background",
         "terms": "focus unfocused",
-        "description": "None while Zeron is the app you're in."
+        "description": "None while Zeren is the app you're in."
       },
       "sounds": {
         "label": "Session sounds",
@@ -1312,7 +1312,7 @@
       },
       "unread": {
         "title": "Couldn't read this computer's notification settings",
-        "body": "Banners follow what Zeron last saved. Try again in a moment."
+        "body": "Banners follow what Zeren last saved. Try again in a moment."
       }
     },
     "files": {
@@ -1348,7 +1348,7 @@
       "row_terms": "shortcut keybinding hotkey keys",
       "description": "The keys for what you do most.",
       "empty_title": "No shortcuts yet",
-      "empty_body": "Zeron's shortcuts show here as they're added.",
+      "empty_body": "Zeren's shortcuts show here as they're added.",
       "reset": "Reset",
       "reset_label": "Reset {name} to {keys}",
       "restore": "Restore defaults",
@@ -1368,7 +1368,7 @@
       "description": "Set up once, one permission at a time. Screen Recording captures the window; Accessibility optionally adds off-screen application text.",
       "capture_section": "Capture",
       "permissions": "Permissions",
-      "permissions_description": "macOS asks for these for the app that opened Zeron: Zeron itself, or, run from a terminal or an editor, that app. Grant them there in System Settings → Privacy & Security, then quit and reopen it once.",
+      "permissions_description": "macOS asks for these for the app that opened Zeren: Zeren itself, or, run from a terminal or an editor, that app. Grant them there in System Settings → Privacy & Security, then quit and reopen it once.",
       "ready": "Ready",
       "required": "Required",
       "set_up": "Set up",
@@ -1376,7 +1376,7 @@
       "press_now": "Press a shortcut…",
       "change_shortcut": "Change shortcut, now {keys}",
       "open_system_settings": "Open System Settings",
-      "changed": "Changed a permission? Check again after returning to Zeron.",
+      "changed": "Changed a permission? Check again after returning to Zeren.",
       "check_again": "Check again",
       "enabled": {
         "label": "Capture Appshots",
@@ -1407,7 +1407,7 @@
       "capture": {
         "label": "Window capture",
         "terms": "screen recording permission",
-        "description": "Screen Recording lets Zeron capture the frontmost window. macOS may request one restart.",
+        "description": "Screen Recording lets Zeren capture the frontmost window. macOS may request one restart.",
         "allow": "Allow window capture"
       },
       "text": {
@@ -1451,7 +1451,7 @@
       },
       "this_mac": "this computer",
       "couldnt_update": "Couldn't update {name}",
-      "cant_reach": "Zeron can't reach {device}.",
+      "cant_reach": "Zeren can't reach {device}.",
       "try_later": "Try again in a moment.",
       "policy": {
         "notify": "Notify",
@@ -1481,9 +1481,9 @@
         "no_match_title": "Nothing called “{q}”",
         "no_match_body": "Try its maker's name, or what it does.",
         "clear": "Clear search",
-        "offline": "Zeron can't reach the registry right now: this is the list from earlier.",
+        "offline": "Zeren can't reach the registry right now: this is the list from earlier.",
         "unavailable": "Couldn't list the registry on {device}",
-        "unavailable_hint": "Zeron can't reach it right now. Try again in a moment.",
+        "unavailable_hint": "Zeren can't reach it right now. Try again in a moment.",
         "try_again": "Try again",
         "gone_title": "This agent isn't in the registry",
         "gone_body": "It may have left it since. Go back to see what's there.",
@@ -1520,7 +1520,7 @@
         "added_body": "It's in your providers on {device}, switched on.",
         "open_providers": "Open Providers",
         "failed_title": "Couldn't add {name}",
-        "failed_offline": "Zeron can't reach {device}. Nothing was changed.",
+        "failed_offline": "Zeren can't reach {device}. Nothing was changed.",
         "failed_body": "{reason}. Nothing was changed on {device}.",
         "on_device": "On {device}",
         "installed": "Version {version}, the registry's latest.",
@@ -1627,7 +1627,7 @@
       "invite_someone": "Invite someone",
       "bad_address": "One address doesn't look right.",
       "sent": "{n, plural, one {# invite sent} other {# invites sent}}",
-      "sent_body": "They'll get an email from Zeron.",
+      "sent_body": "They'll get an email from Zeren.",
       "exists_one": "Already a member or invited.",
       "exists_many": "These are already members or invited.",
       "some_failed": "Some couldn't be sent. Check them and try again.",
@@ -1637,7 +1637,7 @@
       "remove": "Remove",
       "invite_to": "Invite to {org}",
       "invite_teammates": "Invite your teammates",
-      "invite_body": "They join as members. Each gets an email from Zeron.",
+      "invite_body": "They join as members. Each gets an email from Zeren.",
       "send_invites": "Send invites",
       "addresses": "Email addresses",
       "addresses_hint": "Enter or a comma adds another.",
@@ -1659,7 +1659,7 @@
       "links_section": "Links",
       "version": {
         "label": "Version",
-        "terms": "zeron engine version build about",
+        "terms": "zeren engine version build about",
         "description": "The engine on this computer."
       },
       "updates": {
@@ -1690,38 +1690,38 @@
         "checking": "Checking for updates…",
         "checking_line": "Asking for the newest release.",
         "updating": "Updating the engine…",
-        "updating_line": "Downloading Zeron {version} and putting it in place.",
-        "updated": "Updated to Zeron {version}",
+        "updating_line": "Downloading Zeren {version} and putting it in place.",
+        "updated": "Updated to Zeren {version}",
         "updated_running": "The engine is running the new version.",
         "updated_starting": "The engine is starting again on it.",
-        "unmanaged": "Update from the Zeron app",
-        "unmanaged_line": "This computer's engine came with the Zeron app, which updates it: open Zeron and choose Check for Updates.",
+        "unmanaged": "Update from the Zeren app",
+        "unmanaged_line": "This computer's engine came with the Zeren app, which updates it: open Zeren and choose Check for Updates.",
         "check_again": "Check again",
         "couldnt_check": "Couldn't check for updates",
         "offline_line": "This computer seems to be offline.",
         "couldnt_update": "Couldn't update",
         "failed_line": "Something went wrong. Try again in a moment.",
         "not_connected": "Not connected to the engine",
-        "not_connected_line": "Zeron's version shows once the engine is running.",
+        "not_connected_line": "Zeren's version shows once the engine is running.",
         "check": "Check for updates",
-        "available": "Zeron {version} is available",
+        "available": "Zeren {version} is available",
         "you_have": "You have {version}.",
         "update_engine": "Update engine",
         "unreachable_line": "The engine couldn't reach the release feed.",
-        "up_to_date": "Zeron is up to date",
+        "up_to_date": "Zeren is up to date",
         "newest_checked": "{version} is the newest · checked {ago}",
-        "downloading": "Downloading Zeron {version}…",
+        "downloading": "Downloading Zeren {version}…",
         "downloading_line": "You can keep working.",
-        "ready": "Zeron {version} is ready",
-        "ready_line": "Restart to finish. If you don't, it installs when you quit Zeron.",
+        "ready": "Zeren {version} is ready",
+        "ready_line": "Restart to finish. If you don't, it installs when you quit Zeren.",
         "restart": "Restart to update",
-        "download_failed": "Couldn't download Zeron {version}",
-        "held": "Zeron {version} can't be installed yet",
-        "available_stable": "Zeron {version} (Stable) is available",
+        "download_failed": "Couldn't download Zeren {version}",
+        "held": "Zeren {version} can't be installed yet",
+        "available_stable": "Zeren {version} (Stable) is available",
         "update": "Update",
         "newest": "{version} is the newest we know of."
       },
-      "description": "Which Zeron this is, and keeping it up to date.",
+      "description": "Which Zeren this is, and keeping it up to date.",
       "app": {
         "label": "This app",
         "built": "Not packaged yet · built {built}",
@@ -1732,15 +1732,15 @@
         "label": "Get beta updates",
         "terms": "beta early test channel stable preview next",
         "on": "You're getting beta updates. Turn this off to go back to Stable.",
-        "off": "Try the next Zeron early. Needs macOS {version} or later."
+        "off": "Try the next Zeren early. Needs macOS {version} or later."
       },
-      "updates_self_description": "Zeron updates itself: a new version downloads in the background and installs when you restart.",
+      "updates_self_description": "Zeren updates itself: a new version downloads in the background and installs when you restart.",
       "version_info": {
         "label": "Version info",
         "description": "For a bug report: the versions and builds above.",
         "copied": "Version info copied"
       },
-      "updates_description": "Updates go to the engine on this computer, as the Zeron app's do. This app isn't packaged yet, so it isn't updated here."
+      "updates_description": "Updates go to the engine on this computer, as the Zeren app's do. This app isn't packaged yet, so it isn't updated here."
     },
     "archived": {
       "title": "Archived",
@@ -1829,7 +1829,7 @@
         "description": "Credits Cloud chats used. A credit is a minute of a standard machine.",
         "used": "{credits} used",
         "reading": "Reading usage…",
-        "failed": "Couldn't read usage. It shows once Zeron can reach Cloud.",
+        "failed": "Couldn't read usage. It shows once Zeren can reach Cloud.",
         "out": "Out of credits. Add some in Billing.",
         "left": "{credits} left",
         "range_name": "Usage range"
@@ -1852,8 +1852,8 @@
       },
       "unreachable": {
         "title": "Couldn't check Cloud",
-        "outdated": "This version of Zeron can't manage Cloud yet. Update it in About.",
-        "failed": "Zeron couldn't reach Cloud. Try again in a moment."
+        "outdated": "This version of Zeren can't manage Cloud yet. Update it in About.",
+        "failed": "Zeren couldn't reach Cloud. Try again in a moment."
       },
       "attention": {
         "title": "Cloud needs attention",
@@ -1933,14 +1933,14 @@
       "photo": {
         "label": "Photo",
         "terms": "avatar picture image",
-        "own": "Shows beside your name across Zeron.",
+        "own": "Shows beside your name across Zeren.",
         "from_sign_in": "From the account you signed in with.",
         "avatar": "Your photo",
         "change": "Change",
         "choose": "Choose a photo",
         "images": "Images",
         "open_failed": "Couldn't open that picture",
-        "open_failed_body": "Zeron couldn't read it as a PNG or JPEG.",
+        "open_failed_body": "Zeren couldn't read it as a PNG or JPEG.",
         "preview": "Your photo, as it will show",
         "zoom": "Zoom"
       },
@@ -1979,7 +1979,7 @@
       "card": {
         "label": "Member card",
         "terms": "share copy link x twitter",
-        "share_text": "Just claimed my Zeron card",
+        "share_text": "Just claimed my Zeren card",
         "none": "No card yet"
       },
       "devices": {
@@ -1992,7 +1992,7 @@
         "terms": "log out logout leave account session",
         "busy": "Signing out…",
         "description": "This computer stops syncing until you sign in again.",
-        "confirm_title": "Sign out of Zeron?",
+        "confirm_title": "Sign out of Zeren?",
         "confirm_body": "Your sessions stay in your account. On this computer, setup opens again."
       },
       "delete": {
@@ -2019,7 +2019,7 @@
       },
       "save": "Save changes",
       "signed_out": {
-        "description": "Sign in to show up as yourself across Zeron.",
+        "description": "Sign in to show up as yourself across Zeren.",
         "yours": "Yours when you sign in",
         "name": "Your name and photo",
         "name_description": "How your team sees you, beside every chat you share.",
@@ -2189,7 +2189,7 @@
         "new_section": "New section",
         "path": "Path",
         "no_folder": "It has no folder yet",
-        "zeron_link": "Zeron conversation link",
+        "zeren_link": "Zeren conversation link",
         "link_not_ready": "Conversation link is not ready yet",
         "codex_link": "Codex conversation link",
         "harness_session_id": "Harness session ID",
@@ -2257,9 +2257,9 @@
             "too_large": "That image is too large.",
             "open": "Couldn't open that image. Choose a PNG or JPEG.",
             "save": "Couldn't save the project. Try again.",
-            "save_outdated": "Zeron on this computer needs an update to save project icons. Update it, then save again.",
+            "save_outdated": "Zeren on this computer needs an update to save project icons. Update it, then save again.",
             "save_gone": "This project was removed on another device.",
-            "save_offline": "Zeron on this computer isn't responding. Try again in a moment."
+            "save_offline": "Zeren on this computer isn't responding. Try again in a moment."
           }
         }
       },
@@ -2327,7 +2327,7 @@
         "shell_settings": "Settings",
         "shell_find": "Find",
         "shell_close": "Close",
-        "shell_reload": "Reload Zeron",
+        "shell_reload": "Reload Zeren",
         "shell_reload_interface": "Reload interface"
       },
       "group": {
@@ -2372,11 +2372,11 @@
       "frosted_glass": "Frosted glass",
       "search": "Search sessions, commands and files…",
       "app": "App",
-      "reload_zeron": "Reload Zeron",
+      "reload_zeren": "Reload Zeren",
       "reload_interface": "Reload interface",
       "commands": "Commands",
       "run": "Run",
-      "default_interface": "Use Zeron v3"
+      "default_interface": "Use Zeren v3"
     },
     "add_project": {
       "something_went_wrong": "Something went wrong",
@@ -2419,14 +2419,14 @@
       "search_repos": "Search repositories…",
       "loading_repos": "Loading your repositories…",
       "no_repos": "No repositories found",
-      "no_repos_hint": "Cloud lists the repositories the Zeron GitHub App can reach. Add more in Settings → Cloud.",
+      "no_repos_hint": "Cloud lists the repositories the Zeren GitHub App can reach. Add more in Settings → Cloud.",
       "no_repos_yet": "No repositories yet",
       "choose_repos": "Choose repositories in Settings → Cloud",
       "github_not_connected": "GitHub isn't connected",
       "connect_github": "Connect GitHub in Settings → Cloud",
       "repos_failed": "Couldn't load your repositories",
       "repos_failed_hint": "Go back and pick Cloud to try again.",
-      "repos_offline": "Zeron can't be reached right now",
+      "repos_offline": "Zeren can't be reached right now",
       "private": "Private",
       "on_device": "On {device}",
       "from_github": "From GitHub",
@@ -2443,13 +2443,13 @@
       "failed_named": "Couldn't update {name}",
       "installing": "Installing…",
       "manual": "needs doing by hand",
-      "not_applied": "Zeron didn't update",
+      "not_applied": "Zeren didn't update",
       "not_applied_body": "It restarted on the same version. You can try again from the update button.",
       "offline": "Offline",
       "on_that_device": "updates from that device",
       "plan_agents": "Agents wait for what's running to finish",
       "plan_chats": "{n, plural, one {Stops # running chat. It picks up again after the restart} other {Stops # running chats. They pick up again after the restart}}",
-      "plan_here": "Downloads Zeron for this device, then asks you to restart",
+      "plan_here": "Downloads Zeren for this device, then asks you to restart",
       "preparing": "Preparing…",
       "ready": "{version} is ready. Restart to finish",
       "restart": "Restart",
@@ -2483,11 +2483,11 @@
     "skip_for_now": "Skip for now",
     "not_now": "Not now",
     "signin": {
-      "title": "Welcome\nto Zeron",
+      "title": "Welcome\nto Zeren",
       "lines": {
         "phone": "Pick up any chat on your phone.",
         "machines": "Run agents on any of your machines.",
-        "cloud": "Hand a chat to Zeron Cloud and walk away."
+        "cloud": "Hand a chat to Zeren Cloud and walk away."
       },
       "waiting": "Finish signing in in your browser.",
       "failed": "Couldn't sign in. Nothing was changed.",
@@ -2518,7 +2518,7 @@
         "description": "Sign in any time to sync them to your other devices."
       },
       "open_org": "Open {org}",
-      "open_zeron": "Open Zeron",
+      "open_zeren": "Open Zeren",
       "title_org": "{org} is ready",
       "title": "You're all set",
       "body": "Here's what was set up.",
@@ -2539,8 +2539,8 @@
     },
     "invite": {
       "one_address": "One address",
-      "failed_one": "{why, select, invalid {{who} isn't an address Zeron can send to.} exists {{who} is already in or invited.} other {{who} couldn't be sent.}}",
-      "failed_many": "{why, select, invalid {{who} isn't an address Zeron can send to, and {n} more weren't sent.} exists {{who} is already in or invited, and {n} more weren't sent.} other {{who} couldn't be sent, and {n} more weren't sent.}}",
+      "failed_one": "{why, select, invalid {{who} isn't an address Zeren can send to.} exists {{who} is already in or invited.} other {{who} couldn't be sent.}}",
+      "failed_many": "{why, select, invalid {{who} isn't an address Zeren can send to, and {n} more weren't sent.} exists {{who} is already in or invited, and {n} more weren't sent.} other {{who} couldn't be sent, and {n} more weren't sent.}}",
       "nothing_sent": "Nothing was sent. {says}",
       "bad_addresses": "{n, plural, one {One address doesn't look right.} other {# addresses don't look right.}}",
       "too_many": "Up to {max} at a time.",
@@ -2550,7 +2550,7 @@
       "send_invites": "Send invites",
       "send_n": "{n, plural, one {Send # invite} other {Send # invites}}",
       "title": "Invite your teammates",
-      "sent": "{n, plural, one {# invite sent. They'll get an email from Zeron.} other {# invites sent. They'll get an email from Zeron.}}",
+      "sent": "{n, plural, one {# invite sent. They'll get an email from Zeren.} other {# invites sent. They'll get an email from Zeren.}}",
       "body": "Chats and agents you share stay in step for everyone.",
       "field": "Email addresses",
       "hint": "Enter or a comma adds another. They join as members."
@@ -2574,7 +2574,7 @@
       "placeholder": "username"
     },
     "card": {
-      "draft": "Just claimed my Zeron card",
+      "draft": "Just claimed my Zeren card",
       "failed_title": "Your card didn't load",
       "failed_body": "{says} Try again in a moment."
     },
@@ -2582,7 +2582,7 @@
       "title_install": "Install an agent",
       "title": "Your agents",
       "looking": "Looking for coding agents on this computer…",
-      "unavailable": "Zeron runs the coding agents you already use.",
+      "unavailable": "Zeren runs the coding agents you already use.",
       "none": "None are on this computer yet. Install one to continue.",
       "found": "{n, plural, one {Found # agent on this computer. Sign in to any you'd like to use.} other {Found # agents on this computer. Sign in to any you'd like to use.}}",
       "this_mac": "this computer"
@@ -2609,7 +2609,7 @@
       "missing_body": "It may have been archived, or it's on a device that hasn't synced yet.",
       "new_chat": "New chat",
       "offline_title": "Can't load this chat right now",
-      "offline_body": "Zeron will show it as soon as it can reach your agents again."
+      "offline_body": "Zeren will show it as soon as it can reach your agents again."
     },
     "home": {
       "title": "Add a project to get started",
@@ -2640,15 +2640,15 @@
       "side_chat": "Side chat",
       "couldnt_create": "Couldn't create the side chat."
     },
-    "zeron_commands": {
-      "model": "Zeron: choose agent, model, and reasoning",
-      "new": "Zeron: start a new conversation",
-      "resume": "Zeron: search and open conversations",
-      "settings": "Zeron: open settings",
-      "files": "Zeron: open project files",
-      "terminal": "Zeron: open a terminal",
-      "rename": "Zeron: rename this conversation",
-      "stop": "Zeron: stop the active run"
+    "zeren_commands": {
+      "model": "Zeren: choose agent, model, and reasoning",
+      "new": "Zeren: start a new conversation",
+      "resume": "Zeren: search and open conversations",
+      "settings": "Zeren: open settings",
+      "files": "Zeren: open project files",
+      "terminal": "Zeren: open a terminal",
+      "rename": "Zeren: rename this conversation",
+      "stop": "Zeren: stop the active run"
     },
     "find": {
       "no_results": "No results",
@@ -2784,8 +2784,8 @@
     },
     "terminal": {
       "no_session": "This tab has no session to run in.",
-      "offline": "Zeron can't reach this session's device right now.",
-      "update": "Update Zeron to use terminals here.",
+      "offline": "Zeren can't reach this session's device right now.",
+      "update": "Update Zeren to use terminals here.",
       "failed": "The terminal didn't open",
       "label": "Terminal"
     },
@@ -2957,7 +2957,7 @@
     },
     "unreadable": {
       "title": "These files couldn't be read",
-      "body": "Zeron couldn't list this folder."
+      "body": "Zeren couldn't list this folder."
     },
     "none": {
       "title": "No files here",
@@ -2968,13 +2968,13 @@
       "body": "Save the file again once it's fixed, and they come back here as they were."
     },
     "workspace": {
-      "offline": "Zeron can't reach this session's device right now.",
-      "unreadable_text": "It isn't text Zeron can read.",
+      "offline": "Zeren can't reach this session's device right now.",
+      "unreadable_text": "It isn't text Zeren can read.",
       "not_remade": "{name} couldn't be made again",
       "not_saved": "{name} couldn't be saved",
       "not_read_yet": "It hasn't been read from disk yet.",
       "cant_save_here": "{name} can't be saved here",
-      "read_only": "Zeron can show this file but not write it.",
+      "read_only": "Zeren can show this file but not write it.",
       "not_moved": "{name} couldn't be moved",
       "changed": "It changed before it could be. Try again.",
       "cant_rename": "Files can't be renamed here",
@@ -2989,11 +2989,11 @@
   "engine": {
     "update": {
       "restart": "Restart to update",
-      "out_of_date": "Zeron's engine is out of date",
-      "restart_tip": "Zeron updated in the background. Restarting its engine ends what's running in it.",
+      "out_of_date": "Zeren's engine is out of date",
+      "restart_tip": "Zeren updated in the background. Restarting its engine ends what's running in it.",
       "theirs_tip": "It was started outside this app: restart it there to update it.",
       "short": "Engine out of date",
-      "old": "This Zeron needs a newer engine",
+      "old": "This Zeren needs a newer engine",
       "old_tip": "Its engine is older than this version needs. Open About & updates to go back to Stable.",
       "short_old": "Needs a newer engine"
     }
@@ -3001,7 +3001,7 @@
   "account": {
     "api": {
       "says": {
-        "offline": "Zeron can't be reached right now.",
+        "offline": "Zeren can't be reached right now.",
         "signed_out": "You've been signed out.",
         "taken": "That username is taken.",
         "reserved": "That username is reserved.",
@@ -3018,7 +3018,7 @@
         "cancelled": "Sign-in was cancelled.",
         "denied": "Sign-in was turned down in the browser. Try again when you're ready.",
         "timed_out": "The browser didn't finish signing you in. Try again.",
-        "offline": "Zeron can't be reached. Check your connection and try again.",
+        "offline": "Zeren can't be reached. Check your connection and try again.",
         "expired": "You were signed out. Sign in again to carry on.",
         "failed": "Sign-in didn't finish. Try again."
       }
@@ -3049,8 +3049,8 @@
         "page_area": "the page area",
         "chat_page": "the chat page",
         "new_chat_page": "the new chat page",
-        "zeron": "part of Zeron",
-        "zeron_parts": "parts of Zeron"
+        "zeren": "part of Zeren",
+        "zeren_parts": "parts of Zeren"
       },
       "list": "{rest} and {last}",
       "list_sep": ", ",
@@ -3058,7 +3058,7 @@
       "programs": "programs",
       "permission": {
         "ui_add": {
-          "title": "Add things to Zeron's interface"
+          "title": "Add things to Zeren's interface"
         },
         "ui_change": {
           "title": "Change how {places} shows",
@@ -3066,7 +3066,7 @@
         },
         "ui_replace": {
           "title": "Replace {places} with its own",
-          "detail": "Its code runs as part of Zeron: it can do anything you can."
+          "detail": "Its code runs as part of Zeren: it can do anything you can."
         },
         "profile_read": {
           "title": "See your name, username and picture"
@@ -3153,7 +3153,7 @@
         }
       },
       "author": {
-        "zeron": "by Zeron",
+        "zeren": "by Zeren",
         "you": "by you",
         "verified": "by @{username}",
         "unknown": "Unknown author"
@@ -3196,19 +3196,19 @@
       "any_site": "Any site on the internet",
       "near_host": "{host}: this computer or your network",
       "details": {
-        "changes": "Parts of Zeron it changes",
+        "changes": "Parts of Zeren it changes",
         "replaces": "Screens it replaces",
         "changes_since": "Also changes, since you allowed it"
       }
     },
     "page": {
       "title": "Plugins",
-      "description": "What plugins add to Zeron on each of your computers, and the tools they give your agents.",
+      "description": "What plugins add to Zeren on each of your computers, and the tools they give your agents.",
       "search": "Search plugins",
       "tabs": "Plugins",
       "installed": "Installed",
       "yours": "Yours",
-      "package_filter": "Zeron plugin",
+      "package_filter": "Zeren plugin",
       "install_title": "Install Plugin",
       "installed_toast": "Installed {name}",
       "installed_toast_version": "Installed {name} {version}",
@@ -3219,7 +3219,7 @@
       "settings_of": "{name} settings",
       "review": "Review",
       "show_folder": "Show folder",
-      "builtin": "{name} is part of Zeron",
+      "builtin": "{name} is part of Zeren",
       "remove_named": "Remove {name}",
       "update": "Update",
       "updating": "Updating…",
@@ -3228,19 +3228,19 @@
       "none_body": "Ask an agent to make one.",
       "show_plugins_folder": "Show plugins folder",
       "remove_title": "Remove this plugin?",
-      "remove_body": "It stops everywhere in Zeron at once. Its folder goes to the plugins folder's removed items, in case you want it back.",
+      "remove_body": "It stops everywhere in Zeren at once. Its folder goes to the plugins folder's removed items, in case you want it back.",
       "new_title": "New plugin",
       "new_body": "A folder of your own, signed as yours. Ask an agent to fill it in, or edit init.luau yourself.",
       "make_it": "Make it",
       "name": "Name",
       "name_placeholder": "My plugin",
       "install_dialog_title": "Install a plugin",
-      "install_dialog_body": "Paste a link to a .zeron-plugin file, a GitHub release or a repository, or choose a file. Zeron checks who signed it, and you allow what it asks before it runs.",
+      "install_dialog_body": "Paste a link to a .zeren-plugin file, a GitHub release or a repository, or choose a file. Zeren checks who signed it, and you allow what it asks before it runs.",
       "install": "Install",
       "link": "Link",
       "choose_file": "Choose File",
       "offline_title": "Plugins aren't available right now",
-      "offline_body": "The ones you've allowed come back when Zeron is running again.",
+      "offline_body": "The ones you've allowed come back when Zeren is running again.",
       "cant_reach": "Can't reach {device} right now. Try again once it's online.",
       "couldnt_switch": "Couldn't turn {name} on or off",
       "couldnt_remove": "Couldn't remove the plugin",
@@ -3248,11 +3248,11 @@
       "install_link": "Install from a link",
       "install_more": "Install",
       "device_offline_title": "{device} is offline",
-      "device_offline_body": "Its plugins show here once it's online again, with Zeron running.",
+      "device_offline_body": "Its plugins show here once it's online again, with Zeren running.",
       "try_again": "Try again",
-      "remove_body_device": "It stops everywhere in Zeron on {device} at once. Its folder goes to the removed items in that computer's plugins folder, in case you want it back.",
+      "remove_body_device": "It stops everywhere in Zeren on {device} at once. Its folder goes to the removed items in that computer's plugins folder, in case you want it back.",
       "install_dialog_title_device": "Install a plugin on {device}",
-      "install_dialog_body_device": "Paste a link to a .zeron-plugin file, a GitHub release or a repository. Zeron checks who signed it, and you allow what it asks before it runs there.",
+      "install_dialog_body_device": "Paste a link to a .zeren-plugin file, a GitHub release or a repository. Zeren checks who signed it, and you allow what it asks before it runs there.",
       "file_here_only": "A plugin file installs only on the computer it's on. To install one from a file, show this computer's plugins.",
       "setup_title": "Finish setting up your account",
       "setup_body": "Your plugins load as soon as you've chosen where you work."
@@ -3262,7 +3262,7 @@
       "made_by": "Made by @{username}",
       "unknown_author": "Unknown author",
       "tampered_why": "It changed after you allowed it. Look again before it runs.",
-      "unknown_why": "Zeron can't tell who made it. Allow it only if you trust where it came from.",
+      "unknown_why": "Zeren can't tell who made it. Allow it only if you trust where it came from.",
       "nothing": "Nothing to allow",
       "asks_nothing": "It asks for nothing beyond running in its own space.",
       "allow_title": "Allow {name}?",
@@ -3273,12 +3273,12 @@
       "not_now": "Not now",
       "allow": "Allow",
       "on_device": "On {device}",
-      "unverified_why": "Zeron can't confirm who made this. Allow it only if you trust where it came from.",
-      "unverified_why_from": "Zeron can't confirm who made this. Allow it only if you trust where it came from: {where}.",
+      "unverified_why": "Zeren can't confirm who made this. Allow it only if you trust where it came from.",
+      "unverified_why_from": "Zeren can't confirm who made this. Allow it only if you trust where it came from: {where}.",
       "made_on_your_device": "Made on one of your devices",
       "grew": "New since you allowed it:",
-      "allow_there": "Allow it on {device}: it asks there, in Zeron on that computer.",
-      "mine_confirm": "Sign {name} as your own? Only if you wrote it yourself: Zeron will treat it as yours from now on, on this computer.",
+      "allow_there": "Allow it on {device}: it asks there, in Zeren on that computer.",
+      "mine_confirm": "Sign {name} as your own? Only if you wrote it yourself: Zeren will treat it as yours from now on, on this computer.",
       "mine_cancel": "Cancel",
       "mine_sign": "Sign as mine",
       "details": "Details",
@@ -3287,7 +3287,7 @@
     "permissions": {
       "screen_recording": {
         "title": "Screen Recording",
-        "description": "Lets {name} capture the window in front. macOS may ask you to reopen Zeron once.",
+        "description": "Lets {name} capture the window in front. macOS may ask you to reopen Zeren once.",
         "grant": "Allow Screen Recording"
       },
       "accessibility": {
@@ -3295,7 +3295,7 @@
         "description": "Lets {name} read the text in other applications' windows.",
         "grant": "Allow Accessibility"
       },
-      "note": "macOS asks for these for the app that opened Zeron: Zeron itself, or, run from a terminal or an editor, that app. Grant them in System Settings → Privacy & Security, then quit and reopen it once."
+      "note": "macOS asks for these for the app that opened Zeren: Zeren itself, or, run from a terminal or an editor, that app. Grant them in System Settings → Privacy & Security, then quit and reopen it once."
     },
     "settings": {
       "granted": "Granted",
@@ -3327,7 +3327,7 @@
       "review": "Review",
       "template_waiting_body": "A template from someone else.",
       "failed": "{name} stopped working",
-      "failed_body": "Zeron keeps working without it until it's updated or fixed.",
+      "failed_body": "Zeren keeps working without it until it's updated or fixed.",
       "show_folder": "Show folder",
       "template_failed": "Your template's {name} has an error",
       "template_failed_body": "That part shows the default interface until it's fixed and saved.",
@@ -3338,13 +3338,13 @@
   "templates": {
     "page": {
       "title": "Templates",
-      "description": "Whole interfaces for Zeron. Anything a template leaves out comes from the default interface.",
+      "description": "Whole interfaces for Zeren. Anything a template leaves out comes from the default interface.",
       "search": "Search templates",
       "tabs": "Templates",
       "installed": "Installed",
       "yours": "Yours",
       "author": {
-        "zeron": "by Zeron",
+        "zeren": "by Zeren",
         "you": "by you",
         "verified": "by @{username}",
         "unknown": "by an unknown author",
@@ -3353,11 +3353,11 @@
       "about": {
         "broken": "Can't run, so the default interface shows: {error}",
         "errors": "Some parts show the default interface: {error}",
-        "out_of_date": "Made for Zeron {version}. Zeron has updated since.",
-        "out_of_date_unversioned": "Made for an earlier Zeron. Zeron has updated since.",
+        "out_of_date": "Made for Zeren {version}. Zeren has updated since.",
+        "out_of_date_unversioned": "Made for an earlier Zeren. Zeren has updated since.",
         "no_description": "No description."
       },
-      "package_filter": "Zeron template",
+      "package_filter": "Zeren template",
       "export_title": "Export Template",
       "couldnt_export": "Couldn't export {name}",
       "exported": "Exported {name}",
@@ -3380,7 +3380,7 @@
       "none_body": "Ask an agent to make one, or start from a copy of the default.",
       "show_templates_folder": "Show templates folder",
       "delete_title": "Delete this template?",
-      "delete_body": "It's set aside in the templates folder, so you can get it back. If it's in use, Zeron switches to the default interface.",
+      "delete_body": "It's set aside in the templates folder, so you can get it back. If it's in use, Zeren switches to the default interface.",
       "couldnt_delete": "Couldn't delete the template",
       "new_title": "New template",
       "new_body": "A copy of the default interface for you to change. Ask an agent to change it, or edit its files yourself.",
@@ -3391,7 +3391,7 @@
       "install_more": "Install",
       "install_title": "Install Template",
       "install_dialog_title": "Install a template",
-      "install_dialog_body": "Paste a link to a .zeron-template file, a GitHub release or a repository, or choose a file. Zeron checks who signed it, and you allow it before it's used.",
+      "install_dialog_body": "Paste a link to a .zeren-template file, a GitHub release or a repository, or choose a file. Zeren checks who signed it, and you allow it before it's used.",
       "link": "Link",
       "install": "Install",
       "choose_file": "Choose File",
@@ -3415,29 +3415,29 @@
       "install_title": "Install {name}?",
       "keep_title": "Keep {name}?",
       "keep_trust": "Keep it only if you trust what made it",
-      "keep_body": "An agent made, changed or switched to this template, or it hasn't been kept since it changed. Until you keep it, it's a preview. Kept, it runs with everything Zeron can do.",
+      "keep_body": "An agent made, changed or switched to this template, or it hasn't been kept since it changed. Until you keep it, it's a preview. Kept, it runs with everything Zeren can do.",
       "keep_files": "{n, plural, one {# file} other {# files}} of its own, as they are now",
-      "keep_files_detail": "If they change again, Zeron asks again.",
+      "keep_files_detail": "If they change again, Zeren asks again.",
       "keep": "Keep",
       "trust": "Install it only if you trust {whom}",
-      "trust_body": "A template runs as part of Zeron: it replaces Zeron's interface and can do anything Zeron can, with your chats, files, accounts and agents.",
-      "unknown_body": "Zeron can't tell whose key signed it. Install it only if you trust where it came from.",
+      "trust_body": "A template runs as part of Zeren: it replaces Zeren's interface and can do anything Zeren can, with your chats, files, accounts and agents.",
+      "unknown_body": "Zeren can't tell whose key signed it. Install it only if you trust where it came from.",
       "signature": "Its signature checks out",
       "signature_detail": "Nothing in it changed since it was signed, by key {key}.",
       "files": "{n, plural, one {# file} other {# files}}",
-      "files_made_for": "{n, plural, one {# file} other {# files}} · made for Zeron {version}",
+      "files_made_for": "{n, plural, one {# file} other {# files}} · made for Zeren {version}",
       "left_out": "{n, plural, one {# file} other {# files}} left out",
-      "left_out_detail": "Templates can't replace these, so Zeron keeps its versions: {files}",
+      "left_out_detail": "Templates can't replace these, so Zeren keeps its versions: {files}",
       "not_now": "Not now",
       "install": "Install",
-      "unverified_body": "Zeron can't confirm who made this. Install it only if you trust where it came from.",
-      "unverified_body_from": "Zeron can't confirm who made this. Install it only if you trust where it came from: {where}."
+      "unverified_body": "Zeren can't confirm who made this. Install it only if you trust where it came from.",
+      "unverified_body_from": "Zeren can't confirm who made this. Install it only if you trust where it came from: {where}."
     }
   },
   "themes": {
     "page": {
       "title": "Themes",
-      "description": "Colours for Zeron. Your theme is worn with any template.",
+      "description": "Colours for Zeren. Your theme is worn with any template.",
       "search": "Search themes",
       "tabs": "Themes",
       "all": "All",

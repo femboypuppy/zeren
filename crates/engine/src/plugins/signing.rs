@@ -10,11 +10,11 @@ use sha2::Digest as _;
 
 use super::manifest::Manifest;
 
-pub const PAYLOAD_PREFIX: &str = "zeron-plugin:v1\n";
+pub const PAYLOAD_PREFIX: &str = "zeren-plugin:v1\n";
 /// A template package's (plugins/template_packages.rs): its own domain, so a
 /// plugin's signature never verifies as a template's, or the reverse.
-pub const TEMPLATE_PAYLOAD_PREFIX: &str = "zeron-template:v1\n";
-pub const KEY_PROOF_PREFIX: &str = "zeron-plugin-key:v1:";
+pub const TEMPLATE_PAYLOAD_PREFIX: &str = "zeren-template:v1\n";
+pub const KEY_PROOF_PREFIX: &str = "zeren-plugin-key:v1:";
 pub const KEY_FILE: &str = "plugin-signing-key";
 
 pub type FileHashes = BTreeMap<String, String>;
@@ -205,7 +205,7 @@ impl SigningKey {
         B64URL.encode(self.pair.sign(message).as_ref())
     }
 
-    /// `b64url(sig("zeron-plugin-key:v1:" + key))` for `POST /plugin-keys`.
+    /// `b64url(sig("zeren-plugin-key:v1:" + key))` for `POST /plugin-keys`.
     pub fn proof(&self) -> String {
         self.sign(format!("{KEY_PROOF_PREFIX}{}", self.public()).as_bytes())
     }
@@ -248,12 +248,12 @@ pub fn load_key(data_dir: &Path) -> Option<SigningKey> {
 
 /// This device's proof for a device-room dial to `target` on `conn_id` at
 /// `ts` (epoch ms): `(public key, signature)` over
-/// [`zeron_rpc::caller_proof_message`], both b64url. `None` without a key
+/// [`zeren_rpc::caller_proof_message`], both b64url. `None` without a key
 /// (never made here: an unregistered key would prove nothing). The private
 /// key never leaves this module.
 pub fn device_link_proof(data_dir: &Path, target: &str, conn_id: &str, ts: i64) -> Option<(String, String)> {
     let key = load_key(data_dir)?;
-    let message = zeron_rpc::caller_proof_message(target, conn_id, ts);
+    let message = zeren_rpc::caller_proof_message(target, conn_id, ts);
     Some((key.public(), key.sign(message.as_bytes())))
 }
 
@@ -311,7 +311,7 @@ fn delete_locked(data_dir: &Path) -> Result<(), String> {
     Ok(())
 }
 
-/// The manifest as Zeron writes it: 2-space indent, trailing newline.
+/// The manifest as Zeren writes it: 2-space indent, trailing newline.
 pub fn pretty(value: &serde_json::Value) -> Vec<u8> {
     let mut bytes = serde_json::to_vec_pretty(value).unwrap_or_default();
     bytes.push(b'\n');
@@ -324,7 +324,7 @@ mod tests {
 
     #[test]
     fn plugins_first_uses_at_once_agree_on_one_key() {
-        let dir = std::env::temp_dir().join(format!("zeron-key-race-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("zeren-key-race-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let keys: Vec<String> = std::thread::scope(|scope| {
@@ -365,7 +365,7 @@ mod tests {
         let raw = serde_json::json!({ "name": "Pin", "id": "pin" });
         let bytes = payload(&raw, "KEY", &files());
         let expected = format!(
-            "zeron-plugin:v1\n{{\"id\":\"pin\",\"name\":\"Pin\",\"signature\":{{\"files\":{{\"init.luau\":\"{}\"}},\"key\":\"KEY\"}}}}",
+            "zeren-plugin:v1\n{{\"id\":\"pin\",\"name\":\"Pin\",\"signature\":{{\"files\":{{\"init.luau\":\"{}\"}},\"key\":\"KEY\"}}}}",
             sha256_hex(b"print(1)")
         );
         assert_eq!(String::from_utf8(bytes).unwrap(), expected);

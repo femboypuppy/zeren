@@ -14,7 +14,7 @@ return ui.column {
 	w_full = true,
 	h_full = true,
 	-- (On a ground of its own, so a capture reads as the app does.)
-	theme = "zeron-dark",
+	theme = "zeren-dark",
 	bg = "$background",
 	p = "$space.6",
 	justify = "end",

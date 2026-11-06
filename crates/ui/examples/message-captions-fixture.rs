@@ -1,12 +1,12 @@
 //! Message caption review fixture: a chat that messaged another, switched
 //! provider, then received that chat's reply, in an isolated, offline shell.
 //! With `--capture <dir>` it saves the transcript at rest and with the
-//! sender caption hovered, then quits; ZERON_PALETTE_LIGHT=1 renders the
+//! sender caption hovered, then quits; ZEREN_PALETTE_LIGHT=1 renders the
 //! light theme.
 use gpui::{AppContext, Bounds, WindowBounds, WindowOptions, px, size};
 use serde_json::json;
 use std::path::{Path, PathBuf};
-use zeron_ui::*;
+use zeren_ui::*;
 
 const SENDER_ID: &str = "cd27c5c2-6f1e-4d1a-9a52-3b0c8e7d4f10";
 
@@ -35,8 +35,8 @@ fn entries() -> serde_json::Value {
             "parts": [{"id": "t", "kind": "text", "text": text}]})
     };
     let routed = format!(
-        "[Message from Zeron chat zgui prod: Windows platform (WING-PC) (cd27c5c2). Reply to it with the Zeron `send_message` tool, chat {SENDER_ID}.]\n\n\
-         Windows lane: the matrices are done on current main (#513, #542, #543). Windows in front and verified uncovered on every run, Zeron minimized, alternating, 0 invalid runs; dist builds, shared DejaVu font."
+        "[Message from Zeren chat zgui prod: Windows platform (WING-PC) (cd27c5c2). Reply to it with the Zeren `send_message` tool, chat {SENDER_ID}.]\n\n\
+         Windows lane: the matrices are done on current main (#513, #542, #543). Windows in front and verified uncovered on every run, Zeren minimized, alternating, 0 invalid runs; dist builds, shared DejaVu font."
     );
     json!([
         text("u0", "user", 0, "Profile the render loop on Linux and Windows and tell me where the frame time goes."),
@@ -46,7 +46,7 @@ fn entries() -> serde_json::Value {
             "parts": [
                 {"id": "t", "kind": "text", "text": "Linux is done: layout is 61% of the frame, paint 22%. I'll ask the Windows chat to run the same matrix."},
                 {"id": "k1", "kind": "tool", "isError": false, "resolved": true,
-                    "call": {"kind": "mcp", "server": "zeron", "tool": "send_message", "input": {
+                    "call": {"kind": "mcp", "server": "zeren", "tool": "send_message", "input": {
                         "chat": "zgui prod: Windows platform (WING-PC)",
                         "text": "Run the render-loop matrix on current main (layout, paint, present per frame) and report the split. Linux: layout 61%, paint 22%."}}},
                 {"id": "t2", "kind": "text", "text": "It'll report back here."},
@@ -82,7 +82,7 @@ fn main() -> anyhow::Result<()> {
         let fonts = typography::register_fonts(cx);
         typography::init(settings.ui_font_family.clone(), settings.ui_font_size, settings.terminal_font_family.clone(), settings.terminal_font_size, settings.code_font_family.clone(), settings.code_font_size, fonts, cx);
         theme_library::init(data.clone(), cx);
-        let mode = if std::env::var_os("ZERON_PALETTE_LIGHT").is_some() { appearance::AppearanceMode::Light } else { appearance::AppearanceMode::Dark };
+        let mode = if std::env::var_os("ZEREN_PALETTE_LIGHT").is_some() { appearance::AppearanceMode::Light } else { appearance::AppearanceMode::Dark };
         appearance::init(mode, settings.theme_selection, settings.accent, settings.surface, cx);
         history::init(settings.git_history_columns, settings.git_history_column_widths, settings.git_history_column_order, settings.git_history_author_display, cx);
         composer::init(cx, settings.composer_send_behavior);
@@ -94,8 +94,8 @@ fn main() -> anyhow::Result<()> {
         };
         let state = cx.new(|_| {
             let mut s = state::AppState::new();
-            s.connection = zeron_proto::view::ConnectionStatus::Ready;
-            s.workspace_scope = Some(zeron_proto::WorkspaceScope::Local);
+            s.connection = zeren_proto::view::ConnectionStatus::Ready;
+            s.workspace_scope = Some(zeren_proto::WorkspaceScope::Local);
             s.local_device_id = Some("local".into());
             s.devices = vec![serde_json::from_value(json!({"id":"local","name":"This device","platform":std::env::consts::OS,"lastSeenAt":null})).unwrap()];
             s.chats = vec![
@@ -125,7 +125,7 @@ fn main() -> anyhow::Result<()> {
         cx.spawn(async move |cx| {
             pause(cx, 600).await;
             state.update(cx, |s, cx| {
-                s.receive_transcript_frame(zeron_doc::TranscriptFrame::Reset { reset: serde_json::from_value(entries).unwrap() }, cx).unwrap();
+                s.receive_transcript_frame(zeren_doc::TranscriptFrame::Reset { reset: serde_json::from_value(entries).unwrap() }, cx).unwrap();
                 cx.notify();
             });
             let Some(dir) = capture_dir else { return };
@@ -133,7 +133,7 @@ fn main() -> anyhow::Result<()> {
             pause(cx, 1500).await;
             capture(window, cx, &dir, "captions");
             // Hover the sender caption: right-aligned, just over its bubble.
-            if let Some((x, y)) = std::env::var("ZERON_CAPTION_HOVER").ok().and_then(|at| {
+            if let Some((x, y)) = std::env::var("ZEREN_CAPTION_HOVER").ok().and_then(|at| {
                 let (x, y) = at.split_once(',')?;
                 Some((x.parse::<f32>().ok()?, y.parse::<f32>().ok()?))
             }) {

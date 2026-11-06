@@ -1,7 +1,7 @@
 --!strict
 -- Changes: what changed in a session's checkout, the gallery's commit page
 -- (demos/example_git_commit) on the design system's list
--- (ds/git_changes). Three scopes, as Zeron's Changes pane has them: the
+-- (ds/git_changes). Three scopes, as Zeren's Changes pane has them: the
 -- work tree (against the last commit: staged or not, a box each), the
 -- branch (since it left its base) and the last turn (since a chat's turn
 -- started on its device). Under the list, the commit: its message and
@@ -37,7 +37,7 @@ local banner = require("@ds/banner")
 local Inline = require("@ds/inline_block")
 
 
-return function(zeron: any, Repo: any, words: any)
+return function(zeren: any, Repo: any, words: any)
 	-- A notice of what went wrong, with the way to try again if there is
 	-- one, and a × to put it away.
 	local function said_notice(p: any, status: any?, retry: (() -> ())?, dismiss: (() -> ())?): Node
@@ -46,7 +46,7 @@ return function(zeron: any, Repo: any, words: any)
 			tone = "danger",
 			title = w.title,
 			body = w.body,
-			action = if retry and w.retry then { label = zeron.s("try_again"), on_click = retry } else nil,
+			action = if retry and w.retry then { label = zeren.s("try_again"), on_click = retry } else nil,
 			on_dismiss = dismiss,
 		}
 	end
@@ -127,7 +127,7 @@ return function(zeron: any, Repo: any, words: any)
 			end, Button {
 				function(): string
 					local s = status()
-					return zeron.s("pull.button", { n = if s then s.behind or 0 else 0 })
+					return zeren.s("pull.button", { n = if s then s.behind or 0 else 0 })
 				end,
 				id = "git-pull",
 				tone = "secondary",
@@ -149,9 +149,9 @@ return function(zeron: any, Repo: any, words: any)
 				function(): string
 					local s = status()
 					if s and s.upstream == nil then
-						return zeron.s("push.publish")
+						return zeren.s("push.publish")
 					end
-					return zeron.s("push.button", { n = if s then s.ahead or 0 else 0 })
+					return zeren.s("push.button", { n = if s then s.ahead or 0 else 0 })
 				end,
 				id = "git-push",
 				tone = "secondary",
@@ -173,7 +173,7 @@ return function(zeron: any, Repo: any, words: any)
 				shrink = 0,
 				items = "center",
 				provide = { git_branch = branch_info },
-				zeron.slot("branch", { direction = "row", gap = "$space.1", items = "center" }),
+				zeren.slot("branch", { direction = "row", gap = "$space.1", items = "center" }),
 			}
 		end
 
@@ -210,13 +210,13 @@ return function(zeron: any, Repo: any, words: any)
 					return ""
 				end
 				if (s.conflicts or 0) > 0 then
-					return zeron.s("conflicts.title", { n = s.conflicts })
+					return zeren.s("conflicts.title", { n = s.conflicts })
 				end
-				return zeron.s(`state.{s.state or "merge"}`)
+				return zeren.s(`state.{s.state or "merge"}`)
 			end,
 			body = function(): string
 				local s = status()
-				return if s and (s.conflicts or 0) > 0 then zeron.s("conflicts.body") else zeron.s("state.commit_to_finish")
+				return if s and (s.conflicts or 0) > 0 then zeren.s("conflicts.body") else zeren.s("state.commit_to_finish")
 			end,
 		} })
 		-- What came back no (staging, discarding, switching, fetching,
@@ -293,7 +293,7 @@ return function(zeron: any, Repo: any, words: any)
 			on_change = function(on: boolean)
 				m.stage_all(on)
 			end,
-			name = zeron.s("stage_all"),
+			name = zeren.s("stage_all"),
 		}
 		local function lines_of(f: Repo.File): { any }?
 			local d = m.diff_of(f)
@@ -303,20 +303,20 @@ return function(zeron: any, Repo: any, words: any)
 		-- failed), or that it was cut short.
 		local function foot_of(f: Repo.File): Node?
 			if f.binary then
-				return ui.text { zeron.t("diff.binary"), text_size = "$font.size.sm", color = "$text.tertiary" }
+				return ui.text { zeren.t("diff.binary"), text_size = "$font.size.sm", color = "$text.tertiary" }
 			end
 			local d = m.diff_of(f)
 			if d and d.problem then
-				return ui.text { words(d.problem, m.status:peek()).body, text_size = "$font.size.sm", color = "$zeron.tone.danger.ink" }
+				return ui.text { words(d.problem, m.status:peek()).body, text_size = "$font.size.sm", color = "$zeren.tone.danger.ink" }
 			end
 			if d and d.cut then
-				return ui.text { zeron.t("diff.cut"), text_size = "$font.size.sm", color = "$text.tertiary" }
+				return ui.text { zeren.t("diff.cut"), text_size = "$font.size.sm", color = "$text.tertiary" }
 			end
 			return ui.row {
 				gap = "$space.2",
 				items = "center",
-				progress.ProgressRing { size = 12, tone = "neutral", label = zeron.s("loading") },
-				ui.text { zeron.t("diff.loading"), text_size = "$font.size.sm", color = "$text.tertiary" },
+				progress.ProgressRing { size = 12, tone = "neutral", label = zeren.s("loading") },
+				ui.text { zeren.t("diff.loading"), text_size = "$font.size.sm", color = "$text.tertiary" },
 			}
 		end
 		local function foot_when(f: Repo.File): boolean
@@ -334,7 +334,7 @@ return function(zeron: any, Repo: any, words: any)
 			local staged = stage_of(f.path) ~= "none"
 			return {
 				{
-					label = zeron.s(if staged then "file.unstage" else "file.stage"),
+					label = zeren.s(if staged then "file.unstage" else "file.stage"),
 					icon = if staged then "minus" else "plus",
 					on_select = function()
 						m.stage({ f.path }, not staged)
@@ -342,7 +342,7 @@ return function(zeron: any, Repo: any, words: any)
 				},
 				{ separator = true },
 				{
-					label = zeron.s("file.discard"),
+					label = zeren.s("file.discard"),
 					icon = "trash-bin-minimalistic",
 					danger = true,
 					on_select = function()
@@ -357,7 +357,7 @@ return function(zeron: any, Repo: any, words: any)
 			end
 			return IconButton {
 				icon = "trash-bin-minimalistic",
-				label = zeron.s("file.discard"),
+				label = zeren.s("file.discard"),
 				size = "sm",
 				tone = "quiet",
 				class = "git-discard",
@@ -370,7 +370,7 @@ return function(zeron: any, Repo: any, words: any)
 
 		-- A comment being written: under the line asked (a range's last),
 		-- the range's lines lit. Sent, it's a chip on the chat's draft
-		-- (`zeron.compose_comment`: Zeron's review comments block, its file,
+		-- (`zeren.compose_comment`: Zeren's review comments block, its file,
 		-- lines, side, the code and the note); the lines keep a mark while
 		-- the chip is there, lit as it's pointed at.
 		local composing = ui.use_state(nil :: { path: string, key: string, lines: { git.Line } }?)
@@ -384,7 +384,7 @@ return function(zeron: any, Repo: any, words: any)
 		-- pointed at), from this chat's comments still on its draft.
 		local marked = ui.computed(function(): { [string]: { [string]: string } }
 			local out: { [string]: { [string]: string } } = {}
-			for key, at in zeron.composed() do
+			for key, at in zeren.composed() do
 				local ok, d = pcall(ui.json.decode, key)
 				if ok and type(d) == "table" and type(d.p) == "string" and type(d.k) == "table" and (at.session == nil or at.session == id) then
 					local by = out[d.p] or {}
@@ -449,7 +449,7 @@ return function(zeron: any, Repo: any, words: any)
 				table.insert(code, `{if l.kind == " " then " " else l.kind}{l.text}`)
 				table.insert(keys, git.line_key(l))
 			end
-			zeron.compose_comment {
+			zeren.compose_comment {
 				file = file,
 				line = lo,
 				to = if hi > lo then hi else nil,
@@ -480,10 +480,10 @@ return function(zeron: any, Repo: any, words: any)
 								inset = ctx.inset,
 								joined = ctx.joined,
 								reveal = ctx.reveal,
-								location = if side == "L" then zeron.s("comment.where_old", { where = where }) else where,
+								location = if side == "L" then zeren.s("comment.where_old", { where = where }) else where,
 								value = note,
-								placeholder = zeron.s("comment.placeholder"),
-								submit = zeron.s("comment.add"),
+								placeholder = zeren.s("comment.placeholder"),
+								submit = zeren.s("comment.add"),
 								on_submit = send_comment,
 								on_cancel = function()
 									composing:set(nil)
@@ -507,7 +507,7 @@ return function(zeron: any, Repo: any, words: any)
 				-- (A list cut short: how much of it shows.)
 				extra = function(): string
 					local c = m.changes:get()
-					return if c and c.total then zeron.s("changes.partial", { n = #(c.files or {}), total = c.total }) else ""
+					return if c and c.total then zeren.s("changes.partial", { n = #(c.files or {}), total = c.total }) else ""
 				end,
 				lead = if working() then stage_all else nil,
 				narrow = narrow,
@@ -538,7 +538,7 @@ return function(zeron: any, Repo: any, words: any)
 			end, function(key: string): Node
 				local f = m.by_path:peek()[chosen:peek()]
 				if key == "" or not f then
-					return EmptyState { icon = "document", title = zeron.s("diff.pick_title"), body = zeron.s("diff.pick_body"), size = "sm", fill = true }
+					return EmptyState { icon = "document", title = zeren.s("diff.pick_title"), body = zeren.s("diff.pick_body"), size = "sm", fill = true }
 				end
 				return git.frame {
 					fill = true,
@@ -578,28 +578,28 @@ return function(zeron: any, Repo: any, words: any)
 			if scope_now == "working" then
 				return EmptyState {
 					icon = "git-commit",
-					title = zeron.s("empty.working_title"),
+					title = zeren.s("empty.working_title"),
 					body = function(): string
 						local s = status()
 						if s and s.branch and (s.ahead or 0) > 0 then
-							return zeron.s("empty.working_ahead", { n = s.ahead, branch = s.branch })
+							return zeren.s("empty.working_ahead", { n = s.ahead, branch = s.branch })
 						end
-						return zeron.s("empty.working_body", { branch = (s and s.branch) or "" })
+						return zeren.s("empty.working_body", { branch = (s and s.branch) or "" })
 					end,
 					fill = true,
 				}
 			elseif scope_now == "branch" then
 				return EmptyState {
 					icon = "git-branch",
-					title = zeron.s("empty.branch_title"),
+					title = zeren.s("empty.branch_title"),
 					body = function(): string
 						local c = m.changes:get()
-						return zeron.s("empty.branch_body", { base = (c and c.base) or "" })
+						return zeren.s("empty.branch_body", { base = (c and c.base) or "" })
 					end,
 					fill = true,
 				}
 			end
-			return EmptyState { icon = "chat-round-line", title = zeron.s("empty.turn_title"), body = zeron.s("empty.turn_body"), fill = true }
+			return EmptyState { icon = "chat-round-line", title = zeren.s("empty.turn_title"), body = zeren.s("empty.turn_body"), fill = true }
 		end
 		local body = ui.presence(function(): string
 			return `{phase()}|{if wide then "wide" else "narrow"}`
@@ -611,7 +611,7 @@ return function(zeron: any, Repo: any, words: any)
 					grow = 1,
 					items = "center",
 					justify = "center",
-					progress.ProgressRing { size = 18, tone = "neutral", label = zeron.s("loading") },
+					progress.ProgressRing { size = 18, tone = "neutral", label = zeren.s("loading") },
 				}
 			elseif p == "failed" then
 				return said_notice(m.changes_problem:peek(), m.status:peek(), function()
@@ -657,7 +657,7 @@ return function(zeron: any, Repo: any, words: any)
 		end
 		local function commit_label(): string
 			local n = staged_count()
-			return if n == 0 then zeron.s("commit.button") else zeron.s("commit.files", { n = n })
+			return if n == 0 then zeren.s("commit.button") else zeren.s("commit.files", { n = n })
 		end
 		local function conflicts(): boolean
 			local s = status()
@@ -690,19 +690,19 @@ return function(zeron: any, Repo: any, words: any)
 					ui.row {
 						gap = "$space.2",
 						items = "center",
-						progress.ProgressRing { size = 14, tone = "neutral", label = zeron.s("push.pushing_label") },
+						progress.ProgressRing { size = 14, tone = "neutral", label = zeren.s("push.pushing_label") },
 						FadeText {
 							function(): string
 								local s = status()
 								local where = if s and s.upstream then s.upstream else `{(s and s.remote) or "origin"}/{(s and s.branch) or ""}`
-								return zeron.s("push.pushing", { n = math.max(1, (s and s.ahead) or 1), where = where })
+								return zeren.s("push.pushing", { n = math.max(1, (s and s.ahead) or 1), where = where })
 							end,
 							grow = 1,
 							text_size = "$font.size.md",
 							color = "$text.secondary",
 						},
 					},
-					progress.ProgressBar { size = "thin", w_full = true, label = zeron.s("push.pushing_label") },
+					progress.ProgressBar { size = "thin", w_full = true, label = zeren.s("push.pushing_label") },
 				}
 			elseif string.sub(key, 1, 7) == "failed:" then
 				local a = m.act_problem:peek()
@@ -710,7 +710,7 @@ return function(zeron: any, Repo: any, words: any)
 				local actions: { any } = {}
 				if a.what == "push" and a.problem.code == "rejected" then
 					table.insert(actions, {
-						label = zeron.s("push.pull_then_push"),
+						label = zeren.s("push.pull_then_push"),
 						primary = true,
 						on_click = function()
 							m.act("pull", "pull", nil, function()
@@ -723,7 +723,7 @@ return function(zeron: any, Repo: any, words: any)
 				end
 				if w.retry or a.what == "push" then
 					table.insert(actions, {
-						label = zeron.s("try_again"),
+						label = zeren.s("try_again"),
 						on_click = function()
 							m.act_problem:set(nil)
 							if a.what == "push" then
@@ -751,14 +751,14 @@ return function(zeron: any, Repo: any, words: any)
 					end,
 					items = {
 						{
-							label = zeron.s("commit.and_push"),
+							label = zeren.s("commit.and_push"),
 							icon = "arrow-up",
 							on_click = function()
 								commit(true, false)
 							end,
 						},
 						{
-							label = zeron.s("commit.amend"),
+							label = zeren.s("commit.amend"),
 							icon = "pen",
 							on_click = function()
 								commit(false, true)
@@ -772,7 +772,7 @@ return function(zeron: any, Repo: any, words: any)
 				-- Who commits (git's user.name there), drawn again if it changes.
 				local who = ui.presence(function(): string
 					local s = status()
-					return (s and s.who ~= "" and s.who) or zeron.s("commit.you")
+					return (s and s.who ~= "" and s.who) or zeren.s("commit.you")
 				end, function(name: string): Node
 					return people.Person { id = `git-author-{name}`, name = name, size = 18 }
 				end, { shrink = 1, min_w = 0 })
@@ -781,8 +781,8 @@ return function(zeron: any, Repo: any, words: any)
 					gap = "$space.2",
 					TextArea {
 						value = m.message,
-						placeholder = zeron.t("commit.placeholder"),
-						name = zeron.s("commit.message"),
+						placeholder = zeren.t("commit.placeholder"),
+						name = zeren.s("commit.message"),
 						subject = { soft = 50, max = 72 },
 						rows = if wide then 2 else 1,
 						max_rows = 6,
@@ -807,7 +807,7 @@ return function(zeron: any, Repo: any, words: any)
 				w_full = true,
 				shrink = 0,
 				pt = "$space.3",
-				ui.div { w_full = true, shrink = 0, pt = "$space.3", border_sides = { 1, 0, 0, 0 }, border_color = "$zeron.settings.rule", inner },
+				ui.div { w_full = true, shrink = 0, pt = "$space.3", border_sides = { 1, 0, 0, 0 }, border_color = "$zeren.settings.rule", inner },
 			}
 		end, { w_full = true, shrink = 0 })
 
@@ -819,13 +819,13 @@ return function(zeron: any, Repo: any, words: any)
 			title = function(): string
 				local paths = discard_paths:get()
 				if #paths == 1 then
-					return zeron.s("discard.title_one", { name = string.match(paths[1], "([^/]+)$") or paths[1] })
+					return zeren.s("discard.title_one", { name = string.match(paths[1], "([^/]+)$") or paths[1] })
 				end
-				return zeron.s("discard.title_many", { n = #paths })
+				return zeren.s("discard.title_many", { n = #paths })
 			end,
-			body = zeron.t("discard.body"),
+			body = zeren.t("discard.body"),
 			confirm = {
-				label = zeron.s("discard.confirm"),
+				label = zeren.s("discard.confirm"),
 				on_click = function()
 					local paths = discard_paths:peek()
 					discard_open:set(false)

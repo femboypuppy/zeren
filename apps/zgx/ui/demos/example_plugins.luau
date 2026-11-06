@@ -16,9 +16,9 @@ local enabled = {
 }
 
 local INSTALLED = {
-	{ id = "linear", name = "Linear", by = "Zeron", hue = "indigo", version = "2.4.1", about = "Read issues and move them along from a chat." },
+	{ id = "linear", name = "Linear", by = "Zeren", hue = "indigo", version = "2.4.1", about = "Read issues and move them along from a chat." },
 	{ id = "sentry", name = "Sentry", by = "Functional Software", hue = "rose", version = "1.9.0", update = "1.10.0", about = "Pull a stack trace and its release into the conversation." },
-	{ id = "postgres", name = "Postgres", by = "Zeron", hue = "sky", version = "0.8.3", about = "Let agents read a schema and run read-only queries." },
+	{ id = "postgres", name = "Postgres", by = "Zeren", hue = "sky", version = "0.8.3", about = "Let agents read a schema and run read-only queries." },
 	{ id = "playwright", name = "Playwright", by = "Microsoft", hue = "emerald", version = "3.2.0", about = "Drive a browser to check what an agent built." },
 }
 local CATALOG = {
@@ -106,7 +106,7 @@ return {
 				return ds.Callout {
 					tone = "danger",
 					title = "Couldn't reach the plugin catalog",
-					body = "Your installed plugins still work. Zeron will try again when you're back online.",
+					body = "Your installed plugins still work. Zeren will try again when you're back online.",
 					action = { label = "Try again", on_click = function() shown:set("ready") end },
 				}
 			elseif key == "none" then

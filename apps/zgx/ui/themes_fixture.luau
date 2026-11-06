@@ -1,7 +1,7 @@
 -- Settings → Themes and Settings → Appearance, mounted on their own with
 -- themes made up here (no host in a test): the pages
 -- tests/themes_in_place.test.luau drives. What src/themes.rs would publish
--- is set here (`themes.library`: a few of Zeron's built-in themes, a
+-- is set here (`themes.library`: a few of Zeren's built-in themes, a
 -- template's own, and what you import), and what the pages ask of it is
 -- stubbed to change this data as the host does (its Rust tests run the real
 -- thing). Settings' route picks the page: Themes, or Appearance for any
@@ -35,9 +35,9 @@ end
 -- Two templates: the default in use, and Ledger, which brings a dark theme.
 templates.now:set({
 	state = "ready",
-	active = "zeron",
+	active = "zeren",
 	list = {
-		{ id = "zeron", name = "Zeron", builtin = true, active = true, status = "ok" },
+		{ id = "zeren", name = "Zeren", builtin = true, active = true, status = "ok" },
 		{ id = "ledger", name = "Ledger", author = "you", builtin = false, active = false, status = "ok" },
 	},
 } :: any)
@@ -152,8 +152,8 @@ end }
 -- palette each scheme wears with Ledger's own theme as the template's.
 ui.command { id = "read", title = "Read what's worn", run = function()
 	local slots = palettes.slots(data.LEDGER_FILE :: any)
-	worn:set(`{ui.theme.current:peek()} {ui.theme.get("zeron.window")}`)
-	slots_said:set(`{if slots.light then slots.light.id else "zeron"} {if slots.dark then slots.dark.id or "ledger" else "zeron"}`)
+	worn:set(`{ui.theme.current:peek()} {ui.theme.get("zeren.window")}`)
+	slots_said:set(`{if slots.light then slots.light.id else "zeren"} {if slots.dark then slots.dark.id or "ledger" else "zeren"}`)
 end }
 
 publish()
@@ -161,7 +161,7 @@ publish()
 return ui.scroll {
 	w_full = true,
 	h_full = true,
-	bg = "$zeron.window",
+	bg = "$zeren.window",
 	ui.column {
 		w_full = true,
 		p = "$space.6",

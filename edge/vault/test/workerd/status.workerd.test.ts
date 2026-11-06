@@ -148,7 +148,7 @@ describe("canary", () => {
     const fresh = fakeJwt({ exp: sec(Date.now() + 10 * DAY), jti: "canary" });
     const upstream = mockUpstream({
       [CODEX_TOKEN_URL]: () => json({ access_token: fresh }),
-      "https://api.github.com/app": () => json({ slug: "zeron-test" })
+      "https://api.github.com/app": () => json({ slug: "zeren-test" })
     });
     const logs: string[] = [];
     vi.spyOn(console, "log").mockImplementation((line: unknown) => void logs.push(String(line)));
@@ -183,7 +183,7 @@ describe("canary", () => {
 
   it("the cron handler is a no-op without CANARY_USER_ID", async () => {
     // It still checks the GitHub App: answer that here, not from the network.
-    mockUpstream({ "https://api.github.com/app": () => json({ slug: "zeron-test" }) });
+    mockUpstream({ "https://api.github.com/app": () => json({ slug: "zeren-test" }) });
     const logs: string[] = [];
     vi.spyOn(console, "log").mockImplementation((line: unknown) => void logs.push(String(line)));
     const ctx = createExecutionContext();

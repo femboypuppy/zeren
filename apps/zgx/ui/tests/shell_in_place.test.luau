@@ -817,7 +817,7 @@ test("the project filter narrows the list to one project, and put away shows the
 	expect(app:state("shell_sidebar_project")).to_be(nil)
 end)
 
-test("a session's row shows its running subagents as Zeron's pill: how many, 99+ past that, none at none", function()
+test("a session's row shows its running subagents as Zeren's pill: how many, 99+ past that, none at none", function()
 	local app = open()
 	local function pill(): string?
 		for line in app:tree("#sidebar"):gmatch("[^\n]+") do
@@ -891,8 +891,8 @@ test("the palette finds the session's files once typing pauses, under Files, and
 	expect(app:wait('#palette-list >> role:option "README.md"', { timeout_ms = 3000 })).to_be(true)
 	-- (A folder isn't something it opens.)
 	expect(node(app, "#palette-list", "option", "docs")).to_be_nil()
-	-- Its Files scope (⌘4, as Zeron's): the files alone. (All of them
-	-- here: unscoped, commands matching "re", Reload Zeron among them,
+	-- Its Files scope (⌘4, as Zeren's): the files alone. (All of them
+	-- here: unscoped, commands matching "re", Reload Zeren among them,
 	-- come first and can push a file below the list's fold.)
 	app:key("cmd+4")
 	app:frames(20)

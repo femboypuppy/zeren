@@ -6,4 +6,4 @@
 
 **Ask:** let `tooltip` take a function or a state, as text does.
 
-**Seen on:** zgx `b3371f8` (Zeron's pin), macOS. Zeron: the sidebar row's status corner keeps one `presence` for this.
+**Seen on:** zgx `b3371f8` (Zeren's pin), macOS. Zeren: the sidebar row's status corner keeps one `presence` for this.

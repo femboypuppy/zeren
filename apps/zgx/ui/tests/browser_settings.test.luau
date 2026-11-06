@@ -7,12 +7,12 @@
 -- percentage in the field (which puts it back), the ⋯ menu's zoom and
 -- inspector, and a file the page can't show says so. Settings on the shell
 -- in ui/shell_fixture.luau (signed in as Ada: her profile is
--- `zeron-user_ada`); the tab on the panel in ui/panel_fixture.luau, its page
--- stood in for (signed out: `zeron-local`).
+-- `zeren-user_ada`); the tab on the panel in ui/panel_fixture.luau, its page
+-- stood in for (signed out: `zeren-local`).
 
 local PAGE = "#settings-page"
 local NAV = "#settings-nav"
-local ADA = "zeron-user_ada"
+local ADA = "zeren-user_ada"
 
 local function shows(app: any, scope: string, text: string): boolean
 	return app:tree(scope):find(text, 1, true) ~= nil
@@ -46,7 +46,7 @@ local function seed(app: any)
 	app:set_state("browser_history", {
 		[ADA] = {
 			{ url = "https://react.dev/learn", title = "Quick Start – React", at = now - 60, count = 2 },
-			{ url = "https://zeron.sh/", title = "Zeron", at = now - 1800, count = 1 },
+			{ url = "https://zeron.sh/", title = "Zeren", at = now - 1800, count = 1 },
 			{ url = "https://example.com/", title = "Example Domain", at = now - 3 * 86400, count = 1 },
 		},
 	})
@@ -85,7 +85,7 @@ test("Browser settings: history lists, filters, and lets one page go in place", 
 	local app = settings("History")
 	seed(app)
 	expect(app:wait(`{PAGE} >> "Quick Start – React"`, { timeout_ms = 5000 })).to_be(true)
-	expect(shows(app, PAGE, "Zeron")).to_be(true)
+	expect(shows(app, PAGE, "Zeren")).to_be(true)
 	expect(shows(app, PAGE, "Example Domain")).to_be(true)
 	expect(shows(app, PAGE, "3 pages kept.")).to_be(true)
 	-- Laid out by day, the latest first, each with the time it was visited.
@@ -102,8 +102,8 @@ test("Browser settings: history lists, filters, and lets one page go in place", 
 	app:set_state("settings_browser_history_query", "")
 	app:frames(20)
 	-- One let go: the others stay the same rows.
-	local zeron = node(app, PAGE, "Zeron")
-	expect(zeron).never.to_be_nil()
+	local zeren = node(app, PAGE, "Zeren")
+	expect(zeren).never.to_be_nil()
 	-- (Its × shows as the row is pointed at, in its time's place.)
 	local remove = `{PAGE} >> role:button "Remove Example Domain from history"`
 	expect(app:tree(remove)).to_contain("hidden")
@@ -113,7 +113,7 @@ test("Browser settings: history lists, filters, and lets one page go in place", 
 	app:click(remove)
 	app:frames(20)
 	expect(shows(app, PAGE, "Example Domain")).to_be(false)
-	expect(node(app, PAGE, "Zeron")).to_be(zeron)
+	expect(node(app, PAGE, "Zeren")).to_be(zeren)
 	local kept = (app:state("browser_history") :: any)[ADA]
 	expect(#kept).to_be(2)
 end)
@@ -217,7 +217,7 @@ end
 
 local function history(app: any): { any }?
 	local all = app:state("browser_history") :: any
-	return if all then all["zeron-local"] else nil
+	return if all then all["zeren-local"] else nil
 end
 
 local function calls(app: any): string
@@ -228,7 +228,7 @@ test("browser tab: words search on the engine chosen; an address loads", functio
 	local app = panel()
 	go(app, "react hooks", "https://www.google.com/search?q=react+hooks")
 	app:set_state("browser_search_engine", "duckduckgo")
-	go(app, "zeron", "https://duckduckgo.com/?q=zeron")
+	go(app, "zeren", "https://duckduckgo.com/?q=zeren")
 	go(app, "example.com", "https://example.com/")
 	go(app, "localhost:3000", "http://localhost:3000/")
 	-- (A path stays refused: there's no search a file should become.)
@@ -350,10 +350,10 @@ local function seeded(): any
 	local app = panel()
 	local now = os.time()
 	app:set_state("browser_history", {
-		["zeron-local"] = {
+		["zeren-local"] = {
 			{ url = "https://react.dev/reference/react/useEffect", title = "useEffect – React", at = now - 60, count = 3 },
 			{ url = "https://react.dev/", title = "React", at = now - 3600, count = 6 },
-			{ url = "https://github.com/zeronsh/zeron/pull/1187", title = "Browser settings · Pull Request #1187", at = now - 600, count = 2 },
+			{ url = "https://github.com/femboypuppy/zeren/pull/1187", title = "Browser settings · Pull Request #1187", at = now - 600, count = 2 },
 			{ url = "https://developer.apple.com/documentation/webkit", title = "WebKit | Apple Developer", at = now - 86400 * 3, count = 1 },
 		},
 	})
@@ -412,7 +412,7 @@ test("suggestions: ↓ fills the field with the row lit; Escape puts back what w
 	expect(rows(app)[2]).to_be("Browser settings · Pull Request #1187")
 	app:key("ArrowDown")
 	app:frames(5)
-	expect(field(app)).to_be("github.com/zeronsh/zeron/pull/1187")
+	expect(field(app)).to_be("github.com/femboypuppy/zeren/pull/1187")
 	-- ↑ back to the first: the site finished again.
 	app:key("ArrowUp")
 	app:frames(5)
@@ -450,9 +450,9 @@ test("suggestions: Shift-Backspace lets the lit page out of history", function()
 	app:key("shift+Backspace")
 	app:frames(10)
 	expect(table.find(rows(app), "Browser settings · Pull Request #1187")).to_be_nil()
-	local kept = (app:state("browser_history") :: any)["zeron-local"]
+	local kept = (app:state("browser_history") :: any)["zeren-local"]
 	for _, v in kept do
-		expect(v.url).never.to_be("https://github.com/zeronsh/zeron/pull/1187")
+		expect(v.url).never.to_be("https://github.com/femboypuppy/zeren/pull/1187")
 	end
 end)
 

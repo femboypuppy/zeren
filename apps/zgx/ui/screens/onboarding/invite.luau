@@ -1,11 +1,11 @@
 -- Inviting teammates, after naming the organization: emails become chips as
 -- they're typed, one that can't be sent to stays and says so, and the way
--- on sends them (Zeron's `POST /auth/orgs/{id}/invitations`; Zeron sends
+-- on sends them (Zeren's `POST /auth/orgs/{id}/invitations`; Zeren sends
 -- the emails, and they join as members). Optional: Skip for now stands
 -- beside the way on until they've gone. The gallery's Invite your
--- teammates is the design, less its invite link (Zeron has none yet).
+-- teammates is the design, less its invite link (Zeren has none yet).
 --
--- Sent, the step lists who got one; an address Zeron wouldn't send to
+-- Sent, the step lists who got one; an address Zeren wouldn't send to
 -- stays in the field with why, and the rest are listed as sent. Gone
 -- wrong, the line under the title says so and nothing is sent.
 
@@ -33,12 +33,12 @@ end
 -- The edge's limit on one sending.
 local MAX = 20
 
--- Why Zeron wouldn't send to an address: the reasons the line has words
+-- Why Zeren wouldn't send to an address: the reasons the line has words
 -- for (onboarding.invite.failed_*'s), any other said as couldn't be sent.
 local WHY: { [string]: boolean } = { invalid = true, exists = true }
 
 -- What went wrong with the last sending, kept as plain words (state holds
--- no messages) and said where it's drawn: who and why, or Zeron's word.
+-- no messages) and said where it's drawn: who and why, or Zeren's word.
 type Problem = { why: string?, email: string?, more: number?, word: string? }
 
 return function(props: Props): Node
@@ -173,7 +173,7 @@ return function(props: Props): Node
 				return ui.t("onboarding.invite.body"):get()
 			end,
 			tone = function()
-				return if problem:get() then "$zeron.tone.danger.ink" else "$text.secondary"
+				return if problem:get() then "$zeren.tone.danger.ink" else "$text.secondary"
 			end,
 			ui.column {
 				w_full = true,

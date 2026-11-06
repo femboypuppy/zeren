@@ -24,7 +24,7 @@ transcript merging is performed.
   its card to running without fabricating user text. Actual child user messages
   are still persisted when supplied by the provider.
 - On `thread/resume`, stored parent spawn items rebuild the child ownership
-  table without replaying cards or content into Zeron's existing documents.
+  table without replaying cards or content into Zeren's existing documents.
 - Root self-activity never registers a child or produces a spawn card.
 
 ## Offline regression coverage
@@ -39,8 +39,8 @@ content isolation and final card status, then restarts the engine and appends a
 resumed child's output to the original document.
 
 ```sh
-cargo test --locked -p zeron-harness -p zeron-doc -p zeron-proto
-cargo test --locked -p zeron-engine --lib --test e2e --test misc
+cargo test --locked -p zeren-harness -p zeren-doc -p zeren-proto
+cargo test --locked -p zeren-engine --lib --test e2e --test misc
 ```
 
 ## Live validation
@@ -52,13 +52,13 @@ Setting `agents.enabled=false` disables agent tools, so it cannot select v1.
 
 Title runs pass `features.multi_agent`, `features.multi_agent_v2` and
 `agents.enabled` as false in the `thread/start` `config` map, and so does the
-driver for a run whose Zeron server is side-chats-only. The app-server
+driver for a run whose Zeren server is side-chats-only. The app-server
 merges that map into its `-c` overrides (`load_with_cli_overrides` in
 `codex-rs/app-server/src/config_manager.rs`), and an enabled
 `features.multi_agent_v2` takes precedence over `agents.enabled`
 (`codex-rs/core/config.schema.json`).
 
-Zeron doesn't offer the native subagents switch (Settings → Providers) for
+Zeren doesn't offer the native subagents switch (Settings → Providers) for
 Codex, though: a thread keeps the multi-agent mode it ran with. A thread
 started with agents off records `disabled` in its session meta
 (`codex-rs/core/src/session/session.rs`), each turn records its mode
@@ -92,7 +92,7 @@ overrides; the test does not edit the user's Codex config.
 CODEX_SUBAGENT_TEST_MODE=v1 \
 CODEX_SUBAGENT_TEST_MODEL=gpt-5.6-luna \
 CODEX_SUBAGENT_TEST_EXECUTABLE=/absolute/path/to/v1-wrapper \
-cargo test --locked -p zeron-harness --test codex \
+cargo test --locked -p zeren-harness --test codex \
   live_subagent_spawn_and_followup_keep_one_transcript -- --ignored --nocapture
 ```
 

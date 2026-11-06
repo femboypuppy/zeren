@@ -36,7 +36,7 @@ return function(props: Props): Node
 	end)
 	return ui.row {
 		w_full = true,
-		gap = "$zeron.list.gap",
+		gap = "$zeren.list.gap",
 		items = "center",
 		Surface {
 			depth = "flat",

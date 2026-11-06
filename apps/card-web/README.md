@@ -1,6 +1,6 @@
 # The member card on the web
 
-Zeron's member card (`apps/zgx/ui/ds/member_card.luau`, the native one) as a
+Zeren's member card (`apps/zgx/ui/ds/member_card.luau`, the native one) as a
 web page: a canvas that draws the same card from the same numbers, a share
 page whose meta tags make X show it inside a post as a Player Card, and a
 still picture of it for everywhere else. The native card is the source of
@@ -105,7 +105,7 @@ public card doesn't carry).
 ## Comparing with the native card
 
 The acceptance test is pixel difference, not a look. The rig captures the
-gallery's Member card page (`./target/release/zeron-zgx gallery --inspect`
+gallery's Member card page (`./target/release/zeren-zgx gallery --inspect`
 from `apps/zgx`, `zgx inspect snapshot` of the page pane) and the same card
 on the web at the same size (300×420 points at 2×), pose and foil position
 (the fixtures in `tools/fixtures/gallery.json`, served at

@@ -64,7 +64,7 @@
       if (event.defaultPrevented) return;
       let url;
       try { url = new URL(link.href); } catch { return; }
-      const release = url.pathname.match(/^\/releases\/zeron-(\d+\.\d+\.\d+)-(macos-arm64\.dmg|windows-x86_64\.zip|linux-(?:x86_64|aarch64)\.tar\.gz)$/);
+      const release = url.pathname.match(/^\/releases\/zeren-(\d+\.\d+\.\d+)-(macos-arm64\.dmg|windows-x86_64\.zip|linux-(?:x86_64|aarch64)\.tar\.gz)$/);
       if (url.origin !== "https://zeron.sh" || !release) return;
       capture("download_clicked", {
         placement,

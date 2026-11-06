@@ -1,4 +1,4 @@
-//! Release channels: `stable` (everyone) and `beta` (Zeron.app testers).
+//! Release channels: `stable` (everyone) and `beta` (Zeren.app testers).
 //!
 //! The channel a Mac follows is kept in the data dir, `update-channel.json`,
 //! where every updater reads it on each check: the app's own (whichever
@@ -66,7 +66,7 @@ impl Channel {
     }
 
     /// The release feed's base for this channel, under `stable` (the edge's
-    /// `/releases` or `ZERON_RELEASES_URL`).
+    /// `/releases` or `ZEREN_RELEASES_URL`).
     pub fn base(self, stable: &str) -> String {
         let stable = stable.trim_end_matches('/');
         match self {
@@ -211,14 +211,14 @@ pub fn macos_at_least(system: &str, minimum: &str) -> bool {
 /// macOS app install, or macOS older than [`BETA_MINIMUM_MACOS`].
 pub fn beta_unavailable() -> Option<String> {
     if !matches!(crate::detect_install(), crate::InstallKind::MacApp { .. }) {
-        return Some("Beta updates are for the Zeron app on a Mac.".into());
+        return Some("Beta updates are for the Zeren app on a Mac.".into());
     }
     match macos_version() {
         Some(version) if macos_at_least(version, BETA_MINIMUM_MACOS) => None,
         Some(version) => Some(format!(
-            "Zeron beta needs macOS {BETA_MINIMUM_MACOS} or later. This Mac has macOS {version}."
+            "Zeren beta needs macOS {BETA_MINIMUM_MACOS} or later. This Mac has macOS {version}."
         )),
-        None => Some(format!("Zeron beta needs macOS {BETA_MINIMUM_MACOS} or later.")),
+        None => Some(format!("Zeren beta needs macOS {BETA_MINIMUM_MACOS} or later.")),
     }
 }
 

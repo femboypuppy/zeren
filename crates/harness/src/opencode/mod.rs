@@ -59,7 +59,7 @@
 //! Attempt ≥ [`RETRY_REPORT_ATTEMPT`] surfaces an error chip; attempt ≥
 //! [`RETRY_ABORT_ATTEMPT`] aborts the turn instead of retrying forever.
 //! A prompt that produces NO session-scoped event within
-//! [`default_stall_bound`] (`ZERON_OPENCODE_STALL_MS`, 0 disables) of the
+//! [`default_stall_bound`] (`ZEREN_OPENCODE_STALL_MS`, 0 disables) of the
 //! server accepting it errors out instead of spinning "Working" forever.
 //! Both wires report busy within milliseconds of accepting a prompt, before
 //! any provider bootstrap, so a slow first turn never trips it (verified
@@ -80,7 +80,7 @@ use futures::stream::BoxStream;
 use serde_json::{Value, json};
 use tokio::sync::mpsc;
 
-use zeron_proto::{
+use zeren_proto::{
     AccessMode, AgentEvent, DoneStatus, HarnessId, Model, ModelOption, ModelOptionChoice,
     ReasoningLevel, RunRequest, SlashCommand, SteeringMode, TodoItem, TodoStatus, ToolCall,
     UserInputAnswer, UserInputQuestion,
@@ -93,7 +93,7 @@ use crate::{Harness, HarnessError, RunControls};
 /// plugin-heavy starts can take minutes. Shared by chat startup and model
 /// discovery (same boot either way).
 const DEFAULT_STARTUP_TIMEOUT: Duration = Duration::from_secs(300);
-const STARTUP_TIMEOUT_ENV: &str = "ZERON_OPENCODE_STARTUP_TIMEOUT_SECS";
+const STARTUP_TIMEOUT_ENV: &str = "ZEREN_OPENCODE_STARTUP_TIMEOUT_SECS";
 
 /// Health-poll cadence while the server boots.
 const HEALTH_POLL: Duration = Duration::from_millis(150);
@@ -175,7 +175,7 @@ const RETRY_ABORT_ATTEMPT: u64 = 8;
 
 /// Default bound on prompt-send → first session-scoped bus event.
 const DEFAULT_STALL_BOUND: Duration = Duration::from_secs(60);
-const STALL_ENV: &str = "ZERON_OPENCODE_STALL_MS";
+const STALL_ENV: &str = "ZEREN_OPENCODE_STALL_MS";
 
 /// What a wedged/silent run usually means for opencode.
 const STALL_HINT: &str = "The model provider is likely unreachable or rejecting requests. \
@@ -443,7 +443,7 @@ impl OpencodeHarness {
     async fn server(
         &self,
         cwd: Option<&str>,
-        mcp: Option<&zeron_proto::McpServer>,
+        mcp: Option<&zeren_proto::McpServer>,
     ) -> Result<Server, HarnessError> {
         self.server_with_env(cwd, mcp, &[], &Default::default(), AccessMode::FullAccess)
             .await
@@ -455,15 +455,15 @@ impl OpencodeHarness {
     async fn server_with_env(
         &self,
         cwd: Option<&str>,
-        mcp: Option<&zeron_proto::McpServer>,
-        extra_mcp: &[zeron_proto::McpServer],
+        mcp: Option<&zeren_proto::McpServer>,
+        extra_mcp: &[zeren_proto::McpServer],
         run_env: &std::collections::BTreeMap<String, String>,
         access: AccessMode,
     ) -> Result<Server, HarnessError> {
         if let Some(base) = &self.base_url {
             if !extra_mcp.is_empty() {
                 tracing::warn!(
-                    target: "zeron_harness::opencode",
+                    target: "zeren_harness::opencode",
                     count = extra_mcp.len(),
                     "attached to an existing opencode server; plugin MCP servers are skipped"
                 );
@@ -621,7 +621,7 @@ impl Harness for OpencodeHarness {
     async fn skills(
         &self,
         cwd: &std::path::Path,
-    ) -> Result<Option<Vec<zeron_proto::invocation::Skill>>, HarnessError> {
+    ) -> Result<Option<Vec<zeren_proto::invocation::Skill>>, HarnessError> {
         let mut skills = crate::skills::discover(self.id(), cwd).await?;
         let _guard = self.probe_lock.lock().await;
         let directory = cwd
@@ -665,7 +665,7 @@ impl Harness for OpencodeHarness {
         // intact. Capture the selected identity before converting it to the
         // provider's `/command arguments` text.
         let initial_native_command_selected = selected_native_command(&request.prompt, self.id());
-        request.prompt = zeron_proto::invocation::harness_prompt(&request.prompt, self.id());
+        request.prompt = zeren_proto::invocation::harness_prompt(&request.prompt, self.id());
         let cwd = (!request.cwd.is_empty()).then(|| request.cwd.clone());
         let server = self
             .server_with_env(
@@ -838,7 +838,7 @@ impl Server {
         exe: &std::path::Path,
         cwd: Option<&str>,
         startup: Duration,
-        mcp: Option<&zeron_proto::McpServer>,
+        mcp: Option<&zeren_proto::McpServer>,
     ) -> Result<Self, HarnessError> {
         Self::spawn_with_env(
             exe,
@@ -857,7 +857,7 @@ impl Server {
         exe: &std::path::Path,
         cwd: Option<&str>,
         startup: Duration,
-        mcp: Option<&zeron_proto::McpServer>,
+        mcp: Option<&zeren_proto::McpServer>,
         run_env: &std::collections::BTreeMap<String, String>,
         access: AccessMode,
     ) -> Result<Self, HarnessError> {
@@ -869,7 +869,7 @@ impl Server {
     /// also resolves [`Protocol`]). `run_env` is the host-resolved run
     /// environment ([`RunRequest::env`]); `access` adds its permission
     /// rules ([`access_config`]). The plugins' native MCP servers
-    /// ([`RunRequest::extra_mcp`]) ride beside Zeron's own `mcp`.
+    /// ([`RunRequest::extra_mcp`]) ride beside Zeren's own `mcp`.
     ///
     /// Every opencode process shares one SQLite database; a server booting
     /// while another migrates or checkpoints it can exit with "database is
@@ -882,8 +882,8 @@ impl Server {
         exe: &std::path::Path,
         cwd: Option<&str>,
         startup: Duration,
-        mcp: Option<&zeron_proto::McpServer>,
-        extra_mcp: &[zeron_proto::McpServer],
+        mcp: Option<&zeren_proto::McpServer>,
+        extra_mcp: &[zeren_proto::McpServer],
         run_env: &std::collections::BTreeMap<String, String>,
         access: AccessMode,
     ) -> Result<Self, HarnessError> {
@@ -907,7 +907,7 @@ impl Server {
                 Err(SpawnFailure::Retryable(error)) if attempt < SPAWN_RETRIES => {
                     attempt += 1;
                     tracing::warn!(
-                        target: "zeron_harness::opencode",
+                        target: "zeren_harness::opencode",
                         attempt,
                         %error,
                         "opencode serve exited at startup on a transient fault; retrying"
@@ -927,8 +927,8 @@ impl Server {
         exe: &std::path::Path,
         cwd: Option<&str>,
         startup: Duration,
-        mcp: Option<&zeron_proto::McpServer>,
-        extra_mcp: &[zeron_proto::McpServer],
+        mcp: Option<&zeren_proto::McpServer>,
+        extra_mcp: &[zeren_proto::McpServer],
         run_env: &std::collections::BTreeMap<String, String>,
         access: AccessMode,
         version: Option<&semver::Version>,
@@ -958,7 +958,7 @@ impl Server {
         let restricted = !access.is_full_access();
         if mcp.is_some() || !extra_mcp.is_empty() || restricted {
             // The config shape differs by generation. If even the cold probe
-            // can't tell, run without the Zeron MCP server rather than fail,
+            // can't tell, run without the Zeren MCP server rather than fail,
             // but never without the rules a restricted mode relies on: the
             // run would do unasked what the person chose to approve.
             match preferred {
@@ -988,7 +988,7 @@ impl Server {
                 }
                 None => tracing::warn!(
                     binary_path = %exe.display(),
-                    "opencode version unknown; starting without the Zeron MCP server"
+                    "opencode version unknown; starting without the Zeren MCP server"
                 ),
             }
         }
@@ -998,7 +998,7 @@ impl Server {
         cmd.env("OPENCODE_PASSWORD", &password)
             .env("OPENCODE_SERVER_PASSWORD", &password)
             .env("OPENCODE_SERVER_USERNAME", "opencode")
-            .env("OPENCODE_CLIENT", "zeron");
+            .env("OPENCODE_CLIENT", "zeren");
         // Probes have no project: run them from home, where the global
         // config lives, never the engine's own working directory (which for
         // a GUI or service launch can be System32 or the install folder).
@@ -1033,7 +1033,7 @@ impl Server {
                 let mut lines = crate::lossy_lines::lossy_lines(stderr);
                 let mut migration = MigrationRace::default();
                 while let Ok(Some(line)) = lines.next_line().await {
-                    tracing::debug!(target: "zeron_harness::opencode", "stderr: {line}");
+                    tracing::debug!(target: "zeren_harness::opencode", "stderr: {line}");
                     if migration.feed(&line)
                         || is_database_locked(&line)
                         || is_address_in_use(&line)
@@ -1053,7 +1053,7 @@ impl Server {
             tokio::spawn(async move {
                 let mut lines = crate::lossy_lines::lossy_lines(stdout);
                 while let Ok(Some(line)) = lines.next_line().await {
-                    tracing::debug!(target: "zeron_harness::opencode", "stdout: {line}");
+                    tracing::debug!(target: "zeren_harness::opencode", "stdout: {line}");
                     if line.to_ascii_lowercase().contains("server listening on") {
                         listening.notify_one();
                     }
@@ -1424,7 +1424,7 @@ impl Server {
                 Ok(list) => unwrap_data(list).as_array().cloned().unwrap_or_default(),
                 Err(e) => {
                     tracing::debug!(
-                        target: "zeron_harness::opencode",
+                        target: "zeren_harness::opencode",
                         "pending request sweep: {e}"
                     );
                     Vec::new()
@@ -1487,7 +1487,7 @@ impl Server {
             .is_err()
         {
             tracing::warn!(
-                target: "zeron_harness::opencode",
+                target: "zeren_harness::opencode",
                 "aborting subagent sessions timed out"
             );
         }
@@ -1711,29 +1711,29 @@ fn agent_option(agents: &Value) -> ModelOption {
 
 /// OpenCode exposes plugin/configured skills in its native command catalog.
 /// Source metadata prevents a command with the same name being misclassified.
-fn merge_skill_commands(skills: &mut Vec<zeron_proto::invocation::Skill>, commands: &Value) {
+fn merge_skill_commands(skills: &mut Vec<zeren_proto::invocation::Skill>, commands: &Value) {
     for command in commands.as_array().into_iter().flatten() {
         if command["source"] != "skill" {
             continue;
         }
         let Some(name) = command["name"]
             .as_str()
-            .filter(|name| zeron_proto::invocation::valid_skill_command_name(name))
+            .filter(|name| zeren_proto::invocation::valid_skill_command_name(name))
         else {
             continue;
         };
         if let Some(skill) = skills.iter_mut().find(|skill| skill.name == name) {
-            skill.command = Some(zeron_proto::invocation::SkillCommand {
+            skill.command = Some(zeren_proto::invocation::SkillCommand {
                 name: name.into(),
                 harness: HarnessId::Opencode,
             });
         } else {
-            skills.push(zeron_proto::invocation::Skill {
+            skills.push(zeren_proto::invocation::Skill {
                 name: name.into(),
                 path: format!("opencode-skill:{name}"),
                 description: command["description"].as_str().unwrap_or_default().into(),
                 enabled: true,
-                command: Some(zeron_proto::invocation::SkillCommand {
+                command: Some(zeren_proto::invocation::SkillCommand {
                     name: name.into(),
                     harness: HarnessId::Opencode,
                 }),
@@ -1995,16 +1995,16 @@ enum TurnSignal {
 /// composer. Raw slash text is deliberately excluded: OpenCode's command set
 /// is live, project-scoped state and cannot be inferred by static preflight.
 fn selected_native_command(prompt: &str, harness: HarnessId) -> bool {
-    let delivered = zeron_proto::invocation::harness_prompt(prompt, harness);
-    if zeron_proto::invocation::leading_command(&delivered).is_none() {
+    let delivered = zeren_proto::invocation::harness_prompt(prompt, harness);
+    if zeren_proto::invocation::leading_command(&delivered).is_none() {
         return false;
     }
-    zeron_proto::invocation::invocation_links(prompt)
+    zeren_proto::invocation::invocation_links(prompt)
         .into_iter()
         .any(|(range, invocation)| {
             let selected_for_harness = match invocation {
-                zeron_proto::invocation::Invocation::Command { .. } => true,
-                zeron_proto::invocation::Invocation::Skill {
+                zeren_proto::invocation::Invocation::Command { .. } => true,
+                zeren_proto::invocation::Invocation::Skill {
                     command: Some(command),
                     ..
                 } => command.harness == harness,
@@ -2112,7 +2112,7 @@ async fn run_session(session: Session) {
                     }
                     Err(e) => {
                         tracing::debug!(
-                            target: "zeron_harness::opencode",
+                            target: "zeren_harness::opencode",
                             "session resume failed (starting fresh): {e}"
                         );
                         create_session(&server, dir, agent).await?
@@ -2255,7 +2255,7 @@ async fn run_session(session: Session) {
     .await;
     if connect_wait.is_err() {
         tracing::debug!(
-            target: "zeron_harness::opencode",
+            target: "zeren_harness::opencode",
             "event bus not connected within 15s; prompting anyway"
         );
     }
@@ -2500,7 +2500,7 @@ async fn run_session(session: Session) {
                 if !matches!(abort, Ok(Ok(_))) {
                     // Deliver at the natural turn end instead.
                     tracing::warn!(
-                        target: "zeron_harness::opencode",
+                        target: "zeren_harness::opencode",
                         "steer preempt abort failed; delivering at turn end"
                     );
                 }
@@ -2654,7 +2654,7 @@ async fn run_session(session: Session) {
                         // The turn may still be running: this session must
                         // never take a prompt on top of it.
                         tracing::warn!(
-                            target: "zeron_harness::opencode",
+                            target: "zeren_harness::opencode",
                             "turn stop abort failed; tearing the runtime down"
                         );
                         stop_teardown = true;
@@ -2717,7 +2717,7 @@ async fn run_session(session: Session) {
                 let Some(update) = update else { continue 'main; };
                 if update.generation != turn_generation || !turn.active || interrupt_requested || stopping {
                     tracing::debug!(
-                        target: "zeron_harness::opencode",
+                        target: "zeren_harness::opencode",
                         update_generation = update.generation,
                         active_generation = turn_generation,
                         "ignoring a request outcome from a retired turn"
@@ -2736,7 +2736,7 @@ async fn run_session(session: Session) {
                     // running: the server took the prompt after all.
                     TurnSignal::PromptFailed(message) if turn.idle_ready => {
                         tracing::warn!(
-                            target: "zeron_harness::opencode",
+                            target: "zeren_harness::opencode",
                             "prompt POST failed but the turn is running: {message}"
                         );
                         turn.prompt_in_flight = false;
@@ -2786,7 +2786,7 @@ async fn run_session(session: Session) {
                     Some(steer) => {
                         let native_command_selected =
                             selected_native_command(&steer.prompt, HarnessId::Opencode);
-                        let prompt = zeron_proto::invocation::harness_prompt(
+                        let prompt = zeren_proto::invocation::harness_prompt(
                             &steer.prompt,
                             HarnessId::Opencode,
                         );
@@ -2882,7 +2882,7 @@ async fn run_session(session: Session) {
                     // The stop's abort acknowledged nothing within the grace:
                     // the turn may still be running. Tear the runtime down.
                     tracing::warn!(
-                        target: "zeron_harness::opencode",
+                        target: "zeren_harness::opencode",
                         "turn stop unacknowledged; tearing the runtime down"
                     );
                     stop_teardown = true;
@@ -2982,7 +2982,7 @@ async fn run_session(session: Session) {
                             server.stderr_tail.wait_closed().await;
                             settle_lost_server!('main, Some(status));
                         }
-                        tracing::warn!(target: "zeron_harness::opencode", "{message}");
+                        tracing::warn!(target: "zeren_harness::opencode", "{message}");
                         // Ending the run tears the server down.
                         settle_lost_server!('main, message: message);
                     }
@@ -3041,7 +3041,7 @@ async fn run_session(session: Session) {
     }
     if !done_sent {
         // Consumer went away (stream dropped): nothing to report to.
-        tracing::debug!(target: "zeron_harness::opencode", "run loop ended without settling");
+        tracing::debug!(target: "zeren_harness::opencode", "run loop ended without settling");
     }
     bus_handle.abort();
     server.shutdown(kill_grace).await;
@@ -3096,7 +3096,7 @@ async fn create_session(
         }
         if attempt == 0 && status.is_server_error() {
             tracing::debug!(
-                target: "zeron_harness::opencode",
+                target: "zeren_harness::opencode",
                 "POST /session answered {status}; retrying once (the lazy-migration crash self-heals)"
             );
             tokio::time::sleep(Duration::from_millis(250)).await;
@@ -3556,7 +3556,7 @@ async fn deliver_prompt(
             Err(error) => last_error = error.to_string(),
         }
         tracing::warn!(
-            target: "zeron_harness::opencode",
+            target: "zeren_harness::opencode",
             attempt,
             "prompt POST failed: {last_error}"
         );
@@ -3608,7 +3608,7 @@ fn native_command_request<'a>(
     commands: &[SlashCommand],
     selected: bool,
 ) -> Result<Option<(&'a str, &'a str)>, HarnessError> {
-    let Some((name, arguments)) = zeron_proto::invocation::leading_command(prompt) else {
+    let Some((name, arguments)) = zeren_proto::invocation::leading_command(prompt) else {
         return if selected {
             Err(HarnessError::Protocol(
                 "The selected OpenCode command is no longer available in this project".into(),
@@ -4244,7 +4244,7 @@ async fn handle_bus_event(ctx: BusCtx<'_>) -> BusOutcome {
                             .await
                         {
                             tracing::debug!(
-                                target: "zeron_harness::opencode",
+                                target: "zeren_harness::opencode",
                                 "question reject failed: {e}"
                             );
                         }
@@ -5502,7 +5502,7 @@ async fn stream_bus(
             Ok(Some(Err(_)) | None) => return announced,
             Err(_) => {
                 tracing::warn!(
-                    target: "zeron_harness::opencode",
+                    target: "zeren_harness::opencode",
                     "event bus silent for {}s; reconnecting",
                     silence.as_secs()
                 );
@@ -5768,7 +5768,7 @@ fn inline_config(inherited: Option<&str>) -> Result<Value, HarnessError> {
 /// and other MCP servers; never write chat identity into a shared config file.
 fn mcp_config(
     inherited: Option<&str>,
-    mcp: &zeron_proto::McpServer,
+    mcp: &zeren_proto::McpServer,
     protocol: Protocol,
 ) -> Result<String, HarnessError> {
     let mut config = inline_config(inherited)?;
@@ -5800,13 +5800,13 @@ fn mcp_config(
     Ok(config.to_string())
 }
 
-/// [`mcp_config`] for Zeron's own server and then each plugin server
+/// [`mcp_config`] for Zeren's own server and then each plugin server
 /// ([`RunRequest::extra_mcp`]); the inherited config passes through
 /// untouched when there are none.
 fn mcp_configs(
     inherited: Option<String>,
-    mcp: Option<&zeron_proto::McpServer>,
-    extras: &[zeron_proto::McpServer],
+    mcp: Option<&zeren_proto::McpServer>,
+    extras: &[zeren_proto::McpServer],
     protocol: Protocol,
 ) -> Result<Option<String>, HarnessError> {
     let mut inline = inherited;
@@ -5985,14 +5985,14 @@ mod mcp_injection_tests {
     use super::*;
 
     #[test]
-    fn mcp_configs_add_plugin_servers_beside_zeron_in_both_generations() {
-        let zeron = zeron_proto::McpServer {
-            name: "zeron".into(),
-            command: "/opt/zeron/zeron".into(),
+    fn mcp_configs_add_plugin_servers_beside_zeren_in_both_generations() {
+        let zeren = zeren_proto::McpServer {
+            name: "zeren".into(),
+            command: "/opt/zeren/zeren".into(),
             args: vec!["mcp".into()],
             env: Default::default(),
         };
-        let extra = zeron_proto::McpServer {
+        let extra = zeren_proto::McpServer {
             name: "plugin-focus".into(),
             command: "/data/plugins/.loaded/focus/0123/bin/server".into(),
             args: vec!["--stdio".into()],
@@ -6005,7 +6005,7 @@ mod mcp_injection_tests {
         for (protocol, servers) in [(Protocol::V1, "/mcp"), (Protocol::V2, "/mcp/servers")] {
             let inline = mcp_configs(
                 Some(r#"{"model":"keep"}"#.into()),
-                Some(&zeron),
+                Some(&zeren),
                 std::slice::from_ref(&extra),
                 protocol,
             )
@@ -6015,8 +6015,8 @@ mod mcp_injection_tests {
             assert_eq!(config["model"], "keep");
             let servers = config.pointer(servers).unwrap();
             assert_eq!(
-                servers["zeron"]["command"],
-                json!(["/opt/zeron/zeron", "mcp"])
+                servers["zeren"]["command"],
+                json!(["/opt/zeren/zeren", "mcp"])
             );
             let plugin = &servers["plugin-focus"];
             assert_eq!(
@@ -6041,7 +6041,7 @@ const http = require('node:http');
 const version = '{major}.0.0';
 if (process.argv.includes('--version')) {{ console.log(version); process.exit(0); }}
 const config = JSON.parse(process.env.OPENCODE_CONFIG_CONTENT);
-const server = {major} === 1 ? config.mcp.zeron : config.mcp.servers.zeron;
+const server = {major} === 1 ? config.mcp.zeren : config.mcp.servers.zeren;
 if (!server || server.command[1] !== 'mcp') throw new Error('missing MCP config');
 const port = Number(process.argv[process.argv.indexOf('--port') + 1]);
 http.createServer((req, res) => {{
@@ -6056,14 +6056,14 @@ http.createServer((req, res) => {{
             );
             std::fs::write(&exe, script).unwrap();
             std::fs::set_permissions(&exe, std::fs::Permissions::from_mode(0o700)).unwrap();
-            let first = zeron_proto::McpServer {
-                name: "zeron".into(),
-                command: "/path with spaces/zeron".into(),
+            let first = zeren_proto::McpServer {
+                name: "zeren".into(),
+                command: "/path with spaces/zeren".into(),
                 args: vec!["mcp".into()],
-                env: [("ZERON_CHAT_ID".into(), "first".into())].into(),
+                env: [("ZEREN_CHAT_ID".into(), "first".into())].into(),
             };
             let mut second = first.clone();
-            second.env.insert("ZERON_CHAT_ID".into(), "second".into());
+            second.env.insert("ZEREN_CHAT_ID".into(), "second".into());
             let mut a = Server::spawn(
                 &exe,
                 fixture.path().to_str(),
@@ -6084,11 +6084,11 @@ http.createServer((req, res) => {{
             let b_config = b.get_json("/config-probe", None).await.unwrap();
             a.shutdown(Duration::from_millis(100)).await;
             b.shutdown(Duration::from_millis(100)).await;
-            assert_eq!(a_config["environment"]["ZERON_CHAT_ID"], "first");
-            assert_eq!(b_config["environment"]["ZERON_CHAT_ID"], "second");
+            assert_eq!(a_config["environment"]["ZEREN_CHAT_ID"], "first");
+            assert_eq!(b_config["environment"]["ZEREN_CHAT_ID"], "second");
             assert_eq!(
                 a_config["command"],
-                json!(["/path with spaces/zeron", "mcp"])
+                json!(["/path with spaces/zeren", "mcp"])
             );
         }
     }
@@ -6148,9 +6148,9 @@ http.createServer((req, res) => {
 "#;
         std::fs::write(&exe, script).unwrap();
         std::fs::set_permissions(&exe, std::fs::Permissions::from_mode(0o700)).unwrap();
-        let mcp = zeron_proto::McpServer {
-            name: "zeron".into(),
-            command: "zeron".into(),
+        let mcp = zeren_proto::McpServer {
+            name: "zeren".into(),
+            command: "zeren".into(),
             args: vec!["mcp".into()],
             env: Default::default(),
         };
@@ -6264,7 +6264,7 @@ if (process.argv.includes('--version')) {{
   http.createServer((req, res) => {{
     res.setHeader('content-type', 'application/json');
     if (req.url === '/config-probe') {{
-      res.end(JSON.stringify({{server: config.mcp.servers.zeron, auth}})); return;
+      res.end(JSON.stringify({{server: config.mcp.servers.zeren, auth}})); return;
     }}
     if (req.url === '/api/info') {{ res.end(JSON.stringify({{version: '2.0.20'}})); return; }}
     res.statusCode = 404; res.end('{{}}');
@@ -6274,9 +6274,9 @@ if (process.argv.includes('--version')) {{
         );
         std::fs::write(&exe, script).unwrap();
         std::fs::set_permissions(&exe, std::fs::Permissions::from_mode(0o700)).unwrap();
-        let mcp = zeron_proto::McpServer {
-            name: "zeron".into(),
-            command: "zeron".into(),
+        let mcp = zeren_proto::McpServer {
+            name: "zeren".into(),
+            command: "zeren".into(),
             args: vec!["mcp".into()],
             env: Default::default(),
         };
@@ -6291,7 +6291,7 @@ if (process.argv.includes('--version')) {{
             .expect("a slow first --version must not fail the run");
             let probe = server.get_json("/config-probe", None).await.unwrap();
             server.shutdown(Duration::from_millis(100)).await;
-            assert_eq!(probe["server"]["command"], json!(["zeron", "mcp"]));
+            assert_eq!(probe["server"]["command"], json!(["zeren", "mcp"]));
             // 2.x reads OPENCODE_PASSWORD first: both must carry ours.
             assert!(probe["auth"]["password"].is_string());
             assert_eq!(probe["auth"]["password"], probe["auth"]["legacy"]);
@@ -6300,11 +6300,11 @@ if (process.argv.includes('--version')) {{
 
     #[test]
     fn mcp_injection_preserves_config_and_scopes_identity_for_both_protocols() {
-        let mut mcp = zeron_proto::McpServer {
-            name: "zeron".into(),
-            command: "/path with spaces/zeron".into(),
+        let mut mcp = zeren_proto::McpServer {
+            name: "zeren".into(),
+            command: "/path with spaces/zeren".into(),
             args: vec!["mcp".into()],
-            env: [("ZERON_CHAT_ID".into(), "first".into())].into(),
+            env: [("ZEREN_CHAT_ID".into(), "first".into())].into(),
         };
         for protocol in [Protocol::V1, Protocol::V2] {
             let inherited = match protocol {
@@ -6318,7 +6318,7 @@ if (process.argv.includes('--version')) {{
             let first: Value =
                 serde_json::from_str(&mcp_config(Some(inherited), &mcp, protocol).unwrap())
                     .unwrap();
-            mcp.env.insert("ZERON_CHAT_ID".into(), "second".into());
+            mcp.env.insert("ZEREN_CHAT_ID".into(), "second".into());
             let second: Value =
                 serde_json::from_str(&mcp_config(Some(inherited), &mcp, protocol).unwrap())
                     .unwrap();
@@ -6331,24 +6331,24 @@ if (process.argv.includes('--version')) {{
             let servers = first.pointer(pointer).unwrap();
             assert_eq!(servers["user"]["url"], "https://example.test");
             assert_eq!(
-                servers["zeron"]["command"],
-                json!(["/path with spaces/zeron", "mcp"])
+                servers["zeren"]["command"],
+                json!(["/path with spaces/zeren", "mcp"])
             );
-            assert_eq!(servers["zeron"]["environment"]["ZERON_CHAT_ID"], "first");
+            assert_eq!(servers["zeren"]["environment"]["ZEREN_CHAT_ID"], "first");
             assert_eq!(
-                second.pointer(pointer).unwrap()["zeron"]["environment"]["ZERON_CHAT_ID"],
+                second.pointer(pointer).unwrap()["zeren"]["environment"]["ZEREN_CHAT_ID"],
                 "second"
             );
             if protocol == Protocol::V1 {
-                assert_eq!(servers["zeron"]["enabled"], true);
+                assert_eq!(servers["zeren"]["enabled"], true);
             } else {
-                assert_eq!(servers["zeron"]["disabled"], false);
-                assert!(servers["zeron"].get("enabled").is_none());
+                assert_eq!(servers["zeren"]["disabled"], false);
+                assert!(servers["zeren"].get("enabled").is_none());
             }
             for invalid in ["[]", "{", r#"{"mcp":false}"#] {
                 assert!(mcp_config(Some(invalid), &mcp, protocol).is_err());
             }
-            mcp.env.insert("ZERON_CHAT_ID".into(), "first".into());
+            mcp.env.insert("ZEREN_CHAT_ID".into(), "first".into());
         }
     }
 }

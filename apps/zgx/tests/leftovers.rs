@@ -2,7 +2,7 @@
 //! source, found before it ships (README, "Patterns").
 //!
 //! - In `ui/` (every `.luau`, tests included):
-//!   - a `print(` whose message isn't a `zeron-zgx: …` log line (the one
+//!   - a `print(` whose message isn't a `zeren-zgx: …` log line (the one
 //!     form the app logs in);
 //!   - a call of a bare `warn(` or `log(` the file doesn't define itself;
 //!   - a state, persisted value or shared value named like a probe (`probe`,
@@ -10,7 +10,7 @@
 //!   - a `TEMP`, `XXX`, `DEBUG` or `REMOVE ME` marker in a comment.
 //! - In `src/` (outside tests):
 //!   - an `eprintln!`, `println!`, `eprint!` or `print!` that isn't a
-//!     `zeron-zgx: …` log line (or one of the few other known prefixes);
+//!     `zeren-zgx: …` log line (or one of the few other known prefixes);
 //!   - a `dbg!` anywhere, tests included;
 //!   - the same comment markers.
 //!
@@ -281,7 +281,7 @@ fn marker(comment: &str) -> Option<&'static str> {
 }
 
 /// The app's one log form, and the other prefixes known to be logs.
-const LOG_PREFIXES: &[&str] = &["zeron-zgx: ", "terminal-bridge: "];
+const LOG_PREFIXES: &[&str] = &["zeren-zgx: ", "terminal-bridge: "];
 
 /// Source files whose output is the point (dev tools printing results).
 const PRINTERS: &[&str] = &["src/audit_shots.rs"];
@@ -314,7 +314,7 @@ fn ui_findings() -> Vec<String> {
         for at in src.calls("print(", true) {
             let message = src.literal_after(at + 6).unwrap_or("");
             if !LOG_PREFIXES.iter().any(|p| message.starts_with(p)) {
-                out.push(format!("{file}:{}: print( that isn't a `zeron-zgx: …` log line", src.line(at)));
+                out.push(format!("{file}:{}: print( that isn't a `zeren-zgx: …` log line", src.line(at)));
             }
         }
         for name in ["warn", "log"] {
@@ -366,7 +366,7 @@ fn src_findings() -> Vec<String> {
                     }
                     let message = src.literal_after(at + mac.len()).unwrap_or("");
                     if !LOG_PREFIXES.iter().any(|p| message.starts_with(p)) {
-                        out.push(format!("{file}:{}: {} that isn't a `zeron-zgx: …` log line", src.line(at), &mac[..mac.len() - 1]));
+                        out.push(format!("{file}:{}: {} that isn't a `zeren-zgx: …` log line", src.line(at), &mac[..mac.len() - 1]));
                     }
                 }
             }
@@ -398,7 +398,7 @@ fn the_scanner_tells_code_from_text() {
     let s = luau(
         "local x = ui.state(\"findprobe_log\", 0)\n\
          print(`[x] {x}`)\n\
-         print(`zeron-zgx: fine {x}`)\n\
+         print(`zeren-zgx: fine {x}`)\n\
          local demo = [[print(1) -- TEMP]]\n\
          local q = \"print(2)\"\n\
          -- quoting print( in prose is fine\n\
@@ -408,7 +408,7 @@ fn the_scanner_tells_code_from_text() {
     );
     let prints: Vec<usize> = s.calls("print(", true).iter().map(|&a| s.line(a)).collect();
     assert_eq!(prints, vec![2, 3]);
-    assert_eq!(s.literal_after(s.calls("print(", true)[1] + 6), Some("zeron-zgx: fine {x}"));
+    assert_eq!(s.literal_after(s.calls("print(", true)[1] + 6), Some("zeren-zgx: fine {x}"));
     assert_eq!(s.calls("warn(", true), Vec::<usize>::new());
     assert!(probe_name(s.literal_after(s.calls("ui.state(", false)[0] + 9).unwrap()));
     assert!(!probe_name("templates_tab"));
@@ -416,7 +416,7 @@ fn the_scanner_tells_code_from_text() {
     assert_eq!(marks, vec!["XXX"]);
 
     let r = rust(
-        "fn a() { eprintln!(\"zeron-zgx: ok\"); let c = '{'; let s = r#\"dbg!(x)\"#; }\n\
+        "fn a() { eprintln!(\"zeren-zgx: ok\"); let c = '{'; let s = r#\"dbg!(x)\"#; }\n\
          #[cfg(test)]\n\
          mod tests { fn b() { eprintln!(\"loose\"); } }\n\
          fn c() { println!(\"loose\"); }\n"

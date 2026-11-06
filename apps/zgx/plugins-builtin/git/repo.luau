@@ -7,7 +7,7 @@
 -- place in its slots, so switching views asks nothing again.
 --
 -- Every call goes to the service on the device the session's checkout is
--- on (`zeron.service(session.device)`); every failure is kept as a
+-- on (`zeren.service(session.device)`); every failure is kept as a
 -- Problem (`problem(err)`: the refusal's reason, the service's own code,
 -- the words), for the view to say in plain words (words.luau).
 
@@ -61,7 +61,7 @@ local SAFETY = 60000
 -- A file's diff shows at most this many lines (and says so past them).
 local MAX_LINES = 2000
 
-return function(zeron: any)
+return function(zeren: any)
 	local gitds = require("@ds/git")
 	local M = {}
 
@@ -70,7 +70,7 @@ return function(zeron: any)
 	-- ("rejected", "dirty", …) and words.
 	function M.problem(err: any): Problem
 		local text = if type(err) == "table" and err.message then tostring(err.message) else tostring(err)
-		local reason = zeron.reason(text)
+		local reason = zeren.reason(text)
 		local rest = string.match(text, "^[%a_]+: (.*)$") or text
 		if reason == "failed" then
 			local code, words = string.match(rest, "^([%a_]+): (.*)$")
@@ -182,7 +182,7 @@ return function(zeron: any)
 
 		-- The session's record: its device and its folder.
 		local function where(): (string?, string?)
-			local s = zeron.sessions()[id]
+			local s = zeren.sessions()[id]
 			if not s then
 				return nil, nil
 			end
@@ -194,7 +194,7 @@ return function(zeron: any)
 			local device, cwd = where()
 			local a = if args then table.clone(args) else {}
 			a.cwd = cwd
-			return zeron.service(device):call(method, a, { timeout = timeout or 60 })
+			return zeren.service(device):call(method, a, { timeout = timeout or 60 })
 		end
 
 		-- The files as the list draws them, staging asked laid over them.
@@ -311,7 +311,7 @@ return function(zeron: any)
 		end
 
 		local function shown(): boolean
-			return next(m.showing) ~= nil and zeron.window(true).shown
+			return next(m.showing) ~= nil and zeren.window(true).shown
 		end
 
 		-- Its device said the checkout changed: asked again if a view shows
@@ -332,7 +332,7 @@ return function(zeron: any)
 			end
 			m.listening = true
 			local device = where()
-			zeron.service(device):on("changed", function(data: any)
+			zeren.service(device):on("changed", function(data: any)
 				local _, cwd = where()
 				if cwd and type(data) == "table" and type(data.cwds) == "table" and table.find(data.cwds, cwd) then
 					m.heard()
@@ -348,9 +348,9 @@ return function(zeron: any)
 		function m.watch(shows: any)
 			listen()
 			local key = {}
-			local front = zeron.window(true).active
+			local front = zeren.window(true).active
 			ui.effect(function()
-				local window = zeron.window()
+				local window = zeren.window()
 				local on = shows:get() and window.shown
 				local now_front = window.active
 				local came_front = now_front and not front
@@ -601,13 +601,13 @@ return function(zeron: any)
 		end
 		panel.open_tab {
 			kind = if history then M.KINDS.history else M.KINDS.changes,
-			title = zeron.s(if history then "tab.history" else "tab.changes"),
+			title = zeren.s(if history then "tab.history" else "tab.changes"),
 			icon = if history then "git-commit" else "file-diff",
 			data = { session = session },
 		}
 	end
 
-	-- A commit in a tab of its own, as Zeron's commit diff tab: titled by
+	-- A commit in a tab of its own, as Zeren's commit diff tab: titled by
 	-- its subject (its short id with none), the one already open for it
 	-- brought forward (`data.key`: the panel finds it by its id, not its
 	-- title, which two commits may share).

@@ -4,7 +4,7 @@
 -- that, and the commit docked under it, so the message and the button are
 -- there at any scroll. At the window's width the list stands beside the
 -- diff of the file chosen in it; at a pane's width a file opens its diff
--- in place under its row, and nothing else moves (Zeron's own Changes
+-- in place under its row, and nothing else moves (Zeren's own Changes
 -- panel is one list at line granularity, changes.rs; this follows it).
 -- Then nothing to commit, two files in conflict, the push under way, and
 -- the push that failed. The list is git_changes.luau; the rest of the
@@ -122,7 +122,7 @@ local function dock(state: string, files: { Changes.File }, conflicts: boolean, 
 				else ui.row { w_full = true, gap = "$space.2", items = "center", who, ui.div { grow = 1 }, commit },
 		}
 	end
-	return ui.div { w_full = true, shrink = 0, pt = "$space.3", border_sides = { 1, 0, 0, 0 }, border_color = "$zeron.settings.rule", inner }
+	return ui.div { w_full = true, shrink = 0, pt = "$space.3", border_sides = { 1, 0, 0, 0 }, border_color = "$zeren.settings.rule", inner }
 end
 
 return {

@@ -41,7 +41,7 @@ end
 -- The selects' one width.
 local SELECT_W = 168
 -- A small button's side padding (ds/button `sm`).
-local SNUG = (ui.theme.get("zeron.space.snug") :: number?) or 8
+local SNUG = (ui.theme.get("zeren.space.snug") :: number?) or 8
 
 local custom_text = ui.state("settings_browser_custom_text", data.custom_engine:peek())
 

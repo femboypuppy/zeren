@@ -96,7 +96,7 @@ return ui.component(function(props: Props): Node
 					return KNOB / 2 - 2 + f * math.max(0, (track.width or 0) - KNOB)
 				end,
 				bg = function()
-					return if fraction() >= f then "$zeron.check.mark" else "$text.tertiary"
+					return if fraction() >= f then "$zeren.check.mark" else "$text.tertiary"
 				end,
 				opacity = 0.7,
 				pointer_events = "none",
@@ -184,7 +184,7 @@ return ui.component(function(props: Props): Node
 			top = (KNOB - TRACK) / 2,
 			h = TRACK,
 			rounded = "$radius.full",
-			bg = "$zeron.switch.track",
+			bg = "$zeren.switch.track",
 			pointer_events = "none",
 		},
 		-- Its fill, up to the knob's centre.
@@ -194,7 +194,7 @@ return ui.component(function(props: Props): Node
 			top = (KNOB - TRACK) / 2,
 			h = TRACK,
 			rounded = "$radius.full",
-			bg = "$zeron.switch.on",
+			bg = "$zeren.switch.on",
 			pointer_events = "none",
 			w = function()
 				return knob_x()
@@ -216,8 +216,8 @@ return ui.component(function(props: Props): Node
 		w = KNOB,
 		h = KNOB,
 		rounded = "$radius.full",
-		bg = "$zeron.switch.knob",
-		shadow = "$zeron.switch.knob_lift",
+		bg = "$zeren.switch.knob",
+		shadow = "$zeren.switch.knob_lift",
 		-- A hairline, so the white knob holds its edge on a pale window.
 		border = 1,
 		border_color = "$border.subtle",
@@ -278,7 +278,7 @@ return ui.component(function(props: Props): Node
 		w_full = props.w_full,
 		grow = props.grow,
 		disabled = props.disabled,
-		opacity = if props.disabled then "$zeron.disabled" else nil,
+		opacity = if props.disabled then "$zeren.disabled" else nil,
 		body,
 		if props.format
 			then ui.text {

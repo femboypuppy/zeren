@@ -4,7 +4,7 @@ use futures::future::BoxFuture;
 use gpui::{Entity, TestAppContext};
 use serde_json::Value;
 use std::sync::Arc;
-use zeron_rpc::{RpcClient, RpcError, RpcReply, RpcService};
+use zeren_rpc::{RpcClient, RpcError, RpcReply, RpcService};
 
 type Reply = Result<RpcReply, RpcError>;
 
@@ -32,7 +32,7 @@ impl ScriptedRpc {
     }
 
     pub(super) fn client(self: &Arc<Self>) -> RpcClient {
-        zeron_rpc::memory_client(self.clone())
+        zeren_rpc::memory_client(self.clone())
     }
 
     pub(super) fn settle(

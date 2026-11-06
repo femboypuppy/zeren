@@ -1,5 +1,5 @@
 /**
- * zeron-vault — the credential vault Worker (docs/design/cloud-device.md,
+ * zeren-vault — the credential vault Worker (docs/design/cloud-device.md,
  * "Credential vault"). Holds users' provider credentials encrypted under a
  * KEK kept in Worker secrets (crypto.ts) and hands out short-lived grants
  * (access tokens, never refresh tokens) to enrolled, authorized devices.

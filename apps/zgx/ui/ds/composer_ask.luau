@@ -5,7 +5,7 @@
 -- Allow). The surface, its corners and the caret stay where they were, so
 -- answering reads as writing, not as a dialog.
 --
--- A question (Zeron's question panel, crates/ui/src/composer.rs
+-- A question (Zeren's question panel, crates/ui/src/composer.rs
 -- render_question_panel): its header small and tracked, its page among its
 -- pages, the question itself, then its options, each with its number: 1 to
 -- 9 pick one from the keys. Chosen, an option wears a ring, never a fill.
@@ -58,7 +58,7 @@ export type Approval = {
 export type ApprovalProps = { approval: Approval }
 
 -- A panel's head: its kind, small and tracked (the words alone: no glyph
--- stands for a question or an approval, as Zeron's panel has none), with
+-- stands for a question or an approval, as Zeren's panel has none), with
 -- its page among its pages and the × at the end.
 -- (`kind` the agent's header, or a function of the locale's word.)
 local function head(kind: string | () -> string, page: string?, on_close: (() -> ())?, close_hint: (() -> string)?): Node
@@ -98,14 +98,14 @@ end
 -- An option's number, in a cap at its start: the key that picks it.
 local function key(n: number): Node
 	return ui.div {
-		w = "$zeron.composer.option.key",
-		h = "$zeron.composer.option.key",
+		w = "$zeren.composer.option.key",
+		h = "$zeren.composer.option.key",
 		shrink = 0,
 		items = "center",
 		justify = "center",
 		-- Concentric with its option, 8 in from the option's edge.
-		rounded = "$zeron.composer.option.key_radius",
-		bg = "$zeron.secondary.bg",
+		rounded = "$zeren.composer.option.key_radius",
+		bg = "$zeren.secondary.bg",
 		ui.text {
 			tostring(n),
 			text_size = "$font.size.xs",
@@ -130,16 +130,16 @@ M.Question = ui.component(function(props: QuestionProps): Node
 		table.insert(
 			rows,
 			ui.row {
-				min_h = "$zeron.composer.option.h",
+				min_h = "$zeren.composer.option.h",
 				-- Its wash and ring hang past the text's edge: the number cap
 				-- sits on the edge the title and the answer share.
 				mx = ui.raw(-8, "the row's wash hangs a step past the text's edge"),
 				pl = "$space.2",
 				pr = "$space.2",
-				py = "$zeron.space.tight",
-				gap = "$zeron.space.snug",
+				py = "$zeren.space.tight",
+				gap = "$zeren.space.snug",
 				items = "center",
-				rounded = "$zeron.composer.option.radius",
+				rounded = "$zeren.composer.option.radius",
 				role = if q.multi then "checkbox" else "radio",
 				checked = on,
 				label = o.label,
@@ -150,7 +150,7 @@ M.Question = ui.component(function(props: QuestionProps): Node
 				border = 1,
 				border_over = true,
 				border_color = function()
-					return if on() then "$zeron.composer.option.ring" else "#00000000"
+					return if on() then "$zeren.composer.option.ring" else "#00000000"
 				end,
 				hover = { bg = "$hover" },
 				active = { bg = "$pressed" },
@@ -169,7 +169,7 @@ M.Question = ui.component(function(props: QuestionProps): Node
 					end
 					return false
 				end,
-				if i <= 9 then key(i) else ui.div { w = "$zeron.composer.option.key", shrink = 0 },
+				if i <= 9 then key(i) else ui.div { w = "$zeren.composer.option.key", shrink = 0 },
 				ui.column {
 					grow = 1,
 					min_w = 0,
@@ -222,7 +222,7 @@ M.Question = ui.component(function(props: QuestionProps): Node
 			else nil),
 		ui.column {
 			pb = "$space.2",
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			ui.text {
 				q.text,
 				wrap = true,
@@ -235,7 +235,7 @@ M.Question = ui.component(function(props: QuestionProps): Node
 				then ui.text { locale.t("ds.composer_ask.multi"), text_size = "$font.size.sm", line_height = "$font.line.sm", color = "$text.tertiary" }
 				else nil,
 		},
-		ui.column { w_full = true, gap = "$zeron.space.hair", role = if q.multi then "group" else "radiogroup", label = q.text, table.unpack(rows) },
+		ui.column { w_full = true, gap = "$zeren.space.hair", role = if q.multi then "group" else "radiogroup", label = q.text, table.unpack(rows) },
 	}
 end)
 
@@ -269,17 +269,17 @@ M.Approval = ui.component(function(props: ApprovalProps): Node
 					py = "$space.2",
 					-- At the strip's inset, concentric with the pill as its
 					-- chips are.
-					rounded = "$zeron.composer.chip.radius",
-					bg = "$zeron.code.wash",
+					rounded = "$zeren.composer.chip.radius",
+					bg = "$zeren.code.wash",
 					border = 1,
-					border_color = "$zeron.prose.code.edge",
+					border_color = "$zeren.prose.code.edge",
 					SelectionMenu { w_full = true, ui.text {
 						a.command,
 						literal = true,
 						wrap = true,
 						font = "$font.mono",
-						text_size = "$zeron.prose.code.size",
-						line_height = "$zeron.prose.code.line",
+						text_size = "$zeren.prose.code.size",
+						line_height = "$zeren.prose.code.line",
 						color = "$text.primary",
 					} },
 				}

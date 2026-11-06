@@ -18,7 +18,7 @@
  *   2. The disk persists across stop/resume (the engine's data dir, its
  *      runner key, the user's clones).
  *   3. Enabled systemd system units start again on resume (the engine runs
- *      as `zeron-cloud.service`; nothing re-runs the installer on wake).
+ *      as `zeren-cloud.service`; nothing re-runs the installer on wake).
  *   4. Per-sandbox `env` from create is visible to `exec` commands (the
  *      installer reads its enrollment from there).
  *   5. `exec` runs as an unprivileged user with passwordless sudo, on Linux

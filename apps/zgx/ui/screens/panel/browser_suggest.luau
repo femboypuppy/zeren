@@ -749,14 +749,14 @@ function M.use(opts: Options): { [string]: any }
 	-- popover-keep-focus.)
 	local function list(box: Ref, root: Ref, radius: number): Node
 		local PAD = 4
-		local GAP = (ui.theme.get("zeron.list.gap") :: number?) or 2
+		local GAP = (ui.theme.get("zeren.list.gap") :: number?) or 2
 		local rows = ui.each(shown, row, {
 			key = function(r: Row): string
 				return r.key
 			end,
 			direction = "column",
 			-- (The token itself, as GAP reads it for the height below.)
-			gap = "$zeron.list.gap",
+			gap = "$zeren.list.gap",
 			w_full = true,
 		})
 		-- Its height: the hairline, the rows and the inset round them, the
@@ -792,15 +792,15 @@ function M.use(opts: Options): { [string]: any }
 				-- (Unrolled from nothing as it opens, then following its rows.)
 				h = motion.tween(target, { duration = 160, ease = "outCubic" }),
 				overflow = "hidden",
-				bg = "$zeron.menu.solid",
+				bg = "$zeren.menu.solid",
 				border = 1,
 				border_sides = { 0, 1, 1, 1 },
-				border_color = "$zeron.field.edge_focus",
+				border_color = "$zeren.field.edge_focus",
 				rounded_tl = 0,
 				rounded_tr = 0,
 				rounded_bl = radius,
 				rounded_br = radius,
-				shadow = "$zeron.menu.shadow",
+				shadow = "$zeren.menu.shadow",
 				role = "listbox",
 				label = ui.t("panel.browser.suggest.label"),
 				-- The hairline: inset to the rows' wash, where the field's

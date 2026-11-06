@@ -1,5 +1,5 @@
 -- Settings: Codex's banked resets. Codex lets an account bank resets of
--- its usage limits; Zeron shows them where they matter, on the Codex
+-- its usage limits; Zeren shows them where they matter, on the Codex
 -- account's own row: how many are banked in its detail line, and, once a
 -- window is at its limit, "Use a reset" right there. Using one is a
 -- dialog: which (the soonest to expire first), what it does, one button.

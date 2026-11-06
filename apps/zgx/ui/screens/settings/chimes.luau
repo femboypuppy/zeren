@@ -6,7 +6,7 @@
 -- picks up where it was.
 --
 -- And the window's focus, told to the engine (`SetViewportFocus`), which
--- holds its banners while Zeron is the app in front if Notifications says
+-- holds its banners while Zeren is the app in front if Notifications says
 -- "Only when in the background". Told when it changes, then again every 20
 -- seconds while it holds (the engine forgets a report that goes stale).
 

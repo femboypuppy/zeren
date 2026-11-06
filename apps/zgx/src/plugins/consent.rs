@@ -97,8 +97,8 @@ fn key(on: &On, item: &super::Item) -> String {
 }
 
 /// `text` shown as a plugin's words: one line of what prints, no
-/// direction overrides or invisible marks (words that read as Zeron's own,
-/// "✓ Zeron", among them), at most `most` characters.
+/// direction overrides or invisible marks (words that read as Zeren's own,
+/// "✓ Zeren", among them), at most `most` characters.
 fn plain(text: &str, most: usize) -> String {
     let mut out: String = text
         .chars()
@@ -146,18 +146,18 @@ fn bounded(item: &Json) -> Json {
     };
     tools(&mut item["tools"]);
     // How far each program and place it names reaches, as the engine
-    // rates them (zeron-plugin-guard): a shell or interpreter, which is full
+    // rates them (zeren-plugin-guard): a shell or interpreter, which is full
     // control of the computer; another program that can do anything you can
     // (git and gh are said as what they do: the runner holds them to rules of
     // their own); a host on this device or your network.
-    use zeron_plugin_guard::commands::{Risk, full_control, held_to_its_own_rules, risk};
+    use zeren_plugin_guard::commands::{Risk, full_control, held_to_its_own_rules, risk};
     let programs = |list: &Json, keep: &dyn Fn(&str) -> bool| -> Json {
         json!(list.as_array().into_iter().flatten().filter_map(Json::as_str).filter(|c| keep(c)).collect::<Vec<_>>())
     };
     let anything = |list: &Json| programs(list, &|c| risk(c) == Risk::Anything && !full_control(c) && !held_to_its_own_rules(c));
     let full = |list: &Json| programs(list, &|c| full_control(c));
     let local = |list: &Json| -> Json {
-        json!(list.as_array().into_iter().flatten().filter_map(Json::as_str).filter(|h| *h != "*" && zeron_plugin_guard::net::risky(h)).collect::<Vec<_>>())
+        json!(list.as_array().into_iter().flatten().filter_map(Json::as_str).filter(|h| *h != "*" && zeren_plugin_guard::net::risky(h)).collect::<Vec<_>>())
     };
     item["commands_anything"] = anything(&item["commands"]);
     item["commands_full_control"] = full(&item["commands"]);
@@ -213,8 +213,8 @@ pub fn review(bridge: &Rc<Bridge>, id: &str, on: On) {
     let window = bridge.windows.open(options(), move |cx| {
         let Some(bridge) = weak.upgrade() else { return };
         let host = host(cx, &bridge, ids.clone(), ons.clone(), slot.clone(), seen_.clone());
-        // (`ZERON_ZGX_REVIEW`, development: devtools are this window's.)
-        crate::serve_sheet(cx, host, "consent.luau", crate::dev::switch("ZERON_ZGX_REVIEW").is_some());
+        // (`ZEREN_ZGX_REVIEW`, development: devtools are this window's.)
+        crate::serve_sheet(cx, host, "consent.luau", crate::dev::switch("ZEREN_ZGX_REVIEW").is_some());
         let weak = Rc::downgrade(&bridge);
         cx.on_closed(move || {
             if let Some(b) = weak.upgrade() {
@@ -228,7 +228,7 @@ pub fn review(bridge: &Rc<Bridge>, id: &str, on: On) {
 fn options() -> WindowOptions {
     WindowOptions {
         resizable: false,
-        ..crate::zeron_window(SIZE.0, SIZE.1)
+        ..crate::zeren_window(SIZE.0, SIZE.1)
     }
 }
 
@@ -271,7 +271,7 @@ fn host(cx: &mut WindowContext, bridge: &Rc<Bridge>, id: Rc<RefCell<String>>, on
         if allow && !may_allow(&seen_.borrow(), &key(&on, &item), on.is_some(), Instant::now()) {
             return;
         }
-        eprintln!("zeron-zgx: plugins: {id} {}", if allow { "allowed" } else { "not allowed (Not now)" });
+        eprintln!("zeren-zgx: plugins: {id} {}", if allow { "allowed" } else { "not allowed (Not now)" });
         out.set(shown(&b, &id, &on, true, None));
         let (weak, window, out) = (Rc::downgrade(&b), window.clone(), out.clone());
         engine::get().spawn(async move {
@@ -305,7 +305,7 @@ fn host(cx: &mut WindowContext, bridge: &Rc<Bridge>, id: Rc<RefCell<String>>, on
     // "It's mine": signed as yours, after which it asks only for what it
     // needs, as your own plugins do. (This device's alone: signing is with
     // its key, so another device's sheet doesn't offer it.)
-    // (Only the plugin shown, by someone Zeron can't name, unchanged since
+    // (Only the plugin shown, by someone Zeren can't name, unchanged since
     // you allowed it: never one someone else signed.)
     let (weak, out, ids) = (Rc::downgrade(bridge), shared, id);
     host.action("plugins.sign", move |arg| {
@@ -347,7 +347,7 @@ fn may_allow(seen: &Option<(String, Instant)>, key: &str, elsewhere: bool, now: 
 }
 
 /// Whether "It's mine" may sign `item`: one this device holds, by someone
-/// Zeron can't name, as it was made (not changed since you allowed it).
+/// Zeren can't name, as it was made (not changed since you allowed it).
 fn claimable(item: &super::Item) -> bool {
     item.status() == "pending" && item.json["author"]["kind"].as_str().is_none_or(|kind| kind == "unknown")
 }
@@ -361,7 +361,7 @@ async fn mint_review(id: &str, hash: &str) -> Result<String, String> {
 
 fn said(error: &str, on: &On) -> String {
     match (error, on) {
-        ("offline" | "closed", _) => "Zeron isn't running right now. Try again in a moment.".into(),
+        ("offline" | "closed", _) => "Zeren isn't running right now. Try again in a moment.".into(),
         (e, Some((_, name))) if remote::unreachable(e) => format!("Can't reach {name} right now. Try again once it's online."),
         (other, _) => other.to_string(),
     }
@@ -372,13 +372,13 @@ mod tests {
     use super::*;
 
     /// R27: a plugin's name, version and tools' words can't pass for
-    /// Zeron's own on the sheet (a version reading "✓ Zeron", a name
+    /// Zeren's own on the sheet (a version reading "✓ Zeren", a name
     /// turned around by a direction override, a page of words).
     #[test]
     fn a_plugin_s_words_come_to_the_sheet_bounded_and_plain() {
         let item = json!({
             "name": "Focus\u{202E}nori\u{200B}\n\tTimer",
-            "version": "✓ Zeron verified",
+            "version": "✓ Zeren verified",
             "description": "x".repeat(5000),
             "tools": [{ "name": "count", "description": format!("Count.\u{2066}{}", "y".repeat(900)) }],
             "digest_diff": { "tools_added": [{ "name": "pwn", "description": "z".repeat(900) }], "tools_changed": [] },

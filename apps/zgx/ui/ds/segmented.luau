@@ -55,7 +55,7 @@ return function(props: Props): Node
 	local value = props.value
 	local fixed = props.segment
 	-- The thumb's inset in its track.
-	local PAD = ui.theme.get("zeron.space.hair") :: number
+	local PAD = ui.theme.get("zeren.space.hair") :: number
 	local index = ui.computed(function(): number
 		local v = value:get()
 		for i, option in props.options do
@@ -150,7 +150,7 @@ return function(props: Props): Node
 		-- without this it places against the nearest `relative` ancestor
 		-- outside (a FilesPane's box), not this track.
 		relative = true,
-		bg = "$zeron.secondary.bg",
+		bg = "$zeren.secondary.bg",
 		-- The thumb, under the labels: flat, the selected wash alone (as a
 		-- sidebar's selected row); concentric with the track (its radius less
 		-- the inset).
@@ -163,7 +163,7 @@ return function(props: Props): Node
 				top = PAD,
 				h = H - PAD * 2,
 				rounded = ui.raw(control.nest(TRACK_RADIUS, PAD), "the track's corner less the thumb's inset: concentric"),
-				bg = "$zeron.segmented.thumb",
+				bg = "$zeren.segmented.thumb",
 				w = motion.spring(ui.computed(function(): number
 					return width(index:get() + 1)
 				end), SPRING),
@@ -178,6 +178,6 @@ return function(props: Props): Node
 		),
 		table.unpack(segments),
 	}
-	control.contain(track, { radius = TRACK_RADIUS, inset = "$zeron.space.hair" })
+	control.contain(track, { radius = TRACK_RADIUS, inset = "$zeren.space.hair" })
 	return ui.row(track)
 end

@@ -4,7 +4,7 @@
 -- exactly as it names it (selectors, screens, programs, its agents' tools).
 -- Its window is its own (ui/consent.luau): no plugin and no template runs
 -- there, and only that window can allow anything (`plugins.decide`), so
--- nothing standing in for Zeron's screens can say yes on your behalf.
+-- nothing standing in for Zeren's screens can say yes on your behalf.
 --
 -- The host publishes what to show as `consent`:
 --   { item = PluginItem?, busy = boolean, error = string?,
@@ -41,7 +41,7 @@ local function busy(): boolean
 end
 
 -- A version as a version reads (`1.2.0`, `0.3.0-beta.1`), else nothing:
--- never words that could pass for a badge of Zeron's.
+-- never words that could pass for a badge of Zeren's.
 local function version(it: any): string?
 	local v = it.version
 	if type(v) ~= "string" or #v == 0 or #v > 32 or not string.match(v, "^[%w%.%+%-]+$") then
@@ -66,7 +66,7 @@ local function literal(list: { string }?): Node?
 			wrap = true,
 		})
 	end
-	return ui.column { w_full = true, gap = "$zeron.space.hair", table.unpack(rows) }
+	return ui.column { w_full = true, gap = "$zeren.space.hair", table.unpack(rows) }
 end
 
 -- Named things with their own words: a tool's name, and what it tells
@@ -79,7 +79,7 @@ local function named(list: { words.Item }?): Node?
 	for _, t in list do
 		table.insert(rows, ui.column {
 			w_full = true,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			ui.text { t.name, font = "$font.mono", text_size = "$font.size.sm", line_height = "$font.line.sm", color = "$text.primary", wrap = true },
 			if t.description
 				then ui.text { t.description, text_size = "$font.size.sm", line_height = "$font.line.sm", color = "$text.secondary", wrap = true }
@@ -96,14 +96,14 @@ local function line(l: words.Line): Node
 		gap = "$space.3",
 		items = "start",
 		ui.div {
-			pt = "$zeron.space.hair",
-			color = if l.risky then "$zeron.tone.danger.ink" else "$text.secondary",
+			pt = "$zeren.space.hair",
+			color = if l.risky then "$zeren.tone.danger.ink" else "$text.secondary",
 			ds.Icon { name = l.icon :: any, size = 16 },
 		},
 		ui.column {
 			grow = 1,
 			min_w = 0,
-			gap = "$zeron.space.hair",
+			gap = "$zeren.space.hair",
 			-- (Read as it's drawn: words.Line's words follow the locale.)
 			ui.text {
 				function(): string
@@ -111,7 +111,7 @@ local function line(l: words.Line): Node
 				end,
 				text_size = "$font.size.md",
 				line_height = "$font.line.md",
-				color = if l.risky then "$zeron.tone.danger.ink" else "$text.primary",
+				color = if l.risky then "$zeren.tone.danger.ink" else "$text.primary",
 				wrap = true,
 			},
 			if l.detail
@@ -158,7 +158,7 @@ local function author(it: any): Node
 	return ds.Badge { ui.t("plugins.words.unverified"), tone = "warning", icon = "danger-triangle" }
 end
 
--- (The host's reason as it gives it; else Zeron's words.)
+-- (The host's reason as it gives it; else Zeren's words.)
 local function why_unknown(it: any): string | Message
 	local reason = it.author and it.author.reason
 	if it.status == "tampered" then
@@ -333,7 +333,7 @@ local Sheet = ui.component(function(props: { it: any, elsewhere: string? }): Nod
 					else nil,
 				if #grew > 0 then section(ui.t("plugins.consent.grew"), grew) else nil,
 				asks,
-				-- What of Zeron's interface it reaches, exactly: quiet, folded
+				-- What of Zeren's interface it reaches, exactly: quiet, folded
 				-- away, never an ask of its own.
 				if #details > 0
 					then ui.column {
@@ -365,7 +365,7 @@ local Sheet = ui.component(function(props: { it: any, elsewhere: string? }): Nod
 									for _, d in details do
 										table.insert(out, ui.column {
 											w_full = true,
-											gap = "$zeron.space.hair",
+											gap = "$zeren.space.hair",
 											ui.text { d.title, text_size = "$font.size.sm", color = "$text.secondary" },
 											literal(d.list),
 										})
@@ -416,7 +416,7 @@ local Sheet = ui.component(function(props: { it: any, elsewhere: string? }): Nod
 					return consent:get().error or ""
 				end,
 				text_size = "$font.size.sm",
-				color = "$zeron.tone.danger.ink",
+				color = "$zeren.tone.danger.ink",
 				wrap = true,
 			}),
 			ui.switch(function(): string

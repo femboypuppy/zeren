@@ -7,7 +7,7 @@ local state = require("@screens/onboarding/state")
 local actions = require("@screens/onboarding/actions")
 local api = require("@account/api")
 
--- Zeron isn't here (a test host has no `account.*`): what setup tells it
+-- Zeren isn't here (a test host has no `account.*`): what setup tells it
 -- goes nowhere.
 local function nowhere(): any
 	return { after = function() end }
@@ -65,7 +65,7 @@ type Run = {
 	passed: { string }?,
 }
 
--- A run, as `signed_in` (or `skip_sign_in`) leaves it once Zeron answered.
+-- A run, as `signed_in` (or `skip_sign_in`) leaves it once Zeren answered.
 local function run(r: Run): string
 	state.path:set(r.path :: any)
 	state.name_done:set(r.name_done == true)
@@ -222,7 +222,7 @@ test("the dots count every step and never move", function()
 	expect(last).to_be(3)
 end)
 
-test("someone who already had Zeron is welcomed with only their username and card", function()
+test("someone who already had Zeren is welcomed with only their username and card", function()
 	state.welcome = true
 	-- No username yet, whatever else their account had finished.
 	expect(run { path = "signed_in", passed = { "appearance", "org", "invite", "github", "providers" } }).to_be("username")

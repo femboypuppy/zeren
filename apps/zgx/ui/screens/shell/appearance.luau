@@ -27,7 +27,7 @@
 -- A plugin offers a wallpaper by replacing a new chat's background place
 -- (`#new-chat-background`, in its manifest's `ui.change`; the place provides
 -- `pointer` = { x, y }, 0 to 1) and declaring a `wallpaper` setting, the
--- row Zeron draws on its settings page to use it. Zeron's effect is drawn
+-- row Zeren draws on its settings page to use it. Zeren's effect is drawn
 -- over whatever stands there.
 
 local state = require("@app/screens/onboarding/state")
@@ -67,7 +67,7 @@ do
 		-- A retired choice (a scene's name, the wallpaper folder).
 		M.wallpaper:set("none")
 	end
-	-- (Blur went: Zeron's effects are these.)
+	-- (Blur went: Zeren's effects are these.)
 	for _, e in { M.effect, M.plugin_effect } do
 		if not EFFECTS[e:peek()] then
 			e:set("none")

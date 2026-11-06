@@ -131,9 +131,9 @@ test("the home says where the session runs: its device, project and branch, by n
 	local app = home()
 	expect(app:has('#panel-home-device >> \"work-laptop\"')).to_be(true)
 	expect(app:has('#panel-home-project >> \"comet-native\"')).to_be(true)
-	expect(app:has('#panel-home-branch >> \"zeron/panel-home\"')).to_be(true)
+	expect(app:has('#panel-home-branch >> \"zeren/panel-home\"')).to_be(true)
 	-- What the branch adds is a plugin's to say (Git's, in the row's
-	-- `zeron.panel.branch` slot: src/plugins/examples_tests.rs); with none,
+	-- `zeren.panel.branch` slot: src/plugins/examples_tests.rs); with none,
 	-- the name alone, and nothing of git asked by core.
 	app:frames(10)
 	expect(app:has('#panel-home-branch >> "+324962"')).to_be(false)
@@ -262,7 +262,7 @@ test("Add action asks for a name and a command, then adds it; an import comes fi
 	expect(eventually(app, function(): boolean
 		return closed(app, "Add action")
 	end)).to_be(true)
-	-- An import from zeron.json: the editor, filled in from it.
+	-- An import from zeren.json: the editor, filled in from it.
 	app:click('role:button "Import Tests"')
 	expect(app:wait('role:dialog >> "Add action"', { timeout_ms = 15000 })).to_be(true)
 	app:frames(30)
@@ -326,7 +326,7 @@ test("actions that couldn't load say why, and Retry loads them", function()
 	app:set_state("panel_home_actions", {})
 	app:set_state("test_home_generation", 2)
 	app:frames(20)
-	expect(app:wait('"The engine couldn\'t read zeron.json"', { timeout_ms = 15000 })).to_be(true)
+	expect(app:wait('"The engine couldn\'t read zeren.json"', { timeout_ms = 15000 })).to_be(true)
 	app:command("actions_ok")
 	app:click("#panel-home-actions-retry")
 	expect(app:wait('role:button "Run Dev server"', { timeout_ms = 15000 })).to_be(true)

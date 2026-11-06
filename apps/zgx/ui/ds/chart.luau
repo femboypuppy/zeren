@@ -74,7 +74,7 @@ return ui.component(function(props: Props): Node
 		for _, s in series do
 			count = math.max(count, #(s.values or {}))
 		end
-		local size = n("zeron.visual.text.xs.size", 12)
+		local size = n("zeren.visual.text.xs.size", 12)
 		local faint, grid, axis = "$text.tertiary", "$border.subtle", "$border"
 		-- The insets: the widest tick label on the left (a horizontal
 		-- chart's, its widest category), the categories' line underneath.
@@ -326,7 +326,7 @@ return ui.component(function(props: Props): Node
 		end
 		return out
 	end)
-	local text_sm = { size = "$zeron.visual.text.sm.size", line = "$zeron.visual.text.sm.line" }
+	local text_sm = { size = "$zeren.visual.text.sm.size", line = "$zeren.visual.text.sm.line" }
 	return ui.column {
 		class = "chart",
 		w_full = true,
@@ -362,7 +362,7 @@ return ui.component(function(props: Props): Node
 					end
 					return ui.row {
 						items = "center",
-						gap = "$zeron.space.tight",
+						gap = "$zeren.space.tight",
 						ui.div {
 							w = DOT,
 							h = DOT,

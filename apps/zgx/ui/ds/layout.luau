@@ -5,7 +5,7 @@
 --   Divider { label = "or" }           with a word in it
 --   Divider { vertical = true }        between a bar's groups
 --   Link { "Learn more", on_click = … } inline, the accent's ink
---   Breadcrumbs { items = { { label = "zeron" }, { label = "ds" }, { label = "badge.luau" } } }
+--   Breadcrumbs { items = { { label = "zeren" }, { label = "ds" }, { label = "badge.luau" } } }
 --   KeyValue { items = { { key = "Branch", value = "main" }, … } }
 
 local Icon = require("@self/icon")
@@ -68,12 +68,12 @@ function M.Link(props: LinkProps): Node
 		label = props[1],
 		focusable = true,
 		cursor = "pointer",
-		gap = "$zeron.space.hair",
+		gap = "$zeren.space.hair",
 		items = "center",
 		shrink = 0,
 		rounded = "$radius.sm",
-		color = if quiet then "$text.secondary" else "$zeron.tone.accent.ink",
-		hover = { underline = true, color = if quiet then "$text.primary" else "$zeron.tone.accent.ink" },
+		color = if quiet then "$text.secondary" else "$zeren.tone.accent.ink",
+		hover = { underline = true, color = if quiet then "$text.primary" else "$zeren.tone.accent.ink" },
 		underline_offset = 3,
 		focus = control.ring,
 		on_click = props.on_click,
@@ -122,7 +122,7 @@ function M.Breadcrumbs(props: BreadcrumbsProps): Node
 		}
 		table.insert(out, crumb)
 	end
-	return ui.row { role = "group", label = locale.t("ds.layout.breadcrumbs"), gap = "$zeron.space.hair", items = "center", min_w = 0, table.unpack(out) }
+	return ui.row { role = "group", label = locale.t("ds.layout.breadcrumbs"), gap = "$zeren.space.hair", items = "center", min_w = 0, table.unpack(out) }
 end
 
 -- A key–value list: what something is, a fact a line (a commit's author,

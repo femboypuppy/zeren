@@ -199,7 +199,7 @@ describe("R17: a lookup says who, how sure, and what to compare", () => {
 
   it("keeps brand, staff and lookalike names from being claimed", async () => {
     const { userId } = await person();
-    for (const name of ["github", "anthropic", "openai", "google", "apple", "microsoft", "wing", "admin", "support", "security", "zer0n", "the-zeron", "openai-dev", "github_bot", "g00gle", "adm1n", "zeron-support", "wingleeio"]) {
+    for (const name of ["github", "anthropic", "openai", "google", "apple", "microsoft", "wing", "admin", "support", "security", "zer0n", "the-zeren", "openai-dev", "github_bot", "g00gle", "adm1n", "zeren-support", "wingleeio"]) {
       const res = await edge(userId, "POST", "/username", { username: name });
       expect(res.status, name).toBe(403);
     }
@@ -361,7 +361,7 @@ describe("R24: invitations", () => {
   });
 
   it("refuses org names with links, addresses, lookalike letters or our name", async () => {
-    for (const name of ["Verify at evil.com", "https://x.test", "Zeron Security", "Zer0n Team", "Acme‮gnp", "Pаypal Support", "Login www.example", "mail me@x.io", "GitHub", "Open AI"]) {
+    for (const name of ["Verify at evil.com", "https://x.test", "Zeren Security", "Zer0n Team", "Acme‮gnp", "Pаypal Support", "Login www.example", "mail me@x.io", "GitHub", "Open AI"]) {
       const { userId } = await person();
       const created = await auth("POST", "/auth/orgs", userId, { json: { name } });
       expect(created.status, name).toBe(400);
@@ -372,7 +372,7 @@ describe("R24: invitations", () => {
   });
 
   it("checks a name when it's set: an org named before the rules keeps inviting, and can't be renamed to one", async () => {
-    for (const old of ["hata.dev", "Zeron", "Acme‮gnp", "Pаypal"]) {
+    for (const old of ["hata.dev", "Zeren", "Acme‮gnp", "Pаypal"]) {
       const orgId = newId("org");
       const a = await person(orgId, "admin");
       // Named in WorkOS before the edge checked names.

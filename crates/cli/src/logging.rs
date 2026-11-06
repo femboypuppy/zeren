@@ -1,4 +1,4 @@
-//! Logging and process setup for `zeron`'s modes: stdout or stderr, a
+//! Logging and process setup for `zeren`'s modes: stdout or stderr, a
 //! bounded log file per long-running mode, panics into the log, and glibc's
 //! arenas kept trimmed.
 
@@ -31,8 +31,8 @@ pub fn spawn_malloc_trimmer() {
     }
 }
 
-/// Logging for a process: stdout (stderr for `zeron mcp`, whose stdout is
-/// the protocol), mirrored to `{data_dir}/logs/zeron-{mode}.log` for
+/// Logging for a process: stdout (stderr for `zeren mcp`, whose stdout is
+/// the protocol), mirrored to `{data_dir}/logs/zeren-{mode}.log` for
 /// long-running modes — a process launched from Finder or by the app has no
 /// visible output. Long-running modes log at info, one-shot commands at warn
 /// (`RUST_LOG` overrides either).
@@ -94,7 +94,7 @@ pub fn long_running_setup() {
     spawn_malloc_trimmer();
 }
 
-/// `{data_dir}/logs/zeron-{mode}.log`, previous launch preserved as `.old`.
+/// `{data_dir}/logs/zeren-{mode}.log`, previous launch preserved as `.old`.
 /// Headed and headless are separate files so an embedded-engine app and a
 /// daemon on the same machine never interleave writes.
 ///
@@ -105,7 +105,7 @@ pub fn long_running_setup() {
 /// second unlinked it entirely, and the daemon spent the rest of the incident
 /// logging to an orphaned inode (an entire day of sync diagnostics gone at
 /// the exact moment they were needed). A launch that finds the canonical file
-/// locked logs to `zeron-{mode}.{pid}.log` instead; the next lock-holding
+/// locked logs to `zeren-{mode}.{pid}.log` instead; the next lock-holding
 /// launch sweeps pid-suffixed files older than a week.
 pub fn open_log_file(mode: &str) -> Option<(std::fs::File, std::path::PathBuf)> {
     let dir = paths::data_dir().join("logs");
@@ -113,7 +113,7 @@ pub fn open_log_file(mode: &str) -> Option<(std::fs::File, std::path::PathBuf)> 
 }
 
 /// How large a log grows before it moves to `.old`: the background engine
-/// and `zeron headless` run for weeks, and rotating only at launch would let
+/// and `zeren headless` run for weeks, and rotating only at launch would let
 /// their logs fill the disk.
 const LOG_LIMIT: u64 = 64 * 1024 * 1024;
 
@@ -193,7 +193,7 @@ fn open_log_file_in(
     mode: &str,
 ) -> Option<(std::fs::File, std::path::PathBuf)> {
     std::fs::create_dir_all(dir).ok()?;
-    let path = dir.join(format!("zeron-{mode}.log"));
+    let path = dir.join(format!("zeren-{mode}.log"));
     #[cfg(unix)]
     {
         use std::os::unix::io::AsRawFd;
@@ -209,7 +209,7 @@ fn open_log_file_in(
         let rc = unsafe { libc::flock(existing.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) };
         if rc != 0 {
             // A live process owns the canonical log — leave it alone.
-            let overflow = dir.join(format!("zeron-{mode}.{}.log", std::process::id()));
+            let overflow = dir.join(format!("zeren-{mode}.{}.log", std::process::id()));
             return std::fs::File::create(&overflow)
                 .ok()
                 .map(|file| (file, overflow));
@@ -219,7 +219,7 @@ fn open_log_file_in(
         // to rotate — the probe itself created the empty file.)
         drop(existing);
         if preexisting {
-            let _ = std::fs::rename(&path, dir.join(format!("zeron-{mode}.log.old")));
+            let _ = std::fs::rename(&path, dir.join(format!("zeren-{mode}.log.old")));
         }
         let file = std::fs::File::create(&path).ok()?;
         unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) };
@@ -228,7 +228,7 @@ fn open_log_file_in(
     }
     #[cfg(not(unix))]
     {
-        let _ = std::fs::rename(&path, dir.join(format!("zeron-{mode}.log.old")));
+        let _ = std::fs::rename(&path, dir.join(format!("zeren-{mode}.log.old")));
         std::fs::File::create(&path).ok().map(|file| (file, path))
     }
 }
@@ -241,7 +241,7 @@ mod rotating_log_tests {
     #[test]
     fn a_log_past_its_limit_moves_to_old_and_starts_over() {
         let dir = tempfile::tempdir().unwrap();
-        let path = dir.path().join("zeron-engine.log");
+        let path = dir.path().join("zeren-engine.log");
         let file = std::fs::File::create(&path).unwrap();
         let log = RotatingLog::new(file, path.clone(), 100);
         let mut writer = &log;
@@ -249,7 +249,7 @@ mod rotating_log_tests {
         // Over the limit: the next write rotates first.
         writer.write_all(b"fresh\n").unwrap();
         writer.flush().unwrap();
-        let old = dir.path().join("zeron-engine.log.old");
+        let old = dir.path().join("zeren-engine.log.old");
         assert_eq!(std::fs::metadata(&old).unwrap().len(), 120);
         assert_eq!(std::fs::read_to_string(&path).unwrap(), "fresh\n");
     }
@@ -265,14 +265,14 @@ mod log_file_tests {
         let dir = dir.path();
         // First launch owns the canonical file and keeps writing.
         let first = open_log_file_in(dir, "headed").expect("first log");
-        assert!(dir.join("zeron-headed.log").is_file());
+        assert!(dir.join("zeren-headed.log").is_file());
         // Second launch while the first is alive: canonical file untouched,
         // pid-suffixed overflow file instead (the 2026-08-04 clobber).
         let second = open_log_file_in(dir, "headed").expect("second log");
-        let pid_path = dir.join(format!("zeron-headed.{}.log", std::process::id()));
+        let pid_path = dir.join(format!("zeren-headed.{}.log", std::process::id()));
         assert!(pid_path.is_file(), "expected pid-suffixed overflow log");
         assert!(
-            !dir.join("zeron-headed.log.old").exists(),
+            !dir.join("zeren-headed.log.old").exists(),
             "live canonical log must not be rotated away"
         );
         drop(second);
@@ -280,21 +280,21 @@ mod log_file_tests {
         drop(first);
         let third = open_log_file_in(dir, "headed").expect("third log");
         assert!(
-            dir.join("zeron-headed.log.old").is_file(),
+            dir.join("zeren-headed.log.old").is_file(),
             "rotation resumes"
         );
         drop(third);
     }
 }
 
-/// Delete `zeron-{mode}.{pid}.log` overflow files older than a week — they
+/// Delete `zeren-{mode}.{pid}.log` overflow files older than a week — they
 /// only exist when a second instance raced a live one for the canonical log.
 #[cfg(unix)]
 fn sweep_stale_pid_logs(dir: &std::path::Path, mode: &str) {
     let Ok(entries) = std::fs::read_dir(dir) else {
         return;
     };
-    let prefix = format!("zeron-{mode}.");
+    let prefix = format!("zeren-{mode}.");
     let week = std::time::Duration::from_secs(7 * 24 * 60 * 60);
     for entry in entries.flatten() {
         let name = entry.file_name();

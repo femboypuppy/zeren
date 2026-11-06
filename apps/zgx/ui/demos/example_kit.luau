@@ -81,7 +81,7 @@ function M.stage(props: Stage): Node
 			rounded = "$radius.xl",
 			border = 1,
 			border_color = "$border.subtle",
-			bg = "$zeron.window",
+			bg = "$zeren.window",
 			overflow = "hidden",
 			table.unpack(screen),
 			lights(),
@@ -162,8 +162,8 @@ function M.window(props: { narrow: (() -> boolean)?, fixed: boolean?, [number]: 
 end
 
 -- Each page's glyph says what the page is: a person, tuning
--- dials, a keyboard; Zeron's own widget for Providers; people, a
--- plug, a wallet (Solar Linear, as Zeron's settings use).
+-- dials, a keyboard; Zeren's own widget for Providers; people, a
+-- plug, a wallet (Solar Linear, as Zeren's settings use).
 local PAGES: { SettingsTypes.NavItem } = {
 	{ heading = "Personal" },
 	{ value = "profile", label = "Profile", icon = "user-rounded" },

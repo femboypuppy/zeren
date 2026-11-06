@@ -18,7 +18,7 @@ test("Glass tint: the theme's own over a macOS-like blur or where unknown, more 
 end)
 
 test("Glass tint: a tint keeps that much of its see-through", function()
-	-- Zeron dark's (0.8 opaque) with none of its blur: 0.95.
+	-- Zeren dark's (0.8 opaque) with none of its blur: 0.95.
 	expect(glass_tint.thicker("#0b0b0dcc", 0.25)).to_be("#0b0b0df2")
 	expect(glass_tint.thicker("#0b0b0dcc", 1)).to_be("#0b0b0dcc")
 	expect(glass_tint.thicker("#0b0b0d", 0.25)).to_be_nil()

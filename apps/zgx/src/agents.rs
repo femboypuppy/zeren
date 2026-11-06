@@ -375,7 +375,7 @@ pub fn install(host: &ScriptHost) {
         if let Some(page) = page.filter(|p| openable(p))
             && let Err(error) = crate::auth::open_sign_in(&page)
         {
-            eprintln!("zeron-zgx: agents: the browser didn't open: {error}");
+            eprintln!("zeren-zgx: agents: the browser didn't open: {error}");
         }
     });
     let a = agents.clone();
@@ -583,7 +583,7 @@ impl Agents {
                     ("name", Value::from(h["name"].as_str().unwrap_or(id))),
                     ("mark", mark(id).map_or(Value::Nil, Value::from)),
                     // An agent added from the ACP registry: its one-ink icon
-                    // (it has no mark), and no accounts of Zeron's to show.
+                    // (it has no mark), and no accounts of Zeren's to show.
                     ("registry", Value::Bool(id.starts_with("acp."))),
                     ("icon", h["icon"].as_str().map_or(Value::Nil, Value::from)),
                     ("installed", Value::Bool(h["installed"].as_bool().unwrap_or(true))),
@@ -684,7 +684,7 @@ impl Agents {
         let params = addressed_to(target, params);
         engine::get().spawn(async move {
             if let Err(error) = engine::get().call(method, params).await {
-                eprintln!("zeron-zgx: agents: {method} failed: {error}");
+                eprintln!("zeren-zgx: agents: {method} failed: {error}");
             }
         });
     }
@@ -744,7 +744,7 @@ impl Agents {
         let params = self.addressed(params);
         engine::get().spawn(async move {
             if let Err(error) = engine::get().call(method, params).await {
-                eprintln!("zeron-zgx: agents: {method} failed: {error}");
+                eprintln!("zeren-zgx: agents: {method} failed: {error}");
             }
         });
     }
@@ -822,7 +822,7 @@ impl Agents {
                 self.publish();
             }
             // (Not told: the row offers the sign-in, as before.)
-            Err(error) => eprintln!("zeron-zgx: agents: {id} didn't say whether it's signed in: {error}"),
+            Err(error) => eprintln!("zeren-zgx: agents: {id} didn't say whether it's signed in: {error}"),
         }
     }
 
@@ -838,7 +838,7 @@ impl Agents {
                 Ok(Value::Nil)
             }
             Err(error) => {
-                eprintln!("zeron-zgx: agents: {id}'s key wasn't kept: {error}");
+                eprintln!("zeren-zgx: agents: {id}'s key wasn't kept: {error}");
                 Err(fail(&error))
             }
         }
@@ -862,7 +862,7 @@ impl Agents {
                 Ok(Value::Nil)
             }
             Err(error) => {
-                eprintln!("zeron-zgx: agents: {id} didn't sign out: {error}");
+                eprintln!("zeren-zgx: agents: {id} didn't sign out: {error}");
                 Err(fail(&error))
             }
         }
@@ -875,7 +875,7 @@ impl Agents {
             // (Another device's, asked before the switch: not shown.)
             Ok(_) if *self.target.borrow() != asked_of => {}
             Ok(snapshot) => self.take_accounts(&snapshot),
-            Err(error) => eprintln!("zeron-zgx: agents: accounts unavailable: {error}"),
+            Err(error) => eprintln!("zeren-zgx: agents: accounts unavailable: {error}"),
         }
     }
 
@@ -973,7 +973,7 @@ impl Agents {
                 Ok(Value::Nil)
             }
             Err(error) => {
-                eprintln!("zeron-zgx: agents: ActivateAgentAccount failed: {error}");
+                eprintln!("zeren-zgx: agents: ActivateAgentAccount failed: {error}");
                 if let (Some(before), Some(device)) = (before, self.device_accounts.borrow_mut().get_mut(&key)) {
                     device.accounts = before;
                 }
@@ -1036,7 +1036,7 @@ impl Agents {
                 Ok(Value::Nil)
             }
             Err(error) => {
-                eprintln!("zeron-zgx: agents: {id}'s code didn't finish the sign-in: {error}");
+                eprintln!("zeren-zgx: agents: {id}'s code didn't finish the sign-in: {error}");
                 self.settle(&id, generation, true);
                 Err(fail(&error))
             }
@@ -1075,7 +1075,7 @@ impl Agents {
         let start = match engine::get().call("StartAgentLogin", addressed_to(device, params)).await {
             Ok(start) => start,
             Err(error) => {
-                eprintln!("zeron-zgx: agents: {id}'s sign-in didn't start: {error}");
+                eprintln!("zeren-zgx: agents: {id}'s sign-in didn't start: {error}");
                 self.settle(&id, generation, true);
                 return Err(fail(&error));
             }
@@ -1095,7 +1095,7 @@ impl Agents {
             if let Some(url) = start["url"].as_str().filter(|u| !u.is_empty() && openable(u))
                 && let Err(error) = crate::auth::open_sign_in(url)
             {
-                eprintln!("zeron-zgx: agents: the browser didn't open: {error}");
+                eprintln!("zeren-zgx: agents: the browser didn't open: {error}");
             }
             if let Some(login) = self.logins.borrow_mut().get_mut(&id) {
                 login.code = true;
@@ -1111,7 +1111,7 @@ impl Agents {
                 && opened.as_deref() != Some(url)
             {
                 if let Err(error) = crate::auth::open_sign_in(url) {
-                    eprintln!("zeron-zgx: agents: the browser didn't open: {error}");
+                    eprintln!("zeren-zgx: agents: the browser didn't open: {error}");
                 }
                 opened = Some(url.to_string());
                 // Kept, for the card to open again.
@@ -1138,7 +1138,7 @@ impl Agents {
             let poll = match engine::get().call("PollAgentLogin", addressed_to(device, json!({ "loginId": login_id }))).await {
                 Ok(poll) => poll,
                 Err(error) => {
-                    eprintln!("zeron-zgx: agents: lost {id}'s sign-in: {error}");
+                    eprintln!("zeren-zgx: agents: lost {id}'s sign-in: {error}");
                     self.settle(&id, generation, true);
                     return Err(fail(&error));
                 }
@@ -1160,7 +1160,7 @@ impl Agents {
                 }
                 Some("error") => {
                     eprintln!(
-                        "zeron-zgx: agents: {id}'s sign-in failed: {}",
+                        "zeren-zgx: agents: {id}'s sign-in failed: {}",
                         poll["message"].as_str().unwrap_or("no reason given")
                     );
                     // An agent from the ACP registry says why in its own
@@ -1251,7 +1251,7 @@ impl Agents {
             }
             Ok(_) => Ok(Value::Nil),
             Err(error) => {
-                eprintln!("zeron-zgx: agents: {id} couldn't be turned {}: {error}", if enabled { "on" } else { "off" });
+                eprintln!("zeren-zgx: agents: {id} couldn't be turned {}: {error}", if enabled { "on" } else { "off" });
                 // The list as the engine has it, so the switch goes back.
                 self.publish();
                 Err(fail(&error))
@@ -1269,7 +1269,7 @@ impl Agents {
                 Ok(Value::Nil)
             }
             Err(error) => {
-                eprintln!("zeron-zgx: agents: {method} failed: {error}");
+                eprintln!("zeren-zgx: agents: {method} failed: {error}");
                 Err(fail(&error))
             }
         }
@@ -1314,7 +1314,7 @@ impl Agents {
         let (state, why) = match &reply {
             Ok(outcome) => reset_state(outcome["outcome"].as_str()),
             Err(error) => {
-                eprintln!("zeron-zgx: agents: the reset wasn't used: {error}");
+                eprintln!("zeren-zgx: agents: the reset wasn't used: {error}");
                 ("failed", Some(reset_failure(error)))
             }
         };
@@ -1374,7 +1374,7 @@ impl Agents {
                 Ok(Value::Nil)
             }
             Err(error) => {
-                eprintln!("zeron-zgx: agents: {id} didn't install: {error}");
+                eprintln!("zeren-zgx: agents: {id} didn't install: {error}");
                 self.publish();
                 Err(fail(&error))
             }
@@ -1575,10 +1575,10 @@ fn device_accounts_value(accounts: &[Json]) -> Value {
     let mut by: BTreeMap<&str, Vec<Value>> = BTreeMap::new();
     for account in accounts {
         let Some(harness) = account["harness"].as_str() else { continue };
-        let Ok(id) = serde_json::from_value::<zeron_proto::HarnessId>(account["harness"].clone()) else {
+        let Ok(id) = serde_json::from_value::<zeren_proto::HarnessId>(account["harness"].clone()) else {
             continue;
         };
-        if !(zeron_proto::providers::signs_in(id) && zeron_proto::providers::reports_usage(id)) {
+        if !(zeren_proto::providers::signs_in(id) && zeren_proto::providers::reports_usage(id)) {
             continue;
         }
         let windows: Vec<Value> = account["usageWindows"]
@@ -1599,7 +1599,7 @@ fn device_accounts_value(accounts: &[Json]) -> Value {
             ("active", Value::Bool(account["active"].as_bool().unwrap_or(false))),
             (
                 "can_switch",
-                Value::Bool(account["switchable"].as_bool().unwrap_or(false) && zeron_proto::providers::switches_accounts(id)),
+                Value::Bool(account["switchable"].as_bool().unwrap_or(false) && zeren_proto::providers::switches_accounts(id)),
             ),
             ("windows", Value::List(windows.into())),
         ];

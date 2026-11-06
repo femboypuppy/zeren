@@ -228,7 +228,7 @@ function M.queue(id: string, op: { [string]: any })
 	quietly(ui.call("chat.queue", args))
 end
 
--- Words put into the composer's draft (a plugin's `zeron.compose.insert`,
+-- Words put into the composer's draft (a plugin's `zeren.compose.insert`,
 -- a shortcut): at its end, on a line of their own unless `inline`, and
 -- the composer given the keys.
 function M.insert(text: string, inline: boolean?)
@@ -256,7 +256,7 @@ end
 
 -- A bare Escape no one else took (a menu, a dialog, a mention list, a
 -- question): with Settings' "Escape stops the agent" on, it stops the
--- chat shown's running turn, as Zeron's does (settings.rs
+-- chat shown's running turn, as Zeren's does (settings.rs
 -- `escape_stops_active_agent`). True if it did.
 -- The same for a chat beside the one shown (a side chat with the keyboard).
 function M.escape_chat(id: string, running: boolean): boolean

@@ -1,4 +1,4 @@
--- Zeron's design system, on zgx's primitives. Three layers, as zgx's
+-- Zeren's design system, on zgx's primitives. Three layers, as zgx's
 -- design guide has them: the theme (tokens.luau, themes/*.json) holds every
 -- value; the components here turn tokens into styles with `ui.variants`;
 -- the design lint (`ui.theme.strict`, on in every entry but the intro)
@@ -181,7 +181,7 @@ return {
 	GitHubBlock = require("@self/github_block"),
 	-- An agent on a device and its accounts (Settings → Providers' cards).
 	ProviderCard = require("@self/provider_card"),
-	-- An agent's mark: Zeron's own, a registry agent's icon, or its initial.
+	-- An agent's mark: Zeren's own, a registry agent's icon, or its initial.
 	AgentMark = require("@self/agent_mark"),
 	-- The accent the app is drawn in, as the material is (ds.material).
 	look = require("@self/look"),

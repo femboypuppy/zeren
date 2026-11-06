@@ -18,7 +18,7 @@
 //!   falling back to `-lc` if that produces nothing (some rc files hang or
 //!   `exec` a multiplexer when interactive).
 //! - The shell runs in its own session, without a controlling terminal: an
-//!   interactive shell cannot take over the terminal zeron was started from.
+//!   interactive shell cannot take over the terminal zeren was started from.
 //! - Output is read on a side thread into a shared buffer; the poll loop
 //!   returns as soon as the end marker appears, so init that blocks *after*
 //!   printing (or grandchildren inheriting the pipe) can't wedge us.
@@ -26,7 +26,7 @@
 //!   ($SHELL, the passwd entry, the platform default) share one overall
 //!   budget. macOS falls back to launchd's PATH when no shell answers.
 //!
-//! Set `ZERON_NO_LOGIN_SHELL=1` to disable the snapshot entirely.
+//! Set `ZEREN_NO_LOGIN_SHELL=1` to disable the snapshot entirely.
 
 use std::ffi::{OsStr, OsString};
 use std::sync::OnceLock;
@@ -79,7 +79,7 @@ pub fn login_shell_path() -> Option<&'static OsStr> {
 
 /// The PATH the user's own sessions get, beyond this process's: the login
 /// shell's on Unix; on Windows the persisted user + machine PATH, read fresh
-/// so a toolchain installed after zeron started is found without a restart.
+/// so a toolchain installed after zeren started is found without a restart.
 pub(crate) fn user_path() -> Option<OsString> {
     #[cfg(windows)]
     {
@@ -128,7 +128,7 @@ pub fn prewarm() {
     #[cfg(unix)]
     {
         let _ = std::thread::Builder::new()
-            .name("zeron-shell-env".into())
+            .name("zeren-shell-env".into())
             .spawn(|| {
                 let _ = login_shell_path();
             });
@@ -147,8 +147,8 @@ mod unix {
     use std::sync::{Arc, Mutex};
     use std::time::{Duration, Instant};
 
-    const BEGIN_MARKER: &str = "__ZERON_SHELL_ENV_BEGIN__";
-    const END_MARKER: &str = "__ZERON_SHELL_ENV_END__";
+    const BEGIN_MARKER: &str = "__ZEREN_SHELL_ENV_BEGIN__";
+    const END_MARKER: &str = "__ZEREN_SHELL_ENV_END__";
     /// Enough for any sane environment; a runaway rc file can't OOM us.
     const MAX_OUTPUT: usize = 2 * 1024 * 1024;
     const ATTEMPT_TIMEOUT: Duration = Duration::from_secs(5);
@@ -158,7 +158,7 @@ mod unix {
     const EXIT_FLUSH_GRACE: Duration = Duration::from_millis(250);
 
     pub(super) fn capture() -> Option<Snapshot> {
-        if std::env::var_os("ZERON_NO_LOGIN_SHELL").is_some_and(|v| !v.is_empty()) {
+        if std::env::var_os("ZEREN_NO_LOGIN_SHELL").is_some_and(|v| !v.is_empty()) {
             return None;
         }
         let deadline = Instant::now() + TOTAL_BUDGET;
@@ -291,11 +291,11 @@ mod unix {
             .stderr(Stdio::null())
             // Let rc files detect (and skip work for) this probe, mirroring
             // VSCODE_RESOLVING_ENVIRONMENT; TERM=dumb quiets fancy prompts.
-            .env("ZERON_RESOLVING_ENVIRONMENT", "1")
+            .env("ZEREN_RESOLVING_ENVIRONMENT", "1")
             .env("TERM", "dumb");
         // SAFETY: setsid is async-signal-safe. A new session has no
         // controlling terminal, so an interactive shell's job control cannot
-        // take the terminal's foreground from the zeron that launched it.
+        // take the terminal's foreground from the zeren that launched it.
         unsafe {
             cmd.pre_exec(|| {
                 libc::setsid();
@@ -316,7 +316,7 @@ mod unix {
         if let Some(mut stdout) = child.stdout.take() {
             let buf = Arc::clone(&buf);
             let _ = std::thread::Builder::new()
-                .name("zeron-shell-env-read".into())
+                .name("zeren-shell-env-read".into())
                 .spawn(move || {
                     let mut chunk = [0u8; 8192];
                     loop {
@@ -526,12 +526,12 @@ exit 1
             let shell = fake_shell(
                 dir.path(),
                 &format!(
-                    "#!/bin/sh\nPATH=\"/zeron-test/custom/bin:/usr/bin:/bin\"; export PATH\n{RUN_PAYLOAD}"
+                    "#!/bin/sh\nPATH=\"/zeren-test/custom/bin:/usr/bin:/bin\"; export PATH\n{RUN_PAYLOAD}"
                 ),
             );
             let path = snapshot_path(&shell, Duration::from_secs(10)).unwrap();
             let path = path.to_string_lossy();
-            assert!(path.starts_with("/zeron-test/custom/bin:"), "got: {path}");
+            assert!(path.starts_with("/zeren-test/custom/bin:"), "got: {path}");
         }
 
         #[test]
@@ -564,7 +564,7 @@ exit 1
             let shell = fake_shell(
                 dir.path(),
                 &format!(
-                    "#!/bin/sh\ncase \" $* \" in *\" -i \"*) sleep 60;; esac\nPATH=\"/zeron-test/fallback/bin:/usr/bin:/bin\"; export PATH\n{RUN_PAYLOAD}"
+                    "#!/bin/sh\ncase \" $* \" in *\" -i \"*) sleep 60;; esac\nPATH=\"/zeren-test/fallback/bin:/usr/bin:/bin\"; export PATH\n{RUN_PAYLOAD}"
                 ),
             );
             let start = Instant::now();
@@ -574,7 +574,7 @@ exit 1
             let path = snapshot_path(&shell, Duration::from_secs(3)).unwrap();
             assert!(
                 path.to_string_lossy()
-                    .starts_with("/zeron-test/fallback/bin"),
+                    .starts_with("/zeren-test/fallback/bin"),
                 "got: {}",
                 path.to_string_lossy()
             );

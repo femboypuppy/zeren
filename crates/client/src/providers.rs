@@ -16,7 +16,7 @@ use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex};
 
 use tokio::io::AsyncWriteExt as _;
-use zeron_proto::{
+use zeren_proto::{
     AgentAccount, AgentAccountsSnapshot, AgentAuthKind, AgentLoginMode, AgentLoginPoll,
     AgentLoginStart, AgentLoginStatus, HarnessId,
 };
@@ -56,7 +56,7 @@ impl Client {
             .relay
             .call(
                 device_id,
-                zeron_rpc::methods::START_AGENT_LOGIN,
+                zeren_rpc::methods::START_AGENT_LOGIN,
                 serde_json::json!({
                     "harness": harness,
                     "provider": provider,
@@ -93,7 +93,7 @@ impl Client {
             .relay
             .call(
                 device_id,
-                zeron_rpc::methods::POLL_AGENT_LOGIN,
+                zeren_rpc::methods::POLL_AGENT_LOGIN,
                 serde_json::json!({ "loginId": login_id }),
             )
             .await?;
@@ -123,7 +123,7 @@ impl Client {
         let snapshot = self
             .accounts_call(
                 device_id,
-                zeron_rpc::methods::COMPLETE_AGENT_LOGIN,
+                zeren_rpc::methods::COMPLETE_AGENT_LOGIN,
                 serde_json::json!({ "loginId": login_id, "code": code.trim() }),
             )
             .await;
@@ -145,7 +145,7 @@ impl Client {
                     .relay
                     .call(
                         &device_id,
-                        zeron_rpc::methods::CANCEL_AGENT_LOGIN,
+                        zeren_rpc::methods::CANCEL_AGENT_LOGIN,
                         serde_json::json!({ "loginId": login_id }),
                     )
                     .await;
@@ -205,7 +205,7 @@ impl Client {
                         .relay
                         .call(
                             &device_id,
-                            zeron_rpc::methods::RELAY_AGENT_LOGIN_CALLBACK,
+                            zeren_rpc::methods::RELAY_AGENT_LOGIN_CALLBACK,
                             serde_json::json!({
                                 "loginId": login,
                                 "requesterDeviceId": requester,
@@ -235,7 +235,7 @@ impl Client {
                             crate::provider_login::http_response(
                                 "502 Bad Gateway",
                                 &[("Content-Type", "text/plain; charset=utf-8")],
-                                "The computer didn't accept the sign-in. Go back to Zeron and try again.",
+                                "The computer didn't accept the sign-in. Go back to Zeren and try again.",
                             )
                             .as_bytes(),
                         )
@@ -268,7 +268,7 @@ impl Client {
                     .relay
                     .call(
                         device_id,
-                        zeron_rpc::methods::SET_HARNESS_ENABLED,
+                        zeren_rpc::methods::SET_HARNESS_ENABLED,
                         serde_json::json!({ "harness": harness, "enabled": enabled }),
                     )
                     .await?;
@@ -287,7 +287,7 @@ impl Client {
     pub async fn device_agent_accounts(&self, device_id: &str) -> Result<AgentAccountsSnapshot> {
         self.accounts_call(
             device_id,
-            zeron_rpc::methods::LIST_AGENT_ACCOUNTS,
+            zeren_rpc::methods::LIST_AGENT_ACCOUNTS,
             serde_json::json!({}),
         )
         .await
@@ -305,7 +305,7 @@ impl Client {
         }
         self.accounts_call(
             device_id,
-            zeron_rpc::methods::ACTIVATE_AGENT_ACCOUNT,
+            zeren_rpc::methods::ACTIVATE_AGENT_ACCOUNT,
             serde_json::json!({ "harness": harness, "accountId": account_id }),
         )
         .await
@@ -323,7 +323,7 @@ impl Client {
         }
         self.accounts_call(
             device_id,
-            zeron_rpc::methods::FORGET_AGENT_ACCOUNT,
+            zeren_rpc::methods::FORGET_AGENT_ACCOUNT,
             serde_json::json!({ "harness": harness, "accountId": account_id }),
         )
         .await
@@ -370,7 +370,7 @@ pub(crate) fn with_demo_toggles(demo: bool, mut list: Vec<HarnessInfo>) -> Vec<H
 }
 
 fn demo_accounts() -> AgentAccountsSnapshot {
-    let window = |label: &str, used: f32, hours: i64| zeron_proto::AgentUsageWindow {
+    let window = |label: &str, used: f32, hours: i64| zeren_proto::AgentUsageWindow {
         label: label.into(),
         used_fraction: used,
         resets_at: Some(chrono::Utc::now() + chrono::Duration::hours(hours)),

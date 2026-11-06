@@ -580,7 +580,7 @@ test("a send that wasn't delivered says so, and sends again", function()
 	expect(app:state("calls")).to_contain("retry:s1:lost1")
 end)
 
-test("no byline over a reply; its time and Copy show under it on hover, as Zeron's", function()
+test("no byline over a reply; its time and Copy show under it on hover, as Zeren's", function()
 	local app = mount("chat_fixture.luau")
 	app:resize(900, 700)
 	open(app, "s6")
@@ -673,7 +673,7 @@ test("a chat opened as it stands shows its end, with no runway under its last tu
 	local app = mount("chat_fixture.luau")
 	app:resize(960, 640)
 	open(app, "s8")
-	-- Zeron holds the view under a prompt only for a turn sent from this
+	-- Zeren holds the view under a prompt only for a turn sent from this
 	-- window: opened, the conversation fills the view to its end, its
 	-- earlier turn in sight above the last.
 	local tree = app:tree("#transcript")

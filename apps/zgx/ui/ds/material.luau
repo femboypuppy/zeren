@@ -1,4 +1,4 @@
--- How Zeron's surfaces stand: frosted (the window's glass; menus over the
+-- How Zeren's surfaces stand: frosted (the window's glass; menus over the
 -- platform's frosted material) or opaque (solid colours throughout). One
 -- setting for the whole app, kept across launches.
 --
@@ -36,18 +36,18 @@ function M.glass_theme(): { [string]: any }?
 end
 
 -- What a theme wears where nothing shows through, for one whose glass tones
--- would all but vanish on its solid window (`zeron.solid`): the page's card
+-- would all but vanish on its solid window (`zeren.solid`): the page's card
 -- and its edge, and muted text. Nil over glass, and for a theme that doesn't
 -- name its own.
 function M.solid_theme(): { [string]: any }?
-	if M.see_through() or ui.theme.get("zeron.solid.card") == nil then
+	if M.see_through() or ui.theme.get("zeren.solid.card") == nil then
 		return nil
 	end
 	return {
-		["zeron.inset.bg"] = "$zeron.solid.card",
-		["zeron.inset.edge"] = "$zeron.solid.edge",
-		["text.secondary"] = "$zeron.solid.secondary",
-		["text.tertiary"] = "$zeron.solid.tertiary",
+		["zeren.inset.bg"] = "$zeren.solid.card",
+		["zeren.inset.edge"] = "$zeren.solid.edge",
+		["text.secondary"] = "$zeren.solid.secondary",
+		["text.tertiary"] = "$zeren.solid.tertiary",
 	}
 end
 

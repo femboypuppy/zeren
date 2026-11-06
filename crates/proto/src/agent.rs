@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// The wire prefix of an agent added from the ACP registry: its harness
 /// slug is `acp.<registry id>` (`acp.gemini`), kept apart from the built-in
-/// slugs (the registry also lists agents Zeron drives itself, `cursor`,
+/// slugs (the registry also lists agents Zeren drives itself, `cursor`,
 /// `devin`, …) and safe as a directory name on every platform.
 pub const REGISTRY_SLUG_PREFIX: &str = "acp.";
 
@@ -234,7 +234,7 @@ pub enum HarnessInstallSource {
     Homebrew,
     Cargo,
     Vendor,
-    ManagedByZeron,
+    ManagedByZeren,
     #[default]
     Unknown,
 }
@@ -328,24 +328,24 @@ pub struct HarnessUpdateStatus {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub wait_reason: Option<String>,
     /// The installed release is known not to work with (or isn't supported
-    /// by) this engine's zeron.
+    /// by) this engine's zeren.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub compatibility: Option<HarnessCompatibility>,
-    /// A newer release exists, but zeron won't install it: it is known not
+    /// A newer release exists, but zeren won't install it: it is known not
     /// to work. Such a release is never reported as available.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub held_back: Option<HarnessCompatibility>,
 }
 
-/// How well a CLI release works with this zeron (see the engine's
+/// How well a CLI release works with this zeren (see the engine's
 /// compatibility policy).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum HarnessCompatibilityStatus {
     Supported,
-    /// Outside the releases this zeron was built and tested against.
+    /// Outside the releases this zeren was built and tested against.
     Unsupported,
-    /// Known not to work with this zeron.
+    /// Known not to work with this zeren.
     Broken,
 }
 
@@ -469,7 +469,7 @@ impl SandboxLevel {
 
 /// What an agent-made chat may run with: `sandbox` and `access` no more
 /// trusting than its creator's (`ceiling`), and whether either was lowered.
-/// A chat created through Zeron's MCP never gets more access than the chat
+/// A chat created through Zeren's MCP never gets more access than the chat
 /// that created it.
 pub fn cap_access(
     (sandbox, access): (SandboxLevel, AccessMode),
@@ -560,7 +560,7 @@ pub struct RunRequest {
     /// Absolute paths of image attachments already staged on the run device
     /// (composer uploads: UploadChunk/UploadCommit → durable path). The same
     /// paths also ride the prompt text as `Attached images (local files …)`
-    /// refs (zeron's `withAttachments` transport — that's what persists in the
+    /// refs (zeren's `withAttachments` transport — that's what persists in the
     /// doc); this field additionally lets a harness inline the bytes as image
     /// content blocks. Additive + serde-defaulted for wire compat.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -571,12 +571,12 @@ pub struct RunRequest {
     /// host ignores it and runs in `cwd` (the repo's main checkout).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub worktree: Option<WorktreeSpec>,
-    /// Zeron's own MCP server, injected by the HOST engine as it starts the
-    /// run: the `zeron mcp` subcommand of this same binary, pointed at the
+    /// Zeren's own MCP server, injected by the HOST engine as it starts the
+    /// run: the `zeren mcp` subcommand of this same binary, pointed at the
     /// engine's loopback IPC and stamped with the originating chat so the
     /// agent can spawn, read, and message side chats. Additive +
     /// serde-defaulted — an old host leaves it unset and the agent simply has
-    /// no Zeron tools; title runs never carry it.
+    /// no Zeren tools; title runs never carry it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mcp: Option<McpServer>,
     /// Native MCP servers from the host's plugins (those `on` with `native`
@@ -658,11 +658,11 @@ pub struct McpServer {
 }
 
 impl McpServer {
-    /// Set to `1` on Zeron's own server when its host turned the provider's
+    /// Set to `1` on Zeren's own server when its host turned the provider's
     /// native subagents off (Settings → Providers) and the chat has no
     /// parent: the agent delegates through this server's side chats instead,
     /// and the driver launches it without its subagent tools.
-    pub const SIDE_CHATS_ONLY_ENV: &'static str = "ZERON_SIDE_CHATS_ONLY";
+    pub const SIDE_CHATS_ONLY_ENV: &'static str = "ZEREN_SIDE_CHATS_ONLY";
 
     pub fn side_chats_only(&self) -> bool {
         self.env
@@ -681,7 +681,7 @@ impl McpServer {
 pub struct WorktreeSpec {
     /// The repo whose worktree to create (the space's folder on the host).
     pub repo_path: String,
-    /// Base ref the fresh `zeron/<name>` branch is created off.
+    /// Base ref the fresh `zeren/<name>` branch is created off.
     pub base: String,
     /// Owning project used to resolve host-local setup Actions. Optional for
     /// wire compatibility with clients that only request worktree creation.
@@ -838,7 +838,7 @@ pub const SUBAGENT_INPUT_KEEP: [&str; 5] = [
 ];
 
 /// Bounds on an agent's inline visual ([`AgentEvent::Visual`]): a Luau
-/// script Zeron runs in a sandbox and renders natively.
+/// script Zeren runs in a sandbox and renders natively.
 pub const VISUAL_MAX_BYTES: usize = 256 * 1024;
 pub const VISUAL_MAX_TITLE_CHARS: usize = 200;
 /// Files a visual may ship with (models, textures, environment maps).
@@ -1002,7 +1002,7 @@ pub enum DoneStatus {
 
 /// The normalized streaming event every harness emits.
 ///
-/// Mirrors zeron's `AgentEvent` tagged enum.
+/// Mirrors zeren's `AgentEvent` tagged enum.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum AgentEvent {
@@ -1022,7 +1022,7 @@ pub enum AgentEvent {
     },
     /// A raster image in the reply: one a harness generated (the engine
     /// materializes this path before publication) or one an agent showed with
-    /// Zeron's `show_image` MCP tool (already stored in uploads).
+    /// Zeren's `show_image` MCP tool (already stored in uploads).
     #[serde(rename_all = "camelCase")]
     GeneratedImage {
         id: String,
@@ -1031,8 +1031,8 @@ pub enum AgentEvent {
         mime_type: String,
     },
     /// An agent-authored visual shown inline in the reply: a Luau script
-    /// that builds native UI (`zeron-visual`). The engine emits it when the
-    /// agent calls Zeron's `show_visual` MCP tool; `path` is the stored
+    /// that builds native UI (`zeren-visual`). The engine emits it when the
+    /// agent calls Zeren's `show_visual` MCP tool; `path` is the stored
     /// script on the host device.
     Visual {
         id: String,

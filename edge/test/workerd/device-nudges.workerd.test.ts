@@ -24,13 +24,13 @@ it("migrates legacy receipts, keeps more than 256 wakes, and fences stale acknow
 
 it("replays unacknowledged frames and retires only the matching token", async () => {
   const room = env.DEVICE_ROOMS.get(env.DEVICE_ROOMS.idFromName(crypto.randomUUID()));
-  const headers = { "x-zeron-auth-user": "owner", upgrade: "websocket" };
+  const headers = { "x-zeren-auth-user": "owner", upgrade: "websocket" };
   const response = await room.fetch("https://test/ws?role=host&nudgeAck=1", { headers });
   expect(response.status).toBe(101);
   const ws = response.webSocket!; ws.accept(); ws.binaryType = "arraybuffer";
   const messages: Array<{ chatId: string; token: string }> = [];
   ws.addEventListener("message", e => { const frame=decodeDeviceFrame(new Uint8Array(e.data as ArrayBuffer)); messages.push(JSON.parse(new TextDecoder().decode(frame.payload))); });
-  const post = () => room.fetch("https://test/nudge", { method: "POST", headers: { "x-zeron-auth-user": "owner" }, body: JSON.stringify({chatId:"chat"}) });
+  const post = () => room.fetch("https://test/nudge", { method: "POST", headers: { "x-zeren-auth-user": "owner" }, body: JSON.stringify({chatId:"chat"}) });
   const posted = await post();
   expect(posted.status, await posted.text()).toBe(200);
   await expect.poll(() => messages.length).toBe(1);
@@ -50,7 +50,7 @@ it("replays unacknowledged frames and retires only the matching token", async ()
 
 it("drains 300 queued wakes through a bounded acknowledgment window", async () => {
   const room = env.DEVICE_ROOMS.get(env.DEVICE_ROOMS.idFromName(crypto.randomUUID()));
-  const response = await room.fetch("https://test/ws?role=host&nudgeAck=1", { headers: { "x-zeron-auth-user": "owner", upgrade: "websocket" } });
+  const response = await room.fetch("https://test/ws?role=host&nudgeAck=1", { headers: { "x-zeren-auth-user": "owner", upgrade: "websocket" } });
   const ws = response.webSocket!; ws.accept(); ws.binaryType = "arraybuffer";
   const seen = new Set<string>();
   ws.addEventListener("message", e => {
@@ -71,14 +71,14 @@ it("drains 300 queued wakes through a bounded acknowledgment window", async () =
 
 it("keeps legacy hosts usable without acknowledgment support", async () => {
   const room = env.DEVICE_ROOMS.get(env.DEVICE_ROOMS.idFromName(crypto.randomUUID()));
-  const response = await room.fetch("https://test/ws?role=host", { headers: { "x-zeron-auth-user": "owner", upgrade: "websocket" } });
+  const response = await room.fetch("https://test/ws?role=host", { headers: { "x-zeren-auth-user": "owner", upgrade: "websocket" } });
   const ws = response.webSocket!; ws.accept(); ws.binaryType = "arraybuffer";
   const messages: string[] = [];
   ws.addEventListener("message", e => {
     const frame = decodeDeviceFrame(new Uint8Array(e.data as ArrayBuffer));
     messages.push(JSON.parse(new TextDecoder().decode(frame.payload)).chatId);
   });
-  await room.fetch("https://test/nudge", {method:"POST",headers:{"x-zeron-auth-user":"owner"},body:JSON.stringify({chatId:"legacy"})});
+  await room.fetch("https://test/nudge", {method:"POST",headers:{"x-zeren-auth-user":"owner"},body:JSON.stringify({chatId:"legacy"})});
   await expect.poll(() => messages).toEqual(["legacy"]);
   await runInDurableObject(room, async (_i, state) => {
     expect(pendingNudges(state.storage.sql)).toEqual([]);

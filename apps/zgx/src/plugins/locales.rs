@@ -1,11 +1,11 @@
 //! A plugin's own words: `locales/<locale>.json` in its folder (`en.json`
-//! its source, as Zeron's ui/locales), each flattened to dotted keys and
+//! its source, as Zeren's ui/locales), each flattened to dotted keys and
 //! published to the plugin alone as `plugin.<id>.locales`
 //! (`{ en = { ["greeting.title"] = "…" }, ["zh-Hans"] = { … } }`). The SDK's
-//! `zeron.t` / `zeron.s` (plugins-sdk/zeron.luau) show them in the locale
+//! `zeren.t` / `zeren.s` (plugins-sdk/zeren.luau) show them in the locale
 //! the app shows, falling back to the plugin's English, then the key.
 //!
-//! zgx keeps one catalog per host (the app's: Zeron's own words, which the
+//! zgx keeps one catalog per host (the app's: Zeren's own words, which the
 //! lent design system shows), so a plugin's words are read here and
 //! formatted by the SDK, not by `ui.t`. A plugin with no `locales` folder
 //! gets an empty table and loses nothing.
@@ -38,13 +38,13 @@ pub fn read(dir: &Path) -> Json {
         let Some(locale) = path.file_stem().and_then(|s| s.to_str()).map(str::to_string) else { continue };
         total += std::fs::metadata(&path).map(|m| m.len()).unwrap_or(0);
         if total > MOST_BYTES {
-            eprintln!("zeron-zgx: {}: a plugin's locales hold more than 1 MB; the rest are left out", path.display());
+            eprintln!("zeren-zgx: {}: a plugin's locales hold more than 1 MB; the rest are left out", path.display());
             break;
         }
         let json: Json = match std::fs::read_to_string(&path).map_err(|e| e.to_string()).and_then(|t| serde_json::from_str(&t).map_err(|e| e.to_string())) {
             Ok(json) => json,
             Err(error) => {
-                eprintln!("zeron-zgx: {}: {error}", path.display());
+                eprintln!("zeren-zgx: {}: {error}", path.display());
                 continue;
             }
         };

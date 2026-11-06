@@ -254,7 +254,7 @@ S.cpp = [==[
 #include <memory>
 #include <string>
 
-namespace zeron {
+namespace zeren {
 
 template <typename T>
 class Cache final {
@@ -269,7 +269,7 @@ private:
 auto banner = R"html(<p class="x">raw "C++" string</p>)html";
 constexpr auto kLimit = 4'096ull;
 
-}  // namespace zeron
+}  // namespace zeren
 ]==]
 
 S.java = [==[
@@ -296,7 +296,7 @@ public final class Relay implements AutoCloseable {
 S.csharp = [==[
 using System.Text.Json;
 
-namespace Zeron.Sync;
+namespace Zeren.Sync;
 
 #nullable enable
 public sealed record Device(string Id, string Name, bool Online = false);
@@ -327,7 +327,7 @@ end
 
 S.json = [==[
 {
-  "name": "zeron",
+  "name": "zeren",
   "version": "0.2.129",
   "private": true,
   "engines": { "node": ">=20" },
@@ -341,7 +341,7 @@ S.json = [==[
 S.toml = [==[
 # Cargo manifest
 [package]
-name = "zeron-zgx"
+name = "zeren-zgx"
 version = "0.1.0"
 edition = "2021"
 published = 1979-05-27T07:32:00Z
@@ -351,7 +351,7 @@ zgx = { git = "https://github.com/zeronsh/zgx", branch = "main" }
 serde = { version = "1", features = ["derive"] }
 
 [[bin]]
-name = "zeron-zgx"
+name = "zeren-zgx"
 description = """
 A multi-line
 basic string."""
@@ -387,7 +387,7 @@ jobs:
 S.markdown = [==[
 # Release notes
 
-Zeron **0.2.129** reports itself as `CLAUDE_CODE_ENTRYPOINT` for every
+Zeren **0.2.129** reports itself as `CLAUDE_CODE_ENTRYPOINT` for every
 Claude it starts. See [the changelog](https://zeron.sh/changelog) and
 the _plan mode_ notes.
 
@@ -424,10 +424,10 @@ if [[ -z "$HOST" ]]; then
   exit 1
 fi
 
-cargo build --release -p zeron-engine 2>/dev/null | tee build.log
-scp target/release/zeron "$HOST":~/.local/bin/zeron
+cargo build --release -p zeren-engine 2>/dev/null | tee build.log
+scp target/release/zeren "$HOST":~/.local/bin/zeren
 ssh "$HOST" bash <<-EOF
-	systemctl --user restart zeron
+	systemctl --user restart zeren
 	echo "deployed $VERSION"
 EOF
 for f in logs/*.log; do gzip -9 "$f"; done
@@ -438,7 +438,7 @@ S.html = [==[
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Zeron &mdash; agents everywhere</title>
+  <title>Zeren &mdash; agents everywhere</title>
   <style>
     body { font: 15px/1.6 "Geist", sans-serif; color: #1b1b1d; }
   </style>
@@ -520,7 +520,7 @@ diff --git a/crates/ui/src/syntax_cache.rs b/crates/ui/src/syntax_cache.rs
 index 3f1c2a9..8b7afb3 100644
 --- a/crates/ui/src/syntax_cache.rs
 +++ b/crates/ui/src/syntax_cache.rs
-@@ -14,7 +14,7 @@ use zeron_syntax::{HighlightedDocument, LanguageId};
+@@ -14,7 +14,7 @@ use zeren_syntax::{HighlightedDocument, LanguageId};
  pub const QUERY_GENERATION: u32 = 1;
 -const MAX_DOCUMENTS: usize = 96;
 +const MAX_DOCUMENTS: usize = 128;

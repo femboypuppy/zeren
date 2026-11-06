@@ -3,7 +3,7 @@
 //! A Cloud device is an ordinary headless engine whose identity is not a
 //! WorkOS session but an Ed25519 key it enrolled with the edge once:
 //!
-//! - **Detection** at boot: `ZERON_RUNNER_ENROLL={orgId}.{userId}.{deviceId}.{code}`
+//! - **Detection** at boot: `ZEREN_RUNNER_ENROLL={orgId}.{userId}.{deviceId}.{code}`
 //!   naming the device `{data_dir}/runner.json` already holds (or no env) →
 //!   runner as persisted; the env naming a DIFFERENT device (or no
 //!   runner.json) → enroll as that device. A sandbox forked or restored from
@@ -17,20 +17,20 @@
 //!   (0600) and `{data_dir}/device-id` = the edge-minted device id. Network
 //!   failures retry with backoff; a 4xx is fatal (the one-time code is spent).
 //! - **Tokens**: `POST {edge}/runner/token` signed over
-//!   `zeron-runner-token\n{orgId}\n{userId}\n{deviceId}\n{ts}` — driven by
+//!   `zeren-runner-token\n{orgId}\n{userId}\n{deviceId}\n{ts}` — driven by
 //!   [`crate::Auth`]'s runner mode, so every room/relay/RPC bearer consumer
 //!   works unchanged.
 //! - **Heartbeat**: `POST {edge}/runner/heartbeat {activeRuns, clients}` every
 //!   60 s, feeding the CloudAccount DO's per-session idle sleep.
 //! - **Session**: every Cloud session runs in its own sandbox, provisioned with
-//!   `ZERON_CLOUD_{ACCOUNT,CHAT,REPO,PATH,BRANCH}` (persisted to
+//!   `ZEREN_CLOUD_{ACCOUNT,CHAT,REPO,PATH,BRANCH}` (persisted to
 //!   `cloud-session.json` for restarts). At boot it clones the project's
 //!   repository and checks out the session's branch ([`prepare_checkout`]);
 //!   runs wait for that, showing its steps live ([`setup_snapshot`]); its
 //!   device row carries the `cloud-session`
 //!   capability so device lists show the account's one Cloud device instead.
 //!
-//! The device's platform string comes from `ZERON_DEVICE_PLATFORM` (`cloud`
+//! The device's platform string comes from `ZEREN_DEVICE_PLATFORM` (`cloud`
 //! on a Cloud device); a `cloud` platform restricts the harness catalog to
 //! Codex + Claude Code (see [`crate::registry`]).
 
@@ -55,9 +55,9 @@ pub const SESSION_FILE: &str = "cloud-session.json";
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CloudSession {
-    /// The account's logical Cloud device (`ZERON_CLOUD_ACCOUNT`).
+    /// The account's logical Cloud device (`ZEREN_CLOUD_ACCOUNT`).
     pub account: String,
-    /// The session's top-level chat (`ZERON_CLOUD_CHAT`).
+    /// The session's top-level chat (`ZEREN_CLOUD_CHAT`).
     pub chat_id: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub repo: Option<String>,
@@ -75,11 +75,11 @@ impl CloudSession {
                 .filter(|v| !v.is_empty())
         };
         Some(Self {
-            account: get("ZERON_CLOUD_ACCOUNT")?,
-            chat_id: get("ZERON_CLOUD_CHAT")?,
-            repo: get("ZERON_CLOUD_REPO"),
-            path: get("ZERON_CLOUD_PATH"),
-            branch: get("ZERON_CLOUD_BRANCH"),
+            account: get("ZEREN_CLOUD_ACCOUNT")?,
+            chat_id: get("ZEREN_CLOUD_CHAT")?,
+            repo: get("ZEREN_CLOUD_REPO"),
+            path: get("ZEREN_CLOUD_PATH"),
+            branch: get("ZEREN_CLOUD_BRANCH"),
         })
     }
 
@@ -119,7 +119,7 @@ impl CloudSession {
             .filter(char::is_ascii_alphanumeric)
             .take(12)
             .collect();
-        format!("zeron/cloud-{short}")
+        format!("zeren/cloud-{short}")
     }
 
     /// The session repository as GitHub's `owner/name` (what a `github`
@@ -417,7 +417,7 @@ pub fn mark_setup_shown() {
 pub fn setup_snapshot(
     scope: &str,
     waited: Option<Duration>,
-) -> (Vec<zeron_doc::MessagePart>, bool) {
+) -> (Vec<zeren_doc::MessagePart>, bool) {
     let setup = SETUP.lock().unwrap_or_else(PoisonError::into_inner);
     (setup_parts(scope, &setup.steps, waited), setup.done)
 }
@@ -426,11 +426,11 @@ fn setup_parts(
     scope: &str,
     steps: &[SetupStep],
     waited: Option<Duration>,
-) -> Vec<zeron_doc::MessagePart> {
+) -> Vec<zeren_doc::MessagePart> {
     steps
         .iter()
         .map(|step| {
-            let mut input = serde_json::json!({ zeron_proto::CLOUD_SETUP_KEY: step.step });
+            let mut input = serde_json::json!({ zeren_proto::CLOUD_SETUP_KEY: step.step });
             if let Some(command) = &step.command {
                 input["command"] = serde_json::Value::String(command.clone());
             }
@@ -445,9 +445,9 @@ fn setup_parts(
                 "start" | "wake" => "machine",
                 other => other,
             };
-            zeron_doc::MessagePart::Tool {
-                id: zeron_proto::cloud_setup_part_id(scope, slot),
-                call: zeron_proto::ToolCall::Unknown {
+            zeren_doc::MessagePart::Tool {
+                id: zeren_proto::cloud_setup_part_id(scope, slot),
+                call: zeren_proto::ToolCall::Unknown {
                     name: step.name.clone(),
                     input: Some(input),
                 },
@@ -485,19 +485,19 @@ pub const RUNNER_FILE: &str = "runner.json";
 /// `{data_dir}/runner-key` — the Ed25519 private key, PKCS#8 DER, 0600.
 pub const RUNNER_KEY_FILE: &str = "runner-key";
 /// One-time enrollment directive set by the provisioning workflow.
-pub const ENROLL_ENV: &str = "ZERON_RUNNER_ENROLL";
+pub const ENROLL_ENV: &str = "ZEREN_RUNNER_ENROLL";
 /// Generic `Device::platform` override (`cloud` on a Cloud device).
-pub const PLATFORM_ENV: &str = "ZERON_DEVICE_PLATFORM";
+pub const PLATFORM_ENV: &str = "ZEREN_DEVICE_PLATFORM";
 /// How often a runner reports activity to its CloudDevice DO.
 pub const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(60);
 
 const HTTP_TIMEOUT: Duration = Duration::from_secs(15);
 const ENROLL_RETRY_BASE: Duration = Duration::from_secs(1);
 const ENROLL_RETRY_CAP: Duration = Duration::from_secs(60);
-const TOKEN_DOMAIN: &str = "zeron-runner-token";
-const GRANT_DOMAIN: &str = "zeron-vault-grant";
+const TOKEN_DOMAIN: &str = "zeren-runner-token";
+const GRANT_DOMAIN: &str = "zeren-vault-grant";
 
-/// This engine's `Device::platform`: `ZERON_DEVICE_PLATFORM` when set, else
+/// This engine's `Device::platform`: `ZEREN_DEVICE_PLATFORM` when set, else
 /// the OS (`macos` / `linux` / `windows`).
 pub fn device_platform() -> String {
     platform_from(std::env::var(PLATFORM_ENV).ok())
@@ -510,9 +510,9 @@ fn platform_from(value: Option<String>) -> String {
         .unwrap_or_else(|| std::env::consts::OS.to_string())
 }
 
-/// Whether this engine is a Cloud device (`ZERON_DEVICE_PLATFORM=cloud`).
+/// Whether this engine is a Cloud device (`ZEREN_DEVICE_PLATFORM=cloud`).
 pub fn is_cloud_platform() -> bool {
-    device_platform() == zeron_proto::CLOUD_PLATFORM
+    device_platform() == zeren_proto::CLOUD_PLATFORM
 }
 
 /// The persisted runner identity (`runner.json`).
@@ -525,7 +525,7 @@ pub struct RunnerConfig {
     pub edge_url: String,
 }
 
-/// A parsed `ZERON_RUNNER_ENROLL` value. `Debug` never prints the code.
+/// A parsed `ZEREN_RUNNER_ENROLL` value. `Debug` never prints the code.
 #[derive(Clone, PartialEq, Eq)]
 pub struct EnrollCode {
     pub org_id: String,
@@ -722,13 +722,13 @@ impl RunnerIdentity {
 pub(crate) fn http_client() -> reqwest::Client {
     reqwest::Client::builder()
         .timeout(HTTP_TIMEOUT)
-        .user_agent(concat!("zeron/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("zeren/", env!("CARGO_PKG_VERSION")))
         .build()
         .unwrap_or_else(|_| reqwest::Client::new())
 }
 
 /// Boot-time runner detection (see the module docs). Reads
-/// `ZERON_RUNNER_ENROLL` from the environment.
+/// `ZEREN_RUNNER_ENROLL` from the environment.
 pub async fn bootstrap(
     data_dir: &Path,
     edge_url: &str,
@@ -988,11 +988,11 @@ pub struct RelayActivity {
 impl RelayActivity {
     /// Wrap the relay-served RPC service so every request a remote device
     /// makes counts — except the relay's own liveness traffic
-    /// ([`zeron_rpc::is_liveness_probe`]) and requests that only look
+    /// ([`zeren_rpc::is_liveness_probe`]) and requests that only look
     /// ([`passive`]): an app merely open on a Cloud chat lists, reads and
     /// watches, and must not keep the machine awake (and billed). Echo
     /// keepalives are relay-control frames that never reach the service.
-    pub fn wrap(&self, inner: Arc<dyn zeron_rpc::RpcService>) -> Arc<dyn zeron_rpc::RpcService> {
+    pub fn wrap(&self, inner: Arc<dyn zeren_rpc::RpcService>) -> Arc<dyn zeren_rpc::RpcService> {
         Arc::new(CountingService {
             inner,
             activity: self.clone(),
@@ -1016,18 +1016,18 @@ impl RelayActivity {
 }
 
 struct CountingService {
-    inner: Arc<dyn zeron_rpc::RpcService>,
+    inner: Arc<dyn zeren_rpc::RpcService>,
     activity: RelayActivity,
 }
 
 #[async_trait::async_trait]
-impl zeron_rpc::RpcService for CountingService {
+impl zeren_rpc::RpcService for CountingService {
     async fn handle(
         &self,
         method: &str,
         params: serde_json::Value,
-    ) -> Result<zeron_rpc::RpcReply, zeron_rpc::RpcError> {
-        if !zeron_rpc::is_liveness_probe(method, &params) && !passive(method) {
+    ) -> Result<zeren_rpc::RpcReply, zeren_rpc::RpcError> {
+        if !zeren_rpc::is_liveness_probe(method, &params) && !passive(method) {
             self.activity.note();
         }
         self.inner.handle(method, params).await
@@ -1061,7 +1061,7 @@ pub fn passive(method: &str) -> bool {
         "UpdateStatus",
     ];
     LOOKS.iter().any(|prefix| method.starts_with(prefix))
-        || method == zeron_rpc::methods::SET_VIEWPORT_FOCUS
+        || method == zeren_rpc::methods::SET_VIEWPORT_FOCUS
 }
 
 /// Post `{activeRuns, clients}` to `{edge}/runner/heartbeat` every `every`
@@ -1076,7 +1076,7 @@ pub fn passive(method: &str) -> bool {
 ///   fails to deliver carries its count over to the next one.
 pub fn spawn_heartbeat(
     edge_url: &str,
-    tokens: Arc<dyn zeron_rpc::TokenSource>,
+    tokens: Arc<dyn zeren_rpc::TokenSource>,
     active_runs: ActiveRuns,
     activity: RelayActivity,
     every: Duration,
@@ -1167,11 +1167,11 @@ mod tests {
 
     fn session_vars(name: &str) -> Option<String> {
         match name {
-            "ZERON_CLOUD_ACCOUNT" => Some("cloud-acct".into()),
-            "ZERON_CLOUD_CHAT" => Some("0123456789abcdef".into()),
-            "ZERON_CLOUD_REPO" => Some("https://github.com/acme/app.git".into()),
-            "ZERON_CLOUD_PATH" => Some("/home/user/app".into()),
-            "ZERON_CLOUD_BRANCH" => Some("main".into()),
+            "ZEREN_CLOUD_ACCOUNT" => Some("cloud-acct".into()),
+            "ZEREN_CLOUD_CHAT" => Some("0123456789abcdef".into()),
+            "ZEREN_CLOUD_REPO" => Some("https://github.com/acme/app.git".into()),
+            "ZEREN_CLOUD_PATH" => Some("/home/user/app".into()),
+            "ZEREN_CLOUD_BRANCH" => Some("main".into()),
             _ => None,
         }
     }
@@ -1181,7 +1181,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let session = CloudSession::resolve_with(dir.path(), session_vars).unwrap();
         assert_eq!(session.chat_id, "0123456789abcdef");
-        assert_eq!(session.session_branch(), "zeron/cloud-0123456789ab");
+        assert_eq!(session.session_branch(), "zeren/cloud-0123456789ab");
         // Next boot: the systemd env is gone, the file remains.
         assert_eq!(
             CloudSession::resolve_with(dir.path(), |_| None),
@@ -1192,7 +1192,7 @@ mod tests {
         assert_eq!(CloudSession::resolve_with(laptop.path(), |_| None), None);
         // Account + chat are required.
         assert_eq!(
-            CloudSession::resolve_with(laptop.path(), |name| (name == "ZERON_CLOUD_CHAT")
+            CloudSession::resolve_with(laptop.path(), |name| (name == "ZEREN_CLOUD_CHAT")
                 .then(|| "c".into())),
             None
         );
@@ -1222,15 +1222,15 @@ mod tests {
             ),
             step(
                 "branch",
-                "Couldn't check out zeron/cloud-x",
-                Some("git checkout -B zeron/cloud-x"),
+                "Couldn't check out zeren/cloud-x",
+                Some("git checkout -B zeren/cloud-x"),
                 Some("fatal: nope"),
                 false,
                 false,
             ),
             step(
                 "branch",
-                "Checking out zeron/cloud-y",
+                "Checking out zeren/cloud-y",
                 None,
                 None,
                 true,
@@ -1241,7 +1241,7 @@ mod tests {
         let summary: Vec<(String, String, Option<String>, bool, bool, Option<String>)> = parts
             .iter()
             .map(|part| match part {
-                zeron_doc::MessagePart::Tool {
+                zeren_doc::MessagePart::Tool {
                     id,
                     call,
                     output,
@@ -1249,13 +1249,13 @@ mod tests {
                     resolved,
                     ..
                 } => {
-                    let zeron_proto::ToolCall::Unknown { name, .. } = call else {
+                    let zeren_proto::ToolCall::Unknown { name, .. } = call else {
                         panic!("{call:?}")
                     };
                     (
                         id.clone(),
                         name.clone(),
-                        zeron_proto::cloud_setup_step(call).map(str::to_string),
+                        zeren_proto::cloud_setup_step(call).map(str::to_string),
                         *is_error,
                         *resolved,
                         output.clone(),
@@ -1296,7 +1296,7 @@ mod tests {
                 ),
                 row(
                     "m1.cloud-branch",
-                    "Couldn't check out zeron/cloud-x",
+                    "Couldn't check out zeren/cloud-x",
                     "branch",
                     true,
                     true,
@@ -1304,7 +1304,7 @@ mod tests {
                 ),
                 row(
                     "m1.cloud-branch",
-                    "Checking out zeron/cloud-y",
+                    "Checking out zeren/cloud-y",
                     "branch",
                     false,
                     false,
@@ -1394,7 +1394,7 @@ mod tests {
             .unwrap();
         assert_eq!(
             String::from_utf8_lossy(&head.stdout).trim(),
-            "zeron/cloud-abcdef0123"
+            "zeren/cloud-abcdef0123"
         );
         // A wake or restart keeps the working tree (uncommitted work included).
         std::fs::write(path.join("notes.txt"), "work in progress").unwrap();
@@ -1423,8 +1423,8 @@ mod tests {
         let steps: Vec<(String, bool, bool)> = parts
             .iter()
             .map(|part| match part {
-                zeron_doc::MessagePart::Tool {
-                    call: zeron_proto::ToolCall::Unknown { name, .. },
+                zeren_doc::MessagePart::Tool {
+                    call: zeren_proto::ToolCall::Unknown { name, .. },
                     is_error,
                     resolved,
                     ..
@@ -1439,7 +1439,7 @@ mod tests {
             [
                 step("Started a machine", false),
                 step(&format!("Cloned {origin_name}"), false),
-                step("Checked out zeron/cloud-abcdef0123", false),
+                step("Checked out zeren/cloud-abcdef0123", false),
                 step("Woke the machine", false),
                 step("Started a machine", false),
                 step(
@@ -1504,17 +1504,17 @@ mod tests {
         let key = UnparsedPublicKey::new(&ED25519, public);
 
         let token = id.token_request();
-        let message = format!("zeron-runner-token\norg_1\nuser_1\ncloud-1\n{}", token.ts);
+        let message = format!("zeren-runner-token\norg_1\nuser_1\ncloud-1\n{}", token.ts);
         key.verify(message.as_bytes(), &B64URL.decode(&token.sig).unwrap())
             .expect("token signature verifies");
 
         let grant = id.grant_request("codex", None);
         assert!(grant.ts > token.ts);
-        let message = format!("zeron-vault-grant\nuser_1\ncloud-1\ncodex\n{}", grant.ts);
+        let message = format!("zeren-vault-grant\nuser_1\ncloud-1\ncodex\n{}", grant.ts);
         key.verify(message.as_bytes(), &B64URL.decode(&grant.sig).unwrap())
             .expect("grant signature verifies");
         // A different domain never verifies (no cross-protocol replay).
-        let forged = format!("zeron-runner-token\nuser_1\ncloud-1\ncodex\n{}", grant.ts);
+        let forged = format!("zeren-runner-token\nuser_1\ncloud-1\ncodex\n{}", grant.ts);
         assert!(
             key.verify(forged.as_bytes(), &B64URL.decode(&grant.sig).unwrap())
                 .is_err()
@@ -1523,7 +1523,7 @@ mod tests {
 
     #[test]
     fn only_doing_something_keeps_a_cloud_machine_awake() {
-        use zeron_rpc::methods;
+        use zeren_rpc::methods;
         for method in [
             methods::LIST_REFS,
             methods::WATCH_DOC_MESSAGES,

@@ -45,10 +45,10 @@ pub(super) enum Engine {
 static WPE_FAILED: AtomicBool = AtomicBool::new(false);
 
 impl Engine {
-    /// `ZERON_BROWSER_ENGINE=gtk|wpe` overrides the default, WPE WebKit when
+    /// `ZEREN_BROWSER_ENGINE=gtk|wpe` overrides the default, WPE WebKit when
     /// this build embeds its helper.
     fn preferred() -> (Self, bool) {
-        match std::env::var("ZERON_BROWSER_ENGINE").as_deref() {
+        match std::env::var("ZEREN_BROWSER_ENGINE").as_deref() {
             Ok("gtk") => (Self::Gtk, true),
             Ok("wpe") => (Self::Wpe, true),
             _ if wpe::HELPER.is_empty() || WPE_FAILED.load(Ordering::Relaxed) => {
@@ -124,17 +124,17 @@ struct Route {
     evaluation: Mutex<Option<Value>>,
 }
 
-const GTK_HELPER: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/zeron-webkit"));
+const GTK_HELPER: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/zeren-webkit"));
 
 fn helper_path(engine: Engine) -> Result<std::path::PathBuf, String> {
     let root = std::env::var_os("XDG_CACHE_HOME")
         .map(std::path::PathBuf::from)
         .or_else(|| std::env::var_os("HOME").map(|p| std::path::PathBuf::from(p).join(".cache")))
         .ok_or("Could not locate the browser cache directory")?
-        .join("zeron/browser");
+        .join("zeren/browser");
     // Development builds can run a helper built on its own, e.g. instrumented.
     #[cfg(debug_assertions)]
-    if let (Engine::Wpe, Some(path)) = (engine, std::env::var_os("ZERON_WPE_HELPER")) {
+    if let (Engine::Wpe, Some(path)) = (engine, std::env::var_os("ZEREN_WPE_HELPER")) {
         return Ok(path.into());
     }
     match engine {
@@ -485,9 +485,9 @@ fn spawn_wpe(
     if let Some(profile) = profile {
         command.arg("--profile").arg(profile);
     }
-    // `ZERON_BROWSER_DMABUF=0` keeps frames in shared memory, rendered by the
+    // `ZEREN_BROWSER_DMABUF=0` keeps frames in shared memory, rendered by the
     // CPU; `readback` renders them on the GPU and reads them back.
-    let dmabuf = std::env::var("ZERON_BROWSER_DMABUF");
+    let dmabuf = std::env::var("ZEREN_BROWSER_DMABUF");
     if let Some(gpu) = gpu.filter(|_| dmabuf.as_deref() != Ok("0")) {
         command.arg("--render-node").arg(&gpu.render_node);
         // WebKit renders in one of these layouts where it can, so GPUI imports
@@ -798,7 +798,7 @@ impl NativePage {
         presenter.sync_focus(focused, window.is_window_active());
         presenter.paint(&self.route, &mut self.image, bounds, window);
     }
-    /// Whether WebKit gets vblanks: it wants them, and Zeron shows the page
+    /// Whether WebKit gets vblanks: it wants them, and Zeren shows the page
     /// rather than hiding it or showing its error instead.
     fn needs_vblank(&self) -> bool {
         self.route.surface.lock().unwrap().vsync
@@ -1046,7 +1046,7 @@ impl super::BrowserSurface {
         });
         true
     }
-    /// WebKit reads the system clipboard only through Zeron: refresh its copy
+    /// WebKit reads the system clipboard only through Zeren: refresh its copy
     /// before anything that pastes. No text clears it, so a paste never
     /// inserts what an earlier one shared.
     pub(super) fn linux_share_clipboard(&self, cx: &gpui::App) {
@@ -1400,7 +1400,7 @@ mod storage_tests {
         let root = tempfile::tempdir().unwrap();
         let profile = super::super::profile::BrowserProfile::for_workspace(
             root.path(),
-            Some(zeron_proto::WorkspaceScope::Local),
+            Some(zeren_proto::WorkspaceScope::Local),
             None,
             Some("device"),
         )

@@ -3,7 +3,7 @@
 Buttons that show only a glyph and had no tooltip now name what they do on
 hover, in the same chip their neighbours use.
 
-Captured on 2026-10-25 from `zeron/add-missing-button-tooltips` at `bdb4e0c4`
+Captured on 2026-10-25 from `zeren/add-missing-button-tooltips` at `bdb4e0c4`
 (on `main` `c04e3749`): light mode, window 1280×820 logical (2560×1640 px).
 
 A local capture driver, not part of this change, ran the production `Shell` in
@@ -52,7 +52,7 @@ the app's own message: the start failed before any audio device opened.
 compact picker's does ("Add GPT-5.4 to favorites"), and Back shows its
 shortcut ("Back · Esc").
 
-Validation: `cargo test -p zeron-ui --lib -- --test-threads=1` at `bdb4e0c4`
+Validation: `cargo test -p zeren-ui --lib -- --test-threads=1` at `bdb4e0c4`
 passed (1875 tests, 0 failed), and `git show --check` is clean. A parallel
 `cargo test` of the same suite aborts with SIGABRT on macOS without this change
 too; CI runs it under nextest, one process per test.
