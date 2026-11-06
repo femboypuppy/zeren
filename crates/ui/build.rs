@@ -7,6 +7,8 @@ fn main() {
         let object = out.join("voice-permission.o");
         assert!(
             Command::new("clang")
+                .arg("-target")
+                .arg(env::var("TARGET").unwrap())
                 .args(["-fobjc-arc", "-c", "src/dictation/permission.m", "-o"])
                 .arg(&object)
                 .status()

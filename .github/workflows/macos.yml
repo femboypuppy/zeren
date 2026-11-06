@@ -45,8 +45,8 @@ jobs:
   # compiled once (one cargo invocation, so dependencies are built once) and then run.
   macos-native:
     if: inputs.native
-    # shortcut: test natively on Intel while hosted ARM capacity is limited; restore ARM coverage when capacity recovers.
-    runs-on: macos-26-intel
+    # ONNX Runtime supplies macOS binaries for Apple silicon only.
+    runs-on: macos-15
     # A cold cache (first run, eviction, toolchain bump) takes about 32 minutes; warm is about 10.
     timeout-minutes: 45
     steps:
@@ -269,7 +269,7 @@ jobs:
           IPHONEOS_DEPLOYMENT_TARGET=26.0 cargo build --locked -p zeren-mobile --lib --target "$IOS_RUST_TARGET"
           mkdir -p target/ios-core/iphonesimulator/include
           cp "target/$IOS_RUST_TARGET/debug/libzeren_mobile.a" target/ios-core/iphonesimulator/
-          lipo -verify_arch "$(uname -m)" target/ios-core/iphonesimulator/libzeren_mobile.a
+          lipo target/ios-core/iphonesimulator/libzeren_mobile.a -verify_arch "$(uname -m)"
           cp apps/ios/CoreFFI/zeren_coreFFI.h target/ios-core/iphonesimulator/include/zeren_coreFFI.h
           cp apps/ios/CoreFFI/module.modulemap target/ios-core/iphonesimulator/include/module.modulemap
       - name: Run iOS unit tests

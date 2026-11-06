@@ -25,7 +25,7 @@ case "$ARCH" in
   arm64|x86_64) ;;
   *) echo "unsupported macOS binary architecture: $ARCH" >&2; exit 1 ;;
 esac
-lipo -verify_arch "$ARCH" "$BIN_DIR/zeren-engine"
+lipo "$BIN_DIR/zeren-engine" -verify_arch "$ARCH"
 APP="$OUT_DIR/Zeren.app"
 DMG="$OUT_DIR/zeren-$VERSION-macos-$ARCH.dmg"
 APP_TARBALL="$OUT_DIR/zeren-$VERSION-macos-$ARCH-app.tar.gz"
