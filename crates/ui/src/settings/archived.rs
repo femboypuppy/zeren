@@ -396,7 +396,7 @@ impl Render for ArchivedPage {
                             .text_color(theme.text_muted)
                             .opacity(0.8)
                             .when(is_busy, |el| el.opacity(0.4))
-                            .cursor_pointer()
+                            .cursor_default()
                             .hover(|s| s.bg(theme.surface_raised).text_color(theme.text))
                             .tab_index(0)
                             .role(gpui::Role::Button)

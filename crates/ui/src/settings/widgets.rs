@@ -424,7 +424,7 @@ pub fn option_card(
         .flex_col()
         .items_center()
         .gap(px(8.0))
-        .cursor_pointer()
+        .cursor_default()
         .child(
             div()
                 .h(px(OPTION_CARD_HEIGHT))
@@ -1144,7 +1144,7 @@ pub fn select_trigger(
         .flex_row()
         .items_center()
         .gap(px(8.0))
-        .cursor_pointer()
+        .cursor_default()
         .text_size(crate::typography::ui_rems(12.5))
         .text_color(theme.text)
         .tab_index(0)
@@ -1561,7 +1561,7 @@ pub fn action_button(theme: &Theme, tone: ActionTone) -> gpui::Div {
         .px(px(10.0))
         .py(px(5.0))
         .text_size(crate::typography::ui_rems(12.5))
-        .cursor_pointer();
+        .cursor_default();
     match tone {
         ActionTone::Quiet => button
             .text_color(theme.text_muted)

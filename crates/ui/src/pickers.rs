@@ -4194,7 +4194,7 @@ impl Pickers {
                 motion::hover_blend(&id, gpui::transparent_black(), theme.element_hover)
             })
             .on_hover(motion::hover_listener(id.clone()))
-            .cursor_pointer()
+            .cursor_default()
             .on_mouse_down(
                 gpui::MouseButton::Left,
                 cx.listener(move |this, _, _, _| {
@@ -4307,7 +4307,7 @@ impl Pickers {
                 motion::hover_blend(&id, gpui::transparent_black(), theme.element_hover)
             })
             .on_hover(motion::hover_listener(id.clone()))
-            .cursor_pointer()
+            .cursor_default()
             .on_mouse_down(
                 gpui::MouseButton::Left,
                 cx.listener(move |this, _, _, _| {
@@ -4823,7 +4823,7 @@ impl Pickers {
                     .border_1()
                     .border_color(theme.border)
                     .text_color(theme.text)
-                    .cursor_pointer()
+                    .cursor_default()
                     .hover(|s| s.bg(theme.element_hover))
                     .on_click(cx.listener(move |this, _, _, cx| match kind {
                         PickerKind::Branch | PickerKind::Checkout => this.ensure_refs(true, cx),
@@ -5280,7 +5280,7 @@ impl Pickers {
                 .flex()
                 .items_center()
                 .justify_center()
-                .cursor_pointer()
+                .cursor_default()
                 .when(!favorites_view, |el| {
                     el.hover(|s| s.bg(crate::theme::ink(0.06)))
                 })
@@ -5326,7 +5326,7 @@ impl Pickers {
                         .flex()
                         .items_center()
                         .justify_center()
-                        .cursor_pointer()
+                        .cursor_default()
                         .when(!is_viewed, |el| el.hover(|s| s.bg(crate::theme::ink(0.06))))
                         .tooltip(move |_, cx| cx.new(|_| compact::PickerHint(name.clone())).into())
                         .on_click(cx.listener(move |this, _, _, cx| {
@@ -5570,7 +5570,7 @@ impl Pickers {
             .flex_row()
             .items_center()
             .gap(px(10.0))
-            .cursor_pointer();
+            .cursor_default();
         // ONE moving highlight (t3/Base-UI combobox): hovering moves the
         // keyboard cursor instead of painting its own wash, so hover + arrow
         // cursor can never wear two washes at once. Selection is the
@@ -5785,7 +5785,7 @@ impl Pickers {
                 .flex()
                 .items_center()
                 .justify_center()
-                .cursor_pointer()
+                .cursor_default()
                 .hover(|s| s.bg(crate::theme::ink(0.08)))
                 .role(gpui::Role::Button)
                 .aria_label(star_hint.clone())

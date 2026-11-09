@@ -611,7 +611,7 @@ impl Shell {
                     } else {
                         crate::theme::ink(0.03)
                     })
-                    .cursor_pointer()
+                    .cursor_default()
                     .on_click(cx.listener(move |this, _, _, cx| {
                         if let Some(editor) = this.project_actions.editor.as_mut() {
                             editor.icon = kind;
@@ -635,7 +635,7 @@ impl Shell {
                     .flex()
                     .items_center()
                     .gap(px(9.0))
-                    .cursor_pointer()
+                    .cursor_default()
                     .on_click(cx.listener(|this, _, _, cx| {
                         if let Some(editor) = this.project_actions.editor.as_mut() {
                             editor.run_on_worktree_create = !editor.run_on_worktree_create;

@@ -1576,7 +1576,7 @@ impl AccountsPage {
             .gap(px(14.0))
             .when(can_switch, |row| {
                 let hover_key = format!("account-row-{ix}-hover");
-                row.cursor_pointer()
+                row.cursor_default()
                     .bg(crate::motion::hover_blend(
                         &hover_key,
                         theme.wash(0.0),
@@ -1721,7 +1721,7 @@ impl AccountsPage {
                 .text_size(crate::typography::ui_rems(12.0))
                 .text_color(theme.text_muted)
                 .truncate()
-                .cursor_pointer()
+                .cursor_default()
                 .hover(|s| s.text_color(theme.text))
                 .tab_index(0)
                 .role(gpui::Role::Button)
@@ -1946,7 +1946,7 @@ impl AccountsPage {
                     .role(gpui::Role::Button)
                     .aria_label("Retry loading accounts")
                     .tab_index(0)
-                    .cursor_pointer()
+                    .cursor_default()
                     .focus_visible(|s| s.border_2().border_color(theme.accent))
                     .on_click(cx.listener(|page, _, _, cx| {
                         page.load(force_usage_for(LoadTrigger::Retry), cx)
@@ -2223,7 +2223,7 @@ impl Render for AccountsPage {
                 vec![
                     widgets::error_strip(&theme, message)
                         .id("accounts-load-error")
-                        .cursor_pointer()
+                        .cursor_default()
                         .tab_index(0)
                         .role(gpui::Role::Button)
                         .focus_visible(|s| s.border_2().border_color(theme.accent).opacity(1.0))

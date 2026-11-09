@@ -3224,7 +3224,7 @@ impl Shell {
                                 .attention_sound_gate
                                 .should_play(std::time::Instant::now());
                         if should_play {
-                            crate::sound::play(sound);
+                            crate::sound::play(sound, self.settings.sound_completion_style);
                         }
                     }
                     if !engine_posts
@@ -3255,7 +3255,7 @@ impl Shell {
                         .attention_sound_gate
                         .should_play(std::time::Instant::now())
                 {
-                    crate::sound::play(sound);
+                    crate::sound::play(sound, self.settings.sound_completion_style);
                 }
                 if !engine_posts
                     && self.settings.notifications_enabled
@@ -6175,6 +6175,7 @@ impl Shell {
                         NotificationsPage::new(
                             self.settings.sound_enabled,
                             self.settings.sound_completion_enabled,
+                            self.settings.sound_completion_style,
                             self.settings.sound_input_enabled,
                             self.settings.sound_attention_enabled,
                             self.settings.notifications_enabled,
@@ -6190,6 +6191,7 @@ impl Shell {
                             let NotificationsEvent::Changed {
                                 sound,
                                 completion_sound,
+                                completion_style,
                                 input_sound,
                                 attention_sound,
                                 desktop,
@@ -6198,6 +6200,7 @@ impl Shell {
                             } = *event;
                             this.settings.sound_enabled = sound;
                             this.settings.sound_completion_enabled = completion_sound;
+                            this.settings.sound_completion_style = completion_style;
                             this.settings.sound_input_enabled = input_sound;
                             this.settings.sound_attention_enabled = attention_sound;
                             this.settings.notifications_enabled = desktop;
@@ -8810,7 +8813,7 @@ impl Shell {
                             .aria_label("Back")
                             .tab_index(0)
                             .focus_visible(|s| s.border_2().border_color(theme.accent))
-                            .cursor_pointer()
+                            .cursor_default()
                             .on_click(cx.listener(|this, _, _, cx| this.close_settings(cx)))
                             .child(icon(icons::ARROW_LEFT).size(px(16.0)).text_color(
                                 motion::hover_blend(
@@ -8952,7 +8955,7 @@ impl Shell {
                                         },
                                     ))
                                     .focus_visible(|s| s.border_2().border_color(theme.accent))
-                                    .cursor_pointer()
+                                    .cursor_default()
                                     .on_click(cx.listener(move |this, _, _, cx| {
                                         this.open_settings(item, cx)
                                     }))
@@ -9306,7 +9309,7 @@ impl Shell {
                 .h(px(14.0))
                 .flex()
                 .items_center()
-                .when(!preview, |el| el.cursor_pointer())
+                .when(!preview, |el| el.cursor_default())
                 .when(corner_hovered, |el| {
                     el.on_mouse_down(
                         MouseButton::Left,
@@ -9423,7 +9426,7 @@ impl Shell {
                         }
                     })
                 })
-                .cursor_pointer()
+                .cursor_default()
                 // Pressing, scrolling or opening the menu puts the hover card
                 // away: the row has the pointer's intent now.
                 .on_mouse_down(
@@ -9704,7 +9707,7 @@ impl Shell {
                                     "Session time"
                                 })
                                 .when(show_archive, |el| {
-                                    el.cursor_pointer()
+                                    el.cursor_default()
                                         .on_mouse_down(
                                             MouseButton::Left,
                                             cx.listener(|this, _, _, cx| {
@@ -10449,7 +10452,7 @@ impl Shell {
                 .text_size(crate::typography::ui_rems(11.0))
                 .font_weight(gpui::FontWeight::MEDIUM)
                 .text_color(tone)
-                .cursor_pointer()
+                .cursor_default()
                 .hover(move |s| s.bg(chip_bg_hover))
                 .on_click(cx.listener(|this, _, _, cx| {
                     cx.open_url(GITHUB_REPO_URL);
@@ -10475,7 +10478,7 @@ impl Shell {
                         .flex()
                         .items_center()
                         .justify_center()
-                        .cursor_pointer()
+                        .cursor_default()
                         .hover(move |s| s.bg(close_bg_hover))
                         .on_click(cx.listener(|this, _, _, cx| {
                             cx.stop_propagation();
@@ -10534,7 +10537,7 @@ impl Shell {
             .child(div().flex_1().min_w_0().child(label));
         if action != crate::app_update::StripAction::None {
             strip = strip
-                .cursor_pointer()
+                .cursor_default()
                 .hover(move |s| s.bg(chip_bg_hover))
                 .on_click(
                     cx.listener(move |this, _, _, cx| this.on_update_strip_click(action, cx)),
@@ -10825,7 +10828,7 @@ impl Shell {
                             gpui::Toggled::False
                         })
                         .focus_visible(|s| s.border_2().border_color(theme.accent))
-                        .cursor_pointer()
+                        .cursor_default()
                         .on_click(cx.listener(move |_, _, _, cx| {
                             if let Some(update) = crate::app_update::AppUpdate::global(cx) {
                                 update.update(cx, |update, cx| update.set_beta(!on, cx));
@@ -10888,7 +10891,7 @@ impl Shell {
                 )
             })
             .on_hover(motion::hover_listener("open-pull-requests"))
-            .cursor_pointer()
+            .cursor_default()
             .on_click(cx.listener(|this, _, _, cx| {
                 // Leaving Settings through its own footer is a plain route
                 // change; nothing there should grab focus on the way out.
@@ -10961,7 +10964,7 @@ impl Shell {
             } else {
                 motion::hover_blend("user-menu-trigger", theme.text.opacity(0.8), theme.text)
             })
-            .cursor_pointer()
+            .cursor_default()
             // user-menu.tsx trigger: hover `bg-white/[0.04]`, open state
             // (`data-[state=open]`) the slightly stronger `bg-white/[0.06]`;
             // the hover wash fades over `transition-colors`.
@@ -11170,7 +11173,7 @@ impl Shell {
                             .flex()
                             .items_center()
                             .justify_center()
-                            .cursor_pointer()
+                            .cursor_default()
                             .bg(if settings_open {
                                 theme.glass_hover()
                             } else {
@@ -12284,7 +12287,7 @@ impl Shell {
             .border_1()
             .border_color(theme.border)
             .when(!glass, |el| el.shadow_md())
-            .cursor_pointer()
+            .cursor_default()
             .bg(base)
             .on_hover(motion::hover_listener(hover_key))
             .on_click(cx.listener(move |_, _, _, cx| {
@@ -12722,7 +12725,7 @@ impl Shell {
                 .flex_row()
                 .items_center()
                 .gap(px(10.0))
-                .cursor_pointer()
+                .cursor_default()
                 .hover(move |s| s.bg(crate::theme::ink(0.05)).border_color(border_strong))
                 .child(icon(icon_path).size(px(15.0)).flex_none().text_color(muted))
                 .child(
@@ -13177,7 +13180,7 @@ impl Shell {
             .items_center()
             .justify_center()
             .rounded(px(6.0))
-            .cursor_pointer()
+            .cursor_default()
             .bg(motion::hover_blend(
                 plus_fade,
                 crate::theme::wash(0.0),
@@ -13491,7 +13494,7 @@ impl Shell {
                             .border_1()
                             .border_color(theme.border)
                             .text_color(theme.text)
-                            .cursor_pointer()
+                            .cursor_default()
                             .hover(|s| s.bg(theme.glass_hover()))
                             .on_click(cx.listener(|this, _, _, cx| this.load_orgs(cx)))
                             .child(SharedString::from("Retry")),
@@ -13508,7 +13511,7 @@ impl Shell {
                         div()
                             .id(("org-row", ix))
                             .when(submitting, |el| el.opacity(0.5))
-                            .cursor_pointer()
+                            .cursor_default()
                             .hover(|s| s.bg(theme.wash(0.04)))
                             .on_click(cx.listener(move |this, _, _, cx| {
                                 this.select_org(org_id.clone(), cx);
@@ -13638,7 +13641,7 @@ fn window_control_button_with(
         .items_center()
         .justify_center()
         .rounded(px(6.0))
-        .cursor_pointer()
+        .cursor_default()
         // zeren window-controls.tsx: `transition-colors` — the wash fades.
         .bg(motion::hover_blend(
             &fade_key,
@@ -13766,7 +13769,7 @@ fn linux_caption_button(
         .items_center()
         .justify_center()
         .rounded(px(6.0))
-        .cursor_pointer()
+        .cursor_default()
         .hover(move |style| style.bg(hover_bg))
         .role(gpui::Role::Button)
         .aria_label(label)
@@ -13849,7 +13852,7 @@ fn header_icon_button_with(
         .items_center()
         .justify_center()
         .rounded(px(6.0))
-        .cursor_pointer()
+        .cursor_default()
         // zeren __root.tsx header buttons: `transition-colors`.
         .bg(motion::hover_blend(
             &fade_key,

@@ -164,7 +164,7 @@ impl Shell {
             .flex()
             .items_center()
             .justify_center()
-            .cursor_pointer()
+            .cursor_default()
             .bg(motion::hover_blend(
                 FOOTER_HOVER,
                 theme.glass_hover().opacity(0.0),
@@ -242,7 +242,7 @@ impl Shell {
                 div()
                     .id("voice-failure-dismiss")
                     .flex_none()
-                    .cursor_pointer()
+                    .cursor_default()
                     .rounded(px(4.0))
                     .on_click(cx.listener(|this, _, _, cx| {
                         cx.stop_propagation();
@@ -311,7 +311,7 @@ impl Shell {
             .aria_label("Open voice")
             .tab_index(0)
             .rounded_full()
-            .cursor_pointer()
+            .cursor_default()
             .tooltip(stage_tooltip("Open voice"))
             .on_click(cx.listener(|this, _, _, cx| this.set_voice_stage_open(true, cx)))
             .child(self.voice_composer_orb.clone());
@@ -682,7 +682,7 @@ impl Shell {
             .flex()
             .items_center()
             .gap(px(8.0))
-            .cursor_pointer()
+            .cursor_default()
             .bg(motion::hover_blend(
                 "voice-bar-end",
                 popup.danger,
@@ -769,7 +769,7 @@ fn round_control(id: &'static str, theme: &Theme, active: bool) -> gpui::Statefu
         .flex()
         .items_center()
         .justify_center()
-        .cursor_pointer()
+        .cursor_default()
         .text_color(if active { theme.on_solid } else { theme.text })
         .bg(if active {
             theme.solid

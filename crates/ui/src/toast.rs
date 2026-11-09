@@ -521,7 +521,7 @@ pub fn render_toaster(window: &mut Window, cx: &mut App) -> Option<AnyElement> {
                     .text_color(theme.bg)
                     .text_size(crate::typography::ui_rems(12.0))
                     .font_weight(gpui::FontWeight::MEDIUM)
-                    .cursor_pointer()
+                    .cursor_default()
                     .hover(|style| style.opacity(0.85))
                     // Not the start of a swipe.
                     .on_mouse_down(gpui::MouseButton::Left, |_, _, cx| cx.stop_propagation())

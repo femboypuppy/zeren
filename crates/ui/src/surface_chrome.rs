@@ -59,7 +59,7 @@ pub(crate) fn tab_frame(
         .flex()
         .items_center()
         .gap(px(CONTROL_GAP))
-        .cursor_pointer()
+        .cursor_default()
         .role(gpui::Role::Button)
         .aria_selected(selected)
         .tab_index(0)
@@ -138,7 +138,7 @@ pub(crate) fn tab_chip(
         .flex_row()
         .items_center()
         .gap(px(3.0))
-        .cursor_pointer()
+        .cursor_default()
         .role(gpui::Role::Button)
         // The old session-tab strip's solved carve-out: NOT `.occlude()` — a
         // BlockMouse hitbox ends the hit test, so the scroll container behind

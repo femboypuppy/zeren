@@ -3568,7 +3568,7 @@ impl Changes {
             .gap(px(8.0))
             .px(px(Theme::SPACE_MD))
             .bg(rest_bg)
-            .cursor_pointer()
+            .cursor_default()
             .hover(move |s| s.bg(hover_bg))
             .on_click(cx.listener(move |this, _, _, cx| {
                 this.toggle_fold(ix, cx);
@@ -3738,7 +3738,7 @@ impl Changes {
             .items_center()
             .justify_center()
             .rounded(px(crate::surface_chrome::CONTROL_RADIUS))
-            .cursor_pointer()
+            .cursor_default()
             // Latched: the blend is neither read nor driven, and its listener
             // would dirty the whole window on every enter/leave for nothing.
             .map(|el| {
@@ -3885,7 +3885,7 @@ impl Changes {
             .items_center()
             .gap(px(6.0))
             .rounded(px(crate::surface_chrome::CONTROL_RADIUS))
-            .cursor_pointer()
+            .cursor_default()
             .bg(motion::hover_blend(
                 "changes-scope-trigger",
                 crate::theme::wash(0.05),
@@ -4114,7 +4114,7 @@ impl Changes {
             .items_center()
             .gap(px(4.0))
             .rounded(px(6.0))
-            .cursor_pointer()
+            .cursor_default()
             .bg(motion::hover_blend(
                 "changes-ref-trigger",
                 crate::theme::wash(0.0),

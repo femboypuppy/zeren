@@ -24,6 +24,9 @@ static TMP_COUNTER: AtomicU64 = AtomicU64::new(0);
 static SOUND_APPSHOT: &[u8] = include_bytes!("../assets/sounds/appshot.wav");
 
 static SOUND_DONE: &[u8] = include_bytes!("../assets/sounds/done.wav");
+static SOUND_SOFT_CHIME: &[u8] = include_bytes!("../assets/sounds/done-soft-chime.wav");
+static SOUND_WARM_BELL: &[u8] = include_bytes!("../assets/sounds/done-warm-bell.wav");
+static SOUND_QUIET_DROP: &[u8] = include_bytes!("../assets/sounds/done-quiet-drop.wav");
 static SOUND_REQUEST: &[u8] = include_bytes!("../assets/sounds/request.wav");
 static SOUND_ATTENTION: &[u8] = include_bytes!("../assets/sounds/attention.wav");
 static SOUND_VOICE_START: &[u8] = include_bytes!("../assets/sounds/voice-start.wav");
@@ -40,11 +43,50 @@ pub enum Sound {
     Attention,
 }
 
+/// Device-local completion cue, independent of the notification mute switches.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum CompletionSound {
+    WarmBell,
+    QuietDrop,
+    Original,
+    #[default]
+    #[serde(other)]
+    SoftChime,
+}
+
+impl CompletionSound {
+    pub const ALL: [Self; 4] = [
+        Self::SoftChime,
+        Self::WarmBell,
+        Self::QuietDrop,
+        Self::Original,
+    ];
+
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::SoftChime => "Soft Chime",
+            Self::WarmBell => "Warm Bell",
+            Self::QuietDrop => "Quiet Drop",
+            Self::Original => "Original",
+        }
+    }
+
+    fn data(self) -> &'static [u8] {
+        match self {
+            Self::SoftChime => SOUND_SOFT_CHIME,
+            Self::WarmBell => SOUND_WARM_BELL,
+            Self::QuietDrop => SOUND_QUIET_DROP,
+            Self::Original => SOUND_DONE,
+        }
+    }
+}
+
 /// Play a chime on a background thread. Silently a no-op when disabled or no
 /// player is available.
-pub fn play(sound: Sound) {
+pub fn play(sound: Sound, completion: CompletionSound) {
     let data = match sound {
-        Sound::Done => SOUND_DONE,
+        Sound::Done => completion.data(),
         Sound::Request => SOUND_REQUEST,
         Sound::Attention => SOUND_ATTENTION,
     };
@@ -384,6 +426,9 @@ mod tests {
     fn embedded_chimes_are_wav() {
         for data in [
             SOUND_DONE,
+            SOUND_SOFT_CHIME,
+            SOUND_WARM_BELL,
+            SOUND_QUIET_DROP,
             SOUND_REQUEST,
             SOUND_ATTENTION,
             #[cfg(any(target_os = "macos", target_os = "linux"))]

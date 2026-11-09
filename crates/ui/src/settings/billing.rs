@@ -672,7 +672,7 @@ impl BillingPage {
                 .focus_visible(move |s| s.border_2().border_color(accent))
                 .when(!enabled, |el| el.opacity(0.35))
                 .when(enabled, |el| {
-                    el.cursor_pointer()
+                    el.cursor_default()
                         .hover(|s| s.bg(theme.wash(0.06)))
                         .on_click(cx.listener(move |this, _, _, cx| {
                             this.packs =
@@ -868,7 +868,7 @@ impl Render for BillingPage {
             Loadable::Error(message) => vec![
                 widgets::error_strip(&theme, format!("Couldn't load billing: {message}"))
                     .id("billing-retry")
-                    .cursor_pointer()
+                    .cursor_default()
                     .on_click(cx.listener(|this, _, _, cx| {
                         this.status = Loadable::Idle;
                         this.load(cx);
@@ -920,7 +920,7 @@ impl Render for BillingPage {
                                     el.child(
                                         widgets::error_strip(&theme, message)
                                             .id("billing-error")
-                                            .cursor_pointer()
+                                            .cursor_default()
                                             .on_click(cx.listener(|this, _, _, cx| {
                                                 this.error = None;
                                                 cx.notify();

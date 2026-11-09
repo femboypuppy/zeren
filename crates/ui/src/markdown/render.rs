@@ -685,7 +685,7 @@ pub fn render_block(
                             )))
                             .checked(task.checked)
                             .disabled(toggle.is_none())
-                            .when(toggle.is_some(), |checkbox| checkbox.cursor_pointer())
+                            .when(toggle.is_some(), |checkbox| checkbox.cursor_default())
                             .focus_visible(|style| style.border_color(theme.text))
                             .styles(|styles| styles.disabled(|style| style.opacity(0.5)))
                             .on_mouse_down(gpui::MouseButton::Left, |_, _, cx| {
@@ -1705,8 +1705,8 @@ fn paint_text_selection_with_wash(
 /// paragraphs (and their table/list/quote kin), code lines, and the
 /// transcript's user bubbles. `relative` so the selection underlay can
 /// paint beneath the text, I-beam so hovering the region reads as text.
-/// Link hitboxes overlay the wrapper with `.cursor_pointer()` and the
-/// topmost hitbox under the mouse wins, so links inside keep the hand
+/// Link hitboxes overlay the wrapper with `.cursor_default()` and the
+/// topmost hitbox under the mouse wins, so links inside use the arrow
 /// cursor.
 pub(crate) fn selectable_text_wrap() -> Div {
     div().relative().cursor(CursorStyle::IBeam)
@@ -2458,7 +2458,7 @@ fn code_icon_action(
         .flex()
         .items_center()
         .justify_center()
-        .cursor_pointer()
+        .cursor_default()
         .bg(crate::motion::hover_blend(
             &fade_key,
             gpui::transparent_black(),
@@ -2518,7 +2518,7 @@ fn code_copy_button(
             .flex_row()
             .items_center()
             .gap(px(4.0))
-            .cursor_pointer()
+            .cursor_default()
             .bg(crate::motion::hover_blend(
                 &fade_key,
                 gpui::transparent_black(),
@@ -2710,7 +2710,7 @@ fn render_code_block_source_with_actions(
             .flex()
             .items_center()
             .justify_center()
-            .cursor_pointer()
+            .cursor_default()
             .bg(crate::motion::hover_blend(&fade_key, base, hover))
             .on_hover(crate::motion::hover_listener(fade_key))
             .on_click(move |_, window, cx| {
@@ -4504,8 +4504,8 @@ mod tests {
     fn selectable_text_wrap_is_ibeam_cursor() {
         // The wrapper shared by every selectable text region (paragraphs,
         // code lines, user bubbles) must hover with the text cursor. Links
-        // and code action buttons paint their own `.cursor_pointer()`
-        // hitboxes above this wrapper, so they keep the hand cursor.
+        // and code action buttons paint their own `.cursor_default()`
+        // hitboxes above this wrapper, so they use the arrow cursor.
         let mut wrap = selectable_text_wrap();
         assert_eq!(wrap.style().mouse_cursor, Some(CursorStyle::IBeam));
     }

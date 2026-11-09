@@ -172,7 +172,7 @@ impl HarnessesPage {
             })
             .when(interactive, |row| {
                 row.tab_index(0)
-                    .cursor_pointer()
+                    .cursor_default()
                     .focus_visible(|s| s.border_2().border_color(theme.accent))
                     .on_click(on_click)
                     .on_key_down(on_key)

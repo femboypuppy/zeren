@@ -628,7 +628,7 @@ pub(crate) fn wide_button(
         .text_size(crate::typography::ui_rems(14.0))
         .font_weight(gpui::FontWeight::MEDIUM)
         .text_color(theme.on_solid)
-        .cursor_pointer()
+        .cursor_default()
         .hover(|s| s.opacity(0.9))
         .child(SharedString::from(label))
 }
@@ -638,7 +638,7 @@ fn quiet_link(theme: &Theme, id: &'static str, label: &'static str) -> gpui::Sta
         .id(id)
         .text_size(crate::typography::ui_rems(12.0))
         .text_color(theme.text_muted.opacity(0.7))
-        .cursor_pointer()
+        .cursor_default()
         .hover(|s| s.text_color(theme.text))
         .child(SharedString::from(label))
 }

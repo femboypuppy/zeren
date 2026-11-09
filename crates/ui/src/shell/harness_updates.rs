@@ -343,7 +343,7 @@ impl Shell {
                 .focus_visible(move |el| el.border_color(theme.accent))
                 .when(enabled, |button| {
                     button
-                        .cursor_pointer()
+                        .cursor_default()
                         .hover(|el| el.opacity(0.85))
                         .on_click(cx.listener(move |this, _, _, cx| {
                             cx.stop_propagation();
@@ -541,7 +541,7 @@ impl Shell {
             .items_center()
             .gap(px(0.0))
             .when(multiple, |el| {
-                el.cursor_pointer()
+                el.cursor_default()
                     .role(gpui::Role::Button)
                     .aria_label(if expanded {
                         "Collapse agent updates"

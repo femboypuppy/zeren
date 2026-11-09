@@ -371,7 +371,7 @@ pub(super) fn media(
                 .role(gpui::Role::Button)
                 .tab_index(0)
                 .focus_visible(|style| style.border_2().border_color(theme.accent))
-                .cursor_pointer()
+                .cursor_default()
                 .on_click({
                     let source = source.clone();
                     let open = open.clone();

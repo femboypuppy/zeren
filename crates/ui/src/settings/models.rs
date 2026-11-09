@@ -455,7 +455,7 @@ impl HarnessesPage {
                 .rounded(px(6.0))
                 .role(gpui::Role::Button)
                 .aria_label(label)
-                .cursor_pointer()
+                .cursor_default()
                 .tab_index(0)
                 .hover(|s| s.bg(theme.element_hover))
                 .focus_visible(|s| s.border_2().border_color(theme.accent))
@@ -549,7 +549,7 @@ impl HarnessesPage {
                     gpui::Toggled::False
                 })
                 .when(can_toggle, |el| {
-                    el.cursor_pointer()
+                    el.cursor_default()
                         .tab_index(0)
                         .focus_visible(|s| s.border_2().border_color(theme.accent))
                 })

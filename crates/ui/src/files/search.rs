@@ -629,7 +629,7 @@ impl FilesSurface {
             .flex()
             .items_center()
             .gap(px(4.0))
-            .cursor_pointer()
+            .cursor_default()
             .when(selected, |element| element.bg(crate::theme::wash(0.1)))
             .when(!selected, |element| {
                 element.hover(|style| style.bg(crate::theme::wash(0.055)))

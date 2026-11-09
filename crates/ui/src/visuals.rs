@@ -708,7 +708,7 @@ impl VisualFrame {
                             SharedString::from(tab_key.clone()),
                             format!("{tab_key}-hover"),
                         )
-                        .cursor_pointer()
+                        .cursor_default()
                         .role(gpui::Role::Tab)
                         .aria_label(SharedString::from(option.clone()))
                         .child(option.clone())
@@ -732,7 +732,7 @@ impl VisualFrame {
                     .flex_row()
                     .items_center()
                     .gap(px(10.0))
-                    .cursor_pointer()
+                    .cursor_default()
                     .role(gpui::Role::Switch)
                     .aria_label(SharedString::from(label.clone()))
                     .child(crate::settings::widgets::toggle_switch(
@@ -782,7 +782,7 @@ impl VisualFrame {
                     .text_size(crate::typography::ui_rems(14.0))
                     .line_height(crate::typography::ui_rems(22.0))
                     .text_color(theme.accent)
-                    .cursor_pointer()
+                    .cursor_default()
                     .hover(|s| s.underline())
                     .role(gpui::Role::Link)
                     .child(label.clone())
@@ -862,7 +862,7 @@ impl VisualFrame {
             });
         if let Some(handler) = stack.on_click {
             el = el
-                .cursor_pointer()
+                .cursor_default()
                 .role(gpui::Role::Button)
                 .on_click(cx.listener(move |this, _, _, cx| {
                     cx.stop_propagation();
@@ -1146,7 +1146,7 @@ impl VisualFrame {
                     )))
                     .h(px(SLIDER_THUMB + 4.0))
                     .w_full()
-                    .cursor_pointer()
+                    .cursor_default()
                     .role(gpui::Role::Slider)
                     .on_mouse_down(MouseButton::Left, press)
                     .on_drag(VisualDrag(drag_key), |_, _, _, cx| cx.new(|_| DragGhost))
@@ -1264,7 +1264,7 @@ impl VisualFrame {
                 }),
             );
         if let Some(handler) = node.on_click {
-            el = el.cursor_pointer().on_click(cx.listener(
+            el = el.cursor_default().on_click(cx.listener(
                 move |this, event: &gpui::ClickEvent, _, cx| {
                     let origin = this
                         .local

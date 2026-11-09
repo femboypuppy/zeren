@@ -2181,7 +2181,7 @@ impl FilesSurface {
                                         .id("files-retry-close-save")
                                         .when(self.target_change_pending, |button| button.hidden())
                                         .ml_auto()
-                                        .cursor_pointer()
+                                        .cursor_default()
                                         .text_color(theme.text)
                                         .child("Retry")
                                         .on_click(cx.listener(|this, _, _, cx| {
@@ -2192,7 +2192,7 @@ impl FilesSurface {
                                     banner.child(
                                         div()
                                             .id("files-keep-open")
-                                            .cursor_pointer()
+                                            .cursor_default()
                                             .text_color(theme.text_muted)
                                             .child("Keep Open")
                                             .on_click(
@@ -2203,7 +2203,7 @@ impl FilesSurface {
                                 .child(
                                     div()
                                         .id("files-discard-close-changes")
-                                        .cursor_pointer()
+                                        .cursor_default()
                                         .text_color(theme.danger_muted)
                                         .child("Discard Changes")
                                         .on_click(cx.listener(|this, _, _, cx| {
@@ -2250,7 +2250,7 @@ impl FilesSurface {
                                             .child(
                                                 div()
                                                     .id("files-keep-external-edits")
-                                                    .cursor_pointer()
+                                                    .cursor_default()
                                                     .text_color(theme.text_muted)
                                                     .child("Keep Editing")
                                                     .on_click(cx.listener(|this, _, _, cx| {
@@ -2260,7 +2260,7 @@ impl FilesSurface {
                                             .child(
                                                 div()
                                                     .id("files-reload-external")
-                                                    .cursor_pointer()
+                                                    .cursor_default()
                                                     .text_color(theme.text)
                                                     .child("Reload from Disk")
                                                     .on_click(cx.listener(|this, _, _, cx| {
@@ -2273,7 +2273,7 @@ impl FilesSurface {
                                             .child(
                                                 div()
                                                     .id("files-cancel-reload")
-                                                    .cursor_pointer()
+                                                    .cursor_default()
                                                     .text_color(theme.text_muted)
                                                     .child("Cancel")
                                                     .on_click(cx.listener(|this, _, _, cx| {
@@ -2283,7 +2283,7 @@ impl FilesSurface {
                                             .child(
                                                 div()
                                                     .id("files-confirm-reload")
-                                                    .cursor_pointer()
+                                                    .cursor_default()
                                                     .text_color(theme.text)
                                                     .child("Discard & Reload")
                                                     .on_click(cx.listener(|this, _, _, cx| {
@@ -2491,7 +2491,7 @@ impl FilesSurface {
                         .text_color(color)
                         .when(retry, |element| {
                             element
-                                .cursor_pointer()
+                                .cursor_default()
                                 .role(gpui::Role::Button)
                                 .aria_label("Save file")
                                 .hover(|style| style.bg(crate::theme::wash(0.14)))
@@ -2893,7 +2893,7 @@ impl FilesSurface {
                 let open = self.preview.active_comment.as_deref() == Some(comment.id.as_str());
                 overlays.push(
                     cell.bg(theme.surface_card)
-                        .cursor_pointer()
+                        .cursor_default()
                         .role(gpui::Role::Button)
                         .aria_label(format!("Open comment on line {}", row.line))
                         .hover(|style| style.bg(crate::theme::wash(0.08)))
@@ -2917,7 +2917,7 @@ impl FilesSurface {
                 let line = row.line;
                 overlays.push(
                     cell.group(group.clone())
-                        .cursor_pointer()
+                        .cursor_default()
                         .role(gpui::Role::Button)
                         .aria_label(format!("Comment on line {line}"))
                         .hover(|style| style.bg(theme.surface_card))
@@ -3043,7 +3043,7 @@ impl FilesSurface {
                             .items_center()
                             .justify_center()
                             .rounded(px(4.0))
-                            .cursor_pointer()
+                            .cursor_default()
                             .opacity(0.0)
                             .group_hover(group, |style| style.opacity(1.0))
                             .on_click(cx.listener(move |this, _, _, cx| {
@@ -3316,7 +3316,7 @@ fn editor_comment_action(
         .rounded(px(6.0))
         .text_size(px(11.0))
         .font_weight(gpui::FontWeight::MEDIUM)
-        .cursor_pointer()
+        .cursor_default()
         .when(primary, |element| {
             element.bg(theme.solid).text_color(theme.on_solid)
         })

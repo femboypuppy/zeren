@@ -1074,7 +1074,7 @@ impl PullRequestDetailPage {
                     .tab_index(0)
                     .min_w_0()
                     .p(px(NAV_SEGMENT_INSET))
-                    .cursor_pointer()
+                    .cursor_default()
                     .on_hover(crate::motion::hover_listener(hover_key))
                     .child(
                         div()
@@ -1331,7 +1331,7 @@ fn action(id: &'static str, label: &'static str, theme: &Theme) -> gpui::Statefu
         .tab_index(0)
         .border_1()
         .border_color(gpui::transparent_black())
-        .cursor_pointer()
+        .cursor_default()
         .when(icon_only, |el| {
             el.size(px(24.0))
                 .flex_none()
@@ -1763,7 +1763,7 @@ impl Render for PullRequestDetailPage {
                                 .flex_wrap()
                                 .items_center()
                                 .gap(px(8.0))
-                                .cursor_pointer()
+                                .cursor_default()
                                 .hover(|style| style.bg(theme.glass_hover()))
                                 .child(
                                     crate::icons::icon(if self.checks_expanded {
@@ -1855,7 +1855,7 @@ impl Render for PullRequestDetailPage {
                                     )
                                     .child(div().flex_none().child(status_chip(&status, &theme)))
                                     .when(!link.is_empty(), |el| {
-                                        el.cursor_pointer()
+                                        el.cursor_default()
                                             .role(gpui::Role::Link)
                                             .tab_index(0)
                                             .aria_label(format!("Open {name}"))
@@ -2204,7 +2204,7 @@ impl Render for PullRequestDetailPage {
                                                                     "Open review comment on GitHub",
                                                                 )
                                                                 .tab_index(0)
-                                                                .cursor_pointer()
+                                                                .cursor_default()
                                                                 .hover(|style| {
                                                                     style
                                                                         .bg(theme.ink(0.07))

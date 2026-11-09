@@ -7041,7 +7041,7 @@ impl Transcript {
                     .child(caption_label(title, Some(mark), theme.text_muted))
                     .when(known, |el| {
                         el.role(gpui::Role::Link)
-                            .cursor_pointer()
+                            .cursor_default()
                             .hover(|s| s.text_color(theme.text))
                             .on_click(cx.listener(move |_, _: &gpui::ClickEvent, _, cx| {
                                 cx.emit(TranscriptEvent::OpenChat {
@@ -7088,7 +7088,7 @@ impl Transcript {
             .text_size(crate::typography::ui_rems(14.0))
             .line_height(crate::typography::ui_rems(USER_LINE_HEIGHT))
             .text_color(theme.text_muted)
-            .cursor_pointer()
+            .cursor_default()
             .hover(|s| s.text_color(theme.text))
             .child(label)
             .child(
@@ -7592,7 +7592,7 @@ impl Transcript {
                                 appshot.title()
                             ))
                             .tab_index(0)
-                            .cursor_pointer()
+                            .cursor_default()
                             .focus_visible(move |style| style.border_2().border_color(accent))
                             .on_click(cx.listener(move |this, _, window, cx| {
                                 this.attachment_preview_return_focus = window.focused(cx);
@@ -7732,7 +7732,7 @@ impl Transcript {
                         .border_1()
                         .border_color(crate::theme::hairline(0.11))
                         .bg(crate::theme::ink(0.035))
-                        .cursor_pointer()
+                        .cursor_default()
                         .on_click(cx.listener(move |this, _, window, cx| {
                             this.attachment_preview_return_focus = window.focused(cx);
                             preview.viewer.reset();
@@ -7902,7 +7902,7 @@ impl Transcript {
                         .pt(px(Theme::SPACE_LG))
                         .text_size(crate::typography::ui_rems(12.0))
                         .text_color(theme.danger)
-                        .cursor_pointer()
+                        .cursor_default()
                         .on_click(cx.listener(|this, _, _, cx| this.retry_send(cx)))
                         .child(SharedString::from("Not delivered — click to retry"))
                         .into_any_element(),
@@ -8437,7 +8437,7 @@ impl Transcript {
                     .items_center()
                     .justify_center()
                     .rounded(px(Theme::CONTROL_RADIUS))
-                    .cursor_pointer()
+                    .cursor_default()
                     // Same quiet icon-button treatment as the copy action
                     // over transcript code blocks.
                     .bg(motion::hover_blend(
@@ -8474,7 +8474,7 @@ impl Transcript {
                     .items_center()
                     .justify_center()
                     .rounded(px(Theme::CONTROL_RADIUS))
-                    .cursor_pointer()
+                    .cursor_default()
                     .bg(motion::hover_blend(
                         &fade_key,
                         gpui::transparent_black(),
@@ -9156,7 +9156,7 @@ impl Transcript {
             .gap(px(6.0))
             .pr(px(4.0))
             .h(px(TOOL_GROUP_HEADER_HEIGHT))
-            .cursor_pointer()
+            .cursor_default()
             .text_size(px(TOOL_LABEL_SIZE))
             .line_height(px(TOOL_LABEL_LINE_HEIGHT))
             // Quiet even when children failed: agents routinely have failed
@@ -9340,7 +9340,7 @@ impl Transcript {
                             .flex_none()
                             .flex()
                             .items_center()
-                            .cursor_pointer()
+                            .cursor_default()
                             .on_click(cx.listener(move |this, _, _, cx| {
                                 cx.stop_propagation();
                                 let entry =
@@ -9426,7 +9426,7 @@ impl Transcript {
                             .child(label);
                         if !loading {
                             row = row
-                                .cursor_pointer()
+                                .cursor_default()
                                 .hover(|s| s.text_color(theme.text_muted))
                                 .on_click(cx.listener(move |this, _, _, cx| {
                                     this.spawn_blob_fetch(blob_ref.clone(), cx);
@@ -9969,7 +9969,7 @@ impl gpui::Element for ChipOverlays {
                     .id(SharedString::from(format!("{}-{index}-{part}", self.id)))
                     .w(rect.size.width)
                     .h(rect.size.height)
-                    .cursor_pointer()
+                    .cursor_default()
                     .role(gpui::Role::Button)
                     .aria_label(format!(
                         "Preview {}",
@@ -10097,7 +10097,7 @@ fn error_chip(
             .text_color(theme.danger_muted)
             .font_weight(gpui::FontWeight::MEDIUM)
             .text_size(crate::typography::ui_rems(12.0))
-            .cursor_pointer()
+            .cursor_default()
             .hover(move |s| s.bg(danger.opacity(0.22)))
             .on_click(on_click)
             .child(problem.map_or("Log in", ProviderProblem::action_label))
@@ -10862,7 +10862,7 @@ fn chip_header_row(
                                 .when_some(open_file, |badge, (path, opener)| {
                                     badge
                                         .debug_selector(|| "tool-file-badge".into())
-                                        .cursor_pointer()
+                                        .cursor_default()
                                         .hover(|style| {
                                             style.bg(theme.ink(0.1)).text_color(theme.text)
                                         })
@@ -11278,7 +11278,7 @@ fn subagent_chip(
                 .border_1()
                 .border_color(crate::theme::hairline(0.07))
                 .bg(crate::theme::ink(0.03))
-                .cursor_pointer()
+                .cursor_default()
                 .hover(|s| s.bg(crate::theme::ink(0.05)))
                 .on_click(on_open)
                 .child(chip_header_row(

@@ -2394,7 +2394,7 @@ pub(super) fn sidebar_disclosure_header(
         .gap(px(8.0))
         .h(px(SIDEBAR_DISCLOSURE_HEADER_HEIGHT))
         .px(px(Theme::SPACE_SM))
-        .cursor_pointer()
+        .cursor_default()
         .children(icon)
         .child(super::sidebar_faded_label(
             "sidebar-disclosure-label".into(),
@@ -4900,7 +4900,7 @@ impl Shell {
                 )
             })
             .on_hover(motion::hover_listener("spaces-filter"))
-            .cursor_pointer()
+            .cursor_default()
             .on_mouse_down(
                 gpui::MouseButton::Left,
                 cx.listener(|this, _, _, _| this.spaces_menu.note_trigger_press()),
@@ -4987,7 +4987,7 @@ impl Shell {
             .border_1()
             .border_color(theme.border.opacity(0.0))
             .focus_visible(|el| el.border_color(theme.border_strong))
-            .cursor_pointer()
+            .cursor_default()
             .text_color(theme.text_muted)
             .bg(if view_open {
                 theme.glass_hover()
@@ -6117,7 +6117,7 @@ impl Shell {
                     .items_center()
                     .justify_center()
                     .rounded(px(4.0))
-                    .cursor_pointer()
+                    .cursor_default()
                     .role(gpui::Role::Button)
                     .aria_label(label.clone())
                     .opacity(0.0)
@@ -6499,7 +6499,7 @@ impl Shell {
                         .rounded(px(6.0))
                         .text_size(crate::typography::ui_rems(13.0))
                         .text_color(theme.text_muted.opacity(0.55))
-                        .cursor_pointer()
+                        .cursor_default()
                         .hover(|s| s.bg(theme.glass_hover()).text_color(theme.text))
                         .on_click(cx.listener(move |this, _, _, cx| {
                             this.archived_shown = this.archived_shown.max(INITIAL) + PAGE;
@@ -8850,7 +8850,7 @@ impl Shell {
             // The open crumb is where you already are: no hover, no click.
             if !spec.current {
                 el = el
-                    .cursor_pointer()
+                    .cursor_default()
                     .role(gpui::Role::Button)
                     .aria_label(if more {
                         SharedString::from("Show hidden folders")
@@ -8988,7 +8988,7 @@ impl Shell {
                                 .items_center()
                                 .justify_center()
                                 .rounded(px(5.0))
-                                .cursor_pointer()
+                                .cursor_default()
                                 .role(gpui::Role::Button)
                                 .aria_label("Open this path")
                                 .tooltip(crate::settings::widgets::text_tooltip("Open this path"))
@@ -9071,7 +9071,7 @@ impl Shell {
                 .role(gpui::Role::Button)
                 .aria_label(label)
                 .when(enabled, |el| {
-                    el.cursor_pointer()
+                    el.cursor_default()
                         .hover(|s| s.bg(crate::theme::card_selected_bg()))
                         .active(|s| s.opacity(0.8))
                 })
@@ -9111,7 +9111,7 @@ impl Shell {
                     .items_center()
                     .justify_center()
                     .rounded(px(6.0))
-                    .cursor_pointer()
+                    .cursor_default()
                     .role(gpui::Role::Button)
                     .aria_label(back_label)
                     .tooltip(crate::settings::widgets::text_tooltip(back_label))
@@ -9143,7 +9143,7 @@ impl Shell {
                         .items_center()
                         .justify_center()
                         .rounded(px(6.0))
-                        .cursor_pointer()
+                        .cursor_default()
                         .role(gpui::Role::Button)
                         .aria_label("Edit path")
                         .tooltip(crate::settings::widgets::text_tooltip(
@@ -9230,7 +9230,7 @@ impl Shell {
                     .role(gpui::Role::Button)
                     .aria_label("Add project")
                     .when(can_add, |el| {
-                        el.cursor_pointer()
+                        el.cursor_default()
                             .hover(|s| s.bg(crate::theme::card_selected_bg()))
                             .active(|s| s.opacity(0.8))
                             .on_click(cx.listener(move |this, _, _, cx| {

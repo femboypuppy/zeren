@@ -70,7 +70,7 @@ impl HarnessesPage {
                     gpui::Toggled::False
                 })
                 .tab_index(0)
-                .cursor_pointer()
+                .cursor_default()
                 .focus_visible(|s| s.border_2().border_color(theme.accent))
                 .on_click(
                     cx.listener(move |page, _, _, cx| page.toggle_completion(harness, dollar, cx)),

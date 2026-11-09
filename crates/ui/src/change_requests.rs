@@ -220,7 +220,7 @@ fn render_badge_model(
                 .aria_label(accessible_label)
                 .tab_index(0)
                 .focus_visible(|style| style.border_2().border_color(theme.accent))
-                .cursor_pointer()
+                .cursor_default()
                 .hover(move |style| style.bg(color.opacity(0.16)).text_color(color))
                 .on_click(move |_, window, cx| {
                     cx.stop_propagation();

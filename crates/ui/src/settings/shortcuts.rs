@@ -595,7 +595,7 @@ fn binding_control(
                     .focus_visible(move |style| style.border_2().border_color(accent))
                     .text_size(crate::typography::ui_rems(11.0))
                     .text_color(theme.text_muted)
-                    .cursor_pointer()
+                    .cursor_default()
                     .hover(|s| s.text_color(theme.text))
                     .on_click(move |_, window, cx| on_reset(window, cx))
                     .child(SharedString::from("Reset")),
@@ -625,7 +625,7 @@ fn binding_control(
                 .justify_center()
                 .font_family(theme.font_mono.clone())
                 .text_size(crate::typography::ui_rems(12.0))
-                .cursor_pointer()
+                .cursor_default()
                 .map(|el| {
                     if is_recording {
                         el.bg(accent.opacity(0.16))
@@ -826,7 +826,7 @@ impl Render for ShortcutsPage {
                         gpui::Toggled::False
                     })
                     .focus_visible(|s| s.border_2().border_color(theme.accent))
-                    .cursor_pointer()
+                    .cursor_default()
                     .on_click(cx.listener(move |_, _, _, cx| {
                         crate::settings::set_transcript_compact_mode(!compact_mode, cx);
                         cx.notify();
@@ -861,7 +861,7 @@ impl Render for ShortcutsPage {
                         gpui::Toggled::False
                     })
                     .focus_visible(|s| s.border_2().border_color(theme.accent))
-                    .cursor_pointer()
+                    .cursor_default()
                     .on_click(cx.listener(move |_, _, _, cx| {
                         crate::settings::update(
                             crate::settings::SavePolicy::Debounced,
@@ -905,7 +905,7 @@ impl Render for ShortcutsPage {
                     gpui::Toggled::False
                 })
                 .focus_visible(|s| s.border_2().border_color(theme.accent))
-                .cursor_pointer()
+                .cursor_default()
                 .on_click(cx.listener(move |this, _, _, cx| {
                     this.set_escape_stops_active_agent(!escape_stops_active_agent, cx);
                 })),

@@ -135,6 +135,8 @@ settings_index! {
         "audio chime mute"),
     (TaskCompletedSound, Notifications, Some("Sounds"), "Task completed",
         "done finished audio sound"),
+    (CompletionSoundStyle, Notifications, Some("Sounds"), "Completion sound",
+        "done finished audio chime soft warm bell quiet drop preview tone"),
     (InputRequiredSound, Notifications, Some("Sounds"), "Input required",
         "question waiting approval audio sound"),
     (ErrorSound, Notifications, Some("Sounds"), "Errors and disconnections",

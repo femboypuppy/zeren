@@ -149,7 +149,7 @@ pub(crate) fn preview_element(
         .mx_auto()
         .max_h(gpui::px(480.0))
         .aspect_ratio(loaded.width / loaded.height)
-        .cursor_pointer()
+        .cursor_default()
         .role(gpui::Role::Button)
         .aria_label("Enlarge image")
         .on_click(move |_, window, cx| {

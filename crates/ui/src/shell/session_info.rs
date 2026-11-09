@@ -546,7 +546,7 @@ impl Shell {
                         .mr(px(-5.0))
                         .py(px(2.0))
                         .rounded(px(5.0))
-                        .cursor_pointer()
+                        .cursor_default()
                         .hover(|style| style.bg(crate::theme::ink(0.08)))
                         .tooltip(crate::settings::widgets::text_tooltip("Branch changes"))
                         .on_click(cx.listener(|this, _, window, cx| {

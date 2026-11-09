@@ -1576,7 +1576,7 @@ impl Render for GitHistoryFetchButton {
             })
             .when(!fetching, |element| {
                 element
-                    .cursor_pointer()
+                    .cursor_default()
                     .on_hover(crate::motion::hover_listener("history-fetch-all"))
                     .on_click(move |_, _, cx| {
                         cx.stop_propagation();
@@ -1625,7 +1625,7 @@ impl Render for GitHistoryViewButton {
             .items_center()
             .justify_center()
             .rounded(px(crate::surface_chrome::CONTROL_RADIUS))
-            .cursor_pointer()
+            .cursor_default()
             .bg(if showing_tips {
                 theme.accent.opacity(0.12)
             } else {
@@ -1683,7 +1683,7 @@ impl Render for GitHistorySearchControl {
                 .items_center()
                 .justify_center()
                 .rounded(px(crate::surface_chrome::CONTROL_RADIUS))
-                .cursor_pointer()
+                .cursor_default()
                 .bg(crate::motion::hover_blend(
                     "history-search-trigger",
                     crate::theme::wash(0.0),
@@ -1775,7 +1775,7 @@ impl Render for GitHistorySearchControl {
                     .items_center()
                     .justify_center()
                     .rounded(px(3.5))
-                    .cursor_pointer()
+                    .cursor_default()
                     .hover(|style| style.bg(crate::theme::ink(0.08)))
                     .on_mouse_down(gpui::MouseButton::Left, |_, window, _| {
                         window.prevent_default()
@@ -3060,7 +3060,7 @@ impl GitHistory {
             .flex_shrink(1.0)
             .flex()
             .items_center()
-            .cursor_pointer()
+            .cursor_default()
             .when(column == GitHistoryColumn::Author, |header| {
                 header.justify_center().on_mouse_down(
                     gpui::MouseButton::Right,
@@ -3605,7 +3605,7 @@ impl GitHistory {
                 .border_1()
                 .border_color(color.opacity(0.32))
                 .bg(theme.bg.opacity(0.96))
-                .cursor_pointer()
+                .cursor_default()
                 .opacity(if collapsed { 1.0 } else { 0.0 })
                 .group_hover("history-graph-tip", |style| style.opacity(1.0))
                 .on_mouse_down(gpui::MouseButton::Left, |_, window, cx| {
@@ -3890,7 +3890,7 @@ impl GitHistory {
                     .flex()
                     .items_center()
                     .rounded(px(4.0))
-                    .cursor_pointer()
+                    .cursor_default()
                     .hover(|style| style.bg(crate::theme::ink(0.07)))
                     .font_family(theme.font_mono.clone())
                     .text_size(px(10.5))
@@ -3954,7 +3954,7 @@ impl GitHistory {
                 })
                 .when(!pending, |element| {
                     element
-                        .cursor_pointer()
+                        .cursor_default()
                         .hover(|style| {
                             style
                                 .bg(theme.element_hover)
@@ -4064,7 +4064,7 @@ impl GitHistory {
             .flex_row()
             .items_center()
             .text_size(px(11.0))
-            .cursor_pointer()
+            .cursor_default()
             .when_some(focused_row_wash, |element, wash| element.bg(wash))
             .hover(|style| style.bg(crate::theme::ink(0.025)))
             .on_hover(cx.listener(move |this, hovered: &bool, _, cx| {
@@ -4205,7 +4205,7 @@ impl Render for GitHistory {
             .items_center()
             .justify_center()
             .rounded(px(5.0))
-            .cursor_pointer()
+            .cursor_default()
             .opacity(0.0)
             .group_hover("history-column-header", |style| style.opacity(1.0))
             .when(self.column_menu.is_open(), |button| button.opacity(1.0))

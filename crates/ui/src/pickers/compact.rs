@@ -214,7 +214,7 @@ impl Pickers {
             .flex()
             .items_center()
             .gap(px(8.0))
-            .cursor_pointer()
+            .cursor_default()
             .text_color(theme.text)
             .when(selected, |el| {
                 el.bg(crate::theme::card_selected_bg())
@@ -475,7 +475,7 @@ impl Pickers {
                         .flex()
                         .items_center()
                         .justify_center()
-                        .cursor_pointer()
+                        .cursor_default()
                         .when(viewed, |el| el.bg(crate::theme::ink(0.08)))
                         .when(!viewed, |el| {
                             el.opacity(0.7)
@@ -521,7 +521,7 @@ impl Pickers {
                     .flex()
                     .items_center()
                     .justify_center()
-                    .cursor_pointer()
+                    .cursor_default()
                     .hover(|s| s.bg(crate::theme::ink(0.05)))
                     .on_click(cx.listener(|this, _, _, cx| this.show_compact_panel(cx)))
                     .child(
@@ -904,7 +904,7 @@ impl Pickers {
             .flex_col()
             .items_start()
             .justify_center()
-            .cursor_pointer()
+            .cursor_default()
             .on_hover(motion::hover_listener(model_key))
             .on_click(cx.listener(|this, _, _, cx| {
                 this.compact_keyboard = false;
@@ -1007,7 +1007,7 @@ impl Pickers {
                     .flex()
                     .items_center()
                     .justify_center()
-                    .cursor_pointer()
+                    .cursor_default()
                     .bg(crate::theme::ink(0.05 * fast_hover))
                     .on_hover(motion::hover_listener(fast_key))
                     .on_click(cx.listener(move |this, _, _, cx| {
@@ -1104,7 +1104,7 @@ impl Pickers {
                 .aria_description("Use Left and Right to adjust reasoning; Home and End select the first and last levels")
                 .relative()
                 .h(px(SLIDER_HEIGHT))
-                .cursor_pointer()
+                .cursor_default()
                 .on_mouse_down(
                     gpui::MouseButton::Left,
                     cx.listener(|this, event: &gpui::MouseDownEvent, window, cx| {

@@ -50,7 +50,7 @@ pub(crate) fn ring_chip(
         .rounded(px(6.0))
         .text_size(px(11.0))
         .text_color(text)
-        .cursor_pointer()
+        .cursor_default()
         .when(open, |s| s.bg(crate::theme::ink(0.05)))
         .hover(|s| s.bg(crate::theme::ink(0.05)))
         .child(ring(fraction, arc, theme))

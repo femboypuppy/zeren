@@ -5422,7 +5422,7 @@ impl gpui::Element for ComposerTextElement {
             }
         });
         for hitbox in &prepaint.image_chip_hitboxes {
-            window.set_cursor_style(CursorStyle::PointingHand, hitbox);
+            window.set_cursor_style(CursorStyle::Arrow, hitbox);
         }
 
         // WrappedLine isn't Clone — temporarily take the shaped lines out of the
@@ -7450,7 +7450,7 @@ impl Composer {
                             .flex()
                             .items_center()
                             .justify_center()
-                            .cursor_pointer()
+                            .cursor_default()
                             .shadow_sm()
                             .opacity(0.0)
                             .group_hover(group, |s| s.opacity(1.0))
@@ -7520,7 +7520,7 @@ impl Composer {
         };
         let preview = attachments::PreviewImage::new(att.name.clone(), image.clone());
         frame
-            .cursor_pointer()
+            .cursor_default()
             .on_click(cx.listener(move |this, _, _, cx| {
                 preview.viewer.reset();
                 this.preview = Some(preview.clone());
@@ -7610,7 +7610,7 @@ impl Composer {
                 .items_center()
                 .rounded(px(14.0))
                 .overflow_hidden()
-                .cursor_pointer()
+                .cursor_default()
                 .hover(|style| style.bg(crate::theme::ink(0.045)))
                 .tooltip(move |_, cx| {
                     cx.new(|_| AppshotActionTooltip(preview_label.clone()))
@@ -7726,7 +7726,7 @@ impl Composer {
                     .flex()
                     .items_center()
                     .justify_center()
-                    .cursor_pointer()
+                    .cursor_default()
                     .shadow_sm()
                     .opacity(0.0)
                     .group_hover(group, |style| style.opacity(1.0))
@@ -10439,7 +10439,7 @@ impl Composer {
                     )
                 })
                 .on_hover(motion::hover_listener(format!("wizard-option-{ix}")))
-                .cursor_pointer()
+                .cursor_default()
                 .on_click(cx.listener(move |this, _, _, cx| this.wizard_select(ix, cx)))
                 .child(
                     div()
@@ -10622,7 +10622,7 @@ impl Composer {
                     .items_center()
                     .justify_center()
                     .rounded_full()
-                    .cursor_pointer()
+                    .cursor_default()
                     .bg(motion::hover_blend(
                         &dismiss_hover_key,
                         gpui::transparent_black(),
@@ -10828,7 +10828,7 @@ impl Composer {
                 gpui::Toggled::False
             })
             .tab_index(0)
-            .cursor_pointer()
+            .cursor_default()
             // At rest it is a sibling of the paperclip: the same eased ink
             // wash. Live, it is the accent plate and dims like Send.
             .on_hover(motion::hover_listener(hover_key.clone()))
@@ -10952,7 +10952,7 @@ impl Composer {
             .items_center()
             .rounded_full()
             .text_color(theme.text_muted)
-            .cursor_pointer()
+            .cursor_default()
             .hover(|s| s.bg(theme.surface_raised_hover).text_color(theme.text))
             .focus_visible(|s| s.border_1().border_color(theme.accent))
             .on_click(cx.listener(|this, _, _, cx| this.dismiss_dictation(cx)))
@@ -11180,7 +11180,7 @@ impl Composer {
                 .flex()
                 .items_center()
                 .justify_center()
-                .cursor_pointer()
+                .cursor_default()
                 .hover(|s| s.opacity(0.85))
                 .on_click(cx.listener(|this, _, _, cx| this.interrupt_selected(cx)))
                 .tooltip(crate::settings::widgets::text_tooltip("Stop"))
@@ -11231,7 +11231,7 @@ pub(crate) fn send_circle(
         .justify_center()
         .when(blocked, |el| el.opacity(0.35))
         .when(!blocked, |el| {
-            el.cursor_pointer().hover(|s| s.opacity(0.85))
+            el.cursor_default().hover(|s| s.opacity(0.85))
         })
         .child(
             crate::icons::icon(crate::icons::ARROW_UP)
@@ -11495,7 +11495,7 @@ impl Render for Composer {
                     .id("composer-failure")
                     .mx(px(4.0))
                     .mt(px(6.0))
-                    .cursor_pointer()
+                    .cursor_default()
                     .on_click(cx.listener(|this, _, _, cx| {
                         this.failure = None;
                         this.failure_key = None;
@@ -11773,7 +11773,7 @@ impl Render for Composer {
             .items_center()
             .justify_center()
             .rounded_full()
-            .cursor_pointer()
+            .cursor_default()
             // zeren composer-actions.tsx attach: `transition-colors`.
             .bg(motion::hover_blend(
                 &attach_hover_key,

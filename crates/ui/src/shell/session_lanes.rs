@@ -393,7 +393,7 @@ impl Shell {
                         .items_center()
                         .justify_center()
                         .rounded(px(5.0))
-                        .cursor_pointer()
+                        .cursor_default()
                         .hover(|style| style.bg(crate::theme::ink(0.08)))
                         .tooltip(crate::settings::widgets::text_tooltip(label))
                         .on_click(start)

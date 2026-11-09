@@ -127,7 +127,7 @@ impl Render for FilesSettingsPage {
                     .child(
                         widgets::toggle_switch(&theme, autosave_enabled, "files-autosave")
                             .id("files-autosave-toggle")
-                            .cursor_pointer()
+                            .cursor_default()
                             .tab_index(0)
                             .role(gpui::Role::Switch)
                             .aria_label("Autosave")
@@ -173,7 +173,7 @@ impl Render for FilesSettingsPage {
                     .child(
                         widgets::toggle_switch(&theme, word_wrap, "files-word-wrap")
                             .id("files-word-wrap-toggle")
-                            .cursor_pointer()
+                            .cursor_default()
                             .tab_index(0)
                             .role(gpui::Role::Switch)
                             .aria_label("Word wrap")
@@ -204,7 +204,7 @@ impl Render for FilesSettingsPage {
                     .child(
                         widgets::toggle_switch(&theme, show_all_files, "files-show-all")
                             .id("files-show-all-toggle")
-                            .cursor_pointer()
+                            .cursor_default()
                             .tab_index(0)
                             .role(gpui::Role::Switch)
                             .aria_label("Show hidden and ignored files")

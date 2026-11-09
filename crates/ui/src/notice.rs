@@ -113,7 +113,7 @@ pub fn notice_chip_with_action(
         .flex()
         .items_center()
         .justify_center()
-        .cursor_pointer()
+        .cursor_default()
         .hover(move |s| s.bg(accent.opacity(0.12)))
         // The composer chip dismisses on click; copying must
         // not take the notice with it.

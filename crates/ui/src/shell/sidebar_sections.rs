@@ -862,7 +862,7 @@ impl Shell {
                                 .flex()
                                 .items_center()
                                 .justify_center()
-                                .cursor_pointer()
+                                .cursor_default()
                                 .on_click(cx.listener(|this, _, _, cx| {
                                     this.section_dialog = None;
                                     cx.notify();

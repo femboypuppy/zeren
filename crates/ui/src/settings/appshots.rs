@@ -130,7 +130,7 @@ impl ShortcutsPage {
                 .aria_label(label)
                 .tab_index(0)
                 .focus_visible(move |style| style.border_2().border_color(accent))
-                .cursor_pointer()
+                .cursor_default()
                 .child(label)
         };
         let mut window_access = div()

@@ -917,7 +917,7 @@ pub fn menu_row(theme: &Theme, active: bool, fade_key: impl Into<SharedString>) 
         .py(px(6.0))
         .rounded(px(MENU_ITEM_RADIUS))
         .text_size(crate::typography::ui_rems(13.0))
-        .cursor_pointer();
+        .cursor_default();
     if active {
         row.bg(crate::theme::card_selected_bg())
             .text_color(theme.text)
@@ -1218,7 +1218,7 @@ pub fn picker_row(
         .rounded(px(MENU_ITEM_RADIUS))
         .text_size(crate::typography::ui_rems(13.0))
         .text_color(theme.text)
-        .cursor_pointer();
+        .cursor_default();
     if selected {
         return row
             .bg(crate::theme::card_selected_bg())
@@ -1337,7 +1337,7 @@ pub fn btn_ghost(theme: &Theme, label: &str, fade_key: impl Into<SharedString>) 
             crate::theme::wash(0.0),
             ink(0.06),
         ))
-        .cursor_pointer()
+        .cursor_default()
         .child(SharedString::from(label.to_string()));
     btn.interactivity()
         .on_hover(motion::hover_listener(fade_key));
@@ -1354,7 +1354,7 @@ pub fn btn_primary(theme: &Theme, label: &str) -> gpui::Div {
         .text_size(crate::typography::ui_rems(13.0))
         .font_weight(gpui::FontWeight::MEDIUM)
         .text_color(theme.on_solid)
-        .cursor_pointer()
+        .cursor_default()
         .hover(|s| s.opacity(0.9))
         .child(SharedString::from(label.to_string()))
 }
@@ -1369,7 +1369,7 @@ pub fn btn_danger(theme: &Theme, label: &str) -> gpui::Div {
         .text_size(crate::typography::ui_rems(13.0))
         .font_weight(gpui::FontWeight::MEDIUM)
         .text_color(gpui::white())
-        .cursor_pointer()
+        .cursor_default()
         .hover(|s| s.opacity(0.9))
         .child(SharedString::from(label.to_string()))
 }

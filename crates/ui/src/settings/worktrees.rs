@@ -237,7 +237,7 @@ impl WorktreeSettingsCard {
                         gpui::Toggled::False
                     })
                     .when(interactive, |el| {
-                        el.cursor_pointer()
+                        el.cursor_default()
                             .tab_index(0)
                             .focus_visible(|s| s.border_2().border_color(theme.accent))
                             .on_click(cx.listener(|card, _, _, cx| card.toggle_credit(cx)))
@@ -699,7 +699,7 @@ impl Render for WorktreeSettingsCard {
                         gpui::Toggled::False
                     })
                     .when(interactive, |el| {
-                        el.cursor_pointer()
+                        el.cursor_default()
                             .tab_index(0)
                             .focus_visible(|s| s.border_2().border_color(theme.accent))
                             .on_click(cx.listener(|card, _, _, cx| card.toggle(cx)))

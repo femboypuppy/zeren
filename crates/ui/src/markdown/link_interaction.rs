@@ -174,7 +174,7 @@ impl Element for LinkRanges {
                         })
                         .w(rect.size.width)
                         .h(rect.size.height)
-                        .cursor_pointer()
+                        .cursor_default()
                         .role(Role::Link)
                         .aria_label(target.label.clone())
                         .when(part == 0, |el| el.track_focus(&focus))

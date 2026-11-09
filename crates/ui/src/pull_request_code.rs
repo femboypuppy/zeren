@@ -484,7 +484,7 @@ impl PullRequestDetailPage {
                     .border_color(paint.border.opacity(if sticky { 1.0 } else { 0.0 }))
             })
             .when(sticky, |el| el.block_mouse_except_scroll())
-            .cursor_pointer()
+            .cursor_default()
             .hover(move |style| style.bg(hover))
             .focus_visible(|style| style.border_2().border_color(theme.accent))
             .on_click(cx.listener(move |page, _, _, cx| page.toggle_fold(file, cx)))
@@ -674,7 +674,7 @@ impl PullRequestDetailPage {
                         .text_size(px(12.0))
                         .text_color(if selected { theme.text } else { theme.text_dim })
                         .when(selected, |el| el.bg(theme.glass_hover()))
-                        .cursor_pointer()
+                        .cursor_default()
                         .hover(|style| style.bg(theme.glass_hover()))
                         .child(
                             crate::file_icons::icon(

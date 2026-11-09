@@ -280,7 +280,7 @@ impl Composer {
             .flex()
             .items_center()
             .gap(px(8.0))
-            .cursor_pointer()
+            .cursor_default()
             .hover(|s| s.bg(theme.element_hover))
             .tab_index(0)
             .focus_visible(move |s| s.bg(accent.opacity(0.14)))
@@ -381,7 +381,7 @@ impl Composer {
                         "{} output of {command}",
                         if open { "Hide" } else { "Show" }
                     ))
-                    .cursor_pointer()
+                    .cursor_default()
                     .hover(|s| s.bg(theme.element_hover))
                     .tab_index(0)
                     .focus_visible(move |s| s.bg(accent.opacity(0.14)))
@@ -497,7 +497,7 @@ impl Composer {
             .justify_center()
             .rounded(px(5.0))
             .when(!stopping, |el| {
-                el.cursor_pointer()
+                el.cursor_default()
                     .hover(move |s| s.bg(danger.opacity(0.14)))
                     .tab_index(0)
                     .focus_visible(move |s| s.bg(accent.opacity(0.18)))

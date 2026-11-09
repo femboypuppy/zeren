@@ -941,7 +941,7 @@ impl Transcript {
             .relative()
             .w_full()
             .h(px(content))
-            .cursor_pointer()
+            .cursor_default()
             .child(
                 canvas(
                     move |bounds, _, _| bounds_cell.set(Some(bounds)),

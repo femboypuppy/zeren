@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Original rounded notification family; standard-library-only stereo PCM.
 
-The selected Done and Request cues replace existing assets without changing
-notification triggers. Optional minimal alternatives are audition files only.
+Done and Request retain their original assets alongside three softer completion
+choices. Optional minimal alternatives are audition files only.
 No external samples, noisy tails, resonant impacts or upward normalization.
 """
 import argparse
@@ -25,6 +25,12 @@ CUES = {
     'done-minimal': (.18, [(.009, .21, .00085)], []),
     'request-minimal': (.38, [(.009, .17, .00075), (.179, .21, .00052),
                               (.259, .12, .00060)], []),
+    # Smooth attacks and tonal tails only: no percussive clicks.
+    'done-soft-chime': (.65, [], [(.015, 523.25, .052, .15),
+                                 (.145, 659.25, .044, .17)]),
+    'done-warm-bell': (.70, [], [(.015, 392.00, .075, .20)]),
+    'done-quiet-drop': (.48, [], [(.015, 440.00, .060, .10),
+                                 (.105, 349.23, .046, .12)]),
 }
 
 
@@ -78,7 +84,7 @@ if __name__ == '__main__':
     parser.add_argument('--variants-dir', type=Path, help='Also export all cues for audition.')
     args = parser.parse_args()
     assets = Path(__file__).resolve().parents[1] / 'crates/ui/assets/sounds'
-    for name in ['done', 'request']:
+    for name in ['done', 'request', 'done-soft-chime', 'done-warm-bell', 'done-quiet-drop']:
         write_cue(name, assets / f'{name}.wav')
     if args.variants_dir:
         for name in CUES:

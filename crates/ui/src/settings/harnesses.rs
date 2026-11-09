@@ -374,7 +374,7 @@ impl HarnessesPage {
             .aria_label("Check for agents and updates")
             .tooltip(widgets::text_tooltip("Check for agents and updates"))
             .focus_visible(|s| s.border_2().border_color(theme.accent))
-            .cursor_pointer()
+            .cursor_default()
             .hover(|style| style.bg(crate::theme::ink(0.05)))
             .on_click(cx.listener(|this, _, _, cx| this.refresh(cx)))
             .child(if busy {
@@ -1301,7 +1301,7 @@ impl HarnessesPage {
                             .py(px(5.0))
                             .rounded(px(6.0))
                             .text_size(crate::typography::ui_rems(11.0))
-                            .cursor_pointer()
+                            .cursor_default()
                             .map(|button| {
                                 if primary {
                                     button
@@ -1350,7 +1350,7 @@ impl HarnessesPage {
                                     .aria_label(format!("{} preferences", descriptor.name))
                                     .aria_expanded(expanded)
                                     .tab_index(0)
-                                    .cursor_pointer()
+                                    .cursor_default()
                                     // No hover slab (it stopped short of the
                                     // toggle and boxed the row); the chevron
                                     // lifts instead, like a list disclosure.
@@ -1451,7 +1451,7 @@ impl HarnessesPage {
                             .id(("harness-toggle", ix))
                             .when(!interactive && !enabled, |el| el.opacity(0.55))
                             .when(interactive, |el| {
-                                el.cursor_pointer()
+                                el.cursor_default()
                                     .tab_index(0)
                                     .role(gpui::Role::Switch)
                                     .aria_label(descriptor.name.clone())

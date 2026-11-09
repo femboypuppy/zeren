@@ -446,7 +446,7 @@ impl Render for VoiceCard {
         let weak = cx.entity().downgrade();
         let switch = widgets::toggle_switch(&theme, on, "voice-dictation")
             .id("voice-enable")
-            .cursor_pointer()
+            .cursor_default()
             .tab_index(0)
             .role(gpui::Role::Switch)
             .aria_label("Dictation")

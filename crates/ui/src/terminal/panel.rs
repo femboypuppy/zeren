@@ -2038,7 +2038,7 @@ impl TerminalPanel {
                             .justify_center()
                             .rounded(px(6.0))
                             .when(!selected, |el| el.invisible())
-                            .cursor_pointer()
+                            .cursor_default()
                             .hover(|s| s.bg(crate::theme::ink(0.09)))
                             .on_click(cx.listener(move |this, _, window, cx| {
                                 cx.stop_propagation();
@@ -2071,7 +2071,7 @@ impl TerminalPanel {
                             .on_hover(motion::hover_listener(format!("term-tab-{key}")))
                             .text_size(px(12.0))
                             .text_color(text_color)
-                            .cursor_pointer()
+                            .cursor_default()
                             .on_click(cx.listener(move |this, _, _, cx| {
                                 this.select_tab(&chat_select, ix, cx);
                                 this.request_focus(cx);
@@ -2140,7 +2140,7 @@ impl TerminalPanel {
                     .items_center()
                     .justify_center()
                     .rounded(px(8.0))
-                    .cursor_pointer()
+                    .cursor_default()
                     // zeren terminal-panel.tsx icon buttons: `transition-colors`.
                     .bg(motion::hover_blend(
                         "term-new-tab",
@@ -2171,7 +2171,7 @@ impl TerminalPanel {
                     .items_center()
                     .justify_center()
                     .rounded(px(8.0))
-                    .cursor_pointer()
+                    .cursor_default()
                     .bg(motion::hover_blend(
                         "term-collapse",
                         gpui::transparent_black(),

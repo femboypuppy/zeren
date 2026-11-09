@@ -166,7 +166,7 @@ impl BrowserSurface {
                     .items_center()
                     .gap(px(10.0))
                     .when(available, |el| {
-                        el.cursor_pointer()
+                        el.cursor_default()
                             .hover(move |style| {
                                 style
                                     .bg(crate::theme::ink(0.05))
@@ -231,7 +231,7 @@ impl BrowserSurface {
                             .role(gpui::Role::Button)
                             .aria_label(format!("Open {} preview", service.name))
                             .when(available, |el| {
-                                el.cursor_pointer()
+                                el.cursor_default()
                                     .hover(|style| style.bg(crate::theme::ink(0.05)))
                                     .on_click(cx.listener(move |this, _, window, cx| {
                                         cx.stop_propagation();
@@ -278,7 +278,7 @@ impl BrowserSurface {
                 .mt(px(8.0))
                 .text_size(crate::typography::ui_rems(11.0))
                 .text_color(theme.text_muted)
-                .cursor_pointer()
+                .cursor_default()
                 .role(gpui::Role::Button)
                 .aria_label("Enter a website address")
                 .on_click(cx.listener(|this, _, window, cx| this.focus_address(window, cx)))
@@ -380,7 +380,7 @@ impl BrowserSurface {
                             .border_1()
                             .border_color(theme.border)
                             .bg(theme.surface_raised)
-                            .cursor_pointer()
+                            .cursor_default()
                             .role(gpui::Role::Button)
                             .aria_label(if has_error {
                                 "Retry page"
@@ -635,7 +635,7 @@ impl Render for BrowserSurface {
                         .flex()
                         .items_center()
                         .justify_center()
-                        .cursor_pointer()
+                        .cursor_default()
                         .role(gpui::Role::Button)
                         .aria_label("Go to address")
                         .hover(|s| s.bg(crate::theme::wash(0.10)))

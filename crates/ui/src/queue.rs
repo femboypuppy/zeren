@@ -626,7 +626,7 @@ impl Composer {
             .items_center()
             .justify_center()
             .rounded(px(4.0))
-            .cursor_pointer()
+            .cursor_default()
             .when(interaction_blocked, |el| {
                 el.cursor(gpui::CursorStyle::Arrow).opacity(0.35)
             })
@@ -1024,7 +1024,7 @@ impl Composer {
                     .focus_visible(move |style| style.border_color(accent))
                     .hover(move |style| style.border_color(accent))
                     .on_mouse_down(gpui::MouseButton::Left, |_, _, cx| cx.stop_propagation())
-                    .cursor_pointer()
+                    .cursor_default()
                     .on_click(cx.listener(move |this, _, _, cx| {
                         cx.stop_propagation();
                         this.load_queue_full_preview(device.clone(), path.clone(), cx);
@@ -1046,7 +1046,7 @@ impl Composer {
                         .aria_label(format!("Preview {label}"))
                         .tab_index(0)
                         .focus_visible(move |style| style.border_color(accent))
-                        .cursor_pointer()
+                        .cursor_default()
                         .on_mouse_down(gpui::MouseButton::Left, |_, _, cx| cx.stop_propagation())
                         .on_click(cx.listener(move |this, _, _, cx| {
                             cx.stop_propagation();
@@ -1094,7 +1094,7 @@ impl Composer {
             .rounded(px(ROW_CONTROL_RADIUS))
             .opacity(0.72)
             .when(enabled, |el| {
-                el.cursor_pointer()
+                el.cursor_default()
                     .hover(|s| s.opacity(1.0).bg(crate::theme::ink(0.07)))
                     .tab_index(0)
                     .focus_visible(move |s| s.bg(accent.opacity(0.18)).text_color(accent))
@@ -1156,7 +1156,7 @@ impl Composer {
             .text_size(px(11.5))
             .text_color(theme.text_muted)
             .when(enabled, |el| {
-                el.cursor_pointer()
+                el.cursor_default()
                     .tab_index(0)
                     .hover(|s| s.bg(crate::theme::ink(0.07)).text_color(theme.text))
                     .focus_visible(move |s| s.bg(accent.opacity(0.18)).text_color(accent))

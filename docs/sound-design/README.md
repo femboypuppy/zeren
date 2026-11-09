@@ -19,6 +19,14 @@ Settings → Notifications has a master session-sounds switch and independent
 choices for completion, input required, and errors/disconnections. Appshot capture
 keeps its independent **Capture sound** setting on the Appshots page.
 
+**Completion sound** selects Soft Chime (the default), Warm Bell, Quiet Drop, or
+the Original cue. The three softer cues have smooth tonal attacks without clicks
+and peaks below -29 dBFS, compared with the original's -19 dBFS peak. **Preview**
+plays the selected cue when session sounds and task-completed sounds are enabled;
+the environment mute still applies. The choice is saved locally and applies to
+all providers. Older settings receive Soft Chime without changing mute switches.
+Regenerate the bundled choices with `python scripts/generate-notification-sounds.py`.
+
 ## Additional auditions
 
 [Ten additional variants](auditions/README.md) cover send, queue, upload ready,

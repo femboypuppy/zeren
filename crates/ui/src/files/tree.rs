@@ -337,7 +337,7 @@ impl FilesSurface {
                     .flex()
                     .items_center()
                     .gap(px(4.0))
-                    .cursor_pointer()
+                    .cursor_default()
                     .when(node.entry.ignored && decoration.is_none(), |element| {
                         element.opacity(0.52)
                     })
@@ -451,7 +451,7 @@ impl FilesSurface {
                 .flex()
                 .items_center()
                 .gap(px(6.0))
-                .cursor_pointer()
+                .cursor_default()
                 .hover(|style| style.bg(crate::theme::wash(0.055)))
                 .on_click(cx.listener(move |this, _, _, cx| {
                     let cursor = this
@@ -481,7 +481,7 @@ impl FilesSurface {
                 .pr(px(8.0))
                 .flex()
                 .items_center()
-                .cursor_pointer()
+                .cursor_default()
                 .hover(|style| style.bg(crate::theme::wash(0.055)))
                 .on_click(cx.listener(move |this, _, _, cx| {
                     this.load_directory(directory.clone(), Some(cursor.clone()), cx);

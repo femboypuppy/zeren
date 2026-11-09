@@ -478,7 +478,7 @@ impl Shell {
                     .border_color(theme.border)
                     .bg(crate::theme::wash(0.04))
                     .hover(|style| style.bg(crate::theme::wash(0.09)))
-                    .cursor_pointer()
+                    .cursor_default()
                     .flex()
                     .items_center()
                     .text_size(px(11.5))

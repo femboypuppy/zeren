@@ -201,7 +201,7 @@ pub(crate) fn sized(
         .role(gpui::Role::Button)
         .aria_label("Preview image")
         .tab_index(0)
-        .cursor_pointer()
+        .cursor_default()
         .focus_visible(move |style| style.border_2().border_color(accent))
         .child(
             gpui::img(image.clone())

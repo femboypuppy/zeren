@@ -11,14 +11,16 @@ use crate::icons;
 use crate::popover;
 use crate::settings::search::{SearchAnchor, SettingId};
 use crate::settings::widgets;
+use crate::sound::{self, CompletionSound, Sound};
 use crate::theme::Theme;
 
 #[derive(Debug, Clone)]
 pub enum NotificationsEvent {
-    /// A toggle flipped — persist the complete notification preference set.
+    /// A preference changed — persist the complete notification preference set.
     Changed {
         sound: bool,
         completion_sound: bool,
+        completion_style: CompletionSound,
         input_sound: bool,
         attention_sound: bool,
         desktop: bool,
@@ -31,6 +33,8 @@ pub struct NotificationsPage {
     scroll: widgets::PageScroll,
     sound: bool,
     completion_sound: bool,
+    completion_style: CompletionSound,
+    completion_select: widgets::SelectState,
     input_sound: bool,
     attention_sound: bool,
     desktop: bool,
@@ -64,7 +68,7 @@ fn interactive_switch(
     element
         .tab_index(0)
         .focus_visible(move |style| style.border_2().border_color(accent))
-        .cursor_pointer()
+        .cursor_default()
         .on_click(cx.listener(move |this, _, _, cx| {
             this.toggle(preference, cx);
         }))
@@ -80,6 +84,7 @@ impl NotificationsPage {
     pub fn new(
         sound: bool,
         completion_sound: bool,
+        completion_style: CompletionSound,
         input_sound: bool,
         attention_sound: bool,
         desktop: bool,
@@ -91,6 +96,8 @@ impl NotificationsPage {
             scroll: widgets::PageScroll::default(),
             sound,
             completion_sound,
+            completion_style,
+            completion_select: widgets::SelectState::default(),
             input_sound,
             attention_sound,
             desktop,
@@ -103,6 +110,7 @@ impl NotificationsPage {
         cx.emit(NotificationsEvent::Changed {
             sound: self.sound,
             completion_sound: self.completion_sound,
+            completion_style: self.completion_style,
             input_sound: self.input_sound,
             attention_sound: self.attention_sound,
             desktop: self.desktop,
@@ -124,6 +132,12 @@ impl NotificationsPage {
         *value = !*value;
         self.emit(cx);
         cx.notify();
+    }
+
+    fn preview_completion(&self) {
+        if self.sound && self.completion_sound {
+            sound::play(Sound::Done, self.completion_style);
+        }
     }
 
     fn on_scroll_hovered(&mut self, hovered: &bool, _: &mut Window, cx: &mut Context<Self>) {
@@ -154,6 +168,48 @@ impl Render for NotificationsPage {
         let desktop = self.desktop;
         let background_only = self.background_only;
         let agent_updates = self.agent_updates;
+        let completion_select = widgets::select(
+            "notifications-completion-style",
+            "Completion sound",
+            &theme,
+            |page: &mut Self| &mut page.completion_select,
+        )
+        .options(
+            CompletionSound::ALL
+                .into_iter()
+                .map(|sound| widgets::SelectOption::new(sound.label())),
+            CompletionSound::ALL
+                .into_iter()
+                .position(|sound| sound == self.completion_style)
+                .unwrap_or_default(),
+        )
+        .width(148.0)
+        .on_select(|page, ix, _, cx| {
+            page.completion_style = CompletionSound::ALL[ix];
+            page.emit(cx);
+            cx.notify();
+        })
+        .render(&self.completion_select, cx);
+        let preview = widgets::ghost_action(&theme)
+            .id("notifications-completion-preview")
+            .role(gpui::Role::Button)
+            .aria_label("Preview completion sound")
+            .child("Preview")
+            .when(sound && completion_sound, |el| {
+                el.tab_index(0)
+                    .focus_visible(move |style| style.border_2().border_color(accent))
+                    .on_click(cx.listener(|page, _, _, _| page.preview_completion()))
+                    .on_key_down(cx.listener(|page, event: &gpui::KeyDownEvent, _, cx| {
+                        if is_switch_activation(&event.keystroke.key, event.is_held) {
+                            cx.stop_propagation();
+                            page.preview_completion();
+                        }
+                    }))
+            })
+            .when(!(sound && completion_sound), |el| {
+                el.opacity(0.55)
+                    .aria_description("Enable task completed sounds to preview")
+            });
         let toggle = |id: &'static str, label: &'static str, enabled: bool, interactive: bool| {
             // Keep the visual inside its 56×40 activation target.
             // Disabled subordinate controls remain named switches in the
@@ -226,6 +282,26 @@ impl Render for NotificationsPage {
                         }),
                     )
                     .search_anchor(SettingId::TaskCompletedSound),
+            )
+            .child(
+                widgets::card_row(&theme, false)
+                    .child(
+                        div()
+                            .flex_1()
+                            .min_w(px(160.0))
+                            .flex()
+                            .flex_col()
+                            .child(widgets::row_title(&theme, "Completion sound")),
+                    )
+                    .child(
+                        div()
+                            .flex()
+                            .items_center()
+                            .gap(px(8.0))
+                            .child(completion_select)
+                            .child(preview),
+                    )
+                    .search_anchor(SettingId::CompletionSoundStyle),
             )
             .child(
                 widgets::card_row(&theme, false)

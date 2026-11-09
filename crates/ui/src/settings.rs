@@ -1348,6 +1348,8 @@ pub struct UiSettings {
     pub sound_enabled: bool,
     /// Chime when an agent run completes successfully.
     pub sound_completion_enabled: bool,
+    /// Selected completion chime. Older settings use the softer default.
+    pub sound_completion_style: crate::sound::CompletionSound,
     /// Chime when an agent is waiting for user input.
     pub sound_input_enabled: bool,
     /// Chime when a run fails or the durable connection state degrades.
@@ -1535,6 +1537,7 @@ impl Default for UiSettings {
             space_order: Vec::new(),
             sound_enabled: true,
             sound_completion_enabled: true,
+            sound_completion_style: crate::sound::CompletionSound::default(),
             sound_input_enabled: true,
             sound_attention_enabled: true,
             notifications_enabled: true,
@@ -2392,6 +2395,7 @@ impl UiSettings {
             space_order,
             sound_enabled,
             sound_completion_enabled,
+            sound_completion_style,
             sound_input_enabled,
             sound_attention_enabled,
             notifications_enabled,
@@ -3593,6 +3597,7 @@ mod tests {
             space_order: vec!["space-2".to_string(), "space-1".to_string()],
             sound_enabled: false,
             sound_completion_enabled: false,
+            sound_completion_style: crate::sound::CompletionSound::WarmBell,
             sound_input_enabled: true,
             sound_attention_enabled: false,
             notifications_enabled: false,
@@ -4063,6 +4068,48 @@ mod tests {
             GitHistoryAuthorDisplay::Avatar,
             "pre-author-display files default to avatars"
         );
+    }
+
+    #[test]
+    fn completion_sound_choices_persist_and_merge_without_unmuting() {
+        use crate::sound::CompletionSound;
+
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(
+            UiSettings::path(dir.path()),
+            r#"{"soundEnabled":false,"soundCompletionEnabled":false}"#,
+        )
+        .unwrap();
+        let base = UiSettings::load(dir.path());
+        assert_eq!(base.sound_completion_style, CompletionSound::SoftChime);
+        for choice in CompletionSound::ALL {
+            let mut edited = base.clone();
+            edited.sound_completion_style = choice;
+            edited.save(dir.path()).unwrap();
+            let restored = UiSettings::load(dir.path());
+            assert_eq!(restored.sound_completion_style, choice);
+            assert!(!restored.session_sound_enabled(crate::sound::Sound::Done));
+            assert!(!restored.sound_completion_enabled);
+
+            let mut concurrent = base.clone();
+            concurrent.notifications_enabled = false;
+            let merged = UiSettings::merge_changes(&base, &edited, concurrent);
+            assert_eq!(merged.sound_completion_style, choice);
+            assert!(!merged.notifications_enabled);
+        }
+        let mut current = base.clone();
+        current.sound_completion_style = CompletionSound::QuietDrop;
+        let merged = UiSettings::merge_changes(&base, &base, current);
+        assert_eq!(merged.sound_completion_style, CompletionSound::QuietDrop);
+
+        std::fs::write(
+            UiSettings::path(dir.path()),
+            r#"{"soundEnabled":false,"soundCompletionStyle":"futureSound"}"#,
+        )
+        .unwrap();
+        let restored = UiSettings::load(dir.path());
+        assert_eq!(restored.sound_completion_style, CompletionSound::SoftChime);
+        assert!(!restored.sound_enabled);
     }
 
     #[test]

@@ -215,7 +215,7 @@ impl Shell {
                         .items_center()
                         .justify_center()
                         .rounded(px(4.0))
-                        .cursor_pointer()
+                        .cursor_default()
                         .hover(|style| style.bg(crate::theme::wash(0.08)))
                         .on_click(move |_, window, cx| {
                             input.update(cx, |input, cx| input.set_text("", cx));
@@ -297,7 +297,7 @@ impl Shell {
             .role(gpui::Role::ListBoxOption)
             .aria_label(entry.title)
             .aria_selected(active)
-            .cursor_pointer()
+            .cursor_default()
             .on_mouse_down(MouseButton::Left, {
                 let field = field.clone();
                 move |_, window, cx| {

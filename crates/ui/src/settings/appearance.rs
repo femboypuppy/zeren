@@ -466,7 +466,7 @@ impl AppearancePage {
                         .role(gpui::Role::Switch)
                         .aria_label("Render math")
                         .focus_visible(|s| s.border_2().border_color(theme.accent))
-                        .cursor_pointer()
+                        .cursor_default()
                         .aria_toggled(if render_math {
                             gpui::Toggled::True
                         } else {
@@ -539,7 +539,7 @@ impl AppearancePage {
             .relative()
             .w(px(240.0))
             .h(px(28.0))
-            .cursor_pointer()
+            .cursor_default()
             .on_mouse_down(
                 gpui::MouseButton::Left,
                 cx.listener(|this, event: &gpui::MouseDownEvent, window, cx| {
@@ -648,7 +648,7 @@ impl AppearancePage {
                             .child(
                                 div()
                                     .id("reset-transcript-width")
-                                    .cursor_pointer()
+                                    .cursor_default()
                                     .text_color(theme.text_muted)
                                     .hover(|style| style.text_color(theme.text))
                                     .on_click(cx.listener(|this, _, _, cx| {
@@ -1942,7 +1942,7 @@ pub(crate) fn accent_swatch(
         } else {
             gpui::transparent_black()
         })
-        .cursor_pointer()
+        .cursor_default()
         .child(
             div()
                 .size(px(30.0))
@@ -2249,7 +2249,7 @@ impl AppearancePage {
                 } else {
                     theme.surface_raised.opacity(0.28)
                 })
-                .cursor_pointer()
+                .cursor_default()
                 .when(!active, |control| {
                     control.hover(|style| style.bg(theme.surface_raised_hover))
                 })
@@ -2448,7 +2448,7 @@ impl AppearancePage {
                                         .flex()
                                         .items_center()
                                         .justify_center()
-                                        .cursor_pointer()
+                                        .cursor_default()
                                         .when(selected_now, |item| {
                                             item.child(
                                                 icons::icon(icons::CHECK)
@@ -2627,7 +2627,7 @@ impl AppearancePage {
                     .flex()
                     .items_center()
                     .justify_center()
-                    .cursor_pointer()
+                    .cursor_default()
                     .hover(|style| style.bg(theme.surface_raised_hover))
                     .tooltip(widgets::text_tooltip("Close"))
                     .tab_index(0).role(gpui::Role::Button)
@@ -2961,7 +2961,7 @@ impl AppearancePage {
             .relative()
             .w(px(168.0))
             .h(px(28.0))
-            .cursor_pointer()
+            .cursor_default()
             .on_mouse_down(
                 gpui::MouseButton::Left,
                 cx.listener(|this, event: &gpui::MouseDownEvent, window, cx| {
@@ -3161,7 +3161,7 @@ impl AppearancePage {
                     .flex()
                     .items_center()
                     .justify_center()
-                    .cursor_pointer()
+                    .cursor_default()
                     .hover(|style| style.bg(theme.surface_raised_hover))
                     .tab_index(0)
                     .role(gpui::Role::Button)
@@ -3747,7 +3747,7 @@ impl Render for AppearancePage {
                     .role(gpui::Role::Switch)
                     .aria_label("Match wallpaper colors")
                     .focus_visible(|s| s.border_2().border_color(theme.accent))
-                    .cursor_pointer()
+                    .cursor_default()
                     .aria_toggled(if match_wallpaper { gpui::Toggled::True } else { gpui::Toggled::False })
                     .on_click(cx.listener(move |_, _, _, cx| {
                         crate::settings::wallpaper_colors::set_enabled(!match_wallpaper, cx);
@@ -4140,7 +4140,7 @@ impl Render for AppearancePage {
                     .role(gpui::Role::Switch)
                     .aria_label("Pause animations in background")
                     .focus_visible(|s| s.border_2().border_color(theme.accent))
-                    .cursor_pointer()
+                    .cursor_default()
                     .aria_toggled(if pause_in_background {
                         gpui::Toggled::True
                     } else {
@@ -4178,7 +4178,7 @@ impl Render for AppearancePage {
                         .role(gpui::Role::Switch)
                         .aria_label("Smooth scrolling")
                         .focus_visible(|s| s.border_2().border_color(theme.accent))
-                        .cursor_pointer()
+                        .cursor_default()
                         .aria_toggled(if smooth_scrolling {
                             gpui::Toggled::True
                         } else {

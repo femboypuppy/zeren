@@ -259,7 +259,7 @@ pub(crate) fn star_button(url: &str, theme: &Theme, cx: &gpui::App) -> gpui::Sta
         .rounded(px(6.0))
         .border_1()
         .border_color(gpui::transparent_black())
-        .cursor_pointer()
+        .cursor_default()
         .hover(|style| style.bg(theme.glass_hover()))
         .tooltip(widgets::text_tooltip(label))
         .child(
@@ -1920,7 +1920,7 @@ impl PullRequestsPage {
             .flex()
             .items_center()
             .gap(px(6.0))
-            .cursor_pointer()
+            .cursor_default()
             .bg(if open {
                 crate::theme::ink(0.06)
             } else {
@@ -2384,7 +2384,7 @@ impl Render for PullRequestsPage {
                                     .items_center()
                                     .justify_center()
                                     .rounded(px(6.0))
-                                    .cursor_pointer()
+                                    .cursor_default()
                                     .border_1()
                                     .border_color(gpui::transparent_black())
                                     .hover(|style| style.bg(crate::theme::ink(0.04)))
@@ -2519,7 +2519,7 @@ impl Render for PullRequestsPage {
                                                 .items_center()
                                                 .justify_center()
                                                 .rounded(px(4.0))
-                                                .cursor_pointer()
+                                                .cursor_default()
                                                 .on_click(cx.listener(|page, _, _, cx| {
                                                     page.search.update(cx, |input, cx| {
                                                         input.set_text("", cx)
@@ -2590,7 +2590,7 @@ impl Render for PullRequestsPage {
                                 .justify_center()
                                 .gap(px(6.0))
                                 .rounded_full()
-                                .cursor_pointer()
+                                .cursor_default()
                                 .text_size(crate::typography::ui_rems(12.0))
                                 .line_height(crate::typography::ui_rems(16.0))
                                 .text_color(color)
@@ -2872,7 +2872,7 @@ impl PullRequestsPage {
                 .rounded(px(6.0))
                 .border_1()
                 .border_color(gpui::transparent_black())
-                .cursor_pointer()
+                .cursor_default()
                 .hover(|style| style.bg(crate::theme::ink(0.025)))
                 .on_click(cx.listener(move |page, _, _, cx| {
                     if !page.collapsed_groups.remove(&group) {
@@ -3000,7 +3000,7 @@ fn render_table_row(
         ))
         .tab_index(0)
         .when(selected, |el| el.bg(theme.glass_hover()))
-        .cursor_pointer()
+        .cursor_default()
         .hover(|style| style.bg(theme.glass_hover()))
         .on_click(move |_, window, cx| {
             cx.stop_propagation();

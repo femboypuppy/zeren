@@ -1051,7 +1051,7 @@ impl CloudPage {
             .role(gpui::Role::Button)
             .aria_label("Check repositories again")
             .tooltip(widgets::text_tooltip("Check repositories again"))
-            .cursor_pointer()
+            .cursor_default()
             .hover(|style| style.bg(crate::theme::ink(0.05)))
             .when(!refreshing, |el| {
                 el.on_click(cx.listener(|this, _, _, cx| {
@@ -1152,7 +1152,7 @@ impl CloudPage {
             .gap(px(10.0))
             .rounded(px(8.0))
             .bg(widgets::select_fill(theme, false))
-            .cursor_pointer()
+            .cursor_default()
             .hover(|s| s.bg(widgets::select_fill(theme, true)))
             .tab_index(0)
             .role(gpui::Role::Button)
@@ -1376,7 +1376,7 @@ impl Render for CloudPage {
                                     el.child(
                                         widgets::error_strip(&theme, message)
                                             .id("cloud-error")
-                                            .cursor_pointer()
+                                            .cursor_default()
                                             .tab_index(0)
                                             .role(gpui::Role::Button)
                                             .on_click(cx.listener(|this, _, _, cx| {
