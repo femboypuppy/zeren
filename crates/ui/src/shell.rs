@@ -13723,6 +13723,7 @@ fn windows_caption_button(
         .window_control_area(area)
         .child(
             icon(icon_path)
+                .id("caption-icon")
                 .size(px(24.0))
                 .text_color(theme.text)
                 .group_hover("windows-caption-button", move |style| {
