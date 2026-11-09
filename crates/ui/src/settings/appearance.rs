@@ -3812,6 +3812,11 @@ impl Render for AppearancePage {
                 crate::settings::FrostBackdrop::Wallpaper => {
                     "A blurred copy of your desktop wallpaper, painted by Zeren."
                 }
+                crate::settings::FrostBackdrop::System
+                    if !crate::windows_backdrop::supports_system_backdrop() =>
+                {
+                    "Uses wallpaper frost on this Windows version. Live blur requires Windows 11 22H2 or newer."
+                }
                 crate::settings::FrostBackdrop::System => {
                     "Windows Acrylic: blurs the apps behind the window. Needs Transparency                      effects, and backdrop mods (e.g. Windhawk Translucent Windows) set to                      Default for zeren.exe."
                 }

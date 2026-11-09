@@ -8329,17 +8329,17 @@ impl Shell {
     /// Native Windows caption controls integrated into Zeren's unified
     /// titlebar. `WindowControlArea` maps these hit targets to HTMINBUTTON,
     /// HTMAXBUTTON, and HTCLOSE, so Windows owns their behavior (including
-    /// Snap Layouts) while GPUI renders the system Segoe caption glyphs.
+    /// Snap Layouts) while GPUI renders bundled icons, including on Windows 10.
     fn render_windows_caption_controls(&self, window: &Window, cx: &App) -> Option<AnyElement> {
         if !cfg!(target_os = "windows") {
             return None;
         }
 
         let theme = Theme::of(cx);
-        let (maximize_id, maximize_glyph) = if window.is_maximized() {
-            ("window-restore", "\u{e923}")
+        let (maximize_id, maximize_icon) = if window.is_maximized() {
+            ("window-restore", icons::WINDOW_RESTORE)
         } else {
-            ("window-maximize", "\u{e922}")
+            ("window-maximize", icons::WINDOW_MAXIMIZE)
         };
         Some(
             div()
@@ -8350,24 +8350,23 @@ impl Shell {
                 .h(px(Theme::TITLEBAR_HEIGHT))
                 .flex()
                 .flex_row()
-                .font_family("Segoe Fluent Icons")
                 .child(windows_caption_button(
                     "window-minimize",
-                    "\u{e921}",
+                    icons::WINDOW_MINIMIZE,
                     WindowControlArea::Min,
                     theme,
                     false,
                 ))
                 .child(windows_caption_button(
                     maximize_id,
-                    maximize_glyph,
+                    maximize_icon,
                     WindowControlArea::Max,
                     theme,
                     false,
                 ))
                 .child(windows_caption_button(
                     "window-close",
-                    "\u{e8bb}",
+                    icons::CLOSE,
                     WindowControlArea::Close,
                     theme,
                     true,
@@ -13685,11 +13684,10 @@ fn titlebar_right_padding(is_windows: bool, linux_right_captions: usize, base: f
     }
 }
 
-/// A Windows-owned caption target using the same system glyphs and native
-/// non-client hit-test areas as GPUI/Zed's platform titlebar.
+/// Bundled caption icons with Windows-owned non-client hit-test behavior.
 fn windows_caption_button(
     id: &'static str,
-    glyph: &'static str,
+    icon_path: &'static str,
     area: WindowControlArea,
     theme: &Theme,
     close: bool,
@@ -13712,19 +13710,28 @@ fn windows_caption_button(
     };
     div()
         .id(id)
+        .group("windows-caption-button")
         .w(px(WINDOWS_CAPTION_BUTTON_WIDTH))
         .h_full()
         .flex_none()
         .flex()
         .items_center()
         .justify_center()
-        .text_size(crate::typography::ui_rems(10.0))
-        .text_color(theme.text)
-        .hover(move |style| style.bg(hover_bg).text_color(hover_fg))
-        .active(move |style| style.bg(active_bg).text_color(active_fg))
+        .hover(move |style| style.bg(hover_bg))
+        .active(move |style| style.bg(active_bg))
         .occlude()
         .window_control_area(area)
-        .child(glyph)
+        .child(
+            icon(icon_path)
+                .size(px(24.0))
+                .text_color(theme.text)
+                .group_hover("windows-caption-button", move |style| {
+                    style.text_color(hover_fg)
+                })
+                .group_active("windows-caption-button", move |style| {
+                    style.text_color(active_fg)
+                }),
+        )
 }
 
 /// A Linux caption button in zeren's own cluster style (24px, rounded-6,
@@ -13971,9 +13978,10 @@ impl Render for Shell {
         // falls back to a flat colour on some systems.
         let wallpaper_frost = (cfg!(target_os = "windows")
             && theme.is_glass()
-            && self.settings.frost_backdrop == settings::FrostBackdrop::Wallpaper)
-            .then(|| crate::wallpaper_frost::backdrop(window, cx))
-            .flatten();
+            && (self.settings.frost_backdrop == settings::FrostBackdrop::Wallpaper
+                || !crate::windows_backdrop::supports_system_backdrop()))
+        .then(|| crate::wallpaper_frost::backdrop(window, cx))
+        .flatten();
         // With the wallpaper layer present the tint moves onto its own layer
         // above it; otherwise the root paints the tint directly.
         let root_tint = wallpaper_frost.is_none().then_some(frost);

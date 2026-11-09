@@ -1143,7 +1143,9 @@ impl Theme {
     /// ([`Self::GLASS_ALPHA`]), so nothing else shows through — only the
     /// corners.
     pub fn window_background_appearance(&self) -> gpui::WindowBackgroundAppearance {
-        if cfg!(target_os = "linux") {
+        // Windows uses our wallpaper frost or the modern DWM backdrop. Never
+        // install GPUI's legacy Acrylic: it stalls window dragging on Windows 10.
+        if cfg!(target_os = "linux") || (cfg!(target_os = "windows") && self.is_glass()) {
             gpui::WindowBackgroundAppearance::Transparent
         } else if self.is_glass() {
             gpui::WindowBackgroundAppearance::Blurred
@@ -2302,7 +2304,7 @@ mod tests {
             assert!(frosted.is_glass());
             assert_eq!(
                 frosted.window_background_appearance(),
-                gpui::WindowBackgroundAppearance::Blurred
+                gpui::WindowBackgroundAppearance::Transparent
             );
             assert!(frosted.is_frost());
         }
