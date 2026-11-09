@@ -13340,7 +13340,7 @@ dependencies = [
 
 [[package]]
 name = "zatex"
-version = "0.2.138"
+version = "0.2.139"
 dependencies = [
  "tiny-skia",
  "ttf-parser",
