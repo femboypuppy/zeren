@@ -57,8 +57,9 @@ use windows_sys::Win32::Foundation::{WAIT_OBJECT_0, WAIT_TIMEOUT};
 use windows_sys::Win32::System::Threading::{
     CREATE_NO_WINDOW, CREATE_SUSPENDED, CREATE_UNICODE_ENVIRONMENT, CreateProcessW,
     EXTENDED_STARTUPINFO_PRESENT, GetExitCodeProcess, INFINITE, PROCESS_INFORMATION, ResumeThread,
-    STARTF_USESTDHANDLES, STARTUPINFOEXW, WaitForSingleObject,
+    STARTF_USESHOWWINDOW, STARTF_USESTDHANDLES, STARTUPINFOEXW, WaitForSingleObject,
 };
+use windows_sys::Win32::UI::WindowsAndMessaging::SW_HIDE;
 
 #[derive(Debug)]
 pub struct Child {
@@ -232,7 +233,9 @@ fn launch(
     let mut attrs = crate::windows_process::Attributes::for_parent(&parent, &handles)?;
     let mut startup = STARTUPINFOEXW::default();
     startup.StartupInfo.cb = std::mem::size_of::<STARTUPINFOEXW>() as u32;
-    startup.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+    // CREATE_NO_WINDOW alone does not set the show state for windows a CLI creates later.
+    startup.StartupInfo.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+    startup.StartupInfo.wShowWindow = SW_HIDE as u16;
     startup.StartupInfo.hStdInput = handles[0];
     startup.StartupInfo.hStdOutput = handles[1];
     startup.StartupInfo.hStdError = handles[2];

@@ -36,6 +36,45 @@ fn parked_command() -> Command {
 }
 
 #[test]
+fn hidden_startup_child_helper() {
+    if std::env::var_os("ZEREN_TEST_HIDDEN_STARTUP").is_none() {
+        return;
+    }
+    use windows_sys::Win32::System::Console::GetConsoleWindow;
+    use windows_sys::Win32::System::Threading::{GetStartupInfoW, STARTUPINFOW};
+    let mut startup = STARTUPINFOW::default();
+    unsafe { GetStartupInfoW(&mut startup) };
+    assert_ne!(startup.dwFlags & STARTF_USESHOWWINDOW, 0);
+    assert_eq!(startup.wShowWindow, SW_HIDE as u16);
+    assert!(
+        unsafe { GetConsoleWindow() }.is_null(),
+        "background CLI inherited a console"
+    );
+    println!("hidden startup verified");
+}
+
+#[tokio::test]
+async fn background_cli_probes_have_no_console_and_request_hidden_windows() {
+    let output = Command::new(std::env::current_exe().unwrap())
+        .args([
+            "--exact",
+            "process::windows::tests::hidden_startup_child_helper",
+            "--nocapture",
+        ])
+        .env("ZEREN_TEST_HIDDEN_STARTUP", "1")
+        .stdin(Stdio::null())
+        .output()
+        .await
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stdout)
+    );
+    assert!(String::from_utf8_lossy(&output.stdout).contains("hidden startup verified"));
+}
+
+#[test]
 fn parked_child_helper() {
     if let Ok(handle) = std::env::var("ZEREN_TEST_INHERITED_EVENT") {
         // Signal only if the parent's sentinel handle accidentally survived the

@@ -17,8 +17,9 @@ use windows_sys::Win32::Foundation::{
 };
 use windows_sys::Win32::System::Threading::{
     CREATE_NO_WINDOW, CREATE_SUSPENDED, CreateProcessW, EXTENDED_STARTUPINFO_PRESENT,
-    GetCurrentProcess, PROCESS_INFORMATION, STARTUPINFOEXW, TerminateProcess,
+    GetCurrentProcess, PROCESS_INFORMATION, STARTF_USESHOWWINDOW, STARTUPINFOEXW, TerminateProcess,
 };
+use windows_sys::Win32::UI::WindowsAndMessaging::SW_HIDE;
 
 #[derive(Debug)]
 pub(super) struct Escrow {
@@ -44,6 +45,8 @@ impl Escrow {
         let mut attrs = Attributes::for_job(&jobs)?;
         let mut startup = STARTUPINFOEXW::default();
         startup.StartupInfo.cb = std::mem::size_of::<STARTUPINFOEXW>() as u32;
+        startup.StartupInfo.dwFlags = STARTF_USESHOWWINDOW;
+        startup.StartupInfo.wShowWindow = SW_HIDE as u16;
         startup.lpAttributeList = attrs.ptr();
         let mut info = PROCESS_INFORMATION::default();
         // No inherited handles and no execution. Explicit image, no command
