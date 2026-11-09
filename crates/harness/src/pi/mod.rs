@@ -19,11 +19,21 @@ use std::{
     path::{Path, PathBuf},
     time::Duration,
 };
-use tokio::{
-    io::{AsyncBufReadExt, BufReader},
-    sync::mpsc,
-};
+use tokio::sync::mpsc;
 use zeren_proto::{AgentEvent, HarnessId, Model, ReasoningLevel, RunRequest, SteeringMode};
+
+/// Bound on a state query (`get_state`, `get_entries`) a turn's end waits on.
+/// Pi answers them at once even mid-run; silence past this is a wedged
+/// process, which fails the run instead of leaving it Working forever.
+const STATE_QUERY_TIMEOUT: Duration = Duration::from_secs(15);
+/// Bound on applying a mid-session model or thinking change (several
+/// queries, one of which lists the available models).
+const CONFIGURE_TIMEOUT: Duration = Duration::from_secs(30);
+/// How long an idle Pi may hold queued input before the turn settles as it
+/// stands. Pi starts queued input at once; input it leaves queued while idle
+/// has no settle event coming, so the barrier is re-polled until this bound.
+const IDLE_QUEUE_TIMEOUT: Duration = Duration::from_secs(15);
+const IDLE_QUEUE_POLL: Duration = Duration::from_millis(250);
 
 pub struct PiHarness {
     models_cache: crate::catalog::Catalog,
@@ -33,6 +43,7 @@ pub struct PiHarness {
     executable: Option<PathBuf>,
     interrupt_grace: Duration,
     kill_grace: Duration,
+    idle_queue_timeout: Duration,
 }
 impl Default for PiHarness {
     fn default() -> Self {
@@ -44,6 +55,7 @@ impl Default for PiHarness {
             workspace_commands: Default::default(),
             interrupt_grace: Duration::from_secs(2),
             kill_grace: Duration::from_secs(3),
+            idle_queue_timeout: IDLE_QUEUE_TIMEOUT,
         }
     }
 }
@@ -68,6 +80,12 @@ impl PiHarness {
     pub fn with_graces(mut self, interrupt: Duration, kill: Duration) -> Self {
         self.interrupt_grace = interrupt;
         self.kill_grace = kill;
+        self
+    }
+    /// Tune the idle-with-queued-input bound (tests shrink it; default 15s).
+    #[doc(hidden)]
+    pub fn with_idle_queue_timeout(mut self, timeout: Duration) -> Self {
+        self.idle_queue_timeout = timeout;
         self
     }
     pub fn resolve_executable(&self) -> Result<PathBuf, HarnessError> {
@@ -95,7 +113,13 @@ impl PiHarness {
         })
     }
     async fn probe(&self, cwd: &Path, models: bool) -> Result<Value, HarnessError> {
-        let mut process = self.spawn(cwd, &["--no-session".into()], None)?;
+        let mut process = self.spawn(
+            cwd,
+            &["--no-session".into()],
+            None,
+            &[],
+            &Default::default(),
+        )?;
         let (mut tx, rx) = tokio::sync::oneshot::channel();
         let grace = self.kill_grace;
         tokio::spawn(async move {
@@ -117,6 +141,8 @@ impl PiHarness {
         cwd: &Path,
         args: &[String],
         mcp: Option<&zeren_proto::McpServer>,
+        extra_mcp: &[zeren_proto::McpServer],
+        run_env: &std::collections::BTreeMap<String, String>,
     ) -> Result<Process, HarnessError> {
         let exe = self.resolve_executable()?;
         if self.executable.is_none() {
@@ -135,6 +161,7 @@ impl PiHarness {
         if let Some(dir) = &self.agent_dir {
             cmd.env("PI_CODING_AGENT_DIR", dir);
         }
+        crate::apply_run_env(&mut cmd, run_env);
         cmd.args(["--mode", "rpc", "--no-themes"])
             .args(args)
             .current_dir(cwd)
@@ -142,12 +169,13 @@ impl PiHarness {
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .kill_on_drop(true);
-        let scratch = mcp
-            .map(|config| self::mcp::configure(&mut cmd, config))
-            .transpose()?;
-        let mut child = Child::new(cmd.spawn()?);
+        let scratch = self::mcp::configure_all(&mut cmd, mcp, extra_mcp)?;
+        let child = cmd.spawn().map_err(|e| {
+            crate::executable::spawn_error(e, Some(cwd), || crate::executable::binary_hint(&exe))
+        })?;
+        let mut child = Child::new(child);
         let tail = crate::StderrTail::default();
-        let mut lines = BufReader::new(child.stderr.take().expect("piped stderr")).lines();
+        let mut lines = crate::lossy_lines::lossy_lines(child.stderr.take().expect("piped stderr"));
         let stderr = tail.clone();
         let stderr_task = tokio::spawn(async move {
             while let Ok(Some(line)) = lines.next_line().await {
@@ -224,9 +252,18 @@ impl Process {
         }
     }
     async fn shutdown(&mut self, grace: Duration) {
-        self.dialogs.cancel();
+        self.dialogs.cancel(&self.transport.client);
+        self.transport.close_input_for_teardown();
         self.child.shutdown(grace).await;
     }
+}
+/// Whether `request` picks a thinking level (an effort, or thinking off).
+fn thinking_selected(request: &RunRequest) -> bool {
+    request.reasoning.is_some()
+        || request
+            .model_options
+            .get("pi_thinking")
+            .is_some_and(|v| v == "off")
 }
 fn response_data(frame: Value) -> Result<Value, HarnessError> {
     if frame["success"] == true {
@@ -264,6 +301,14 @@ impl Harness for PiHarness {
     }
     fn deterministic_turn_end(&self) -> bool {
         true
+    }
+    /// `set_model` and `set_thinking_level` change the live process. Clearing
+    /// either back to the default cannot be expressed that way.
+    fn reconfigures_in_place(&self, live: &RunRequest, next: &RunRequest) -> bool {
+        let model = |r: &RunRequest| r.model.as_deref().filter(|m| *m != "default").is_some();
+        live.cwd == next.cwd
+            && (model(next) || !model(live))
+            && (thinking_selected(next) || !thinking_selected(live))
     }
     async fn models(&self) -> Result<Vec<Model>, HarnessError> {
         Ok(self.model_catalog(false).await?.models)
@@ -347,10 +392,17 @@ impl Harness for PiHarness {
         if lost_context.is_some() {
             request.resume = None;
         }
-        let process = self.spawn(Path::new(&request.cwd), &args, request.mcp.as_ref())?;
+        let process = self.spawn(
+            Path::new(&request.cwd),
+            &args,
+            request.mcp.as_ref(),
+            &request.extra_mcp,
+            &request.env,
+        )?;
         let (tx, rx) = mpsc::channel(256);
         let kill_grace = self.kill_grace;
         let interrupt_grace = self.interrupt_grace;
+        let idle_queue_timeout = self.idle_queue_timeout;
         tokio::spawn(async move {
             let mut runner = Runner {
                 store,
@@ -371,6 +423,11 @@ impl Harness for PiHarness {
                 session: String::new(),
                 assistant: uuid::Uuid::new_v4().to_string(),
                 lost_context,
+                recheck_state: false,
+                state_deadline: None,
+                idle_queue_timeout,
+                idle_queue_deadline: None,
+                idle_poll: None,
             };
             // The lease lives through shutdown even if the consumer drops its stream.
             let RunControls {
@@ -379,6 +436,7 @@ impl Harness for PiHarness {
                 request_input,
                 mut steering,
                 interrupt,
+                turn: _,
             } = controls;
             runner.process.dialogs.input = Some(std::sync::Arc::from(request_input));
             let consumer = runner.tx.clone();
@@ -388,7 +446,17 @@ impl Harness for PiHarness {
                 _=consumer.closed()=>Ok(()),
             };
             if let Err(error) = result {
-                let status = runner.process.child.try_wait().ok().flatten();
+                // The first symptom of a crash is usually the pipe's ("Pi
+                // stdout closed", EPIPE), racing the exit itself: give the exit
+                // and the stderr tail a moment so the message names the crash.
+                let status =
+                    tokio::time::timeout(Duration::from_millis(250), runner.process.child.wait())
+                        .await
+                        .ok()
+                        .and_then(Result::ok);
+                if status.is_some() {
+                    runner.process.tail.wait_closed().await;
+                }
                 runner.norm.error = Some(if status.is_some() {
                     crate::crash_message("Pi", status, &runner.process.tail)
                 } else {
@@ -416,6 +484,8 @@ struct Delivery {
     epoch: u64,
     // Queue acceptance permits sending the next steer, but is not consumption.
     queued: bool,
+    // Sent while no turn ran: it starts its own turn rather than joining one.
+    opens_turn: bool,
 }
 struct Runner {
     extension_commands: HashSet<String>,
@@ -436,6 +506,18 @@ struct Runner {
     session: String,
     assistant: String,
     lost_context: Option<String>,
+    /// The last state barrier found Pi busy (streaming, compacting, queued
+    /// input) with no settle event guaranteed to follow: re-check at the end
+    /// of compaction or of an automatic retry.
+    recheck_state: bool,
+    /// When an outstanding state query gives up (see STATE_QUERY_TIMEOUT).
+    state_deadline: Option<tokio::time::Instant>,
+    idle_queue_timeout: Duration,
+    /// Since the barrier first found Pi idle with input queued: past it the
+    /// turn settles as it stands (see IDLE_QUEUE_TIMEOUT).
+    idle_queue_deadline: Option<tokio::time::Instant>,
+    /// The next re-poll of that idle state.
+    idle_poll: Option<tokio::time::Instant>,
 }
 impl Runner {
     async fn emit(&self, event: AgentEvent) -> Result<(), HarnessError> {
@@ -460,7 +542,9 @@ impl Runner {
             return Ok(());
         }
         self.active = false;
-        self.process.dialogs.cancel();
+        self.idle_queue_deadline = None;
+        self.idle_poll = None;
+        self.process.dialogs.cancel(&self.process.transport.client);
         self.emit(AgentEvent::Done {
             status: if self.interrupted {
                 zeren_proto::DoneStatus::Interrupted
@@ -520,7 +604,34 @@ impl Runner {
                 .query(json!({"type":"set_steering_mode","mode":"all"}), backlog)
                 .await?;
         }
-        if let Some(model) = self.request.model.as_deref().filter(|s| *s != "default") {
+        let request = self.request.clone();
+        self.configure(&request, backlog).await?;
+        let commands = self
+            .process
+            .query(json!({"type":"get_commands"}), backlog)
+            .await?;
+        self.extension_commands = commands["commands"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|c| c["source"] == "extension")
+            .map(|c| string(c, "name").to_owned())
+            .collect();
+        self.emit(AgentEvent::AvailableCommands {
+            commands: catalog::commands(&commands),
+        })
+        .await?;
+        self.process
+            .query(json!({"type":"get_state"}), backlog)
+            .await
+    }
+    /// Select `request`'s model and thinking level on the live process.
+    async fn configure(
+        &mut self,
+        request: &RunRequest,
+        backlog: &mut Vec<Value>,
+    ) -> Result<(), HarnessError> {
+        if let Some(model) = request.model.as_deref().filter(|s| *s != "default") {
             let models = self
                 .process
                 .query(json!({"type":"get_available_models"}), backlog)
@@ -546,27 +657,20 @@ impl Runner {
                 )
                 .await?;
         }
-        if self.request.reasoning.is_some()
-            || self
-                .request
-                .model_options
-                .get("pi_thinking")
-                .is_some_and(|v| v == "off")
-        {
+        if thinking_selected(request) {
             let supported = self
                 .process
                 .query(json!({"type":"get_available_thinking_levels"}), backlog)
                 .await?;
             let levels = supported["levels"].as_array().cloned().unwrap_or_default();
-            let desired = if self
-                .request
+            let desired = if request
                 .model_options
                 .get("pi_thinking")
                 .is_some_and(|v| v == "off")
             {
                 "off".to_string()
             } else {
-                serde_json::to_value(self.request.reasoning)
+                serde_json::to_value(request.reasoning)
                     .unwrap()
                     .as_str()
                     .unwrap_or("medium")
@@ -591,24 +695,7 @@ impl Runner {
                 )
                 .await?;
         }
-        let commands = self
-            .process
-            .query(json!({"type":"get_commands"}), backlog)
-            .await?;
-        self.extension_commands = commands["commands"]
-            .as_array()
-            .into_iter()
-            .flatten()
-            .filter(|c| c["source"] == "extension")
-            .map(|c| string(c, "name").to_owned())
-            .collect();
-        self.emit(AgentEvent::AvailableCommands {
-            commands: catalog::commands(&commands),
-        })
-        .await?;
-        self.process
-            .query(json!({"type":"get_state"}), backlog)
-            .await
+        Ok(())
     }
     async fn run(
         &mut self,
@@ -674,17 +761,42 @@ impl Runner {
                             }))
                 }) {
                     if let Some(steer) = self.queued.pop_front() {
-                        if !self.active {
+                        // A changed model or thinking level applies on the
+                        // live process before the message it was sent with.
+                        if let Some(next) = &steer.config {
+                            let mut backlog = vec![];
+                            tokio::time::timeout(
+                                CONFIGURE_TIMEOUT,
+                                self.configure(next, &mut backlog),
+                            )
+                            .await
+                            .map_err(|_| {
+                                HarnessError::Protocol(format!(
+                                    "Pi did not apply the model change within {}s",
+                                    CONFIGURE_TIMEOUT.as_secs()
+                                ))
+                            })??;
+                            self.request.model = next.model.clone();
+                            self.request.reasoning = next.reasoning;
+                            self.request.model_options = next.model_options.clone();
+                            for frame in backlog {
+                                self.frame(frame).await?;
+                            }
+                        }
+                        let opens_turn = !self.active;
+                        if opens_turn {
                             self.norm.reset();
                         }
                         self.epoch += 1;
                         self.active = true;
                         // Atomic Pi operation: queue at a step boundary if busy, start if idle.
                         // A separate get_state + steer pair would strand an input on the idle race.
-                        self.submit(steer.prompt.clone(), json!([]), true)?;
+                        let images = load_images(&steer.attachments).await;
+                        self.submit(steer.prompt.clone(), images, true)?;
                         self.deliveries.push_back(Delivery {
                             epoch: self.epoch,
                             queued: false,
+                            opens_turn,
                         });
                     }
                 }
@@ -692,9 +804,35 @@ impl Runner {
             if !self.active && !open && self.queued.is_empty() {
                 return Ok(());
             }
+            if !self.pending.values().any(|p| {
+                matches!(
+                    p,
+                    Pending::Barrier(_) | Pending::EmptyEntries(..) | Pending::EmptyState(..)
+                )
+            }) {
+                self.state_deadline = None;
+            }
+            let state_deadline = self.state_deadline;
+            let idle_poll = self.idle_poll;
             tokio::select! {
                 incoming=self.process.next()=>self.frame(incoming?).await?,
-                steer=steering.recv(),if open=>match steer {Some(steer)=>self.queued.push_back(steer),None=>open=false}
+                steer=steering.recv(),if open=>match steer {Some(steer)=>self.queued.push_back(steer),None=>open=false},
+                _ = tokio::time::sleep_until(state_deadline.unwrap_or_else(tokio::time::Instant::now)),
+                    if state_deadline.is_some() =>
+                {
+                    return Err(HarnessError::Protocol(format!(
+                        "Pi did not answer a state query within {}s",
+                        STATE_QUERY_TIMEOUT.as_secs()
+                    )));
+                }
+                _ = tokio::time::sleep_until(idle_poll.unwrap_or_else(tokio::time::Instant::now)),
+                    if idle_poll.is_some() =>
+                {
+                    self.idle_poll = None;
+                    if self.active {
+                        self.query_state(json!({"type":"get_state"}), Pending::Barrier(self.epoch))?;
+                    }
+                }
             }
         }
     }
@@ -711,7 +849,7 @@ impl Runner {
     }
     async fn interrupt(&mut self, grace: Duration) {
         self.interrupted = true;
-        self.process.dialogs.cancel();
+        self.process.dialogs.cancel(&self.process.transport.client);
         self.queued.clear();
         self.deliveries.clear();
         if !self.active {
@@ -742,6 +880,41 @@ impl Runner {
         })
         .await;
     }
+    /// Send a state query the turn's end depends on, under STATE_QUERY_TIMEOUT.
+    fn query_state(&mut self, command: Value, pending: Pending) -> Result<(), HarnessError> {
+        let id = self.process.transport.client.request(command)?;
+        self.pending.insert(id, pending);
+        self.state_deadline = Some(tokio::time::Instant::now() + STATE_QUERY_TIMEOUT);
+        self.idle_poll = None;
+        Ok(())
+    }
+    /// Pi refused a submission: a steer it would not take, a failed command.
+    /// That fails the input, not the run. A turn the input joined goes on; a
+    /// turn it opened settles Errored through the usual state barrier.
+    async fn rejected(&mut self, epoch: u64, error: HarnessError) -> Result<(), HarnessError> {
+        let message = error.to_string();
+        let opened = match self.deliveries.iter().position(|d| d.epoch == epoch) {
+            Some(0) if self.deliveries[0].opens_turn => {
+                // Its own segment, as if consumed, so the error lands there.
+                self.confirm_delivery().await?;
+                true
+            }
+            Some(index) => {
+                // It will never see a consumption event.
+                self.deliveries.remove(index);
+                false
+            }
+            None => std::mem::take(&mut self.initial_pending),
+        };
+        if opened {
+            self.norm.error = Some(message.clone());
+        }
+        self.emit(AgentEvent::Error { message }).await?;
+        if epoch == self.epoch && self.active {
+            self.query_state(json!({"type":"get_state"}), Pending::Barrier(epoch))?;
+        }
+        Ok(())
+    }
     async fn state(&mut self, data: Value, empty_proof: Option<bool>) -> Result<(), HarnessError> {
         let session = data["sessionId"]
             .as_str()
@@ -761,20 +934,47 @@ impl Runner {
             .as_bool()
             .unwrap_or(self.auto_compaction);
         self.norm.window = data["model"]["contextWindow"].as_u64().or(self.norm.window);
-        if data["isStreaming"] != false
-            || data["isCompacting"] != false
-            || self.pending.values().any(|p| {
-                matches!(
-                    p,
-                    Pending::Prompt(_)
-                        | Pending::Command(_)
-                        | Pending::EmptyEntries(..)
-                        | Pending::EmptyState(..)
-                )
-            })
-        {
+        if self.pending.values().any(|p| {
+            matches!(
+                p,
+                Pending::Prompt(_)
+                    | Pending::Command(_)
+                    | Pending::EmptyEntries(..)
+                    | Pending::EmptyState(..)
+            )
+        }) {
             return Ok(());
         }
+        // Busy: the next agent_settled normally re-checks. Compaction and
+        // automatic retries can end without one, so remember to re-check
+        // when they end (see `frame`).
+        let busy = data["isStreaming"] != false || data["isCompacting"] != false;
+        let queued = data["pendingMessageCount"].as_u64().unwrap_or(0);
+        if busy {
+            self.idle_queue_deadline = None;
+            self.recheck_state = true;
+            return Ok(());
+        }
+        if queued > 0 {
+            // Idle, yet input queued: Pi normally starts it at once, and that
+            // run settles. Input it leaves queued has no event coming, so poll
+            // the barrier, and past the bound settle as the turn stands.
+            let now = tokio::time::Instant::now();
+            let deadline = *self
+                .idle_queue_deadline
+                .get_or_insert(now + self.idle_queue_timeout);
+            if now < deadline {
+                self.recheck_state = true;
+                self.idle_poll = Some(now + IDLE_QUEUE_POLL);
+                return Ok(());
+            }
+            tracing::warn!(
+                queued,
+                "Pi stayed idle with input queued for {:?}; settling the turn",
+                self.idle_queue_timeout
+            );
+        }
+        self.recheck_state = false;
         if file.is_some_and(|p| {
             p.metadata()
                 .is_err_and(|e| e.kind() == std::io::ErrorKind::NotFound)
@@ -787,13 +987,8 @@ impl Runner {
                         .remember_empty(&data, Path::new(&self.request.cwd))?;
                 }
             } else {
-                let id = self
-                    .process
-                    .transport
-                    .client
-                    .request(json!({"type":"get_entries"}))?;
-                self.pending
-                    .insert(id, Pending::EmptyEntries(self.epoch, self.session.clone()));
+                let pending = Pending::EmptyEntries(self.epoch, self.session.clone());
+                self.query_state(json!({"type":"get_entries"}), pending)?;
                 return Ok(());
             }
         }
@@ -858,7 +1053,13 @@ impl Runner {
             let Some(pending) = self.pending.remove(string(&frame, "id")) else {
                 return Ok(());
             };
-            let data = response_data(frame)?;
+            let data = match (response_data(frame), &pending) {
+                (Ok(data), _) => data,
+                (Err(error), Pending::Prompt(epoch) | Pending::Command(epoch)) => {
+                    return self.rejected(*epoch, error).await;
+                }
+                (Err(error), _) => return Err(error),
+            };
             if let Pending::Command(epoch) = pending {
                 if epoch == self.epoch {
                     self.initial_pending = false;
@@ -869,23 +1070,13 @@ impl Runner {
                         serde_json::to_string_pretty(&data).unwrap()
                     };
                     self.emit(AgentEvent::TextDelta { text }).await?;
-                    let id = self
-                        .process
-                        .transport
-                        .client
-                        .request(json!({"type":"get_state"}))?;
-                    self.pending.insert(id, Pending::Barrier(epoch));
+                    self.query_state(json!({"type":"get_state"}), Pending::Barrier(epoch))?;
                 }
                 return Ok(());
             }
             match pending {
                 Pending::Prompt(epoch) if epoch == self.epoch && self.active => {
-                    let id = self
-                        .process
-                        .transport
-                        .client
-                        .request(json!({"type":"get_state"}))?;
-                    self.pending.insert(id, Pending::Barrier(epoch));
+                    self.query_state(json!({"type":"get_state"}), Pending::Barrier(epoch))?;
                 }
                 Pending::Barrier(epoch) if epoch == self.epoch && self.active => {
                     self.state(data, None).await?;
@@ -899,13 +1090,10 @@ impl Runner {
                             )
                         })
                     });
-                    let id = self
-                        .process
-                        .transport
-                        .client
-                        .request(json!({"type":"get_state"}))?;
-                    self.pending
-                        .insert(id, Pending::EmptyState(epoch, session, clean));
+                    self.query_state(
+                        json!({"type":"get_state"}),
+                        Pending::EmptyState(epoch, session, clean),
+                    )?;
                 }
                 Pending::EmptyState(epoch, session, clean)
                     if epoch == self.epoch && self.active =>
@@ -944,12 +1132,12 @@ impl Runner {
             self.emit(event).await?;
         }
         if frame["type"] == "agent_settled" {
-            let id = self
-                .process
-                .transport
-                .client
-                .request(json!({"type":"get_state"}))?;
-            self.pending.insert(id, Pending::Barrier(self.epoch));
+            self.query_state(json!({"type":"get_state"}), Pending::Barrier(self.epoch))?;
+        } else if matches!(string(&frame, "type"), "compaction_end" | "auto_retry_end")
+            && self.active
+            && std::mem::take(&mut self.recheck_state)
+        {
+            self.query_state(json!({"type":"get_state"}), Pending::Barrier(self.epoch))?;
         }
         Ok(())
     }
@@ -957,12 +1145,20 @@ impl Runner {
 /// Inline attachments as native image blocks, best-effort like the Claude
 /// driver: the path refs already ride the prompt text, so an unreadable,
 /// oversized or non-inlinable file (SVG, HEIC, TIFF, ...) must not fail the turn.
-async fn load_images(paths: &[String]) -> Value {
+/// The blocks are ACP's image content shape, so the ACP driver shares them.
+pub(crate) async fn load_images(paths: &[String]) -> Value {
+    load_images_capped(paths, 20 * 1024 * 1024, u64::MAX).await
+}
+
+/// [`load_images`] under a cap per file and a cap on all inlined files
+/// together, in bytes. A file over either rides as its path ref only.
+pub(crate) async fn load_images_capped(paths: &[String], each: u64, total: u64) -> Value {
     use base64::Engine;
     let mut images = vec![];
+    let mut inlined = 0u64;
     for path in paths {
         match tokio::fs::metadata(path).await {
-            Ok(meta) if meta.len() <= 20 * 1024 * 1024 => {}
+            Ok(meta) if meta.len() <= each && meta.len() <= total - inlined => {}
             Ok(_) => {
                 tracing::debug!(%path, "Pi attachment over inline cap; path ref only");
                 continue;
@@ -991,6 +1187,12 @@ async fn load_images(paths: &[String]) -> Value {
             tracing::debug!(%path, "Pi attachment is not an inlinable image; path ref only");
             continue;
         };
+        // The file may have grown since its metadata was read.
+        if bytes.len() as u64 > each || bytes.len() as u64 > total - inlined {
+            tracing::debug!(%path, "Pi attachment over inline cap; path ref only");
+            continue;
+        }
+        inlined += bytes.len() as u64;
         images.push(json!({"type":"image","data":base64::engine::general_purpose::STANDARD.encode(bytes),"mimeType":mime}));
     }
     Value::Array(images)
@@ -998,7 +1200,7 @@ async fn load_images(paths: &[String]) -> Value {
 
 #[cfg(test)]
 mod tests {
-    use super::load_images;
+    use super::{load_images, load_images_capped};
 
     #[tokio::test]
     async fn unsupported_or_missing_attachments_do_not_fail_the_turn() {
@@ -1017,5 +1219,39 @@ mod tests {
         let images = images.as_array().unwrap();
         assert_eq!(images.len(), 1);
         assert_eq!(images[0]["mimeType"], "image/png");
+    }
+
+    #[tokio::test]
+    async fn files_over_either_cap_ride_as_path_refs_only() {
+        use base64::Engine;
+        let dir = tempfile::tempdir().unwrap();
+        let png = |name: &str, len: usize| {
+            let mut bytes = b"\x89PNG\r\n\x1a\n".to_vec();
+            bytes.resize(len, b'.');
+            let path = dir.path().join(name);
+            std::fs::write(&path, bytes).unwrap();
+            path.display().to_string()
+        };
+        // 10 bytes each, 15 together: `big` is over its own cap, `third`
+        // over what is left of the total, `small` still fits.
+        let paths = [
+            png("first", 8),
+            png("big", 12),
+            png("third", 8),
+            png("small", 4),
+        ];
+        let images = load_images_capped(&paths, 10, 15).await;
+        let lengths: Vec<_> = images
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|image| {
+                base64::engine::general_purpose::STANDARD
+                    .decode(image["data"].as_str().unwrap())
+                    .unwrap()
+                    .len()
+            })
+            .collect();
+        assert_eq!(lengths, [8, 4]);
     }
 }

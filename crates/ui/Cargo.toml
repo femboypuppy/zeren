@@ -8,11 +8,16 @@ publish.workspace = true
 [features]
 voice-experimental = [] # Compatibility flag; native subscription voice uses Codex's packaged helper.
 project-palette-fixture = []
+# New project's typed path against a real engine, filmed in process.
+project-path-fixture = ["gpui_platform/test-support"]
 compact-picker-fixture = ["gpui_platform/test-support"]
 
-browser-fixture = []
+# Native captures explicitly present the freshly drawn scene, including when
+# a nested Wayland compositor has stopped requesting idle frames.
+browser-fixture = ["gpui/bench"]
 windows-render-fixture = []
 appshots-fixture = ["gpui_platform/test-support"]
+pull-request-fixture = ["gpui_platform/test-support"]
 resource-profile = ["gpui/bench", "gpui_platform/test-support"]
 
 [[example]]
@@ -36,8 +41,56 @@ name = "appshots-fixture"
 required-features = ["appshots-fixture"]
 
 [[example]]
+name = "program-status-fixture"
+required-features = ["appshots-fixture", "resource-profile"]
+
+[[example]]
+name = "tool-images-fixture"
+required-features = ["appshots-fixture"]
+
+[[example]]
+name = "subagent-fold-fixture"
+required-features = ["appshots-fixture", "resource-profile"]
+
+[[example]]
+name = "remote-sync-fixture"
+required-features = ["appshots-fixture"]
+
+[[example]]
+name = "reply-images-fixture"
+required-features = ["appshots-fixture", "resource-profile"]
+
+[[example]]
+name = "pull-request-fixture"
+required-features = ["pull-request-fixture"]
+
+[[example]]
+name = "pull-request-destination-fixture"
+required-features = ["pull-request-fixture", "browser-fixture"]
+
+[[example]]
+name = "browser-annotation-fixture"
+required-features = ["appshots-fixture"]
+
+[[example]]
 name = "new-project-fixture"
 required-features = ["project-palette-fixture"]
+
+[[example]]
+name = "new-project-path-fixture"
+required-features = ["project-path-fixture"]
+
+[[example]]
+name = "rail-fixture"
+required-features = ["appshots-fixture"]
+
+[[example]]
+name = "message-captions-fixture"
+required-features = ["appshots-fixture"]
+
+[[example]]
+name = "message-markdown-fixture"
+required-features = ["appshots-fixture"]
 
 [[example]]
 name = "sidebar-fixture"
@@ -46,6 +99,22 @@ required-features = ["project-palette-fixture"]
 [[example]]
 name = "compact-picker-fixture"
 required-features = ["compact-picker-fixture"]
+
+[[example]]
+name = "question-answers-fixture"
+required-features = ["appshots-fixture"]
+
+[[example]]
+name = "settings-search-fixture"
+required-features = ["appshots-fixture"]
+
+[[example]]
+name = "right-panel-fixture"
+required-features = ["appshots-fixture"]
+
+[[example]]
+name = "session-card-fixture"
+required-features = ["appshots-fixture"]
 
 [dependencies]
 zeren-voice-media.workspace = true
@@ -61,8 +130,11 @@ zeren-engine.workspace = true
 zeren-harness.workspace = true
 zeren-rpc.workspace = true
 zeren-update.workspace = true
+zeren-notify.workspace = true
 zeren-syntax.workspace = true
 zeren-theme.workspace = true
+zeren-visual.workspace = true
+zeren-visual-gpu.workspace = true
 gpui.workspace = true
 gpui_platform.workspace = true
 gpui_tokio.workspace = true
@@ -70,12 +142,16 @@ tokio-util.workspace = true
 gpui-base.workspace = true
 tokio.workspace = true
 futures.workspace = true
+reqwest.workspace = true
 async-trait.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 pulldown-cmark.workspace = true
 zeren-markdown.workspace = true
+zatex = { workspace = true, features = ["bundled"] }
+html5ever = "0.39"
 alacritty_terminal.workspace = true
+zeren-term.workspace = true
 base64 = "0.22"
 image = { version = "0.25.10", default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp", "tiff", "ico"] }
 usvg = "0.46"
@@ -103,14 +179,15 @@ objc2 = "0.6"
 block2 = "0.6"
 objc2-app-kit = { version = "0.3.2", features = ["NSApplication", "NSHapticFeedback", "NSBitmapImageRep", "NSImage", "NSEvent", "NSResponder", "NSView", "NSWindow"] }
 objc2-foundation = "0.3.2"
+objc2-core-graphics = { version = "0.3.2", default-features = false, features = ["std", "CGDirectDisplay", "CGEvent", "CGEventTypes"] }
 objc2-web-kit = { version = "0.3.2", features = ["WKWebView", "WKNavigationDelegate", "WKNavigationAction", "WKSnapshotConfiguration"] }
-reqwest.workspace = true
 core-foundation = "0.10"
 core-graphics = { version = "0.24", features = ["elcapitan", "highsierra", "link"] }
 foreign-types = "0.5"
 block = "0.1"
 
 [target.'cfg(target_os = "linux")'.dependencies]
+libc.workspace = true
 ashpd = { version = "0.13.13", default-features = false, features = ["async-io", "global_shortcuts", "screenshot", "settings"] }
 atspi = { version = "0.30.0", features = ["zbus"] }
 async-io = "2"
@@ -124,5 +201,11 @@ mimalloc.workspace = true
 tracing-subscriber.workspace = true
 
 [target.'cfg(windows)'.dependencies]
-windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Graphics_Dwm", "Win32_Security", "Win32_System_LibraryLoader", "Win32_System_Threading", "Win32_UI_Controls", "Win32_UI_WindowsAndMessaging"] }
+# Embedded browser: WebView2 in visual-hosting mode, composited by the zui
+# overlay plane. Same windows 0.61 as gpui_windows, so COM types interoperate.
+webview2-com = "0.38"
+windows = { version = "0.61", features = ["Win32_Foundation", "Win32_Graphics_Direct2D_Common", "Win32_Graphics_DirectComposition", "Win32_System_Com", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_WindowsAndMessaging"] }
+windows-core = "0.61"
 raw-window-handle = "0.6"
+reqwest.workspace = true
+windows-sys = { version = "0.61", features = ["Wdk_System_SystemServices", "Win32_Foundation", "Win32_Graphics_Dwm", "Win32_Security", "Win32_System_LibraryLoader", "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_UI_Controls", "Win32_UI_WindowsAndMessaging"] }

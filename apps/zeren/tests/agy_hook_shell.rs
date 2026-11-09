@@ -34,6 +34,8 @@ fn windows_hook_shell_preserves_paths_input_and_approval_decisions() {
                     Err(error) => panic!("{error}"),
                 }
             };
+            // Windows inherits the listener's nonblocking mode on accepted sockets.
+            socket.set_nonblocking(false).unwrap();
             socket
                 .set_read_timeout(Some(Duration::from_secs(10)))
                 .unwrap();

@@ -270,6 +270,183 @@ fn mini_spinner_cells(
         }))
 }
 
+/// A rounded fill that breathes on the zeren pulse clock between `floor` and
+/// `peak` opacity, filling whatever positioned box it is placed in. Like [`pulse_dot`] it repaints from its own cached
+/// view, so the surrounding chrome stays still.
+pub fn pulse_glow(
+    key: impl Into<SharedString>,
+    radius: f32,
+    tint: gpui::Hsla,
+    floor: f32,
+    peak: f32,
+) -> impl IntoElement {
+    PulseGlow {
+        key: key.into(),
+        style: GlowStyle {
+            radius,
+            tint,
+            floor,
+            peak,
+        },
+    }
+}
+
+#[derive(Clone, Copy, PartialEq)]
+struct GlowStyle {
+    radius: f32,
+    tint: gpui::Hsla,
+    floor: f32,
+    peak: f32,
+}
+
+#[derive(IntoElement)]
+struct PulseGlow {
+    key: SharedString,
+    style: GlowStyle,
+}
+
+impl RenderOnce for PulseGlow {
+    fn render(self, window: &mut Window, cx: &mut App) -> impl IntoElement {
+        let style = self.style;
+        let view = window.with_global_id(self.key.into(), |id, window| {
+            window.with_element_state(id, |previous: Option<Entity<PulseGlowView>>, _| {
+                let view = previous.unwrap_or_else(|| cx.new(|_| PulseGlowView { style }));
+                view.update(cx, |view, cx| {
+                    if view.style != style {
+                        view.style = style;
+                        cx.notify();
+                    }
+                });
+                (view.clone(), view)
+            })
+        });
+        view.cached(gpui::StyleRefinement::default().size_full())
+    }
+}
+
+struct PulseGlowView {
+    style: GlowStyle,
+}
+
+impl Render for PulseGlowView {
+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        let GlowStyle {
+            radius,
+            tint,
+            floor,
+            peak,
+        } = self.style;
+        let delta = motion::pulse_delta_slow(&ZEREN_PULSE, cx.entity_id(), cx);
+        // pulse_opacity spans 0.08..1; renormalise to 0..1 before mapping.
+        let wave = (motion::pulse_opacity(delta) - 0.08) / 0.92;
+        div()
+            .size_full()
+            .rounded(px(radius))
+            .bg(tint)
+            .opacity(motion::lerp(floor, peak, wave))
+    }
+}
+
+/// Dashes around a [`ring_spinner`].
+const SPIN_DASHES: usize = 12;
+/// One full turn of a [`ring_spinner`].
+const SPIN_PERIOD: std::time::Duration = std::time::Duration::from_millis(900);
+
+/// The loading spinner for everything that isn't a session at work (those
+/// keep [`mini_glyph_spinner`] and [`gradient_spinner`]): a ring of short
+/// dashes, brightest at the head and fading round to a gap at the tail,
+/// turning clockwise. Only the dashes paint, so it sits on glass, washes and
+/// images alike. It repaints from its own cached view, so the chrome around
+/// it stays still; with reduced motion it rests.
+pub fn ring_spinner(
+    key: impl Into<SharedString>,
+    diameter: f32,
+    tint: gpui::Hsla,
+) -> impl IntoElement {
+    RingSpinner {
+        key: key.into(),
+        diameter,
+        tint,
+    }
+}
+
+#[derive(IntoElement)]
+struct RingSpinner {
+    key: SharedString,
+    diameter: f32,
+    tint: gpui::Hsla,
+}
+
+impl RenderOnce for RingSpinner {
+    fn render(self, window: &mut Window, cx: &mut App) -> impl IntoElement {
+        let (diameter, tint) = (self.diameter, self.tint);
+        let view = window.with_global_id(self.key.into(), |id, window| {
+            window.with_element_state(id, |previous: Option<Entity<RingSpinnerView>>, _| {
+                let view =
+                    previous.unwrap_or_else(|| cx.new(|_| RingSpinnerView { diameter, tint }));
+                view.update(cx, |view, cx| {
+                    if view.diameter != diameter || view.tint != tint {
+                        view.diameter = diameter;
+                        view.tint = tint;
+                        cx.notify();
+                    }
+                });
+                (view.clone(), view)
+            })
+        });
+        view.cached(gpui::StyleRefinement::default().size(px(diameter)))
+    }
+}
+
+struct RingSpinnerView {
+    diameter: f32,
+    tint: gpui::Hsla,
+}
+
+impl Render for RingSpinnerView {
+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        let phase = motion::spin_phase(cx.entity_id(), SPIN_PERIOD, cx).unwrap_or(0.0);
+        let (diameter, tint) = (self.diameter, self.tint);
+        div().size(px(diameter)).child(
+            canvas(
+                |_, _, _| (),
+                move |bounds, _, window, _| {
+                    let stroke = (diameter * 0.11).max(1.5);
+                    let center = bounds.center();
+                    let radius = diameter / 2.0 - stroke;
+                    let slot = std::f32::consts::TAU / SPIN_DASHES as f32;
+                    // The head leads at 12 o'clock plus the turn; each dash
+                    // behind it is dimmer, the last few nearly gone.
+                    let head = -std::f32::consts::FRAC_PI_2 + std::f32::consts::TAU * phase;
+                    for age in 0..SPIN_DASHES {
+                        let opacity = (1.0 - age as f32 / SPIN_DASHES as f32).powf(1.6);
+                        if opacity < 0.04 {
+                            continue;
+                        }
+                        let start = head - slot * age as f32 - slot * 0.62;
+                        let end = head - slot * age as f32;
+                        let at = |theta: f32| {
+                            point(
+                                center.x + px(radius * theta.cos()),
+                                center.y + px(radius * theta.sin()),
+                            )
+                        };
+                        let mut builder = PathBuilder::stroke(px(stroke));
+                        builder.move_to(at(start));
+                        for step in 1..=4 {
+                            builder.line_to(at(start + (end - start) * step as f32 / 4.0));
+                        }
+                        if let Ok(path) = builder.build() {
+                            window.paint_path(path, tint.opacity(opacity));
+                        }
+                    }
+                },
+            )
+            .size_full(),
+        )
+    }
+}
+
 /// Stroke width of [`upload_progress_ring`].
 const RING_STROKE: f32 = 2.5;
 /// Polyline segments for a full circle — plenty for a ≤40px ring.

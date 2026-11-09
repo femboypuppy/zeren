@@ -60,7 +60,7 @@ Validation:
 
 ```sh
 cargo test -p zeren-harness --features native-fixture
-cargo test -p zeren-engine --lib --test pi_resume --test acp_lifecycle --test message_queue --test e2e
+cargo test -p zeren-engine --lib --test misc --test acp_lifecycle --test message_queue --test e2e
 cargo test -p zeren-harness --test pi_live -- --ignored --nocapture
 cargo check -p zeren-ui --tests
 cargo build -p zeren-mobile --features bindgen

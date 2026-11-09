@@ -17,6 +17,9 @@ zeren-proto.workspace = true
 zeren-doc.workspace = true
 zeren-sync.workspace = true
 zeren-rpc.workspace = true
+zeren-preview.workspace = true
+zeren-term-link.workspace = true
+anyhow.workspace = true
 loro.workspace = true
 tokio.workspace = true
 tokio-util.workspace = true
@@ -28,10 +31,13 @@ uuid.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 reqwest.workspace = true
+sha2.workspace = true
+base64 = "0.22"
 async-trait.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true
+zeren-visual.workspace = true
 zeren-sync = { workspace = true, features = ["mock-server"] }
 tokio-tungstenite.workspace = true
 async-trait.workspace = true

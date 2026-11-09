@@ -300,6 +300,7 @@ fn change_request_lookup(root: &std::path::Path) -> Arc<StaticChangeRequestLooku
             state: ChangeRequestState::Open,
             base_ref: "main".into(),
             head_ref: "feature/status".into(),
+            signals: None,
         },
         resolves: AtomicUsize::new(0),
     })
@@ -514,6 +515,77 @@ async fn checkout_change_request_stream_matches_locally_and_through_device_routi
 
     core_a.shutdown().await;
     core_b.shutdown().await;
+}
+
+/// Clients watch a chat's `sourceContext.repoRoot`. It is canonical, so it can
+/// differ from the chat's cwd (always on Windows, where it is `\\?\C:\…`). A
+/// chat outside every project must still resolve, without a space scan, and
+/// a root that is gone must be rejected rather than resolved.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn checkout_change_request_accepts_a_local_chats_source_root() {
+    let dirs = tempfile::tempdir().expect("tempdir");
+    let checkout = dirs.path().join("checkout");
+    init_git_repo(&checkout);
+    let app = checkout.join("app");
+    std::fs::create_dir_all(&app).expect("app folder");
+    let repo_root = std::fs::canonicalize(&checkout).expect("canonical checkout");
+
+    let mut core = assemble(&dirs.path().join("b"), "device-b");
+    core.change_requests = CheckoutChangeRequests::new(
+        core.repos.clone(),
+        "device-b",
+        change_request_lookup(&checkout),
+    );
+    core.workspace
+        .create_chat(
+            "chat-outside-projects",
+            None,
+            Some("device-b"),
+            None,
+            Some(app.to_string_lossy().into_owned()),
+        )
+        .expect("chat");
+    core.workspace
+        .set_chat_source_context(
+            "chat-outside-projects",
+            &zeren_proto::ConversationSourceContext {
+                checkout_id: "checkout".into(),
+                repo_root: repo_root.to_string_lossy().into_owned(),
+                cwd: app.to_string_lossy().into_owned(),
+                branch: "feature/status".into(),
+                head_sha: None,
+                observed_at: chrono::Utc::now(),
+            },
+        )
+        .expect("source context");
+    let client = zeren_rpc::memory_client(core.rpc_service());
+
+    let mut watch = client
+        .subscribe_checked(
+            methods::WATCH_CHECKOUT_CHANGE_REQUEST,
+            serde_json::json!({ "cwd": repo_root }),
+        )
+        .await
+        .expect("a local chat's source root is a known checkout");
+    tokio::time::timeout(Duration::from_secs(5), watch.recv())
+        .await
+        .expect("frame before timeout")
+        .expect("initial frame");
+
+    std::fs::remove_dir_all(&checkout).expect("remove checkout");
+    let rejected = match client
+        .subscribe_checked(
+            methods::WATCH_CHECKOUT_CHANGE_REQUEST,
+            serde_json::json!({ "cwd": repo_root }),
+        )
+        .await
+    {
+        Ok(_) => panic!("a removed checkout must be rejected"),
+        Err(error) => error,
+    };
+    assert!(rejected.to_string().contains("not a known checkout"));
+
+    core.shutdown().await;
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -775,6 +847,45 @@ async fn target_device_id_routes_over_the_relay() {
             .is_err()
     );
 
+    // A reply's Markdown image reads on the chat's host, within its folder.
+    let pictures = dirs.path().join("b-chat-folder");
+    std::fs::create_dir_all(&pictures).unwrap();
+    std::fs::write(pictures.join("shot.png"), payload).unwrap();
+    core_b
+        .workspace
+        .create_chat(
+            "chat-pictures",
+            None,
+            Some("device-b"),
+            None,
+            Some(pictures.to_string_lossy().into_owned()),
+        )
+        .unwrap();
+    let params = serde_json::json!({
+        "chatId": "chat-pictures",
+        "path": pictures.join("shot.png"),
+        "offset": 0,
+    });
+    let local_picture = local_b
+        .call(methods::READ_CHAT_IMAGE_CHUNK, params.clone())
+        .await
+        .unwrap();
+    let mut targeted = params.clone();
+    targeted["targetDeviceId"] = "device-b".into();
+    let remote_picture = client
+        .call(methods::READ_CHAT_IMAGE_CHUNK, targeted)
+        .await
+        .unwrap();
+    assert_eq!(remote_picture, local_picture);
+    assert_eq!(remote_picture["mimeType"], "image/png");
+    // A doesn't host that chat, so it never serves it itself.
+    assert!(
+        client
+            .call(methods::READ_CHAT_IMAGE_CHUNK, params)
+            .await
+            .is_err()
+    );
+
     // The add-space picker's exact call: browse a folder ON B from A's IPC
     // surface (ListFolders + targetDeviceId, relay-forwarded).
     let browse_dir = dirs.path().join("b-folders");
@@ -798,6 +909,40 @@ async fn target_device_id_routes_over_the_relay() {
     assert!(
         names.contains(&"project-x"),
         "remote folder listing must come from B's filesystem: {names:?}"
+    );
+
+    // Worktree preferences and their filesystem validation belong to B.
+    let a_settings = core_a.repos.worktree_settings();
+    let custom_worktrees = dirs.path().join("b-custom-worktrees");
+    let saved = client
+        .call(
+            methods::SET_WORKTREE_SETTINGS,
+            serde_json::json!({
+                "targetDeviceId": "device-b",
+                "useCustomDirectory": true,
+                "customDirectory": custom_worktrees,
+            }),
+        )
+        .await
+        .expect("save worktree location on B");
+    let remote_settings = client
+        .call(
+            methods::GET_WORKTREE_SETTINGS,
+            serde_json::json!({
+                "targetDeviceId": "device-b",
+            }),
+        )
+        .await
+        .expect("read worktree location on B");
+    assert_eq!(saved, remote_settings);
+    assert_eq!(
+        core_a.repos.worktree_settings(),
+        a_settings,
+        "A's preferences are unchanged"
+    );
+    assert_eq!(
+        std::path::PathBuf::from(saved["effectiveDirectory"].as_str().unwrap()),
+        custom_worktrees.canonicalize().unwrap()
     );
 
     // Streaming proxy: WatchDocMessages against B's doc from A's IPC surface.
@@ -846,9 +991,13 @@ async fn target_device_id_routes_over_the_relay() {
             cwd: "/tmp".into(),
             sandbox: SandboxLevel::WorkspaceWrite,
             auto_approve: true,
+            access: Default::default(),
+            plan: false,
             attachments: Vec::new(),
             worktree: None,
             resume: None,
+            env: Default::default(),
+            extra_mcp: Vec::new(),
         },
         message_id: "m-a-1".into(),
     })
@@ -1040,6 +1189,7 @@ async fn target_device_id_routes_over_the_relay() {
             .as_str()
             .expect("remote setup worktree"),
     );
+    assert!(setup_worktree.starts_with(custom_worktrees.canonicalize().unwrap()));
     tokio::time::sleep(Duration::from_millis(250)).await;
     let mut setup_stream = client
         .subscribe(
@@ -1282,7 +1432,22 @@ async fn exercise_terminal_relay(projectless: bool) {
     };
     let terminal_id = session["id"].as_str().expect("terminal id").to_string();
     let expected_cwd = if projectless {
-        std::env::var("HOME").expect("HOME set in test env")
+        // B's own scratch folder for the chat, created when the terminal opened.
+        let chat = core_b.workspace.chat("chat-term").unwrap().unwrap();
+        let chat_cwd = chat.cwd.clone().unwrap();
+        assert!(
+            zeren_proto::projectless::is_scratch_cwd(&chat_cwd),
+            "{chat_cwd}"
+        );
+        assert_eq!(chat.space_id, None);
+        assert!(core_b.workspace.read_spaces().unwrap().is_empty());
+        let name = chat_cwd.rsplit('/').next().unwrap();
+        dirs.path()
+            .join("b")
+            .join("scratch")
+            .join(name)
+            .to_string_lossy()
+            .into_owned()
     } else {
         cwd.to_string_lossy().into_owned()
     };
@@ -1291,12 +1456,6 @@ async fn exercise_terminal_relay(projectless: bool) {
         Some(expected_cwd.as_str()),
         "cwd from B's chat row"
     );
-    if projectless {
-        let chat = core_b.workspace.chat("chat-term").unwrap().unwrap();
-        assert_eq!(chat.cwd.as_deref(), Some("~"));
-        assert_eq!(chat.space_id, None);
-        assert!(core_b.workspace.read_spaces().unwrap().is_empty());
-    }
 
     // SubscribeTerminal: the stream is proxied item-by-item through the relay.
     let mut stream = client
@@ -1441,6 +1600,36 @@ async fn workspace_file_surface_proxies_over_the_relay() {
         .await
         .expect("remote search");
     assert_eq!(matches[0]["path"], "src/remote.rs");
+
+    let warm = client
+        .call(
+            methods::WARM_WORKSPACE_SEARCH,
+            serde_json::json!({
+                "chatId": "chat-files",
+                "targetDeviceId": "device-b",
+            }),
+        )
+        .await
+        .expect("remote search warm-up");
+    assert!(matches!(warm["state"].as_str(), Some("building" | "ready")));
+
+    let content = client
+        .call(
+            methods::SEARCH_WORKSPACE_CONTENT,
+            serde_json::json!({
+                "chatId": "chat-files",
+                "query": "REMOTE",
+                "targetDeviceId": "device-b",
+            }),
+        )
+        .await
+        .expect("remote content search");
+    assert!(
+        content["matches"]
+            .as_array()
+            .is_some_and(|matches| matches.iter().any(|m| m["path"] == "src/remote.rs"))
+            || content["indexing"] == true
+    );
 
     let read = client
         .call(
@@ -1897,6 +2086,13 @@ async fn workspace_entry_mutations_are_forwarded_to_the_owning_plain_folder() {
     })).await.unwrap();
     assert_eq!(deleted["status"], "applied");
     assert!(!folder.join("renamed.txt").exists());
+    // Made on the host, from the viewer.
+    let created=client.call(methods::CREATE_WORKSPACE_ENTRY,serde_json::json!({
+        "spaceId":"mutation-space","targetDeviceId":"mutation-host","operationId":"remote-create",
+        "expectedCheckoutId":page["checkoutId"],"path":"made.txt","kind":"file"
+    })).await.unwrap();
+    assert_eq!(created["status"], "applied");
+    assert_eq!(std::fs::read(folder.join("made.txt")).unwrap(), b"");
     viewer.shutdown().await;
     host.shutdown().await;
 }
@@ -1938,6 +2134,7 @@ async fn mcp_standalone_session_executes_on_the_selected_device() {
         Origin {
             chat_id: Some("coordinator".into()),
             device_id: Some("device-a".into()),
+            ..Default::default()
         },
     )));
     a.workspace
@@ -2078,4 +2275,111 @@ async fn mcp_standalone_session_executes_on_the_selected_device() {
     b.shutdown().await;
     drop(host);
     relay.abort();
+}
+
+/// A device answering `UpdateStatus` with one report and then staying quiet, as an
+/// engine does between checks.
+struct OneStatus(&'static str);
+
+#[async_trait]
+impl RpcService for OneStatus {
+    async fn handle(
+        &self,
+        method: &str,
+        _params: serde_json::Value,
+    ) -> Result<zeren_rpc::RpcReply, RpcError> {
+        if method == methods::UPDATE_STATUS {
+            let item = serde_json::json!({ "currentVersion": self.0 });
+            return Ok(zeren_rpc::RpcReply::Stream(
+                futures::stream::once(async move { item })
+                    .chain(futures::stream::pending())
+                    .boxed(),
+            ));
+        }
+        zeren_rpc::RpcReply::value(&serde_json::json!({}))
+    }
+}
+
+/// Updating a device takes it away for a moment. Whoever asked for its status, on
+/// another device, goes on hearing about it on the same subscription.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn update_status_follows_another_device_through_its_restart() {
+    let (relay_url, _relay) = fake_device_room().await;
+    let dirs = tempfile::tempdir().expect("tempdir");
+    let host = |version: &'static str| {
+        HostRelay::spawn(
+            HostRelayConfig::new(
+                &relay_url,
+                "other-device",
+                Arc::new(StaticToken("test-user".into())),
+            ),
+            Arc::new(OneStatus(version)),
+            Arc::new(|_| true),
+        )
+    };
+    let before = host("1.0.0");
+
+    let core = assemble(&dirs.path().join("asker"), "asking-device");
+    let mut link_config =
+        LinkCacheConfig::new(relay_url.clone(), Arc::new(StaticToken("test-user".into())));
+    link_config.probe_timeout = Duration::from_secs(5);
+    core.set_links(LinkCache::new(link_config));
+    let client = zeren_rpc::memory_client(core.rpc_service());
+
+    let params = serde_json::json!({ "targetDeviceId": "other-device" });
+    let deadline = tokio::time::Instant::now() + Duration::from_secs(15);
+    let mut updates = loop {
+        match client
+            .subscribe_checked(methods::UPDATE_STATUS, params.clone())
+            .await
+        {
+            Ok(updates) => break updates,
+            Err(error) => {
+                assert!(
+                    tokio::time::Instant::now() < deadline,
+                    "never reached it: {error}"
+                );
+                tokio::time::sleep(Duration::from_millis(200)).await;
+            }
+        }
+    };
+    let item = tokio::time::timeout(Duration::from_secs(10), updates.recv())
+        .await
+        .expect("the first report")
+        .expect("the subscription");
+    assert_eq!(item["currentVersion"], "1.0.0");
+
+    drop(before);
+    tokio::time::sleep(Duration::from_secs(1)).await;
+    let _after = host("2.0.0");
+
+    // The test room doesn't say a host went, as a device dying without a word
+    // doesn't: this is the follow asking again.
+    let item = tokio::time::timeout(Duration::from_secs(90), updates.recv())
+        .await
+        .expect("a report after the restart")
+        .expect("the same subscription must still be open");
+    assert_eq!(item["currentVersion"], "2.0.0");
+}
+
+/// Asking a device that isn't there says so plainly, and nothing has started.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn updating_a_device_that_cannot_be_reached_says_so_plainly() {
+    let (relay_url, _relay) = fake_device_room().await;
+    let dirs = tempfile::tempdir().expect("tempdir");
+    let core = assemble(&dirs.path().join("asker"), "asking-device");
+    let mut link_config =
+        LinkCacheConfig::new(relay_url, Arc::new(StaticToken("test-user".into())));
+    link_config.probe_timeout = Duration::from_secs(2);
+    core.set_links(LinkCache::new(link_config));
+    let client = zeren_rpc::memory_client(core.rpc_service());
+    let error = client
+        .call(
+            methods::APPLY_UPDATE,
+            serde_json::json!({ "targetDeviceId": "not-here" }),
+        )
+        .await
+        .expect_err("nothing can answer");
+    assert!(error.to_string().contains("can't be reached"), "{error}");
+    assert!(error.to_string().contains("didn't start"), "{error}");
 }

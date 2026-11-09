@@ -30,6 +30,8 @@ async-trait.workspace = true
 uniffi = "0.32"
 zeren-markdown.workspace = true
 zeren-text.workspace = true
+zeren-visual.workspace = true
+zeren-visual-gpu.workspace = true
 zeren-doc.workspace = true
 zeren-proto.workspace = true
 zeren-client.workspace = true
@@ -37,4 +39,6 @@ serde.workspace = true
 serde_json.workspace = true
 similar.workspace = true
 zeren-syntax.workspace = true
+zatex = { workspace = true, features = ["bundled"] }
 thiserror.workspace = true
+zeren-term.workspace = true

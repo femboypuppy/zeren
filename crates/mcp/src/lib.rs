@@ -22,7 +22,7 @@ mod transcript;
 mod zeren;
 
 pub use jsonrpc::serve_stdio;
-pub use tools::{ToolDef, Tools};
+pub use tools::{ListedTool, ToolDef, Tools};
 pub use transcript::{RenderOptions, RenderedMessage, render_entries};
 pub use zeren::{Origin, Zeren};
 
@@ -31,13 +31,21 @@ pub use zeren::{Origin, Zeren};
 pub struct McpConfig {
     /// Loopback IPC port of the engine to proxy (`ZEREN_IPC_PORT`, default 27654).
     pub ipc_port: u16,
+    /// The engine's data dir, whose `ipc-token-agent` authenticates the IPC
+    /// dial (`ZEREN_DATA_DIR`; the `zeren` binary fills in its default). The
+    /// token itself is resolved at every dial — the `ZEREN_IPC_TOKEN_FILE`
+    /// the engine injects, else `{data_dir}/ipc-token-agent`, never the
+    /// app's full token — so a long-lived server follows the engine across
+    /// restarts and reaches only what its tools need.
+    pub data_dir: Option<std::path::PathBuf>,
     /// The chat whose agent spawned this server, when injected by the engine.
     pub origin: Origin,
 }
 
 impl McpConfig {
-    /// Resolve from the process environment: `ZEREN_IPC_PORT` for the engine,
-    /// `ZEREN_CHAT_ID` / `ZEREN_DEVICE_ID` for the originating chat.
+    /// Resolve from the process environment: `ZEREN_IPC_PORT` /
+    /// `ZEREN_DATA_DIR` for the engine, `ZEREN_CHAT_ID` / `ZEREN_DEVICE_ID`
+    /// for the originating chat.
     pub fn from_env() -> Self {
         let ipc_port = std::env::var("ZEREN_IPC_PORT")
             .ok()
@@ -45,6 +53,9 @@ impl McpConfig {
             .unwrap_or(27654);
         Self {
             ipc_port,
+            data_dir: std::env::var_os("ZEREN_DATA_DIR")
+                .filter(|dir| !dir.is_empty())
+                .map(std::path::PathBuf::from),
             origin: Origin::from_env(),
         }
     }
@@ -52,7 +63,7 @@ impl McpConfig {
 
 /// Run the MCP server on this process's stdin/stdout until stdin closes.
 pub async fn run(config: McpConfig) -> anyhow::Result<()> {
-    let zeren = Zeren::new(format!("ws://127.0.0.1:{}", config.ipc_port), config.origin);
+    let zeren = Zeren::new(config.ipc_port, config.data_dir, config.origin);
     let tools = Tools::new(std::sync::Arc::new(zeren));
     serve_stdio(std::sync::Arc::new(tools)).await
 }

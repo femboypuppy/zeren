@@ -14,7 +14,7 @@ Produces `target/package/zeren-<version>-linux-<arch>.tar.gz` containing:
   the installers rewrite `Exec`, `TryExec`, and `Icon` to absolute paths under
   `~/.zeren/app/current`, since `~/.local/bin` is often not on a desktop
   session's `PATH`)
-- `zeren.png` — 1024×1024 Zeren app icon
+- `zeren.png` — 1024×1024 Zeren app icon (`scripts/make-app-icons.py`)
 - `install.sh` — installs into `~/.zeren/app/<version>` behind a `current`
   symlink (the curl installer's layout, which the in-app updater manages),
   links `~/.local/bin/zeren` to it, and writes the desktop entry and icon under
@@ -52,14 +52,11 @@ installed builds can update into Zeren. CI runs this on tags
    sed "s/__VERSION__/$(grep -m1 '^version' Cargo.toml | sed 's/.*"\(.*\)".*/\1/')/" \
      dist/macos/Info.plist > Zeren.app/Contents/Info.plist
    ```
-3. Icon: generate `zeren.icns` from `dist/macos/icon-1024.png` (the macOS-shaped
-   variant of the artwork — squircle mask, margins, and shadow pre-baked, since
-   `sips` can't apply an alpha mask) and place it at
-   `Zeren.app/Contents/Resources/zeren.icns`:
-   ```sh
-   mkdir zeren.iconset && sips -z 256 256 dist/macos/icon-1024.png --out zeren.iconset/icon_256x256.png
-   iconutil -c icns zeren.iconset -o Zeren.app/Contents/Resources/zeren.icns
-   ```
+3. Icon: `scripts/macos-app-icon.sh Zeren.app/Contents/Resources` writes
+   `Assets.car` from `dist/macos/Zeren.icon` (light, dark, clear and tinted, on
+   macOS 26 and later; compiling it takes Xcode 26 or later) and `zeren.icns`
+   from `dist/macos/icon-1024.png` (earlier macOS and the dmg). All the app's
+   icons are made from the art in `dist/icon` by `scripts/make-app-icons.py`.
 4. Sign + notarize (required for distribution):
    ```sh
    codesign --deep --force --options runtime --sign "Developer ID Application: …" Zeren.app

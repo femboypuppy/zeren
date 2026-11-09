@@ -17,11 +17,42 @@
 
 use gpui::Window;
 
+/// Older Windows builds use wallpaper frost instead of legacy Acrylic, which
+/// stalls interactive window moves and resizes on Windows 10.
+pub fn supports_system_backdrop() -> bool {
+    #[cfg(target_os = "windows")]
+    {
+        static SUPPORTED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+        *SUPPORTED.get_or_init(|| {
+            use windows_sys::Wdk::System::SystemServices::RtlGetVersion;
+            use windows_sys::Win32::System::SystemInformation::OSVERSIONINFOW;
+            let mut version = OSVERSIONINFOW {
+                dwOSVersionInfoSize: std::mem::size_of::<OSVERSIONINFOW>() as u32,
+                ..Default::default()
+            };
+            // RtlGetVersion reports the real build independently of the app manifest.
+            let build =
+                (unsafe { RtlGetVersion(&mut version) } >= 0).then_some(version.dwBuildNumber);
+            supports_system_backdrop_build(build)
+        })
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        false
+    }
+}
+
+#[cfg(any(target_os = "windows", test))]
+fn supports_system_backdrop_build(build: Option<u32>) -> bool {
+    build.is_some_and(|build| build >= 22621)
+}
+
 /// Apply (`live`) or withdraw the Acrylic backdrop on `window`. Call after
 /// every `Window::set_background_appearance`, which re-installs gpui's accent.
 #[cfg(target_os = "windows")]
 pub fn apply(window: &Window, live: bool, dark: bool) {
     use raw_window_handle::{HasWindowHandle, RawWindowHandle};
+    let live = live && supports_system_backdrop();
     // Nothing to apply or undo: skip the platform handle entirely (gpui's
     // test windows have none, and asking for it panics).
     if !live && !imp::applied() {
@@ -39,6 +70,21 @@ pub fn apply(window: &Window, live: bool, dark: bool) {
     // SAFETY: `hwnd` is this live gpui window's handle, and every call below
     // only sets DWM/composition attributes on it.
     unsafe { imp::apply(hwnd, live, dark) }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn legacy_windows_and_unknown_versions_use_wallpaper_frost() {
+        for build in [None, Some(17763), Some(19045), Some(22000), Some(22620)] {
+            assert!(!supports_system_backdrop_build(build), "{build:?}");
+        }
+        for build in [22621, 26100, 26200] {
+            assert!(supports_system_backdrop_build(Some(build)), "{build}");
+        }
+    }
 }
 
 #[cfg(not(target_os = "windows"))]

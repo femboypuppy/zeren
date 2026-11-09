@@ -52,8 +52,17 @@ fn methods(id: HarnessId, platform: Platform) -> Vec<Method> {
     use Method::*;
     let windows = platform == Platform::Windows;
     match id {
-        Mock => vec![],
+        // A registry agent installs from its registry entry
+        // (`crate::acp_registry`), never through a vendor script.
+        Mock | Registry(_) => vec![],
+        Fx if windows => vec![],
+        Fx => vec![Shell("curl -fsSL https://fx.sh/setup.sh | bash", "bash")],
         Antigravity => vec![Archive],
+        Muse if windows => vec![PowerShell("irm https://dev.meta.ai/install.ps1 | iex")],
+        Muse => vec![Shell(
+            "curl -fsSL https://dev.meta.ai/install.sh | sh",
+            "sh",
+        )],
         ClaudeCode if windows => vec![PowerShell("irm https://claude.ai/install.ps1 | iex")],
         ClaudeCode => vec![Shell(
             "curl -fsSL https://claude.ai/install.sh | bash",
@@ -158,7 +167,9 @@ pub fn manual_command(id: HarnessId) -> Option<&'static str> {
         Grok => "npm install -g @xai-official/grok",
         Hermes => "curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash",
         Devin => "curl -fsSL https://cli.devin.ai/install.sh | bash",
-        Antigravity | Mock => return None,
+        Muse => "curl -fsSL https://dev.meta.ai/install.sh | sh",
+        Fx => "curl -fsSL https://fx.sh/setup.sh | bash",
+        Antigravity | Mock | Registry(_) => return None,
     })
 }
 
@@ -174,7 +185,10 @@ fn cli_and_dir(id: HarnessId) -> (&'static str, &'static str) {
         Hermes => ("hermes", "~/.local/bin or ~/.hermes/bin"),
         Devin => ("devin", "~/.local/bin"),
         Antigravity => ("agy_acp_server", "~/.zeren/adapters"),
+        Muse => ("muse", "~/.local/bin"),
         Mock => ("mock", "PATH"),
+        Fx => ("fx", "~/.local/bin"),
+        Registry(agent) => (agent.registry_id(), "~/.zeren/agents"),
     }
 }
 
@@ -192,7 +206,10 @@ pub fn installed(id: HarnessId) -> bool {
         Antigravity => {
             crate::AgyCliHarness::new().installed() || crate::AcpHarness::antigravity().installed()
         }
+        Muse => crate::MuseHarness::new().installed(),
         Mock => false,
+        Fx => crate::AcpHarness::fx().installed(),
+        Registry(agent) => crate::acp_registry::installed(agent),
     }
 }
 
@@ -226,8 +243,8 @@ fn configure(command: &mut Command) {
     let mut paths: Vec<_> = std::env::var_os("PATH")
         .map(|p| std::env::split_paths(&p).collect())
         .unwrap_or_default();
-    if let Some(path) = crate::shell_env::login_shell_path() {
-        paths.extend(std::env::split_paths(path));
+    if let Some(path) = crate::shell_env::user_path() {
+        paths.extend(std::env::split_paths(&path));
     }
     // npm can be found in a managed toolchain even when shell startup was disabled.
     if let Some(npm) =
@@ -393,7 +410,7 @@ async fn run(
 mod tests {
     use super::*;
 
-    const IDS: [HarnessId; 10] = [
+    const IDS: [HarnessId; 11] = [
         HarnessId::ClaudeCode,
         HarnessId::Codex,
         HarnessId::Cursor,
@@ -401,6 +418,7 @@ mod tests {
         HarnessId::Pi,
         HarnessId::Grok,
         HarnessId::Hermes,
+        HarnessId::Fx,
         HarnessId::Devin,
         HarnessId::Antigravity,
         HarnessId::Mock,
@@ -411,7 +429,10 @@ mod tests {
         for platform in [Platform::Unix, Platform::Mac, Platform::Windows] {
             for id in IDS {
                 let list = methods(id, platform);
-                assert_eq!(list.is_empty(), id == HarnessId::Mock);
+                assert_eq!(
+                    list.is_empty(),
+                    id == HarnessId::Mock || (id == HarnessId::Fx && platform == Platform::Windows)
+                );
                 for method in list {
                     assert!(available(method, platform, &|_| true, true));
                     assert!(!available(method, platform, &|_| false, false));

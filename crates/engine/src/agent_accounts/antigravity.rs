@@ -165,6 +165,7 @@ fn parse_usage(frame: &serde_json::Value) -> Result<UsageSnapshot, ProbeError> {
     Ok(UsageSnapshot {
         windows,
         plan_label: None,
+        codex_reset_credits: None,
     })
 }
 
