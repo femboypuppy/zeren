@@ -26,6 +26,81 @@ fn assistant_error_text(code: &str) -> String {
     }
 }
 
+/// Longest API detail kept in an error (some are a raw API error body).
+const ERROR_DETAIL_MAX: usize = 500;
+
+/// `text` cut to [`ERROR_DETAIL_MAX`] bytes on a char boundary, marked with `…`.
+fn bounded(text: &str) -> String {
+    let mut text = text.to_owned();
+    if text.len() > ERROR_DETAIL_MAX {
+        let mut end = ERROR_DETAIL_MAX;
+        while !text.is_char_boundary(end) {
+            end -= 1;
+        }
+        text.truncate(end);
+        text.push('…');
+    }
+    text
+}
+
+/// Why the API refused: the text the CLI put in the failed assistant frame.
+/// A raw `API Error: 400 {"error":{"type":…,"message":…}}` body reads as
+/// `type: message`.
+fn assistant_error_detail(f: &MessageFrame) -> Option<String> {
+    let text = match &f.message.content {
+        Value::String(text) => text.trim().to_owned(),
+        _ => f
+            .message
+            .blocks()
+            .filter(|b| b.kind == "text")
+            .map(|b| b.text.trim().to_owned())
+            .filter(|t| !t.is_empty())
+            .collect::<Vec<_>>()
+            .join("\n"),
+    };
+    if text.is_empty() {
+        return None;
+    }
+    let api_error = text
+        .find('{')
+        .and_then(|at| serde_json::from_str::<Value>(&text[at..]).ok())
+        .and_then(|body| {
+            let error = body.get("error")?;
+            let message = error.get("message")?.as_str()?;
+            Some(match error.get("type").and_then(Value::as_str) {
+                Some(kind) => format!("{kind}: {message}"),
+                None => message.to_owned(),
+            })
+        });
+    Some(bounded(&api_error.unwrap_or(text)))
+}
+
+/// An assistant-level failure for the transcript: the plain headline, then the
+/// code and HTTP status behind it and the API's own reason when the frame
+/// carries them. With neither, just the headline.
+fn assistant_error(f: &MessageFrame, code: &str) -> String {
+    let mut out = assistant_error_text(code);
+    let detail = assistant_error_detail(f);
+    if detail.is_none() && f.api_error_status.is_none() {
+        return out;
+    }
+    let named = out.contains(code);
+    if !named {
+        out.push_str(&format!("\nCode: {code}"));
+    }
+    if let Some(status) = f.api_error_status {
+        out.push_str(&format!(
+            "{}HTTP {status}",
+            if named { "\n" } else { " · " }
+        ));
+    }
+    if let Some(detail) = detail {
+        out.push('\n');
+        out.push_str(&detail);
+    }
+    out
+}
+
 /// Which claude.ai usage window a `rate_limit_event` refers to.
 fn rate_window_label(kind: &str) -> &'static str {
     match kind {
@@ -113,18 +188,7 @@ fn api_failure(f: &ResultFrame) -> Option<String> {
         .as_deref()
         .map(str::trim)
         .filter(|r| !r.is_empty())
-        .map(|r| {
-            let mut r = r.to_owned();
-            if r.len() > 500 {
-                let mut end = 500;
-                while !r.is_char_boundary(end) {
-                    end -= 1;
-                }
-                r.truncate(end);
-                r.push('…');
-            }
-            r
-        });
+        .map(bounded);
     let too_long = detail
         .as_deref()
         .is_some_and(|d| d.to_ascii_lowercase().contains("prompt is too long"));
@@ -293,7 +357,7 @@ fn subagent_message(parent: &str, f: &MessageFrame) -> Vec<AgentEvent> {
         out.push(tag(
             parent,
             AgentEvent::Error {
-                message: assistant_error_text(code),
+                message: assistant_error(f, code),
             },
         ));
     }
@@ -1158,7 +1222,7 @@ impl Normalizer {
                 if let Some(code) = &f.error {
                     self.turn_error_shown = true;
                     out.push(AgentEvent::Error {
-                        message: assistant_error_text(code),
+                        message: assistant_error(&f, code),
                     });
                 }
                 // The enclosing assistant frame closes the streamed message
@@ -2779,6 +2843,40 @@ mod tests {
             Some(AgentEvent::Done { status, error, .. }) => (*status, error.clone()),
             other => panic!("no done: {other:?}"),
         }
+    }
+
+    fn assistant_error_of(frame: &str) -> String {
+        let events =
+            Normalizer::new().normalize(crate::claude::wire::parse_frame(frame).unwrap(), false);
+        events
+            .iter()
+            .find_map(|e| match e {
+                AgentEvent::Error { message } => Some(message.clone()),
+                _ => None,
+            })
+            .expect("an error event")
+    }
+
+    #[test]
+    fn rejected_request_names_its_code_status_and_reason() {
+        let raw = r#"{"type":"assistant","message":{"model":"<synthetic>","content":[{"type":"text","text":"API Error: 400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"messages.3: tool_use ids must be unique\"}}"}]},"error":"invalid_request","api_error_status":400}"#;
+        assert_eq!(
+            assistant_error_of(raw),
+            "The request was rejected as invalid.\nCode: invalid_request · HTTP 400\n\
+             invalid_request_error: messages.3: tool_use ids must be unique"
+        );
+        // Plain CLI text is kept as written.
+        let plain = r#"{"type":"assistant","message":{"content":[{"type":"text","text":"Request blocked by usage policy"}]},"error":"invalid_request"}"#;
+        assert_eq!(
+            assistant_error_of(plain),
+            "The request was rejected as invalid.\nCode: invalid_request\nRequest blocked by usage policy"
+        );
+        // No text and no status: the headline alone, as before.
+        let bare = r#"{"type":"assistant","message":{"content":[]},"error":"invalid_request"}"#;
+        assert_eq!(
+            assistant_error_of(bare),
+            "The request was rejected as invalid."
+        );
     }
 
     #[test]

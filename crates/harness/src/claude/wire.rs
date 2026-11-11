@@ -173,6 +173,9 @@ pub(crate) struct MessageFrame {
     /// Terse assistant-level error code (`rate_limit`, `billing_error`, …).
     #[serde(default)]
     pub error: Option<String>,
+    /// The HTTP status behind `error`, when the API call got that far.
+    #[serde(default)]
+    pub api_error_status: Option<u64>,
 }
 
 #[derive(Debug, Default, Deserialize)]
