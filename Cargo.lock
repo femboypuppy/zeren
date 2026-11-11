@@ -13340,7 +13340,7 @@ dependencies = [
 
 [[package]]
 name = "zatex"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "tiny-skia",
  "ttf-parser",
@@ -13530,7 +13530,7 @@ checksum = "6df3dc4292935e51816d896edcd52aa30bc297907c26167fec31e2b0c6a32524"
 
 [[package]]
 name = "zeren"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "anyhow",
  "clap",
@@ -13555,7 +13555,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-audio"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "base64 0.22.1",
  "cpal 0.18.2",
@@ -13567,7 +13567,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-cli"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "anyhow",
  "clap",
@@ -13583,7 +13583,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-client"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -13614,7 +13614,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-doc"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "chrono",
  "loro",
@@ -13628,7 +13628,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-engine"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "alacritty_terminal",
  "anyhow",
@@ -13685,7 +13685,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-harness"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -13719,7 +13719,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-launch"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "libc",
  "tempfile",
@@ -13728,14 +13728,14 @@ dependencies = [
 
 [[package]]
 name = "zeren-markdown"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "pulldown-cmark",
 ]
 
 [[package]]
 name = "zeren-mcp"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -13757,7 +13757,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-mobile"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "async-trait",
  "serde",
@@ -13784,14 +13784,14 @@ dependencies = [
 
 [[package]]
 name = "zeren-mobile-bindgen"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "uniffi",
 ]
 
 [[package]]
 name = "zeren-notify"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "objc",
  "sha2",
@@ -13800,11 +13800,11 @@ dependencies = [
 
 [[package]]
 name = "zeren-orb"
-version = "0.2.141"
+version = "0.2.142"
 
 [[package]]
 name = "zeren-plugin-guard"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "serde_json",
  "tempfile",
@@ -13812,7 +13812,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-preview"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -13842,11 +13842,11 @@ dependencies = [
 
 [[package]]
 name = "zeren-preview-label"
-version = "0.2.141"
+version = "0.2.142"
 
 [[package]]
 name = "zeren-proto"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "chrono",
  "pulldown-cmark",
@@ -13857,7 +13857,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-rpc"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -13878,7 +13878,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-sync"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "block2 0.6.2",
  "chrono",
@@ -13901,7 +13901,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-syntax"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "thiserror 2.0.20",
  "tree-sitter",
@@ -13936,14 +13936,14 @@ dependencies = [
 
 [[package]]
 name = "zeren-term"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "alacritty_terminal",
 ]
 
 [[package]]
 name = "zeren-term-link"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -13960,7 +13960,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-text"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "core-foundation 0.10.1",
  "core-graphics 0.24.0",
@@ -13977,7 +13977,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-theme"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "anyhow",
  "clap",
@@ -13992,7 +13992,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-ui"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "alacritty_terminal",
  "anyhow",
@@ -14075,7 +14075,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-update"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "anyhow",
  "futures",
@@ -14092,11 +14092,11 @@ dependencies = [
 
 [[package]]
 name = "zeren-veil"
-version = "0.2.141"
+version = "0.2.142"
 
 [[package]]
 name = "zeren-visual"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "base64 0.22.1",
  "gltf",
@@ -14108,7 +14108,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-visual-gpu"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "image",
  "pollster 0.4.0",
@@ -14119,7 +14119,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-voice"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "anyhow",
  "cpal 0.17.3",
@@ -14136,7 +14136,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-voice-media"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "async-trait",
  "semver",
@@ -14151,7 +14151,7 @@ dependencies = [
 
 [[package]]
 name = "zeren-voice-session"
-version = "0.2.141"
+version = "0.2.142"
 dependencies = [
  "async-trait",
  "futures",

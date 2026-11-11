@@ -1027,7 +1027,7 @@ fn codex_sessions(roots: &AgentStoreRoots, project: &str) -> Vec<AgentSession> {
             prompts = transcript.prompt_count();
             first_prompt = transcript.first_prompt().map(str::to_string);
         }
-        if prompts == 0 {
+        if prompts == 0 || first_prompt.as_deref().is_some_and(is_approval_review) {
             continue;
         }
         sessions.push(AgentSession {
@@ -1043,6 +1043,14 @@ fn codex_sessions(roots: &AgentStoreRoots, project: &str) -> Vec<AgentSession> {
         });
     }
     sessions
+}
+
+/// Codex runs a hidden reviewer thread to vet each action it asks approval
+/// for; its rollout lands beside real conversations but is not one.
+fn is_approval_review(first_prompt: &str) -> bool {
+    let prompt = first_prompt.trim_start();
+    prompt.starts_with("The following is the Codex agent history whose request action")
+        || prompt.starts_with("APPROVAL REQUEST START")
 }
 
 fn codex_session_file(roots: &AgentStoreRoots, session_id: &str) -> Result<PathBuf, EngineError> {
@@ -1263,9 +1271,21 @@ fn shell_words(value: Option<&Value>) -> String {
         .flatten()
         .filter_map(Value::as_str)
         .collect();
-    const WRAPPER_FLAGS: [&str; 5] = ["-lc", "-c", "-Command", "/c", "/C"];
+    const WRAPPER_FLAGS: [&str; 4] = ["-lc", "-c", "-command", "/c"];
+    const SHELLS: [&str; 7] = ["bash", "sh", "zsh", "fish", "powershell", "pwsh", "cmd"];
+    // Windows Codex sends `powershell.exe -NoLogo -NoProfile -Command <script>`
+    // and `cmd.exe /d /s /c <script>`: the script is the last word, after a
+    // run of shell options, so a known shell may carry any number of them.
+    let is_flag = |word: &str| WRAPPER_FLAGS.contains(&word.to_ascii_lowercase().as_str());
+    let shell = words
+        .first()
+        .and_then(|word| word.rsplit(['/', '\\']).next())
+        .map(str::to_ascii_lowercase)
+        .unwrap_or_default();
+    let shell = shell.strip_suffix(".exe").unwrap_or(&shell);
     match words.as_slice() {
-        [_, flag, command] if WRAPPER_FLAGS.contains(flag) => command.to_string(),
+        [_, flag, command] if is_flag(flag) => command.to_string(),
+        [_, .., flag, command] if is_flag(flag) && SHELLS.contains(&shell) => command.to_string(),
         _ => words.join(" "),
     }
 }
@@ -1729,6 +1749,30 @@ mod tests {
     }
 
     #[test]
+    fn codex_approval_reviewer_threads_are_not_listed() {
+        let fx = Fixture::new();
+        let cwd = fx.project("svc");
+        let mut review = codex_rollout(&cwd);
+        review[0]["payload"]["id"] = json!("0199-review");
+        review[2]["payload"]["message"] = json!(
+            "The following is the Codex agent history whose request action you are assessing."
+        );
+        fx.write(
+            "codex/sessions/2026/09/02/rollout-2026-09-02T09-00-00-0199-thread.jsonl",
+            &codex_rollout(&cwd),
+        );
+        fx.write(
+            "codex/sessions/2026/09/02/rollout-2026-09-02T09-05-00-0199-review.jsonl",
+            &review,
+        );
+        let sessions = list_sessions_with(&fx.roots, HarnessId::Codex, &cwd).unwrap();
+        assert_eq!(
+            sessions.iter().map(|s| s.id.as_str()).collect::<Vec<_>>(),
+            ["0199-thread"]
+        );
+    }
+
+    #[test]
     fn codex_rollouts_list_and_parse() {
         let fx = Fixture::new();
         let cwd = fx.project("svc");
@@ -1777,6 +1821,20 @@ mod tests {
             "cargo test"
         );
         assert_eq!(shell_words(Some(&json!(["git", "status"]))), "git status");
+        assert_eq!(
+            shell_words(Some(&json!([
+                r"C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe",
+                "-NoLogo",
+                "-NoProfile",
+                "-Command",
+                "git status"
+            ]))),
+            "git status"
+        );
+        assert_eq!(
+            shell_words(Some(&json!(["cmd.exe", "/d", "/s", "/c", "dir"]))),
+            "dir"
+        );
         assert!(codex_output_failed(&json!(
             "{\"output\":\"x\",\"metadata\":{\"exit_code\":1}}"
         )));
