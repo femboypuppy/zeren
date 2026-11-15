@@ -9,13 +9,35 @@ use zeren_proto::{HarnessId, invocation::Skill};
 
 const MAX_DISCOVERY_ENTRIES: usize = 4096;
 
+/// How long a folder's probed commands are reused. A probe starts the provider's
+/// own CLI (seconds on Windows), and the `/` menu asks on every open.
+const COMMANDS_FRESH_FOR: std::time::Duration = std::time::Duration::from_secs(300);
+/// Folders kept; the oldest probe is dropped first.
+const COMMAND_ROOTS_KEPT: usize = 8;
+
+struct ProbedCommands {
+    root: PathBuf,
+    completed: std::time::Instant,
+    commands: Vec<zeren_proto::SlashCommand>,
+}
+
 /// Commands and skill metadata both need the provider's advertised catalog.
-/// Share an overlapping probe, but refresh on a later open so provider account,
-/// plugin and workspace changes are not hidden behind a persistent host cache.
-#[derive(Default)]
+/// Share an overlapping probe and reuse a folder's result for
+/// [`COMMANDS_FRESH_FOR`], so opening the `/` menu is not a process start each
+/// time; after that the next open probes again, so provider account, plugin and
+/// workspace changes show up without a restart.
 pub(crate) struct CommandDiscovery {
-    latest:
-        tokio::sync::Mutex<Option<(PathBuf, std::time::Instant, Vec<zeren_proto::SlashCommand>)>>,
+    probed: tokio::sync::Mutex<Vec<ProbedCommands>>,
+    fresh_for: std::time::Duration,
+}
+
+impl Default for CommandDiscovery {
+    fn default() -> Self {
+        Self {
+            probed: Default::default(),
+            fresh_for: COMMANDS_FRESH_FOR,
+        }
+    }
 }
 
 impl CommandDiscovery {
@@ -27,15 +49,26 @@ impl CommandDiscovery {
         >,
     ) -> Result<Vec<zeren_proto::SlashCommand>, HarnessError> {
         let requested = std::time::Instant::now();
-        let mut latest = self.latest.lock().await;
-        if let Some((root, completed, commands)) = latest.as_ref()
-            && root == cwd
-            && *completed >= requested
-        {
-            return Ok(commands.clone());
+        let mut probed = self.probed.lock().await;
+        // `completed >= requested`: a probe that finished while this call
+        // waited on the lock answers it.
+        if let Some(hit) = probed.iter().find(|p| {
+            p.root == cwd
+                && (p.completed >= requested
+                    || requested.saturating_duration_since(p.completed) < self.fresh_for)
+        }) {
+            return Ok(hit.commands.clone());
         }
         let commands = discover.await?;
-        *latest = Some((cwd.to_owned(), std::time::Instant::now(), commands.clone()));
+        probed.retain(|p| p.root != cwd);
+        probed.push(ProbedCommands {
+            root: cwd.to_owned(),
+            completed: std::time::Instant::now(),
+            commands: commands.clone(),
+        });
+        if probed.len() > COMMAND_ROOTS_KEPT {
+            probed.remove(0);
+        }
         Ok(commands)
     }
 }
@@ -413,8 +446,11 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn command_discovery_shares_overlap_but_refreshes_later_and_other_roots() {
-        let discovery = CommandDiscovery::default();
+    async fn command_discovery_shares_overlap_reuses_recent_results_and_refreshes_later() {
+        let discovery = CommandDiscovery {
+            fresh_for: std::time::Duration::from_millis(50),
+            ..Default::default()
+        };
         let probes = std::cell::Cell::new(0);
         let probe = || async {
             probes.set(probes.get() + 1);
@@ -434,16 +470,35 @@ mod tests {
             1,
             "overlapping callers share one provider process"
         );
+        // A later open within the freshness window starts no process.
         assert_eq!(
             discovery.get(root, probe()).await.unwrap()[0].name,
+            "probe-1"
+        );
+        assert_eq!(probes.get(), 1);
+        // Another folder probes on its own, and both stay cached.
+        let other = Path::new("/other-workspace");
+        assert_eq!(
+            discovery.get(other, probe()).await.unwrap()[0].name,
             "probe-2"
         );
-        let (a, b) = tokio::join!(
-            discovery.get(root, probe()),
-            discovery.get(Path::new("/other-workspace"), probe()),
+        assert_eq!(
+            discovery.get(root, probe()).await.unwrap()[0].name,
+            "probe-1"
         );
-        assert_ne!(a.unwrap()[0].name, b.unwrap()[0].name);
-        assert_eq!(probes.get(), 4);
+        assert_eq!(
+            discovery.get(other, probe()).await.unwrap()[0].name,
+            "probe-2"
+        );
+        assert_eq!(probes.get(), 2);
+        // Past the window the next open probes again.
+        tokio::time::sleep(std::time::Duration::from_millis(120)).await;
+        assert_eq!(
+            discovery.get(root, probe()).await.unwrap()[0].name,
+            "probe-3"
+        );
+        // A failed probe is reported, not cached over the old entry.
+        tokio::time::sleep(std::time::Duration::from_millis(120)).await;
         assert!(
             discovery
                 .get(root, async { Err(HarnessError::Protocol("retry".into())) })
@@ -452,7 +507,7 @@ mod tests {
         );
         assert_eq!(
             discovery.get(root, probe()).await.unwrap()[0].name,
-            "probe-5"
+            "probe-4"
         );
     }
 
