@@ -75,6 +75,47 @@ async fn background_cli_probes_have_no_console_and_request_hidden_windows() {
 }
 
 #[test]
+fn console_attachment_child_helper() {
+    let Some(expected) = std::env::var_os("ZEREN_TEST_CONSOLE") else {
+        return;
+    };
+    use windows_sys::Win32::System::Console::GetConsoleProcessList;
+    let mut pid = 0u32;
+    // 0 when the process has no console at all; a hidden console lists itself.
+    let attached = unsafe { GetConsoleProcessList(&mut pid, 1) };
+    match expected.to_str() {
+        Some("none") => assert_eq!(attached, 0, "a console was attached"),
+        _ => assert_ne!(attached, 0, "the hidden console is missing"),
+    }
+    println!("console attachment verified");
+}
+
+#[tokio::test]
+async fn version_probes_get_no_console_and_agents_a_hidden_one() {
+    for (without_console, expected) in [(true, "none"), (false, "hidden")] {
+        let mut command = Command::new(std::env::current_exe().unwrap());
+        command
+            .args([
+                "--exact",
+                "process::windows::tests::console_attachment_child_helper",
+                "--nocapture",
+            ])
+            .env("ZEREN_TEST_CONSOLE", expected)
+            .stdin(Stdio::null());
+        if without_console {
+            command.without_console();
+        }
+        let output = command.output().await.unwrap();
+        let text = String::from_utf8_lossy(&output.stdout);
+        assert!(output.status.success(), "{expected}: {text}");
+        assert!(
+            text.contains("console attachment verified"),
+            "{expected}: {text}"
+        );
+    }
+}
+
+#[test]
 fn parked_child_helper() {
     if let Ok(handle) = std::env::var("ZEREN_TEST_INHERITED_EVENT") {
         // Signal only if the parent's sentinel handle accidentally survived the

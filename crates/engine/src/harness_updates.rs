@@ -3101,7 +3101,10 @@ async fn run_version_command(
     executable: &Path,
     args: &[&str],
 ) -> Result<String, String> {
-    let output = run_command_output(executable, args, COMMAND_TIMEOUT).await?;
+    // Asking for a version needs no console; with none, a default terminal
+    // (Windows Terminal) has nothing to open a tab for.
+    let output =
+        run_command_output_inner(executable, args, COMMAND_TIMEOUT, &[], &[], true).await?;
     installed_version(harness, &output)
         .ok_or_else(|| "command returned no recognizable version".into())
 }
@@ -3207,7 +3210,27 @@ async fn run_command_output_watched(
     env: &[(&str, &str)],
     refusals: &[Refusal],
 ) -> Result<String, String> {
+    run_command_output_inner(executable, args, timeout, env, refusals, false).await
+}
+
+/// `without_console`: start the command with no console at all (Windows), for a
+/// quick query whose streams are all piped. Updaters keep a hidden console,
+/// which the tools they run in turn inherit.
+async fn run_command_output_inner(
+    executable: &Path,
+    args: &[&str],
+    timeout: Duration,
+    env: &[(&str, &str)],
+    refusals: &[Refusal],
+    without_console: bool,
+) -> Result<String, String> {
     let mut command = Command::new(executable);
+    #[cfg(windows)]
+    if without_console {
+        command.without_console();
+    }
+    #[cfg(not(windows))]
+    let _ = without_console;
     command
         .args(args)
         .stdin(Stdio::null())

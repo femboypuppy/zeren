@@ -56,8 +56,9 @@ use tokio::io::AsyncReadExt;
 use windows_sys::Win32::Foundation::{WAIT_OBJECT_0, WAIT_TIMEOUT};
 use windows_sys::Win32::System::Threading::{
     CREATE_NO_WINDOW, CREATE_SUSPENDED, CREATE_UNICODE_ENVIRONMENT, CreateProcessW,
-    EXTENDED_STARTUPINFO_PRESENT, GetExitCodeProcess, INFINITE, PROCESS_INFORMATION, ResumeThread,
-    STARTF_USESHOWWINDOW, STARTF_USESTDHANDLES, STARTUPINFOEXW, WaitForSingleObject,
+    DETACHED_PROCESS, EXTENDED_STARTUPINFO_PRESENT, GetExitCodeProcess, INFINITE,
+    PROCESS_INFORMATION, ResumeThread, STARTF_USESHOWWINDOW, STARTF_USESTDHANDLES, STARTUPINFOEXW,
+    WaitForSingleObject,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::SW_HIDE;
 
@@ -241,6 +242,12 @@ fn launch(
     startup.StartupInfo.hStdError = handles[2];
     startup.lpAttributeList = attrs.ptr();
     let mut info = PROCESS_INFORMATION::default();
+    // A batch file runs under cmd.exe, which needs a console of its own.
+    let console = if command.without_console && !command::is_batch_script(&prepared.launched) {
+        DETACHED_PROCESS
+    } else {
+        CREATE_NO_WINDOW
+    };
     // SAFETY: buffers/attribute values and all borrowed handles remain alive
     // through creation. The job handle is excluded from inherited handles.
     if unsafe {
@@ -250,10 +257,7 @@ fn launch(
             std::ptr::null(),
             std::ptr::null(),
             1,
-            CREATE_NO_WINDOW
-                | CREATE_SUSPENDED
-                | CREATE_UNICODE_ENVIRONMENT
-                | EXTENDED_STARTUPINFO_PRESENT,
+            console | CREATE_SUSPENDED | CREATE_UNICODE_ENVIRONMENT | EXTENDED_STARTUPINFO_PRESENT,
             prepared.environment.as_ptr().cast(),
             prepared
                 .cwd

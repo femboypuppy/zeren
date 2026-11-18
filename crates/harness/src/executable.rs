@@ -432,7 +432,10 @@ fn probe_version(path: &Path, timeout: std::time::Duration) -> Probe {
                     .stdin(crate::process::Stdio::null())
                     .stdout(crate::process::Stdio::piped())
                     .stderr(crate::process::Stdio::piped())
-                    .kill_on_drop(true);
+                    .kill_on_drop(true)
+                    // A version check redirects every stream: no console, so a
+                    // default terminal never opens a tab for it.
+                    .without_console();
                 let output = match tokio::time::timeout(timeout, command.output()).await {
                     Ok(Ok(output)) => output,
                     Ok(Err(error)) if error.kind() == std::io::ErrorKind::NotFound => {

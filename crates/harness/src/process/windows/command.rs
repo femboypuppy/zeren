@@ -13,6 +13,7 @@ use windows_sys::Win32::System::SystemInformation::{GetSystemDirectoryW, GetWind
 pub struct Command {
     metadata: std::process::Command,
     clear_env: bool,
+    pub(super) without_console: bool,
     pub(super) stdio: [Stdio; 3],
 }
 impl Command {
@@ -20,6 +21,7 @@ impl Command {
         Self {
             metadata: std::process::Command::new(program),
             clear_env: false,
+            without_console: false,
             stdio: [Stdio::inherit(); 3],
         }
     }
@@ -46,6 +48,16 @@ impl Command {
     pub fn env_clear(&mut self) -> &mut Self {
         self.metadata.env_clear();
         self.clear_env = true;
+        self
+    }
+    /// Start the image with no console at all, instead of a hidden one. For a
+    /// short probe whose standard streams are all redirected: with no console
+    /// there is nothing for a default terminal (Windows Terminal) to take over
+    /// and open a tab for. Not for an agent, whose own child processes would
+    /// each open a console of their own. A `.cmd`/`.bat` that has to run
+    /// through cmd.exe keeps its hidden console.
+    pub fn without_console(&mut self) -> &mut Self {
+        self.without_console = true;
         self
     }
     pub fn current_dir(&mut self, dir: impl AsRef<Path>) -> &mut Self {
@@ -201,7 +213,7 @@ impl Command {
     }
 }
 
-fn is_batch_script(path: &Path) -> bool {
+pub(super) fn is_batch_script(path: &Path) -> bool {
     path.extension()
         .is_some_and(|ext| ext.eq_ignore_ascii_case("cmd") || ext.eq_ignore_ascii_case("bat"))
 }
