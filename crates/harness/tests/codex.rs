@@ -1242,12 +1242,19 @@ async fn models_discovers_visible_catalog_with_pagination() {
         .models()
         .await
         .expect("fallback models");
-    assert_eq!(fallback.len(), 11);
-    assert_eq!(fallback[0].id, "gpt-6-astra");
-    assert_eq!(fallback[1].id, "gpt-6.1-sol");
-    assert_eq!(fallback[2].id, "gpt-6.1-terra");
+    assert_eq!(fallback.len(), 13);
+    assert_eq!(fallback[0].id, "gpt-6.2-astra");
     assert!(
-        fallback[2]
+        fallback[0]
+            .reasoning_levels
+            .contains(&ReasoningLevel::Ultra)
+    );
+    assert_eq!(fallback[1].id, "gpt-6.2-sol");
+    assert_eq!(fallback[2].id, "gpt-6-astra");
+    assert_eq!(fallback[3].id, "gpt-6.1-sol");
+    assert_eq!(fallback[4].id, "gpt-6.1-terra");
+    assert!(
+        fallback[4]
             .reasoning_levels
             .contains(&ReasoningLevel::Ultra)
     );

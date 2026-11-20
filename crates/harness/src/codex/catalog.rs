@@ -133,6 +133,20 @@ fn model(
 pub(crate) fn static_models() -> Vec<Model> {
     vec![
         model(
+            "gpt-6.2-astra",
+            "GPT-6.2-Astra",
+            "Our most capable model for your hardest projects, from start to finish.",
+            ULTRA_LADDER,
+            vec![service_tier()],
+        ),
+        model(
+            "gpt-6.2-sol",
+            "GPT-6.2-Sol",
+            "Our go-to model for everyday work, from coding to powering agents at scale.",
+            MAX_LADDER,
+            vec![service_tier()],
+        ),
+        model(
             "gpt-6-astra",
             "GPT-6-Astra",
             "Our most capable model for complex, demanding work.",
@@ -229,15 +243,21 @@ mod tests {
     #[test]
     fn catalog_is_newest_first_with_service_tiers() {
         let models = static_models();
-        assert_eq!(models.len(), 11);
-        assert_eq!(models[0].id, "gpt-6-astra");
-        assert!(models[0].reasoning_levels.contains(&ReasoningLevel::Ultra));
-        assert_eq!(models[1].id, "gpt-6.1-sol");
-        assert!(models[1].reasoning_levels.contains(&ReasoningLevel::Max));
-        assert!(!models[1].reasoning_levels.contains(&ReasoningLevel::Ultra));
-        assert_eq!(models[2].id, "gpt-6.1-terra");
-        assert_eq!(models[2].label, "GPT-6.1 Terra");
-        assert_eq!(models[2].reasoning_levels, ULTRA_LADDER);
+        assert_eq!(models.len(), 13);
+        assert_eq!(models[0].id, "gpt-6.2-astra");
+        assert_eq!(models[0].label, "GPT-6.2-Astra");
+        assert_eq!(models[0].reasoning_levels, ULTRA_LADDER);
+        assert_eq!(models[1].id, "gpt-6.2-sol");
+        assert_eq!(models[1].label, "GPT-6.2-Sol");
+        assert_eq!(models[1].reasoning_levels, MAX_LADDER);
+        assert_eq!(models[2].id, "gpt-6-astra");
+        assert!(models[2].reasoning_levels.contains(&ReasoningLevel::Ultra));
+        assert_eq!(models[3].id, "gpt-6.1-sol");
+        assert!(models[3].reasoning_levels.contains(&ReasoningLevel::Max));
+        assert!(!models[3].reasoning_levels.contains(&ReasoningLevel::Ultra));
+        assert_eq!(models[4].id, "gpt-6.1-terra");
+        assert_eq!(models[4].label, "GPT-6.1 Terra");
+        assert_eq!(models[4].reasoning_levels, ULTRA_LADDER);
         assert!(
             !models
                 .iter()
