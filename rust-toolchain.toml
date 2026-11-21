@@ -1,3 +1,6 @@
 [toolchain]
-channel = "stable"
+# Pinned: the Windows runner images carry their own "stable", and Cargo 1.100's new
+# build-directory layout breaks ort-sys 2.0.0-rc.13's DLL copy step (it panics at
+# dynamic_link.rs:42). Move this when ort is updated.
+channel = "1.99.1"
 components = ["rustfmt", "clippy"]
